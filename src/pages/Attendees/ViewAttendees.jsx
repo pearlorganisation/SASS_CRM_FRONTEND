@@ -1,6 +1,6 @@
 import { Skeleton, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllAttendees } from "../../features/actions/webinarContact";
 import ViewModalAttendees from "./ViewModalAttendees";
@@ -394,10 +394,12 @@ const ViewAttendees = () => {
             <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
               <tr>
                 <th className=""></th>
-                <th className="py-3 px-6">S No.</th>
-                <th className="py-3 px-6">Name</th>
-                <th className="py-3 px-6">Contact Number</th>
+                <th className="py-3 px-6 text-center">S No.</th>
                 <th className="py-3 px-6">Email</th>
+                <th className="py-3 px-6">First Name</th>
+                <th className="py-3 px-6">Last Name</th>
+                <th className="py-3 text-center px-6">Webinar Minutes</th>
+                <th className="py-3 text-center px-6">Total Records</th>
                 <th className="py-3 px-6">Action</th>
               </tr>
             </thead>
@@ -431,28 +433,36 @@ const ViewAttendees = () => {
 
                       }} type="checkbox" className="scale-125"/>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 text-center whitespace-nowrap">
                         {serialNumber}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {item?.firstName}{" "}
-                        {item?.lastName?.match(/:-\)/) || item?.lastName=== "1"  ? "" : item?.lastName}
+                      {item._id}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {item?.phone}
+                      {item?.records[0]?.firstName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {item?.email}
+                      {item?.records[0]?.lastName?.match(/:-\)/)
+                            ? "--"
+                            : item?.lastName}
+                      </td>
+               
+                      <td className="px-6 py-4 text-center whitespace-nowrap">
+                      {item?.records?.reduce((acc,time)=>
+                            acc + time?.timeInSession
+                          ,0)}
+                      </td>
+                      <td className="px-6 py-4  text-center whitespace-nowrap">
+                      {item?.records?.length}
                       </td>
                       <td className="px-3 whitespace-nowrap">
-                        <button
-                          onClick={() => {
-                            handleViewModal(item);
-                          }}
-                          className="py-2 px-3 font-semibold text-green-500 hover:text-green-600 duration-150 hover:bg-gray-50 rounded-lg"
-                        >
-                          View
-                        </button>
+                      <Link to={"/particularContact"} state={item}
+                            className="cursor-pointer py-2 px-3 font-semibold text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50 rounded-lg
+                    "
+                          >
+                            View full details
+                          </Link>
                         <button
                           onClick={() => {
                             handleDeleteModal(item?._id);

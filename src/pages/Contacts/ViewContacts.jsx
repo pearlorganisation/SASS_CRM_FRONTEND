@@ -1,6 +1,6 @@
 import React, { useEffect, useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { getAttendees } from "../../features/actions/webinarContact";
 import Pagination from "@mui/material/Pagination";
 import { Skeleton, Stack } from "@mui/material";
@@ -51,11 +51,12 @@ const ViewContacts = () => {
             <table className="w-full table-auto text-sm text-left ">
               <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
                 <tr>
-                  <th className="py-3 px-2">S No.</th>
-                  <th className="py-3 px-2">First Name</th>
-                  <th className="py-3 px-2">Last Name</th>
-                  <th className="py-3 px-2">Email</th>
-                  <th className="py-3 px-2">Webinar Minutes</th>
+                  <th className="py-3 px-2 ">S No.</th>
+                  <th className="py-3 px-2 ">Email</th>
+                  <th className="py-3 px-2 ">First Name</th>
+                  <th className="py-3 px-2 ">Last Name</th>
+                  <th className="py-3 px-2 text-center">Webinar Minutes</th>
+                  <th className="py-3 px-2 text-center ">Total Records</th>
 
                   <th className="py-3 px-6">Action</th>
                 </tr>
@@ -83,36 +84,38 @@ const ViewContacts = () => {
                     return (
                       <tr>
                         <td
-                          className={`px-3 py-4 whitespace-nowrap border-l-8 border-red-500`}
+                          className={`px-2 py-4 whitespace-nowrap border-l-8 border-red-500`}
                         >
                           {serialNumber}
                         </td>
+                        <td className="px-2 py-4 whitespace-nowrap">
+                          {item._id}
+                        </td>
 
                         <td className="px-2 py-4 whitespace-nowrap ">
-                          {item?.firstName}
+                          {item?.records[0]?.firstName}
                         </td>
                         <td className="px-2 py-4 whitespace-nowrap">
-                          {item?.lastName?.match(/:-\)/)
+                          {item?.records[0]?.lastName?.match(/:-\)/)
                             ? "--"
                             : item?.lastName}
                         </td>
-                        <td className="px-2 py-4 whitespace-nowrap">
-                          {item.email}
+                        <td className="px-2  text-center py-4 whitespace-nowrap">
+                          {item?.records?.reduce((acc,time)=>
+                            acc + time?.timeInSession
+                          ,0)}
                         </td>
-                        <td className="text-center py-4 whitespace-nowrap">
-                          {item?.timeInSession}
+                        <td className="px-2 text-center  py-4 whitespace-nowrap">
+                          {item?.records?.length}
                         </td>
 
                         <td className="px-2 whitespace-nowrap">
-                          <a
-                            onClick={() => {
-                              navigate("/particularContact", { state: item });
-                            }}
+                          <Link to={"/particularContact"} state={item}
                             className="cursor-pointer py-2 px-3 font-semibold text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50 rounded-lg
                     "
                           >
                             View full details
-                          </a>
+                          </Link>
                         </td>
                       </tr>
                     );

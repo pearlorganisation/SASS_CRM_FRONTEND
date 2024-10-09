@@ -96,8 +96,7 @@ console.log(item)
                 Email :{" "}
                 <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
               
-        {item?.email}
-        {/* dummy@gmail.com */}
+        {item?._id}
                 </span>
               </p>
            </div>
@@ -105,12 +104,14 @@ console.log(item)
       
               <p>
                Name :{" "}
-                <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
+               {item?.records.map((item)=>
+                 <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
                  
- {item?.firstName}{" "}{item?.lastName?.match(/:-\)/) ? '' : item?.lastName}
- {/* Dummy  */}
+{`${item?.firstName} ${item?.lastName?.match(/:-\)/) ? '' : item?.lastName}`}{" "}
+
  
                 </span>
+                )}
               </p>
             
               </div>
@@ -122,13 +123,13 @@ console.log(item)
               {" "}
               Phone Number :
               <span className="ms-2 grid lg:grid-cols-2 gap-3" >
-     
+              {item?.records.map((item)=>
         <span onClick={() => handleCopyClick(item?.phone) } className="flex justify-center items-center gap-1 bg-red-500 ms-2 p-1 text-white cursor-pointer rounded-md px-2 py-1">
-         {item?.phone}
+      { item?.phone}
          {/* 9876543210 */}
          <BiSolidCopy color="#050A30" size={12} />
          </span>
-              
+              )}
              
               </span>
             </p>
@@ -420,11 +421,11 @@ console.log(item)
         
       </div>
       <div className="mt-12 shadow-lg rounded-lg overflow-x-auto">
-          {/* {attendeeData?.result?.length <= 0 ? (
+          {item?.records?.length <= 0 ? (
             <div className="text-lg p-2 flex justify-center w-full">
               No record found
             </div>
-          ) : ( */}
+          ) : (
             <table className="w-full table-auto text-sm text-left ">
               <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
                 <tr>
@@ -432,7 +433,7 @@ console.log(item)
                   <th className="py-3 px-2">Webinar</th>
                   <th className="py-3 px-2">First Name</th>
                   <th className="py-3 px-2">Last Name</th>
-                  <th className="py-3 px-2">Webinar Minutes</th>
+                  <th className="py-3  text-center">Webinar Minutes</th>
                   <th className="py-3 px-2">Webinar Date</th>
 
           
@@ -440,7 +441,7 @@ console.log(item)
               </thead>
 
               <tbody className="text-gray-600 divide-y">
-                {/* {false ? (
+                {false ? (
                   <tr>
                     <td colSpan="8" className="text-center px-6 py-8">
                       <Stack spacing={4}>
@@ -453,42 +454,47 @@ console.log(item)
                     </td>
                   </tr>
                 ) : (
-                  Array.isArray(attendeeData?.result) &&
-                  attendeeData?.result?.length > 0 &&
-                  attendeeData?.result?.map((item, idx) => {
-                    const serialNumber = (page - 1) * 25 + idx + 1;
+                  Array.isArray(item?.records) &&
+                  item?.records?.length > 0 &&
+                  item?.records?.map((item, idx) => {
+                    // const serialNumber = (page - 1) * 25 + idx + 1;
               
-                    return ( */}
+                    return (
                       <tr>
                         <td
                           className={`px-3 py-4 whitespace-nowrap `}
                         >
-                          {/* {serialNumber} */}
+                          {idx+1}
                         </td>
 
                         <td className="px-2 py-4 whitespace-nowrap ">
-                          {/* {item?.firstName} */}
+                          {item?.csvName}
+                        </td>
+
+                        <td className="px-2 py-4 whitespace-nowrap ">
+                          {item?.firstName}
                         </td>
                         <td className="px-2 py-4 whitespace-nowrap">
-                          {/* {item?.lastName?.match(/:-\)/)
+                          {item?.lastName?.match(/:-\)/)
                             ? "--"
-                            : item?.lastName} */}
+                            : item?.lastName}
                         </td>
-                        <td className="px-2 py-4 whitespace-nowrap">
-                          {/* {item.email} */}
+                     
+                        <td className=" py-4 text-center whitespace-nowrap">
+                          {item?.timeInSession}
                         </td>
-                        <td className="text-center py-4 whitespace-nowrap">
-                          {/* {item?.timeInSession} */}
+                        <td className="px-3 py-4 whitespace-nowrap">
+                          {item?.date}
                         </td>
 
                  
                       </tr>
-                    {/* );
+                    );
                   })
-                )} */}
+                )}
               </tbody>
             </table>
-          {/* )} */}
+          )}
         </div>
       </div>
       {showModal && <ViewFullDetailsModal setModal={setShowModal} />}
