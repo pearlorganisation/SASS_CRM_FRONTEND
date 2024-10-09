@@ -1,0 +1,143 @@
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { TbLayoutDashboardFilled } from "react-icons/tb";
+import { IoLogOut } from "react-icons/io5";
+import { HiUserGroup } from "react-icons/hi2";
+import { IoPeople } from "react-icons/io5";
+import { SiGooglemeet } from "react-icons/si";
+import { AiFillProduct } from "react-icons/ai";
+import { IoSettings } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../../features/slices/auth";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // for dropdown icon
+import { getAllSidebarLinks } from "../../../features/actions/sidebarLink";
+
+const Sidebar = () => {
+  const dispatch = useDispatch();
+  const {sidebarLinkData,isLoading} = useSelector((state)=>state.sidebarLink)
+
+
+  const [showImportantLinks, setShowImportantLinks] = useState(false); // toggle state for sub-links
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
+  const toggleImportantLinks = () => {
+    setShowImportantLinks((prev) => !prev);
+  };
+
+  useEffect(()=>{
+    dispatch(getAllSidebarLinks())
+  },[])
+
+  return (
+    <aside
+      id="logo-sidebar"
+      className="fixed top-0 left-0 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0"
+      aria-label="Sidebar"
+    >
+      <div className="h-full px-3 pb-4 overflow-y-auto bg-white">
+        <ul className="space-y-2 font-medium">
+          <li>
+            <Link
+              to="/"
+              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+            >
+              <TbLayoutDashboardFilled size={30} />
+              <span className="ms-3">Dashboard</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/webinarDetails"
+              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+            >
+              <SiGooglemeet size={30} />
+              <span className="flex-1 ms-3 whitespace-nowrap">Webinars</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/attendees"
+              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+            >
+              <HiUserGroup size={30} />
+              <span className="flex-1 ms-3 whitespace-nowrap">Attendees</span>
+            </Link>
+          </li>
+
+          <li>
+            <Link
+              to="/employees"
+              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+            >
+              <IoPeople size={30} />
+              <span className="flex-1 ms-3 whitespace-nowrap">Employees</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/products"
+              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+            >
+              <AiFillProduct size={30} />
+              <span className="flex-1 ms-3 whitespace-nowrap">Products</span>
+            </Link>
+          </li>
+
+          {/* Important Links section with subtitles */}
+          <li>
+            <div
+              onClick={toggleImportantLinks}
+              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group cursor-pointer"
+            >
+              <AiFillProduct size={30} />
+              <span className="flex-1 ms-3 whitespace-nowrap">Important Links</span>
+              {showImportantLinks ? <FiChevronUp size={20} /> : <FiChevronDown size={20} />}
+            </div>
+
+            {showImportantLinks && 
+              Array.isArray(sidebarLinkData) && sidebarLinkData.map((item,idx)=>
+              <ul className="pl-10 space-y-1">
+                <li>
+                  <a
+                    href={item?.link}
+                    target="_blank" // Opens the link in a new tab
+                    rel="noopener noreferrer" // Security measure to prevent tab nabbing
+                    className="flex items-center p-2 cursor-pointer text-gray-600 hover:bg-gray-100 rounded-lg"
+                  >
+                    {item.title}
+                  </a>
+                </li>
+      
+              </ul>
+            )}
+          </li>
+
+          <li>
+            <Link
+              to="/settings"
+              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+            >
+              <IoSettings size={30} />
+              <span className="flex-1 ms-3 whitespace-nowrap">Settings</span>
+            </Link>
+          </li>
+
+          <li>
+            <button
+              onClick={handleLogout}
+              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-red-600 hover:text-[17px] hover:bg-gray-100 group"
+            >
+              <IoLogOut size={30} />
+              <span className="flex-1 ms-3 whitespace-nowrap">Sign Out</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </aside>
+  );
+};
+
+export default Sidebar;
