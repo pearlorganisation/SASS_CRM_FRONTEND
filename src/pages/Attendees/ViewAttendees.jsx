@@ -1,9 +1,8 @@
 import { Skeleton, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllAttendees } from "../../features/actions/webinarContact";
-import ViewModalAttendees from "./ViewModalAttendees";
 import Pagination from "@mui/material/Pagination";
 import { IoClose } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
@@ -15,7 +14,6 @@ const ViewAttendees = () => {
   const [assignedButton, setAssignedButton] = useState(false);
   const [assignedEmployee,setAssignedEmployee]= useState();
   const [assigned, setAssigned] = useState([]);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { attendeeData, isLoading } = useSelector(
     (state) => state.webinarContact
@@ -26,29 +24,23 @@ const ViewAttendees = () => {
 
   const pageCount = attendeeData?.totalPages;
 
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [viewData, setViewData] = useState();
-
-  const handleViewModal = (itemData) => {
-    setShowViewModal(true);
-    setViewData(itemData);
-  };
 
   const options = [
     { show: "Email", backend: 'email' },
     { show: "Start - End Time", backend: 'time' },
     { show: "Gender", backend: 'gender' },
     { show: "Location", backend: 'location' },
-    { show: "Min - Max Age Range", backend: 'ageRange' },
+    { show: "Min Age Range", backend: 'ageRangeMin' },
+    { show: "Max Age Range", backend: 'ageRangeMax' },
     { show: "Search From Mobile Number", backend: 'phone' }
   ];
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
-  const [ageRangeMin, setAgeRangeMin] = useState('');
-  const [ageRangeMax, setAgeRangeMax] = useState('');
-  const [phone, setPhone] = useState('');
+  const [ageRangeMin, setAgeRangeMin] = useState();
+  const [ageRangeMax, setAgeRangeMax] = useState();
+  const [phone, setPhone] = useState();
   const [email, setEmail] = useState('');
   const [gender, setGender] = useState('');
   const [location, setLocation] = useState('');
@@ -71,8 +63,9 @@ const ViewAttendees = () => {
       setSelectedOption(option);
     }
   };
-
-  const handleInputSubmit = () => {
+console.log(ageRangeMin,"sdvsdf")
+ 
+const handleInputSubmit = () => {
     if (selectedOption) {
       let newPills = [];
       
@@ -87,15 +80,30 @@ const ViewAttendees = () => {
           }
           break;
           
-        case 'ageRange':
-          // Ensure ageRangeMin is less than ageRangeMax
-          if (ageRangeMin && ageRangeMax && Number(ageRangeMin) < Number(ageRangeMax)) {
-            newPills = [{ option: 'ageRange', value: `${ageRangeMin} - ${ageRangeMax}` }];
-          } else {
-            alert("Min Age must be smaller than Max Age.");
-            return; // Exit the function if the condition is not met
-          }
-          break;
+          case 'ageRangeMin':
+            // Ensure ageRangeMin is less than ageRangeMax, if both are present
+            if (ageRangeMin && ageRangeMax && Number(ageRangeMin) >= Number(ageRangeMax)) {
+              alert("hello",)
+              alert("Min Age must be smaller than Max Age.");
+              return; // Exit the function if the condition is not met
+            }
+            if (ageRangeMin) {
+              newPills = [{ option: 'ageRangeMin', value: ageRangeMin }];
+              alert("hi")
+            }
+            break;
+
+          case 'ageRangeMax':
+              // Ensure ageRangeMin is less than ageRangeMax, if both are present
+              if (ageRangeMin && ageRangeMax && Number(ageRangeMin) >= Number(ageRangeMax)) {
+                alert("Min Age must be smaller than Max Age.");
+                return; // Exit the function if the condition is not met
+              }
+              if (ageRangeMax) {
+                newPills = [{ option: 'ageRangeMax', value: ageRangeMax }];
+              }
+              break;
+              
           
         case 'phone':
           if (phone) {
@@ -129,14 +137,32 @@ const ViewAttendees = () => {
         const updatedPills = pills.filter(pill => !newPills.some(newPill => newPill.option === pill.option));
         setPills([...updatedPills, ...newPills]);
         // Clear inputs
-        setStartTime('');
-        setEndTime('');
-        setAgeRangeMin('');
-        setAgeRangeMax('');
-        setPhone('');
-        setEmail('');
-        setGender('');
-        setLocation('');
+        switch (selectedOption.backend) {
+          case 'time':
+            setStartTime('');
+            setEndTime('');
+            break;
+          // case 'ageRangeMin':
+          //   setAgeRangeMin('');
+          //   break;
+          // case 'ageRangeMax':
+          //   setAgeRangeMax(');
+          //   break;
+          case 'phone':
+            setPhone('');
+            break;
+          case 'email':
+            setEmail('');
+            break;
+          case 'gender':
+            setGender('');
+            break;
+          case 'location':
+            setLocation('');
+            break;
+          default:
+            break;
+        }
         setSelectedOption(null); // Hide the input field after submission
       }
     }
@@ -171,31 +197,34 @@ const ViewAttendees = () => {
       );
     }
 
-    if (selectedOption?.backend === 'ageRange') {
+
+    if (selectedOption?.backend === 'ageRangeMin') {
       return (
-        <div className="flex gap-2">
-          <input
-            type="number"
-            value={ageRangeMin}
-            onChange={(e) => setAgeRangeMin(e.target.value)}
-            className={commonStyle}
-            placeholder="Min Age"
-          />
-          <input
-            type="number"
-            value={ageRangeMax}
-            onChange={(e) => setAgeRangeMax(e.target.value)}
-            className={commonStyle}
-            placeholder="Max Age"
-          />
-        </div>
+        <input
+          type="Number"
+          value={ageRangeMin}
+          onChange={(e) => setAgeRangeMin(e.target.value)}
+          className={commonStyle}
+          placeholder="Min Age Range"
+        />
+      );
+    }
+    if (selectedOption?.backend === 'ageRangeMax') {
+      return (
+        <input
+          type="Number"
+          value={ageRangeMax}
+          onChange={(e) => setAgeRangeMax(e.target.value)}
+          className={commonStyle}
+          placeholder="Max Age Range"
+        />
       );
     }
 
     if (selectedOption?.backend === 'phone') {
       return (
         <input
-          type="text"
+          type="Number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           className={commonStyle}
@@ -489,9 +518,6 @@ const ViewAttendees = () => {
           onChange={handlePagination}
         />
       </div>
-      {showViewModal && (
-        <ViewModalAttendees setModal={setShowViewModal} viewData={viewData} />
-      )}
     </>
   );
 };
