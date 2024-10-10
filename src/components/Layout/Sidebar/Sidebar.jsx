@@ -11,11 +11,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../features/slices/auth";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // for dropdown icon
 import { getAllSidebarLinks } from "../../../features/actions/sidebarLink";
+import { roles } from "../../../utils/roles";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
   const {sidebarLinkData,isLoading} = useSelector((state)=>state.sidebarLink)
+  const {role} = useSelector((state)=>state.auth.userData)
 
+  
 
   const [showImportantLinks, setShowImportantLinks] = useState(false); // toggle state for sub-links
 
@@ -67,7 +70,7 @@ const Sidebar = () => {
             </Link>
           </li>
 
-          <li>
+   { roles.ADMIN === role &&   <li>
             <Link
               to="/employees"
               className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
@@ -76,7 +79,8 @@ const Sidebar = () => {
               <span className="flex-1 ms-3 whitespace-nowrap">Employees</span>
             </Link>
           </li>
-          <li>
+          }
+   { (roles.ADMIN === role || roles.EMPLOYEE_SALES === role )&&         <li>
             <Link
               to="/products"
               className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
@@ -84,7 +88,7 @@ const Sidebar = () => {
               <AiFillProduct size={30} />
               <span className="flex-1 ms-3 whitespace-nowrap">Products</span>
             </Link>
-          </li>
+          </li>}
 
           {/* Important Links section with subtitles */}
           <li>
