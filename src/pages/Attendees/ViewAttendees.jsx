@@ -8,6 +8,7 @@ import { IoClose } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
 import Select from "react-select"
 import { addAssign } from "../../features/actions/assign";
+import { toast } from "sonner";
 
 const ViewAttendees = () => {
   const [savedPresets, setSavedPresets] = useState(false);
@@ -63,7 +64,7 @@ const ViewAttendees = () => {
       setSelectedOption(option);
     }
   };
-console.log(ageRangeMin,"sdvsdf")
+
  
 const handleInputSubmit = () => {
     if (selectedOption) {
@@ -89,14 +90,14 @@ const handleInputSubmit = () => {
             }
             if (ageRangeMin) {
               newPills = [{ option: 'ageRangeMin', value: ageRangeMin }];
-              alert("hi")
+             
             }
             break;
 
           case 'ageRangeMax':
               // Ensure ageRangeMin is less than ageRangeMax, if both are present
               if (ageRangeMin && ageRangeMax && Number(ageRangeMin) >= Number(ageRangeMax)) {
-                alert("Min Age must be smaller than Max Age.");
+                toast.error("Min Age must be smaller than Max Age.");
                 return; // Exit the function if the condition is not met
               }
               if (ageRangeMax) {
@@ -290,7 +291,7 @@ const handleInputSubmit = () => {
   useEffect(() => {
     const filters = buildQueryString(pills);
     console.log(filters);
-    dispatch(getAllAttendees({ page, filters }));
+    dispatch(getAllAttendees({ page, filters, recordType:"" }));
   }, [page, pills, dispatch]);
 
   useEffect(()=>{
@@ -307,9 +308,15 @@ const handleInputSubmit = () => {
   return (
     <>
       <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-10">
+       <div className="flex justify-between">
         <h3 className="text-gray-800 text-xl font-bold sm:text-2xl mb-5">
           Manage Attendees Details
         </h3>
+        <div className="space-x-5  ">
+          <button onClick={()=>dispatch(getAllAttendees({ page, recordType:"sales" }))} className="bg-green-700 hover:bg-green-600 text-white rounded-md px-5 py-1 font-medium">Sales</button>
+          <button onClick={()=>dispatch(getAllAttendees({ page, recordType:"reminder" })) } className="bg-blue-700 hover:bg-blue-600 text-white rounded-md px-5 py-1 font-medium">Reminder</button>
+        </div>
+        </div>
 
         <div>
           {/* Options List */}
@@ -409,6 +416,7 @@ const handleInputSubmit = () => {
                   </ul>
                 </div>
               </div>
+            
              {assignedButton && <div className="flex gap-4">
               <Select 
 
@@ -426,8 +434,9 @@ const handleInputSubmit = () => {
                 <th className="py-3 px-6 text-center">S No.</th>
                 <th className="py-3 px-6">Email</th>
                 <th className="py-3 px-6">First Name</th>
-                <th className="py-3 px-6">Last Name</th>
+                {/* <th className="py-3 px-6">Last Name</th> */}
                 <th className="py-3 text-center px-6">Webinar Minutes</th>
+                <th className="py-3 text-center px-6">Record Type</th>
                 <th className="py-3 text-center px-6">Total Records</th>
                 <th className="py-3 px-6">Action</th>
               </tr>
@@ -471,16 +480,19 @@ const handleInputSubmit = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                       {item?.records[0]?.firstName}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      {/* <td className="px-6 py-4 whitespace-nowrap">
                       {item?.records[0]?.lastName?.match(/:-\)/)
                             ? "--"
                             : item?.lastName}
-                      </td>
+                      </td> */}
                
                       <td className="px-6 py-4 text-center whitespace-nowrap">
                       {item?.records?.reduce((acc,time)=>
                             acc + time?.timeInSession
                           ,0)}
+                      </td>
+                      <td className="px-6 py-4 capitalize text-center whitespace-nowrap">
+                      {item?.records[0]?.recordType}
                       </td>
                       <td className="px-6 py-4  text-center whitespace-nowrap">
                       {item?.records?.length}

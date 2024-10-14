@@ -1,8 +1,11 @@
 import React from 'react'
 import { FaRupeeSign } from "react-icons/fa";
 import { CiCircleCheck } from "react-icons/ci";
+import { roles } from '../../../utils/roles';
+import { useSelector } from 'react-redux';
 
 const ViewPlans = () => {
+  const {role} = useSelector((state)=>state.auth.userData)
   return (
     <div className='p-10 text-center text-gray-800 bg-gray-50 h-screen'>
       <h1 className='text-3xl font-bold'>Pricing</h1>
@@ -93,8 +96,8 @@ const ViewPlans = () => {
         </div>
 
       </div>
-<div className=' mt-10 '> 
-     <a href='/plans/addPlan' className='bg-blue-700 hover:bg-blue-600 text-white rounded-md py-1 px-10 text-lg font-bold'>Add Plan</a></div>
+{roles.SUPER_ADMIN === role && <div className=' mt-10 '> 
+     <a href='/plans/addPlan' className='bg-blue-700 hover:bg-blue-600 text-white rounded-md py-1 px-10 text-lg font-bold'>Add Plan</a></div>}
   
       </div>
   )

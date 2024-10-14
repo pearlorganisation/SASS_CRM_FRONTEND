@@ -32,6 +32,7 @@ import CreateSidebarLink from "./pages/Settings/SidebarLinks/CreateSidebarLink";
 
 const App = () => {
   const {isUserLoggedIn} = useSelector((state)=>state.auth)
+  const {role} = useSelector((state)=>state.auth.userData)
 
 
   const router = createBrowserRouter([
