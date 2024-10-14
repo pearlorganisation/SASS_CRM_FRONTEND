@@ -19,7 +19,7 @@ export const getAllAttendees = createAsyncThunk(
   "getAllWebinarContacts",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/attendee/${payload.page}?${payload.filters}`);
+      const response = await instance.get(`/attendee/${payload.page}?${payload.filters}&recordType=${payload.recordType}`);
       console.log(response)
       return response?.data;
     } catch (e) {
