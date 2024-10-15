@@ -54,27 +54,28 @@ useEffect(()=>{
             <div className="w-full h-full">
               <div className="block rounded-lg bg-white shadow-lg h-full">
                 <div className="g-0 grid grid-cols-[60%_auto] h-full">
-                  <div
-                    className="flex items-end rounded-b-lg lg:rounded-r-lg lg:rounded-bl-none h-full w-full"
-                    style={{
-                      background:
-                        "linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)",
-                    }}
-                  >
-                    <div className="px-4 py-6 text-white md:mx-6 md:p-12">
-                      <h4 className="mb-6 text-4xl font-bold">
-                        We are more than just an application
-                      </h4>
-                      <p className="text-sm">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing
-                        elit, sed do eiusmod tempor incididunt ut labore et
-                        dolore magna aliqua. Ut enim ad minim veniam, quis
-                        nostrud exercitation ullamco laboris nisi ut aliquip ex
-                        ea commodo consequat.
-                      </p>
-                    </div>
-                  </div>
+                <div
+  className="relative border-4 border-black rounded-b-lg lg:rounded-r-lg lg:rounded-bl-none h-screen w-full"
+>
+  <div className="absolute bg-black/40 h-full w-full"> </div>
+  
+  <video className="absolute top-0 left-0 w-full h-full object-cover" autoPlay muted loop>
+    <source src="https://videos.pexels.com/video-files/2325093/2325093-hd_1920_1080_25fps.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
 
+  <div className="relative border-4 border-red-700 px-4 py-6 text-white md:mx-6 md:p-12">
+    <h4 className="mb-6 text-4xl font-bold">
+      We are more than just an application
+    </h4>
+    <p className="text-sm font-bold tracking-wide">
+      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+      tempor incididunt ut labore et dolore magna aliqua.
+    </p>
+  </div>
+</div>
+
+     
                   <div className="w-full flex flex-col justify-center h-full bg-white rounded-lg shadow md:mt-0 xl:p-0">
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                       <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
