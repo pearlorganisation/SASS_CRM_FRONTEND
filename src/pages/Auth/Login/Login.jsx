@@ -55,16 +55,16 @@ useEffect(()=>{
               <div className="block rounded-lg bg-white shadow-lg h-full">
                 <div className="g-0 grid grid-cols-[60%_auto] h-full">
                 <div
-  className="relative border-4 border-black rounded-b-lg lg:rounded-r-lg lg:rounded-bl-none h-screen w-full"
+  className="relative  rounded-b-lg lg:rounded-r-lg lg:rounded-bl-none h-screen w-full"
 >
-  <div className="absolute bg-black/40 h-full w-full"> </div>
+  <div className="absolute  bg-black/40 h-full w-full"> </div>  
   
-  <video className="absolute top-0 left-0 w-full h-full object-cover" autoPlay muted loop>
+  <video className="top-0 left-0 w-full h-full object-cover" autoPlay muted loop>
     <source src="https://videos.pexels.com/video-files/2325093/2325093-hd_1920_1080_25fps.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 
-  <div className="relative border-4 border-red-700 px-4 py-6 text-white md:mx-6 md:p-12">
+  <div className="absolute bottom-0  px-4 py-6 text-white md:mx-6 md:p-12">
     <h4 className="mb-6 text-4xl font-bold">
       We are more than just an application
     </h4>
@@ -76,7 +76,7 @@ useEffect(()=>{
 </div>
 
      
-                  <div className="w-full flex flex-col justify-center h-full bg-white rounded-lg shadow md:mt-0 xl:p-0">
+                  <div className="w-full flex flex-col justify-center h-full  bg-white rounded-lg shadow md:mt-0 xl:p-0" >
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                       <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
                         Sign in to your account
@@ -189,7 +189,7 @@ useEffect(()=>{
         </div>
       </section>
     </>
-  );
+  )
 }
 
 export default Login;
