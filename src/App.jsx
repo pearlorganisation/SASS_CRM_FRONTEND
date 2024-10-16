@@ -27,6 +27,7 @@ import SignUp from "./pages/Auth/SignUp/SignUp";
 import AddPlan from "./pages/Settings/Plans/AddPlan";
 import ViewSidebarLinks from "./pages/Settings/SidebarLinks/ViewSidebarLinks";
 import CreateSidebarLink from "./pages/Settings/SidebarLinks/CreateSidebarLink";
+import Assignments from "./pages/Assignments/Assignments";
 
 
 
@@ -74,6 +75,10 @@ const App = () => {
         {
           path: "/products",
           element: <ViewProducts />,
+        },
+        {
+          path: "/assignments",
+          element: <Assignments />,
         },
         {
           path: "/products/addProduct",

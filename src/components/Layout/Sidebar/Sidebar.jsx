@@ -12,6 +12,7 @@ import { logout } from "../../../features/slices/auth";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // for dropdown icon
 import { getAllSidebarLinks } from "../../../features/actions/sidebarLink";
 import { roles } from "../../../utils/roles";
+import { MdAssignment } from "react-icons/md";
 
 const Sidebar = () => {
   const dispatch = useDispatch();
@@ -80,13 +81,24 @@ const Sidebar = () => {
             </Link>
           </li>
           }
-   { (roles.ADMIN === role || roles.EMPLOYEE_SALES === role )&&         <li>
+   { (roles.ADMIN === role || roles.EMPLOYEE_SALES === role || roles.EMPLOYEE_REMINDER === role )&&         <li>
             <Link
               to="/products"
               className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
             >
               <AiFillProduct size={30} />
               <span className="flex-1 ms-3 whitespace-nowrap">Products</span>
+            </Link>
+          </li>}
+
+
+          { (roles.ADMIN === role || roles.EMPLOYEE_SALES === role || roles.EMPLOYEE_REMINDER === role )&&         <li>
+            <Link
+              to="/assignments"
+              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+            >
+              <MdAssignment  size={30} />
+              <span className="flex-1 ms-3 whitespace-nowrap">Assignments</span>
             </Link>
           </li>}
 

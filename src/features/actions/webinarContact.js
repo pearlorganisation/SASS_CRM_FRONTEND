@@ -71,3 +71,20 @@ export const deleteWebinarContacts = createAsyncThunk(
     }
   }
 );
+
+
+// get all assignments
+export const getAllAssignments = createAsyncThunk(
+  "getAllAssignments",
+  async (payload, { rejectWithValue }) => {
+    console.log('sdfjsdfskdkskfsdfsdf')
+    try {
+      const response = await instance.get(`/attendee/employee/assignments`, {
+        params: payload, 
+      });
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

@@ -9,14 +9,16 @@ import {
   getAllAttendees,
   getAttendees,
   getAllWebinars,
+  getAllAssignments
 } from "../actions/webinarContact";
 
 const initialState = {
   isLoading: false,
   webinarData: [],
   attendeeData: [],
+  assignmentData:[],
   totalPages: null,
-  errorMessage: "",
+  errorMessage: ""
 };
 
 // ---------------------------------------------------------------------------------------
@@ -109,6 +111,25 @@ state.errorMessage = "";
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.isDeleted=false;
+        toast.error(action?.payload || "Something went wrong", {
+          position: "top-center",
+        });
+      })
+      .addCase(getAllAssignments.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getAllAssignments.fulfilled, (state, action) => {
+        console.log(action.payload.data)
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.assignmentData = action.payload?.data || [];
+        state.totalPages = action.payload?.totalPages || 1;
+      })
+      .addCase(getAllAssignments.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        state.assignmentData = [];
         toast.error(action?.payload || "Something went wrong", {
           position: "top-center",
         });
