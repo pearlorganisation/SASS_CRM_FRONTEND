@@ -52,7 +52,10 @@ const Sidebar = () => {
               <span className="ms-3">Dashboard</span>
             </Link>
           </li>
-          <li>
+          {
+            roles.ADMIN === role &&  
+            <>
+            <li>
             <Link
               to="/webinarDetails"
               className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
@@ -70,6 +73,8 @@ const Sidebar = () => {
               <span className="flex-1 ms-3 whitespace-nowrap">Attendees</span>
             </Link>
           </li>
+          </>
+        }
 
    { roles.ADMIN === role &&   <li>
             <Link
@@ -92,7 +97,7 @@ const Sidebar = () => {
           </li>}
 
 
-          { (roles.ADMIN === role || roles.EMPLOYEE_SALES === role || roles.EMPLOYEE_REMINDER === role )&&         <li>
+          { (roles.EMPLOYEE_SALES === role || roles.EMPLOYEE_REMINDER === role )&&         <li>
             <Link
               to="/assignments"
               className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
