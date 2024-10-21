@@ -9,6 +9,7 @@ import employee from "./slices/employee";
 import product from "./slices/product";
 import sidebarLink from "./slices/sidebarLink";
 import assign from "./slices/assign";
+import globalData from "./slices/globalData";
 
 
 
@@ -19,7 +20,8 @@ const rootReducer = combineReducers({
   employee,
   product,
   sidebarLink,
-  assign
+  assign,
+  globalData
   });
 
 // Custom root reducer handling a clear action
