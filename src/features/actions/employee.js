@@ -30,5 +30,19 @@ export const getAllEmployees = createAsyncThunk(
   }
 );
 
+// get employee data
+export const getAllClients = createAsyncThunk(
+  "clients/fetchData",
+  async (id, { rejectWithValue }) => {
+    try {
+      const {data} = await instance.get(`/users/clients`);
+
+      return data?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 
 
