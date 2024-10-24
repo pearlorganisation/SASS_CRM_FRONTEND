@@ -1,7 +1,13 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { getRoleNameByID } from "../../../utils/roles";
 
 const Header = () => {
+  const { userData } = useSelector((state) => state.auth);
+  console.log(userData);
+
+
   return (
     <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200  ">
       <div className="px-3 py-3 lg:px-5 lg:pl-3">
@@ -41,20 +47,12 @@ const Header = () => {
           </div>
           <div className="flex items-center">
             <div className="flex items-center ms-3">
-              <div>
-                <button
-                  type="button"
-                  className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 "
-                  aria-expanded="false"
-                  data-dropdown-toggle="dropdown-user"
-                >
-                  <span className="sr-only">Open user menu</span>
-                  <img
-                    className="w-8 h-8 rounded-full"
-                    src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                    alt="user photo"
-                  />
-                </button>
+              <div className="flex items-center space-x-3">
+                <div className="text-sm text-white">
+                  <p className="font-medium text-black">{userData.userName}</p>
+                  <p className="text-gray-400">{getRoleNameByID(userData.role)}</p>
+                </div>
+               
               </div>
               <div
                 className="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow "
@@ -116,6 +114,6 @@ const Header = () => {
       </div>
     </nav>
   );
-}; 
+};
 
 export default Header;

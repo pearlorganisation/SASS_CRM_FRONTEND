@@ -73,6 +73,7 @@ function Login() {
                         autoPlay
                         muted
                         loop
+                        preload="auto"
                       >
                         <source
                           src={landingGlobalData?.item}

@@ -28,6 +28,7 @@ import AddPlan from "./pages/Settings/Plans/AddPlan";
 import ViewSidebarLinks from "./pages/Settings/SidebarLinks/ViewSidebarLinks";
 import CreateSidebarLink from "./pages/Settings/SidebarLinks/CreateSidebarLink";
 import Assignments from "./pages/Assignments/Assignments";
+import Clients from "./pages/Clients/Clients";
 
 
 
@@ -71,6 +72,10 @@ const App = () => {
         {
           path: "/employees",
           element: <Employees />,
+        },
+        {
+          path: "/clients",
+          element: <Clients />,
         },
         {
           path: "/products",
