@@ -17,7 +17,7 @@ const {userData}= useSelector((state)=>state.auth)
 
   useEffect(()=>{
 dispatch(getAllEmployees(userData?.id))
-  },[])
+  },[userData])
 
   return (
     <div>
