@@ -1,15 +1,15 @@
 
 import React, { useEffect } from 'react'
-import { getAllEmployees } from '../../features/actions/employee'
+// import { getAllEmployees } from '../../features/actions/employee'
 import { useDispatch, useSelector } from 'react-redux'
 
 const Dashboard = () => {
   const dispatch = useDispatch()
-  const {userData}= useSelector((state)=>state.auth)
+  // const {userData}= useSelector((state)=>state.auth)
   
-  useEffect(()=>{
-    dispatch(getAllEmployees(userData?.id))
-  },[])
+  // useEffect(()=>{
+  //   dispatch(getAllEmployees(userData?.id))
+  // },[userData])
   return (
     <div  className='mt-10 flex flex-col font-medium items-center gap-4'>
 
