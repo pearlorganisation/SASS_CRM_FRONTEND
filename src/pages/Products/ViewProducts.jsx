@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAllProducts } from "../../features/actions/product";
 import { Skeleton, Stack } from "@mui/material";
+import { roles } from "../../utils/roles";
 
 const ViewProducts = () => {
   const [showFilters, setShowFilters] = useState(false);
@@ -133,7 +134,11 @@ const ViewProducts = () => {
                 placeholder="Search for users"
               />
             </div> */}
+            {
+              roles.SUPER_ADMIN === userData?.role || roles.ADMIN === userData?.role && (
             <button onClick={()=>navigate("/products/addProduct")} className="bg-blue-600 rounded-md text-white px-3 py-1 font-semibold ">Add Product</button>
+              )
+            }
           </div>
         <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
          
