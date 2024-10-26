@@ -29,6 +29,8 @@ import ViewSidebarLinks from "./pages/Settings/SidebarLinks/ViewSidebarLinks";
 import CreateSidebarLink from "./pages/Settings/SidebarLinks/CreateSidebarLink";
 import Assignments from "./pages/Assignments/Assignments";
 import Clients from "./pages/Clients/Clients";
+import EmployeeAssignments from "./pages/Employees/EmployeeAssignments";
+import LandingPageForm from "./pages/Settings/LandingPage/LandingPageForm";
 
 
 
@@ -74,6 +76,10 @@ const App = () => {
           element: <Employees />,
         },
         {
+          path: "/employees/assignments/:id",
+          element: <EmployeeAssignments />,
+        },
+        {
           path: "/clients",
           element: <Clients />,
         },
@@ -116,6 +122,10 @@ const App = () => {
         {
           path: "/sidebarLinks/addSidebarLink",
           element: <CreateSidebarLink/>,
+        },
+        {
+          path: "/update-landing-page",
+          element: <LandingPageForm/>,
         },
 
       

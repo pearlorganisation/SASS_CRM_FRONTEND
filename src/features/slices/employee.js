@@ -4,14 +4,15 @@ import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
 
-import { addEmployee, getAllEmployees, getAllClients } from "../actions/employee";
+import { addEmployee, getAllEmployees, getAllClients, getEmployeeAssignments } from "../actions/employee";
 
 const initialState = {
   isLoading: false,
   employeeData: [],
   totalPages: null,
   errorMessage: "",
-  clientsData: []
+  clientsData: [],
+  employeeAssignments: []
 };
 
 // ---------------------------------------------------------------------------------------
@@ -71,6 +72,23 @@ export const employeeSlice = createSlice({
         toast.error(action?.payload || "Something went wrong", {
           position: "top-center",
         });
+      })
+      .addCase(getEmployeeAssignments.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getEmployeeAssignments.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.employeeAssignments = action.payload.data;
+        toast.success("Employee Assignments fetched Successfully", {
+          position: "top-center",
+        });
+      })
+      .addCase(getEmployeeAssignments.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        toast.error(action?.payload || "Something went wrong");
       })
  
   },

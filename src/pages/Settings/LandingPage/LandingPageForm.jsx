@@ -2,8 +2,9 @@ import React,{useState} from 'react'
 import { useForm } from "react-hook-form";
 import defaultPhoto from "/placeholder.jpg";
 import { useDispatch } from "react-redux";
-import { createGlobalData } from "../../features/actions/globalData";
+
 import { MdAdminPanelSettings, MdOutlineInsertPhoto } from "react-icons/md";
+import { createGlobalData } from '../../../features/actions/globalData';
 
 const LandingPageForm = () => {
 
@@ -41,7 +42,7 @@ const LandingPageForm = () => {
         setSelectedType(e.target.value);
       };
   return (
-    <div>
+    <div className='pt-20'>
     <form
       className="space-y-6 mx-8 sm:mx-2 p-4 py-6"
       onSubmit={handleSubmit(onSubmit)}
