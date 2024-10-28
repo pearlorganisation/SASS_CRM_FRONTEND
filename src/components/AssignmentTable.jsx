@@ -59,7 +59,11 @@ const AssignmentTable = (props) => {
                       </td>
                       <td className="px-3 whitespace-nowrap">
                         <Link
-                          to={"/particularContact"}
+                          to={`/particularContact?email=${encodeURIComponent(
+                            item?._id
+                          )}&recordType=${encodeURIComponent(
+                            item?.records[0]?.recordType
+                          )}`}
                           state={item}
                           className="cursor-pointer py-2 px-3 font-semibold text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50 rounded-lg
                       "
