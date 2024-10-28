@@ -9,7 +9,8 @@ import {
   getAllAttendees,
   getAttendees,
   getAllWebinars,
-  getAllAssignments
+  getAllAssignments,
+  getAttendeeContactDetails
 } from "../actions/webinarContact";
 
 const initialState = {
@@ -17,6 +18,7 @@ const initialState = {
   webinarData: [],
   attendeeData: [],
   assignmentData:[],
+  attendeeContactDetails: null,
   totalPages: null,
   errorMessage: ""
 };
@@ -128,6 +130,25 @@ state.errorMessage = "";
         state.totalPages = action.payload?.totalPages || 1;
       })
       .addCase(getAllAssignments.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        state.assignmentData = [];
+        toast.error(action?.payload || "Something went wrong", {
+          position: "top-center",
+        });
+      })
+      .addCase(getAttendeeContactDetails.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getAttendeeContactDetails.fulfilled, (state, action) => {
+        console.log(action.payload.data)
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.attendeeContactDetails = action.payload;
+        state.totalPages = action.payload?.totalPages || 1;
+      })
+      .addCase(getAttendeeContactDetails.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.assignmentData = [];

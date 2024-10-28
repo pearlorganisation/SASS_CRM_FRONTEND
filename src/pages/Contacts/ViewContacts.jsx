@@ -93,12 +93,12 @@ const ViewContacts = () => {
                         </td>
 
                         <td className="px-2 py-4 whitespace-nowrap ">
-                          {item?.records[0]?.firstName}
+                          {item?.records[0]?.firstName || 'N/A'}
                         </td>
                         <td className="px-2 py-4 whitespace-nowrap">
                           {item?.records[0]?.lastName?.match(/:-\)/)
                             ? "--"
-                            : item?.lastName}
+                            : item?.lastName || "N/A"}
                         </td>
                         <td className="px-2  text-center py-4 whitespace-nowrap">
                           {item?.records?.reduce((acc,time)=>

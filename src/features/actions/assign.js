@@ -14,6 +14,38 @@ export const addAssign = createAsyncThunk(
   }
 );
 
+export const addNote = createAsyncThunk(
+  "note/create",
+  async (payload, { rejectWithValue }) => {
+    try {
+      console.log("payload", payload);
+      const response = await instance.post(`/notes`, payload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const getNotes = createAsyncThunk(
+  "note/fetchData",
+  async (payload, { rejectWithValue }) => {
+    try {
+      console.log("payload", payload);
+      const response = await instance.get(`/notes`, {
+        params: payload
+      });
+      console.log(response.data, "ssdsdsdsdsdsdsd");
+      return response?.data?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
 
 
 // // get employee data
