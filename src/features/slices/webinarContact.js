@@ -59,6 +59,7 @@ export const webinarContactSlice = createSlice({
       .addCase(getAllAttendees.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
+        state.attendeeData = [];
         toast.error(action?.payload || "Something went wrong", {
           position: "top-center",
         });

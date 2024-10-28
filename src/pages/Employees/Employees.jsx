@@ -111,7 +111,7 @@ dispatch(getAllEmployees(userData?.id))
                 <td className="px-6 py-4">{item?.role?.name}</td>
                 <td className="px-6 py-4">
                   <a
-                    href="#"
+                    href={`/employees/assignments/${item?._id}`}
                     className="font-medium text-blue-600  hover:underline"
                   >
                     View Details

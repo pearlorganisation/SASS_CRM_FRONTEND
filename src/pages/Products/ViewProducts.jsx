@@ -48,6 +48,12 @@ const ViewProducts = () => {
   
 
       <div class="p-10 ">
+      <div className="flex justify-between">
+        <h3 className="text-gray-800 text-xl font-bold sm:text-2xl mb-5">
+          Product Details
+        </h3>
+        
+        </div>
       <div class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-8 bg-white ">
             <div className="relative">
               <button

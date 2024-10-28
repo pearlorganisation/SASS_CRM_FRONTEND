@@ -283,6 +283,16 @@ const handleInputSubmit = () => {
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
   const [page, setPage] = useState(searchParams.get("page") || 1);
 
+  const [selectedType, setSelectedType] = useState("");
+
+  const handleSelectChange = (event) => {
+    const recordType = event.target.value;
+    setSelectedType(recordType);
+    if (recordType) {
+      dispatch(getAllAttendees({ page, recordType }));
+    }
+  };
+
   const handlePagination = (e, p) => {
     setPage(p);
     setSearchParams({ page: p });
@@ -312,10 +322,18 @@ const handleInputSubmit = () => {
         <h3 className="text-gray-800 text-xl font-bold sm:text-2xl mb-5">
           Manage Attendees Details
         </h3>
-        <div className="space-x-5  ">
-          <button onClick={()=>dispatch(getAllAttendees({ page, recordType:"sales" }))} className="bg-green-700 hover:bg-green-600 text-white rounded-md px-5 py-1 font-medium">Sales</button>
-          <button onClick={()=>dispatch(getAllAttendees({ page, recordType:"reminder" })) } className="bg-blue-700 hover:bg-blue-600 text-white rounded-md px-5 py-1 font-medium">Reminder</button>
-        </div>
+        <div className="relative inline-block text-left">
+      <select
+        value={selectedType}
+        onChange={handleSelectChange}
+        className="bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 cursor-pointer transition duration-150 ease-in-out"
+      >
+        <option value="" disabled>Select Record Type</option>
+        <option value="sales">Sales</option>
+        <option value="reminder">Reminder</option>
+      </select>
+     
+    </div>
         </div>
 
         <div>
