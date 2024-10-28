@@ -19,8 +19,10 @@ export const getAllAttendees = createAsyncThunk(
   "getAllWebinarContacts",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/attendee/${payload.page}?${payload.filters}&recordType=${payload.recordType}`);
-      console.log(response)
+      const response = await instance.get(
+        `/attendee/${payload.page}?${payload.filters}&recordType=${payload.recordType}`
+      );
+      console.log(response);
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
@@ -34,7 +36,10 @@ export const getAttendees = createAsyncThunk(
   "getWebinarContacts",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.post(`/attendee/${payload.page}`, payload.data);
+      const response = await instance.post(
+        `/attendee/${payload.page}`,
+        payload.data
+      );
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
@@ -56,9 +61,6 @@ export const getAllWebinars = createAsyncThunk(
   }
 );
 
-
-
-
 //add webinar contacts
 export const deleteWebinarContacts = createAsyncThunk(
   "deleteWebinarContacts",
@@ -72,17 +74,39 @@ export const deleteWebinarContacts = createAsyncThunk(
   }
 );
 
-
 // get all assignments
 export const getAllAssignments = createAsyncThunk(
   "getAllAssignments",
   async (payload, { rejectWithValue }) => {
-    console.log('sdfjsdfskdkskfsdfsdf')
     try {
       const response = await instance.get(`/attendee/employee/assignments`, {
-        params: payload, 
+        params: payload,
       });
       return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const getAttendeeContactDetails = createAsyncThunk(
+  "attendeeContact/fetchData",
+  async (payload, { rejectWithValue }) => {
+    try {
+      console.log("payload", payload);
+      const response = await instance.get(`/attendee`, {
+        params: payload,
+      });
+      console.log(response.data, "skdfksd");
+      if (
+        response &&
+        response?.data &&
+        Array.isArray(response.data?.data) &&
+        response.data.data.length > 0
+      ) {
+        return response.data.data[0];
+      }
+      return null;
     } catch (e) {
       return rejectWithValue(e);
     }
