@@ -47,7 +47,7 @@ export const assignSlice = createSlice({
       .addCase(addNote.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        toast.info("Note Added Successfully", {
+        toast.success("Note Added Successfully", {
           position: "top-center",
         });
       })
@@ -64,9 +64,7 @@ export const assignSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = "";
         state.noteData = action.payload;
-        toast.info("Note Added Successfully", {
-          position: "top-center",
-        });
+        
       })
       .addCase(getNotes.rejected, (state, action) => {
         state.isLoading = false;

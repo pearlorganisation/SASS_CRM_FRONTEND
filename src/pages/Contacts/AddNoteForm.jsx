@@ -23,7 +23,7 @@ const AddNoteForm = (props) => {
 
   const onSubmit = (data) => {
     console.log(data);
-    if(data?.image.length > 0){
+    if(data?.image?.length > 0){
         data.image = data?.image[0];
     }
     dispatch(addNote(data));
