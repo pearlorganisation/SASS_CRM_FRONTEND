@@ -81,9 +81,6 @@ export const employeeSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = "";
         state.employeeAssignments = action.payload.data;
-        toast.success("Employee Assignments fetched Successfully", {
-          position: "top-center",
-        });
       })
       .addCase(getEmployeeAssignments.rejected, (state, action) => {
         state.isLoading = false;

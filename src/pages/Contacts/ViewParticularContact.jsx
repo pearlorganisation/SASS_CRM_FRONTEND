@@ -17,9 +17,7 @@ const ViewParticularContact = () => {
   const { attendeeContactDetails } = useSelector(
     (state) => state.webinarContact
   );
-  const { noteData } = useSelector((state) => state.assign);
-
-  console.log("notedata", noteData);
+  const { noteData, isFormLoading } = useSelector((state) => state.assign);
 
   const searchParams = new URLSearchParams(location.search);
   const email = searchParams.get("email");
@@ -27,9 +25,14 @@ const ViewParticularContact = () => {
 
   useEffect(() => {
     dispatch(getAttendeeContactDetails({ email, recordType }));
-    dispatch(getNotes({ email, recordType }));
     console.log(email, recordType);
   }, []);
+
+  useEffect(() => {
+    if (!isFormLoading) {
+      dispatch(getNotes({ email, recordType }));
+    }
+  }, [isFormLoading]);
 
   const [showModal, setShowModal] = useState(false);
 
@@ -75,10 +78,19 @@ const ViewParticularContact = () => {
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
+  
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return "-";
+    }
+  
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
+    }) + " " + date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 

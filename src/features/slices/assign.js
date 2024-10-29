@@ -9,6 +9,7 @@ import { addAssign , addNote, getNotes} from "../actions/assign";
 
 const initialState = {
   isLoading: false,
+  isFormLoading:false,
   assignData: [],
   noteData: [],
   totalPages: null,
@@ -41,18 +42,18 @@ export const assignSlice = createSlice({
         toast.error(action?.payload || "Something went wrong");
       })
       .addCase(addNote.pending, (state, action) => {
-        state.isLoading = true;
+        state.isFormLoading = true;
         state.errorMessage = "";
       })
       .addCase(addNote.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.isFormLoading = false;
         state.errorMessage = "";
         toast.success("Note Added Successfully", {
           position: "top-center",
         });
       })
       .addCase(addNote.rejected, (state, action) => {
-        state.isLoading = false;
+        state.isFormLoading = false;
         state.errorMessage = action.payload;
         toast.error(action?.payload || "Something went wrong");
       })

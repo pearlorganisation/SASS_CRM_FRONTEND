@@ -1,31 +1,56 @@
 import { Controller, useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Select from "react-select";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addNote } from "../../features/actions/assign";
-
+import { ClipLoader } from "react-spinners";
 
 const AddNoteForm = (props) => {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  const { isFormLoading } = useSelector((state) => state.assign);
   const { email, recordType } = props;
   const [selectedStatus, setSelectedStatus] = useState(null);
   const {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     defaultValues: {
       email: email,
       recordType: recordType,
+      phone: "",
+      callDuration: { hr: "", min: "", sec: "" },
+      status: "",
+      note: "",
+      image: null,
     },
   });
 
+  useEffect(() => {
+    if (!isFormLoading) {
+      reset({
+        email: email,
+        recordType: recordType,
+        phone: "",
+        callDuration: { hr: "", min: "", sec: "" },
+        status: "",
+        note: "",
+        image: null,
+      });
+      setSelectedStatus(null);
+    }
+  }, [isFormLoading]);
+
   const onSubmit = (data) => {
     console.log(data);
-    if(data?.image?.length > 0){
-        data.image = data?.image[0];
+    if (data?.image?.length > 0) {
+      data.image = data?.image[0];
     }
+    data.callDuration.hr = data.callDuration.hr ? data.callDuration.hr : "00";
+    data.callDuration.min = data.callDuration.min ? data.callDuration.min : "00";
+    data.callDuration.sec = data.callDuration.sec ? data.callDuration.sec : "00";
     dispatch(addNote(data));
   };
 
@@ -55,7 +80,7 @@ const AddNoteForm = (props) => {
             <input
               {...register("callDuration.hr")}
               type="text"
-              defaultValue={"00"}
+              placeHolder={"00"}
               className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
               maxLength={2}
             />
@@ -63,7 +88,7 @@ const AddNoteForm = (props) => {
             <input
               {...register("callDuration.min")}
               type="text"
-              defaultValue={"00"}
+              placeHolder={"00"}
               className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
               maxLength={2}
             />
@@ -71,7 +96,7 @@ const AddNoteForm = (props) => {
             <input
               {...register("callDuration.sec")}
               type="text"
-              defaultValue={"00"}
+              placeHolder={"00"}
               className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
               maxLength={2}
             />
@@ -83,44 +108,42 @@ const AddNoteForm = (props) => {
       <div className="pt-2">
         <div className="font-medium">Status</div>
         <Controller
-  name="status"
-  control={control}
-  rules={{ required: "Status is required" }}
-  render={({ field }) => (
-    <Select
-      {...field}
-      options={[
-        { value: "Payment", label: "Payment" },
-        { value: "Discussion", label: "Discussion" },
-        { value: "Other", label: "Other" },
-      ]}
-      className="mt-1 text-sm shadow"
-      placeholder="Choose Status"
-      value={
-        field.value
-          ? { value: field.value, label: field.value }
-          : null
-      } // Correctly setting the selected option
-      onChange={(selected) => {
-        field.onChange(selected.value);
-        setSelectedStatus(selected.value); // Update state based on selection
-      }}
-      styles={{
-        control: (provided) => ({
-          ...provided,
-          border: errors.status
-            ? "1px solid #EF4444"
-            : "1px solid #CBD5E1", // Red border if there's an error
-          borderRadius: "7px",
-        }),
-        placeholder: (provided) => ({
-          ...provided,
-          color: "#9CA3AF",
-        }),
-      }}
-    />
-  )}
-/>
+          name="status"
+          control={control}
+          rules={{ required: "Status is required" }}
+          render={({ field }) => (
+            <Select
+              {...field}
+              options={[
+                { value: "Payment", label: "Payment" },
+                { value: "Discussion", label: "Discussion" },
+                { value: "Other", label: "Other" },
+              ]}
+              className="mt-1 text-sm shadow"
+              placeholder="Choose Status"
+              value={
+                field.value ? { value: field.value, label: field.value } : null
+              } // Correctly setting the selected option
+              onChange={(selected) => {
+                field.onChange(selected.value);
+                setSelectedStatus(selected.value); // Update state based on selection
+              }}
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  border: errors.status
+                    ? "1px solid #EF4444"
+                    : "1px solid #CBD5E1", // Red border if there's an error
+                  borderRadius: "7px",
+                }),
+                placeholder: (provided) => ({
+                  ...provided,
+                  color: "#9CA3AF",
+                }),
+              }}
+            />
+          )}
+        />
 
         {errors.status && (
           <span className="text-red-500 text-sm mt-1">
@@ -181,7 +204,7 @@ const AddNoteForm = (props) => {
         type="submit"
         className="bg-indigo-700 w-full hover:bg-indigo-800 mt-2 text-white py-2 px-4 rounded-md"
       >
-        Submit
+        {isFormLoading ? <ClipLoader color="#c4c2c2" /> : "Add Note"}
       </button>
     </form>
   );
