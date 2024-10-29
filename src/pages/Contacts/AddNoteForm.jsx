@@ -8,8 +8,10 @@ import { ClipLoader } from "react-spinners";
 const AddNoteForm = (props) => {
   const dispatch = useDispatch();
   const { isFormLoading } = useSelector((state) => state.assign);
-  const { email, recordType } = props;
+  const { email, recordType, uniquePhones } = props;
   const [selectedStatus, setSelectedStatus] = useState(null);
+  const [selectedPhone, setSelectedPhone] = useState(null);
+
   const {
     register,
     control,
@@ -40,6 +42,7 @@ const AddNoteForm = (props) => {
         image: null,
       });
       setSelectedStatus(null);
+      setSelectedPhone(null);
     }
   }, [isFormLoading]);
 
@@ -49,8 +52,12 @@ const AddNoteForm = (props) => {
       data.image = data?.image[0];
     }
     data.callDuration.hr = data.callDuration.hr ? data.callDuration.hr : "00";
-    data.callDuration.min = data.callDuration.min ? data.callDuration.min : "00";
-    data.callDuration.sec = data.callDuration.sec ? data.callDuration.sec : "00";
+    data.callDuration.min = data.callDuration.min
+      ? data.callDuration.min
+      : "00";
+    data.callDuration.sec = data.callDuration.sec
+      ? data.callDuration.sec
+      : "00";
     dispatch(addNote(data));
   };
 
@@ -60,10 +67,43 @@ const AddNoteForm = (props) => {
         {/* Phone Number Input */}
         <div className="w-[60%]">
           <label className="font-medium text-sm">Phone Number</label>
-          <input
-            {...register("phone", { required: true })}
-            type="text"
-            className="w-full mt-1 px-5 py-2 text-gray-500 border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
+          <Controller
+            name="phone"
+            control={control}
+            rules={{ required: "Phone number is required" }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={uniquePhones.map((phone) => ({
+                  value: phone,
+                  label: phone,
+                }))}
+                className="mt-1 text-sm shadow"
+                placeholder="Choose Phone Number"
+                value={
+                  field.value
+                    ? { value: field.value, label: field.value }
+                    : null
+                }
+                onChange={(selected) => {
+                  field.onChange(selected.value);
+                  setSelectedPhone(selected.value);
+                }}
+                styles={{
+                  control: (provided) => ({
+                    ...provided,
+                    border: errors.phone
+                      ? "1px solid #EF4444"
+                      : "1px solid #CBD5E1",
+                    borderRadius: "7px",
+                  }),
+                  placeholder: (provided) => ({
+                    ...provided,
+                    color: "#9CA3AF",
+                  }),
+                }}
+              />
+            )}
           />
           {errors.phone && (
             <span className="text-red-500">Phone Number is required</span>
