@@ -7,7 +7,12 @@ const AssignmentTable = (props) => {
     const { isLoading, assignmentData, page = 1, LIMIT= 10 } = props;
     return (
       <div className="mt-7 shadow-lg rounded-lg overflow-x-auto">
-          <table className="w-full table-auto text-sm text-left">
+          {assignmentData.length <= 0 ? (
+            <div className="text-lg p-2 flex justify-center w-full">
+              No record found
+            </div>
+          ) : (
+            <table className="w-full table-auto text-sm text-left">
             <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
               <tr>
                 <th className="py-3 px-6 text-center">S No.</th>
@@ -79,6 +84,7 @@ const AssignmentTable = (props) => {
               )}
             </tbody>
           </table>
+          )}
         </div>
     )
   }

@@ -14,15 +14,14 @@ const ViewSettings = () => {
     <div className="mt-10 text-center">
       <span className="text-2xl font-bold ">SETTINGS</span>
       <div className="grid grid-cols-3 p-10 justify-items-center gap-10 mt-8 shadow-sm bg-gray-50 mx-10 rounded-lg ">
-        {roles.SUPER_ADMIN === role ||
-          (roles.ADMIN === role && (
-            <Link
-              to="/plans"
-              className="flex items-center justify-center gap-10 font-bold text-xl rounded-lg bg-white h-20 w-52 cursor-pointer  hover:bg-green-700 hover:text-white text-green-700"
-            >
-              <RiMoneyRupeeCircleLine size={40} /> Plans
-            </Link>
-          ))}
+        {(roles.SUPER_ADMIN === role || roles.ADMIN === role) && (
+          <Link
+            to="/plans"
+            className="flex items-center justify-center gap-10 font-bold text-xl rounded-lg bg-white h-20 w-52 cursor-pointer  hover:bg-green-700 hover:text-white text-green-700"
+          >
+            <RiMoneyRupeeCircleLine size={40} /> Plans
+          </Link>
+        )}
         {roles.SUPER_ADMIN === role && (
           <>
             <Link
