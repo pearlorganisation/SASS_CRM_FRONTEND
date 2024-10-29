@@ -214,7 +214,7 @@ const ViewParticularContact = () => {
                   {" "}
                   <span className="font-semibold  px-3 ">Notes</span>{" "}
                 </div>
-                <div className="overflow-auto h-96 scrollbar-thin w-full">
+                <div className="overflow-auto max-h-96 scrollbar-thin w-full">
                   {noteData &&
                     noteData.map((item, index) => (
                       <div
