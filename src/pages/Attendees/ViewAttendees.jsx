@@ -9,6 +9,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import Select from "react-select";
 import { addAssign } from "../../features/actions/assign";
 import { toast } from "sonner";
+import AssignmentTable from "../../components/AssignmentTable";
 
 const ViewAttendees = () => {
   const [savedPresets, setSavedPresets] = useState(false);
@@ -32,6 +33,16 @@ const ViewAttendees = () => {
     { show: "Max Age Range", backend: "ageRangeMax" },
     { show: "Search From Mobile Number", backend: "phone" },
   ];
+  const empOptions = [
+    {
+      label: 'Sales',
+      value: 'EMPLOYEE_SALES'
+    },
+    {
+      label: 'Reminder',
+      value: 'EMPLOYEE_REMINDER'
+    }
+  ]
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [startTime, setStartTime] = useState("");
@@ -136,7 +147,7 @@ const ViewAttendees = () => {
           break;
       }
 
-      if (newPills.length) {
+      if (newPills?.length) {
         const updatedPills = pills.filter(
           (pill) => !newPills.some((newPill) => newPill.option === pill.option)
         );
@@ -291,13 +302,14 @@ const ViewAttendees = () => {
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
   const [page, setPage] = useState(searchParams.get("page") || 1);
 
-  const [selectedType, setSelectedType] = useState("sales");
+  const [selectedType, setSelectedType] = useState("EMPLOYEE_SALES");
 
   const handleSelectChange = (event) => {
     const recordType = event.target.value;
     setSelectedType(recordType);
-    if (recordType) {
-      dispatch(getAllAttendees({ page, recordType }));
+    const option = empOptions.find((option) => option.value === recordType);
+    if (option) {
+      dispatch(getAllAttendees({ page, recordType: option.label.toLocaleLowerCase()  }));
     }
   };
 
@@ -313,7 +325,7 @@ const ViewAttendees = () => {
   }, [page, pills, dispatch]);
 
   useEffect(() => {
-    if (assigned.length > 0) {
+    if (assigned?.length > 0) {
       setAssignedButton(true);
     } else {
       setAssignedButton(false);
@@ -321,10 +333,11 @@ const ViewAttendees = () => {
     console.log(assigned);
     console.log(assignedEmployee);
   }, [assigned]);
+  console.log(employeeData,'emp Data');
 
   return (
     <>
-      <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-10">
+      <div className="px-4 md:px-8 py-10">
         <div className="flex justify-between">
           <h3 className="text-gray-800 text-xl font-bold sm:text-2xl mb-5">
             Manage Attendees Details
@@ -338,8 +351,13 @@ const ViewAttendees = () => {
               <option value="" disabled>
                 Select Record Type
               </option>
-              <option value="sales">Sales</option>
-              <option value="reminder">Reminder</option>
+              {
+                empOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))
+              }
             </select>
           </div>
         </div>
@@ -452,11 +470,14 @@ const ViewAttendees = () => {
               <Select
                 options={
                   Array.isArray(employeeData) &&
-                  employeeData.map((item) => ({
+                  employeeData
+                  .filter((item) => item?.role?.name === selectedType) 
+                  .map((item) => ({
                     value: item?._id,
                     label: item?.userName,
                   }))
                 }
+                className="z-20"
                 onChange={(selectedOption) =>
                   setAssignedEmployee(selectedOption.value)
                 }
@@ -479,119 +500,14 @@ const ViewAttendees = () => {
             </div>
           )}
         </div>
-        <div className="mt-7 shadow-lg rounded-lg overflow-x-auto">
-          <table className="w-full table-auto text-sm text-left">
-            <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
-              <tr>
-                <th className=""></th>
-                <th className="py-3 px-6 text-center">S No.</th>
-                <th className="py-3 px-6">Email</th>
-                <th className="py-3 px-6">First Name</th>
-                {/* <th className="py-3 px-6">Last Name</th> */}
-                <th className="py-3 text-center px-6">Webinar Minutes</th>
-                <th className="py-3 text-center px-6">Record Type</th>
-                <th className="py-3 text-center px-6">Total Records</th>
-                <th className="py-3 px-6">Action</th>
-              </tr>
-            </thead>
-            <tbody className="text-gray-600 divide-y">
-              {isLoading ? (
-                <tr>
-                  <td colSpan="8" className="text-center px-6 py-8">
-                    <Stack spacing={4}>
-                      <Skeleton variant="rounded" height={30} />
-                      <Skeleton variant="rounded" height={25} />
-                      <Skeleton variant="rounded" height={20} />
-                      <Skeleton variant="rounded" height={20} />
-                      <Skeleton variant="rounded" height={20} />
-                    </Stack>
-                  </td>
-                </tr>
-              ) : Array.isArray(attendeeData?.result) &&
-                attendeeData?.result.length > 0 ? (
-                attendeeData?.result?.map((item, idx) => {
-                  const serialNumber = (page - 1) * 25 + idx + 1;
-                  return (
-                    <tr key={idx}>
-                      <td className="ps-4 py-4 whitespace-nowrap">
-                        <input
-                          onClick={(e) => {
-                            if (e.target.checked) {
-                              setAssigned((prev) => [
-                                ...prev,
-                                { attendeeId: item?._id, email: item?.email },
-                              ]);
-                            } else {
-                              setAssigned((prev) =>
-                                prev.filter(
-                                  (attendeeObj) =>
-                                    attendeeObj.attendeeId !== item?._id
-                                )
-                              );
-                            }
-                          }}
-                          type="checkbox"
-                          className="scale-125"
-                        />
-                      </td>
-                      <td className="px-6 py-4 text-center whitespace-nowrap">
-                        {serialNumber}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {item._id}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {item?.records[0]?.firstName || "N/A"}
-                      </td>
-                      {/* <td className="px-6 py-4 whitespace-nowrap">
-                      {item?.records[0]?.lastName?.match(/:-\)/)
-                            ? "--"
-                            : item?.lastName}
-                      </td> */}
-
-                      <td className="px-6 py-4 text-center whitespace-nowrap">
-                        {item?.records?.reduce(
-                          (acc, time) => acc + time?.timeInSession,
-                          0
-                        )}
-                      </td>
-                      <td className="px-6 py-4 capitalize text-center whitespace-nowrap">
-                        {item?.records[0]?.recordType}
-                      </td>
-                      <td className="px-6 py-4  text-center whitespace-nowrap">
-                        {item?.records?.length}
-                      </td>
-                      <td className="px-3 whitespace-nowrap">
-                        <Link
-                          to={`/particularContact?email=${encodeURIComponent(
-                            item?._id
-                          )}&recordType=${encodeURIComponent(
-                            item?.records[0]?.recordType
-                          )}`}
-                          state={item}
-                          className="cursor-pointer py-2 px-3 font-semibold text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50 rounded-lg"
-                        >
-                          View full details
-                        </Link>
-
-                        <button
-                          onClick={() => {
-                            handleDeleteModal(item?._id);
-                          }}
-                          className="py-2 px-3 leading-none font-semibold text-red-500 hover:text-red-600 duration-150 hover:bg-gray-50 rounded-lg"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <div className="text-gray-700 p-3">No Data Found</div>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <AssignmentTable
+          isLoading={isLoading}
+          assignmentData={attendeeData?.result}
+          LIMIT={9}
+          page={page}
+          setAssigned={setAssigned}
+        />
+       
       </div>
       <div className="flex justify-center mt-5">
         <Pagination
