@@ -18,11 +18,11 @@ const ViewParticularContact = () => {
   const email = searchParams.get("email");
   const recordType = searchParams.get("recordType");
 
-  const [showModal, setShowModal] = useState(false);
   const [showTimerModal, setShowTimerModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [uniquePhones, setUniquePhones] = useState([]);
   const [uniqueNames, setUniqueNames] = useState([]);
+  const [noteModalData, setNoteModalData] = useState(null);
 
   const { attendeeContactDetails } = useSelector(
     (state) => state.webinarContact
@@ -64,10 +64,6 @@ const ViewParticularContact = () => {
       dispatch(getNotes({ email, recordType }));
     }
   }, [isFormLoading]);
-
-  const handleModal = () => {
-    setShowModal(true);
-  };
 
   const handleTimerModal = () => {
     setShowTimerModal(true);
@@ -176,9 +172,12 @@ const ViewParticularContact = () => {
               <p>
                 Name :{" "}
                 {uniqueNames.map(
-                  (item) =>
+                  (item, index) =>
                     item && (
-                      <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
+                      <span
+                        key={index}
+                        className="ms-2 bg-slate-100 rounded-md px-3 py-1"
+                      >
                         {item}
                       </span>
                     )
@@ -192,9 +191,10 @@ const ViewParticularContact = () => {
                 Phone Number :
                 <span className="ms-2 grid lg:grid-cols-2 gap-3">
                   {uniquePhones.map(
-                    (item) =>
+                    (item, index) =>
                       item && (
                         <span
+                          key={index}
                           onClick={() => handleCopyClick(item)}
                           className="flex justify-center items-center gap-1 bg-red-500 ms-2 p-1 text-white cursor-pointer rounded-md px-2 py-1"
                         >
@@ -218,8 +218,9 @@ const ViewParticularContact = () => {
                   {noteData &&
                     noteData.map((item, index) => (
                       <div
+                        key={index}
                         className="border-b-2 bg-white hover:bg-gray-100 relative cursor-pointer transition duration-300 text-black"
-                        onClick={handleModal}
+                        onClick={() => setNoteModalData(item)}
                       >
                         {/* <div className="bg-red-500 w-[7px] h-full absolute"></div> */}
                         <div className="flex  pl-4 pr-2 pt-2 justify-between ">
@@ -294,7 +295,11 @@ const ViewParticularContact = () => {
               <div className="border-b-4 py-2">
                 <span className="font-semibold px-5 ">Add Note</span>
               </div>
-              <AddNoteForm uniquePhones={uniquePhones} email={email} recordType={recordType} />
+              <AddNoteForm
+                uniquePhones={uniquePhones}
+                email={email}
+                recordType={recordType}
+              />
               <div></div>
             </div>
           </div>
@@ -338,7 +343,7 @@ const ViewParticularContact = () => {
                     // const serialNumber = (page - 1) * 25 + idx + 1;
 
                     return (
-                      <tr>
+                      <tr key={idx}>
                         <td className={`px-3 py-4 whitespace-nowrap `}>
                           {idx + 1}
                         </td>
@@ -375,7 +380,13 @@ const ViewParticularContact = () => {
           )}
         </div>
       </div>
-      {showModal && <ViewFullDetailsModal setModal={setShowModal} />}
+      {noteModalData && (
+        <ViewFullDetailsModal
+          formatDate={formatDate}
+          modalData={noteModalData}
+          setModalData={setNoteModalData}
+        />
+      )}
       {showTimerModal && <ViewTimerModal setModal={setShowTimerModal} />}
     </>
   );

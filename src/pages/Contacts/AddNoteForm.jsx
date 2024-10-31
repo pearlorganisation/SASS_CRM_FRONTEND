@@ -11,12 +11,14 @@ const AddNoteForm = (props) => {
   const { email, recordType, uniquePhones } = props;
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedPhone, setSelectedPhone] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const {
     register,
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -43,11 +45,11 @@ const AddNoteForm = (props) => {
       });
       setSelectedStatus(null);
       setSelectedPhone(null);
+      setSelectedFile(null);
     }
   }, [isFormLoading]);
 
   const onSubmit = (data) => {
-    console.log(data);
     if (data?.image?.length > 0) {
       data.image = data?.image[0];
     }
@@ -58,7 +60,16 @@ const AddNoteForm = (props) => {
     data.callDuration.sec = data.callDuration.sec
       ? data.callDuration.sec
       : "00";
+
+    console.log(data);
     dispatch(addNote(data));
+  };
+
+  const handleFileChange = (e) => {
+    console.log(e.target.files[0]);
+    const file = e.target.files[0];
+    setSelectedFile(file);
+    setValue("image", file);
   };
 
   return (
@@ -206,7 +217,7 @@ const AddNoteForm = (props) => {
       {selectedStatus === "Payment" && (
         <>
           <p className="font-semibold text-sm py-2">Payment Screenshot</p>
-          <div className="pt-5 h-40 rounded-lg border-2 border-dashed flex items-center justify-center">
+          <div className="pt-5 h-40 rounded-lg border-2 border-dashed flex flex-col items-center justify-center">
             <label htmlFor="file" className="cursor-pointer text-center">
               <svg
                 className="w-10 h-10 mx-auto"
@@ -227,7 +238,7 @@ const AddNoteForm = (props) => {
                 <span className="font-medium text-indigo-600">
                   Upload Image
                 </span>{" "}
-                or drag your Image here
+                or drag your image here
               </p>
             </label>
             <input
@@ -235,7 +246,14 @@ const AddNoteForm = (props) => {
               id="file"
               type="file"
               className="hidden"
+              onChange={handleFileChange}
             />
+            {selectedFile && (
+              <p className="mt-2 text-sm text-gray-500">
+                Selected file:{" "}
+                <span className="font-medium">{selectedFile.name}</span>
+              </p>
+            )}
           </div>
         </>
       )}
