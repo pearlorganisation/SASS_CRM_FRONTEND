@@ -23,12 +23,14 @@ const MeetingDetails = () => {
   const [showXslxModal, setShowXslxModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [id, setId] = useState();
+  const [webinarName,setWebinarName] = useState(null);
 
   const handleModal = () => setShowModal(true);
   const handleXslxModal = () => setShowXslxModal(true);
-  const handleDeleteModal = (ID) => {
+  const handleDeleteModal = (ID, name) => {
     setShowDeleteModal(true);
     setId(ID);
+    setWebinarName(name);
   };
 
   const handleDelete = () => {
@@ -139,7 +141,7 @@ const MeetingDetails = () => {
                           View Attendees
                         </a>
                         <button
-                          onClick={() => handleDeleteModal(item?._id)}
+                          onClick={() => handleDeleteModal(item?._id, item?.csvName)}
                           className="py-2 px-3 leading-none font-semibold text-red-500 hover:text-red-600 duration-150 hover:bg-gray-50 rounded-lg"
                         >
                           Delete
@@ -169,7 +171,7 @@ const MeetingDetails = () => {
           document.body
         )}
       {showDeleteModal && (
-        <Delete setModal={setShowDeleteModal} handleDelete={handleDelete} />
+        <Delete setModal={setShowDeleteModal} webinarName={webinarName} handleDelete={handleDelete} />
       )}
     </>
   );

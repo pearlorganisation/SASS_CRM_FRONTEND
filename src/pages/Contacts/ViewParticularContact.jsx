@@ -14,33 +14,56 @@ import { getNotes } from "../../features/actions/assign";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
+  const searchParams = new URLSearchParams(location.search);
+  const email = searchParams.get("email");
+  const recordType = searchParams.get("recordType");
+
+  const [showTimerModal, setShowTimerModal] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [uniquePhones, setUniquePhones] = useState([]);
+  const [uniqueNames, setUniqueNames] = useState([]);
+  const [noteModalData, setNoteModalData] = useState(null);
+
   const { attendeeContactDetails } = useSelector(
     (state) => state.webinarContact
   );
   const { noteData, isFormLoading } = useSelector((state) => state.assign);
 
-  const searchParams = new URLSearchParams(location.search);
-  const email = searchParams.get("email");
-  const recordType = searchParams.get("recordType");
-
   useEffect(() => {
     dispatch(getAttendeeContactDetails({ email, recordType }));
     console.log(email, recordType);
   }, []);
+  useEffect(() => {
+    if (!attendeeContactDetails) return;
+    const uniquePhonesArr = Array.from(
+      new Set(
+        attendeeContactDetails?.data?.map((item) => item?.phone).filter(Boolean)
+      )
+    );
+    console.log(uniquePhonesArr);
+    setUniquePhones(uniquePhonesArr);
+
+    const namesArr = attendeeContactDetails?.data
+      .map((item) => {
+        if (item?.firstName) {
+          const lastName = item?.lastName?.match(/:-\)/) ? "" : item?.lastName;
+          return `${item.firstName} ${lastName || ""}`.trim();
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    const uniqueNamesArr = Array.from(new Set(namesArr));
+
+    console.log(uniqueNamesArr);
+    setUniqueNames(uniqueNamesArr);
+  }, [attendeeContactDetails]);
 
   useEffect(() => {
     if (!isFormLoading) {
       dispatch(getNotes({ email, recordType }));
     }
   }, [isFormLoading]);
-
-  const [showModal, setShowModal] = useState(false);
-
-  const handleModal = () => {
-    setShowModal(true);
-  };
-
-  const [showTimerModal, setShowTimerModal] = useState(false);
 
   const handleTimerModal = () => {
     setShowTimerModal(true);
@@ -61,8 +84,6 @@ const ViewParticularContact = () => {
 
   //  LEAD TYPE SECTION
 
-  const [selectedOption, setSelectedOption] = useState(null);
-
   const getColor = (option) => {
     switch (option?.value) {
       case "Hot":
@@ -78,20 +99,24 @@ const ViewParticularContact = () => {
 
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
-  
+
     // Check if the date is valid
     if (isNaN(date.getTime())) {
       return "-";
     }
-  
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }) + " " + date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+
+    return (
+      date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }) +
+      " " +
+      date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
   };
 
   const customStyles = {
@@ -146,13 +171,14 @@ const ViewParticularContact = () => {
             <div className="flex justify-between border rounded-lg py-2 px-3 shadow-md">
               <p>
                 Name :{" "}
-                {attendeeContactDetails?.data.map(
-                  (item) =>
-                    item?.firstName && (
-                      <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
-                        {`${item?.firstName} ${
-                          item?.lastName?.match(/:-\)/) ? "" : item?.lastName
-                        }`}{" "}
+                {uniqueNames.map(
+                  (item, index) =>
+                    item && (
+                      <span
+                        key={index}
+                        className="ms-2 bg-slate-100 rounded-md px-3 py-1"
+                      >
+                        {item}
                       </span>
                     )
                 )}
@@ -164,14 +190,15 @@ const ViewParticularContact = () => {
                 {" "}
                 Phone Number :
                 <span className="ms-2 grid lg:grid-cols-2 gap-3">
-                  {attendeeContactDetails?.data.map(
-                    (item) =>
-                      item?.phone && (
+                  {uniquePhones.map(
+                    (item, index) =>
+                      item && (
                         <span
-                          onClick={() => handleCopyClick(item.phone)}
+                          key={index}
+                          onClick={() => handleCopyClick(item)}
                           className="flex justify-center items-center gap-1 bg-red-500 ms-2 p-1 text-white cursor-pointer rounded-md px-2 py-1"
                         >
-                          {item.phone}
+                          {item}
                           {/* 9876543210 */}
                           <BiSolidCopy color="#050A30" size={12} />
                         </span>
@@ -187,12 +214,13 @@ const ViewParticularContact = () => {
                   {" "}
                   <span className="font-semibold  px-3 ">Notes</span>{" "}
                 </div>
-                <div className="overflow-auto h-96 scrollbar-thin w-full">
+                <div className="overflow-auto max-h-96 scrollbar-thin w-full">
                   {noteData &&
                     noteData.map((item, index) => (
                       <div
+                        key={index}
                         className="border-b-2 bg-white hover:bg-gray-100 relative cursor-pointer transition duration-300 text-black"
-                        onClick={handleModal}
+                        onClick={() => setNoteModalData(item)}
                       >
                         {/* <div className="bg-red-500 w-[7px] h-full absolute"></div> */}
                         <div className="flex  pl-4 pr-2 pt-2 justify-between ">
@@ -209,7 +237,7 @@ const ViewParticularContact = () => {
                             <p className="text-xs">
                               Call Duration:{" "}
                               <span className="rounded-md px-2">
-                                {`${item?.callDuration?.hr} hr ${item?.callDuration?.min} min ${item?.callDuration?.sec} sec`}
+                                {`${item?.callDuration?.hr}-${item?.callDuration?.min}-${item?.callDuration?.sec}`}
                               </span>
                             </p>
                           </div>
@@ -267,7 +295,11 @@ const ViewParticularContact = () => {
               <div className="border-b-4 py-2">
                 <span className="font-semibold px-5 ">Add Note</span>
               </div>
-              <AddNoteForm email={email} recordType={recordType} />
+              <AddNoteForm
+                uniquePhones={uniquePhones}
+                email={email}
+                recordType={recordType}
+              />
               <div></div>
             </div>
           </div>
@@ -311,7 +343,7 @@ const ViewParticularContact = () => {
                     // const serialNumber = (page - 1) * 25 + idx + 1;
 
                     return (
-                      <tr>
+                      <tr key={idx}>
                         <td className={`px-3 py-4 whitespace-nowrap `}>
                           {idx + 1}
                         </td>
@@ -348,7 +380,13 @@ const ViewParticularContact = () => {
           )}
         </div>
       </div>
-      {showModal && <ViewFullDetailsModal setModal={setShowModal} />}
+      {noteModalData && (
+        <ViewFullDetailsModal
+          formatDate={formatDate}
+          modalData={noteModalData}
+          setModalData={setNoteModalData}
+        />
+      )}
       {showTimerModal && <ViewTimerModal setModal={setShowTimerModal} />}
     </>
   );

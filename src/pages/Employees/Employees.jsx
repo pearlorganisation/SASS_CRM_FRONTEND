@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getAllEmployees } from "../../features/actions/employee";
 import { Skeleton, Stack } from "@mui/material";
 
@@ -110,12 +110,12 @@ dispatch(getAllEmployees(userData?.id))
                 <td className="px-6 py-4">{item?.phone}</td>
                 <td className="px-6 py-4">{item?.role?.name}</td>
                 <td className="px-6 py-4">
-                  <a
-                    href={`/employees/assignments/${item?._id}`}
+                  <Link
+                    to={`/employees/assignments/${item?._id}`}
                     className="font-medium text-blue-600  hover:underline"
                   >
                     View Details
-                  </a>
+                  </Link>
                 </td>
               </tr>)
               )) }
