@@ -112,3 +112,16 @@ export const getAttendeeContactDetails = createAsyncThunk(
     }
   }
 );
+
+//add webinar contacts
+export const updateAttendeeDetails = createAsyncThunk(
+  "attendeeDetails/updateData",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`/attendee`, payload);
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

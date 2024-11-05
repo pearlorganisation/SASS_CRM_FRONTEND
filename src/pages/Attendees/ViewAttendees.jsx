@@ -1,5 +1,5 @@
 import { Skeleton, Stack } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllAttendees } from "../../features/actions/webinarContact";
@@ -10,11 +10,11 @@ import Select from "react-select";
 import { addAssign } from "../../features/actions/assign";
 import { toast } from "sonner";
 import AssignmentTable from "../../components/AssignmentTable";
+import EmployeeAssignModal from "./Modal/EmployeeAssignModal";
 
 const ViewAttendees = () => {
   const [savedPresets, setSavedPresets] = useState(false);
   const [assignedButton, setAssignedButton] = useState(false);
-  const [assignedEmployee, setAssignedEmployee] = useState();
   const [assigned, setAssigned] = useState([]);
   const dispatch = useDispatch();
   const { attendeeData, isLoading } = useSelector(
@@ -35,14 +35,14 @@ const ViewAttendees = () => {
   ];
   const empOptions = [
     {
-      label: 'Sales',
-      value: 'EMPLOYEE_SALES'
+      label: "Sales",
+      value: "EMPLOYEE_SALES",
     },
     {
-      label: 'Reminder',
-      value: 'EMPLOYEE_REMINDER'
-    }
-  ]
+      label: "Reminder",
+      value: "EMPLOYEE_REMINDER",
+    },
+  ];
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [startTime, setStartTime] = useState("");
@@ -54,7 +54,8 @@ const ViewAttendees = () => {
   const [gender, setGender] = useState("");
   const [location, setLocation] = useState("");
   const [pills, setPills] = useState([]);
-
+  const [showModal, setShowModal] = useState(false);
+  const checkboxRefs = useRef([]);
   const handleOptionClick = (option) => {
     if (option.show === selectedOption?.show) {
       // If the clicked option is already selected, hide the input field
@@ -309,7 +310,9 @@ const ViewAttendees = () => {
     setSelectedType(recordType);
     const option = empOptions.find((option) => option.value === recordType);
     if (option) {
-      dispatch(getAllAttendees({ page, recordType: option.label.toLocaleLowerCase()  }));
+      dispatch(
+        getAllAttendees({ page, recordType: option.label.toLocaleLowerCase() })
+      );
     }
   };
 
@@ -331,9 +334,27 @@ const ViewAttendees = () => {
       setAssignedButton(false);
     }
     console.log(assigned);
-    console.log(assignedEmployee);
   }, [assigned]);
-  console.log(employeeData,'emp Data');
+  console.log(employeeData, "emp Data");
+
+  const handleAssignNow = (selectedEmployee) => {
+    dispatch(
+      addAssign({
+        userId: selectedEmployee,
+        attendees: assigned,
+      })
+    ).then(() => {
+      setShowModal(false);
+      setAssigned([]);
+      clearCheckboxes();
+    });
+  };
+
+  const clearCheckboxes = () => {
+    checkboxRefs.current.forEach((checkbox) => {
+      if (checkbox) checkbox.checked = false;
+    });
+  };
 
   return (
     <>
@@ -351,13 +372,11 @@ const ViewAttendees = () => {
               <option value="" disabled>
                 Select Record Type
               </option>
-              {
-                empOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))
-              }
+              {empOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -467,47 +486,23 @@ const ViewAttendees = () => {
 
           {assignedButton && (
             <div className="flex gap-4">
-              <Select
-                options={
-                  Array.isArray(employeeData) &&
-                  employeeData
-                  .filter((item) => item?.role?.name === selectedType) 
-                  .map((item) => ({
-                    value: item?._id,
-                    label: item?.userName,
-                  }))
-                }
-                className="z-20"
-                onChange={(selectedOption) =>
-                  setAssignedEmployee(selectedOption.value)
-                }
-              />
-              {assignedEmployee && (
-                <button
-                  onClick={() =>
-                    dispatch(
-                      addAssign({
-                        userId: assignedEmployee,
-                        attendees: assigned,
-                      })
-                    )
-                  }
-                  className="bg-blue-600 rounded-md px-1 text-white"
-                >
-                  Assign Now
-                </button>
-              )}
+              <button
+                onClick={() => setShowModal(true)}
+                className="bg-blue-600 rounded-md px-1 text-white"
+              >
+                Assign Employee
+              </button>
             </div>
           )}
         </div>
         <AssignmentTable
           isLoading={isLoading}
+          checkboxRefs={checkboxRefs}
           assignmentData={attendeeData?.result}
           LIMIT={9}
           page={page}
           setAssigned={setAssigned}
         />
-       
       </div>
       <div className="flex justify-center mt-5">
         <Pagination
@@ -517,6 +512,15 @@ const ViewAttendees = () => {
           onChange={handlePagination}
         />
       </div>
+
+      {showModal && (
+        <EmployeeAssignModal
+          employeeData={employeeData}
+          selectedType={selectedType}
+          onClose={() => setShowModal(false)}
+          onAssign={handleAssignNow}
+        />
+      )}
     </>
   );
 };

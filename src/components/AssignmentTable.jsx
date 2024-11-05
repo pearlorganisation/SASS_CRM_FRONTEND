@@ -7,7 +7,8 @@ const AssignmentTable = (props) => {
     assignmentData = [],
     page = 1,
     LIMIT = 10,
-    setAssigned = null
+    setAssigned = null,
+    checkboxRefs
   } = props;
   return (
     <div className="mt-7 shadow-lg rounded-lg overflow-x-auto">
@@ -52,6 +53,7 @@ const AssignmentTable = (props) => {
                     {setAssigned && (
                       <td className="ps-4 py-4 whitespace-nowrap">
                         <input
+                        ref={(el) => (checkboxRefs.current[index] = el)}
                           onClick={(e) => {
                             if (e.target.checked) {
                               setAssigned((prev) => [

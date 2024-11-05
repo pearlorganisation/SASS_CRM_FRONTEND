@@ -6,11 +6,15 @@ import Select from "react-select";
 import ViewFullDetailsModal from "./Modal/ViewFullDetailModal";
 import ViewTimerModal from "./Modal/ViewTimerModal";
 import { useLocation } from "react-router-dom";
-import { getAttendeeContactDetails } from "../../features/actions/webinarContact";
+import {
+  getAttendeeContactDetails,
+  updateAttendeeDetails,
+} from "../../features/actions/webinarContact";
 import { useDispatch, useSelector } from "react-redux";
 import AddNoteForm from "./AddNoteForm";
 import { FaRegEdit } from "react-icons/fa";
 import { getNotes } from "../../features/actions/assign";
+import EditModal from "./Modal/EditModal";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -23,6 +27,7 @@ const ViewParticularContact = () => {
   const [uniquePhones, setUniquePhones] = useState([]);
   const [uniqueNames, setUniqueNames] = useState([]);
   const [noteModalData, setNoteModalData] = useState(null);
+  const [editModalData, setEditModalData] = useState(null);
 
   const { attendeeContactDetails } = useSelector(
     (state) => state.webinarContact
@@ -142,6 +147,13 @@ const ViewParticularContact = () => {
       ...provided,
       color: "#FFFFFF", // Default text color for the selected option
     }),
+  };
+
+  const onConfirmEdit = (data) => {
+    setEditModalData(null);
+    dispatch(updateAttendeeDetails(data)).then(() => {
+      dispatch(getAttendeeContactDetails({ email, recordType }));
+    });
   };
 
   if (!attendeeContactDetails) return null;
@@ -369,7 +381,10 @@ const ViewParticularContact = () => {
                         </td>
 
                         <td className="px-3 py-4 h-full">
-                          <FaRegEdit className="text-xl cursor-pointer" />
+                          <FaRegEdit
+                            onClick={() => setEditModalData(item)}
+                            className="text-xl cursor-pointer"
+                          />
                         </td>
                       </tr>
                     );
@@ -388,6 +403,13 @@ const ViewParticularContact = () => {
         />
       )}
       {showTimerModal && <ViewTimerModal setModal={setShowTimerModal} />}
+      {editModalData && (
+        <EditModal
+          setModal={setEditModalData}
+          initialData={editModalData}
+          onConfirmEdit={onConfirmEdit}
+        />
+      )}
     </>
   );
 };

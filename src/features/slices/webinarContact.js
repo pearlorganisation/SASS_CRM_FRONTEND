@@ -10,7 +10,8 @@ import {
   getAttendees,
   getAllWebinars,
   getAllAssignments,
-  getAttendeeContactDetails
+  getAttendeeContactDetails,
+  updateAttendeeDetails
 } from "../actions/webinarContact";
 
 const initialState = {
@@ -45,6 +46,19 @@ export const webinarContactSlice = createSlice({
         });
       })
       .addCase(addWebinarContacts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        toast.error(action?.payload || "Something went wrong");
+      })
+      .addCase(updateAttendeeDetails.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(updateAttendeeDetails.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+      })
+      .addCase(updateAttendeeDetails.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
         toast.error(action?.payload || "Something went wrong");

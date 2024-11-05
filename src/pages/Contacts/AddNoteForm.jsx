@@ -72,6 +72,22 @@ const AddNoteForm = (props) => {
     setValue("image", file);
   };
 
+  const handleInput = (e, maxValue) => {
+    const value = e.target.value;
+
+    // Limit to numeric input and two characters
+    if (/^\d{0,2}$/.test(value)) {
+      const num = Number(value);
+
+      // Enforce range based on maxValue
+      if (num <= maxValue) {
+        e.target.value = value;
+      } else {
+        e.target.value = maxValue.toString().padStart(2, "0");
+      }
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="px-5">
       <div className="sm:flex space-y-6 sm:space-y-0 justify-between gap-5">
@@ -134,6 +150,8 @@ const AddNoteForm = (props) => {
               placeHolder={"00"}
               className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
               maxLength={2}
+              onInput={(e) => handleInput(e, 12)} // Hours range: 00-12
+              onClick={(e) => e.target.select()}
             />
             <span className="font-light px-1">:</span>
             <input
@@ -142,6 +160,8 @@ const AddNoteForm = (props) => {
               placeHolder={"00"}
               className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
               maxLength={2}
+              onInput={(e) => handleInput(e, 59)} // Minutes range: 00-59
+              onClick={(e) => e.target.select()}
             />
             <span className="font-light px-1">:</span>
             <input
@@ -150,6 +170,8 @@ const AddNoteForm = (props) => {
               placeHolder={"00"}
               className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
               maxLength={2}
+              onInput={(e) => handleInput(e, 59)} // Seconds range: 00-59
+              onClick={(e) => e.target.select()}
             />
           </div>
         </div>
