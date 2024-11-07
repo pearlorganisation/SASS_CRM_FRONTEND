@@ -1,8 +1,8 @@
 import React from "react";
+import { formatDate } from "../../../utils/extra";
 
 const ViewFullDetailsModal = (props) => {
-  const { setModalData, modalData, formatDate } = props;
-  console.log(modalData);
+  const { setModalData, modalData} = props;
   return (
     <div
       className="fixed top-0 left-0 z-[9999] flex h-screen w-screen items-center justify-center bg-slate-300/20 backdrop-blur-sm"
@@ -68,7 +68,7 @@ const ViewFullDetailsModal = (props) => {
                   {modalData?.status}
                 </td>
               </tr>
-              <tr class="flex ">
+              {/* <tr class="flex ">
                 <td
                   scope="col"
                   class="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
@@ -78,8 +78,8 @@ const ViewFullDetailsModal = (props) => {
                 <td class="flex h-auto w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 py-3 text-sm text-slate-500 transition duration-300">
                   {modalData?.email}
                 </td>
-              </tr>
-              <tr class="flex ">
+              </tr> */}
+              {/* <tr class="flex ">
                 <td
                   scope="col"
                   class="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
@@ -89,7 +89,7 @@ const ViewFullDetailsModal = (props) => {
                 <td class="flex h-auto w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 py-3 text-sm text-slate-500 transition duration-300">
                   {modalData?.recordType}
                 </td>
-              </tr>
+              </tr> */}
               <tr class="flex ">
                 <td
                   scope="col"

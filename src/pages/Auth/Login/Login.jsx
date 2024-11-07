@@ -13,7 +13,6 @@ function Login() {
   const navigate = useNavigate();
   const [fileType, setFileType] = useState("");
   const { landingGlobalData } = useSelector((state) => state.globalData);
-  console.log(landingGlobalData, "dksdfsd");
 
   const {
     register,

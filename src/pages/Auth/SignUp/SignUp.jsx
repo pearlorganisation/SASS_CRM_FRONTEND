@@ -12,7 +12,6 @@ function SignUp() {
   const dispatch = useDispatch()
   const {isLoading,userData} = useSelector((state)=>state.auth)
   const {landingGlobalData} = useSelector((state)=>state.globalData)
-  console.log(landingGlobalData, 'dksdfsd')
   const navigate = useNavigate();
 
   const {

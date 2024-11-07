@@ -61,12 +61,10 @@ const AddNoteForm = (props) => {
       ? data.callDuration.sec
       : "00";
 
-    console.log(data);
     dispatch(addNote(data));
   };
 
   const handleFileChange = (e) => {
-    console.log(e.target.files[0]);
     const file = e.target.files[0];
     setSelectedFile(file);
     setValue("image", file);
@@ -124,7 +122,7 @@ const AddNoteForm = (props) => {
                       : "1px solid #CBD5E1",
                     borderRadius: "7px",
                   }),
-                  placeholder: (provided) => ({
+                  placeHolder: (provided) => ({
                     ...provided,
                     color: "#9CA3AF",
                   }),
@@ -147,17 +145,17 @@ const AddNoteForm = (props) => {
             <input
               {...register("callDuration.hr")}
               type="text"
-              placeHolder={"00"}
+              placeholder={"00"}
               className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
               maxLength={2}
-              onInput={(e) => handleInput(e, 12)} // Hours range: 00-12
+              onInput={(e) => handleInput(e, 23)} // Hours range: 00-12
               onClick={(e) => e.target.select()}
             />
             <span className="font-light px-1">:</span>
             <input
               {...register("callDuration.min")}
               type="text"
-              placeHolder={"00"}
+              placeholder={"00"}
               className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
               maxLength={2}
               onInput={(e) => handleInput(e, 59)} // Minutes range: 00-59
@@ -167,7 +165,7 @@ const AddNoteForm = (props) => {
             <input
               {...register("callDuration.sec")}
               type="text"
-              placeHolder={"00"}
+              placeholder={"00"}
               className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
               maxLength={2}
               onInput={(e) => handleInput(e, 59)} // Seconds range: 00-59
@@ -209,7 +207,7 @@ const AddNoteForm = (props) => {
                     : "1px solid #CBD5E1", // Red border if there's an error
                   borderRadius: "7px",
                 }),
-                placeholder: (provided) => ({
+                placeHolder: (provided) => ({
                   ...provided,
                   color: "#9CA3AF",
                 }),

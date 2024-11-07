@@ -50,7 +50,6 @@ export const getEmployeeAssignments = createAsyncThunk(
       const response = await instance.get(
         `/attendee/employee/assignments?employeeId=${id}`
       );
-      console.log(response)
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);

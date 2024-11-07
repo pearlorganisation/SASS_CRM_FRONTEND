@@ -20,9 +20,8 @@ export const getAllAttendees = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await instance.get(
-        `/attendee/${payload.page}?${payload.filters}&recordType=${payload.recordType}`
+        `/attendee/${payload.page}?${payload.filters}&recordType=${payload.recordType}&limit=${payload.limit || 10}`
       );
-      console.log(response);
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
@@ -93,11 +92,9 @@ export const getAttendeeContactDetails = createAsyncThunk(
   "attendeeContact/fetchData",
   async (payload, { rejectWithValue }) => {
     try {
-      console.log("payload", payload);
       const response = await instance.get(`/attendee`, {
         params: payload,
       });
-      console.log(response.data, "skdfksd");
       if (
         response &&
         response?.data &&
@@ -113,12 +110,24 @@ export const getAttendeeContactDetails = createAsyncThunk(
   }
 );
 
-//add webinar contacts
 export const updateAttendeeDetails = createAsyncThunk(
   "attendeeDetails/updateData",
   async (payload, { rejectWithValue }) => {
     try {
       const response = await instance.patch(`/attendee`, payload);
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+
+export const updateAttendeeLeadType = createAsyncThunk(
+  "attendeeLeadType/updateData",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`/attendee/leadType`, payload);
       return response;
     } catch (e) {
       return rejectWithValue(e);

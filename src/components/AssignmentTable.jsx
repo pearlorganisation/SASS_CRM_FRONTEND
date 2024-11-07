@@ -1,5 +1,6 @@
 import { Skeleton, Stack } from "@mui/material";
 import { Link } from "react-router-dom";
+import { getColor } from "../utils/LeadType";
 
 const AssignmentTable = (props) => {
   const {
@@ -20,6 +21,7 @@ const AssignmentTable = (props) => {
         <table className="w-full table-auto text-sm text-left">
           <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
             <tr className="stickyRow" >
+            <th className=""></th>
               {setAssigned && <th className=""></th>}
               <th className="py-3 px-6 text-center">S No.</th>
               <th className="py-3 px-6">Email</th>
@@ -50,6 +52,11 @@ const AssignmentTable = (props) => {
                 const serialNumber = (page - 1) * LIMIT + index + 1;
                 return (
                   <tr key={index}>
+                    <td className="text-center whitespace-nowrap relative">
+                    <div className="w-[7px] h-full inset-0 absolute"
+                    style={{ backgroundColor: getColor(item?.records[0]?.leadType) }}
+                    ></div>
+                    </td>
                     {setAssigned && (
                       <td className="ps-4 py-4 whitespace-nowrap">
                         <input

@@ -11,6 +11,7 @@ import { addAssign } from "../../features/actions/assign";
 import { toast } from "sonner";
 import AssignmentTable from "../../components/AssignmentTable";
 import EmployeeAssignModal from "./Modal/EmployeeAssignModal";
+import PageLimitEditor from "../../components/PageLimitEditor";
 
 const ViewAttendees = () => {
   const [savedPresets, setSavedPresets] = useState(false);
@@ -302,6 +303,7 @@ const ViewAttendees = () => {
 
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
   const [page, setPage] = useState(searchParams.get("page") || 1);
+  const [pageLimit, setPageLimit] = useState(10);
 
   const [selectedType, setSelectedType] = useState("EMPLOYEE_SALES");
 
@@ -311,7 +313,7 @@ const ViewAttendees = () => {
     const option = empOptions.find((option) => option.value === recordType);
     if (option) {
       dispatch(
-        getAllAttendees({ page, recordType: option.label.toLocaleLowerCase() })
+        getAllAttendees({ page, recordType: option.label.toLocaleLowerCase(), limit: pageLimit })
       );
     }
   };
@@ -322,10 +324,10 @@ const ViewAttendees = () => {
   };
 
   useEffect(() => {
+    console.log("parent useEffect")
     const filters = buildQueryString(pills);
-    console.log(filters);
-    dispatch(getAllAttendees({ page, filters, recordType: "" }));
-  }, [page, pills, dispatch]);
+    dispatch(getAllAttendees({ page, filters, recordType: "", limit: pageLimit  }));
+  }, [page, pills, pageLimit]);
 
   useEffect(() => {
     if (assigned?.length > 0) {
@@ -333,9 +335,7 @@ const ViewAttendees = () => {
     } else {
       setAssignedButton(false);
     }
-    console.log(assigned);
   }, [assigned]);
-  console.log(employeeData, "emp Data");
 
   const handleAssignNow = (selectedEmployee) => {
     dispatch(
@@ -440,48 +440,56 @@ const ViewAttendees = () => {
         </div>
 
         <div className="flex justify-between gap-4">
-          <div className="relative">
-            <button
-              id="dropdownActionButton"
-              className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-2 "
-              type="button"
-              onClick={() => setSavedPresets((prev) => !prev)}
-            >
-              <span className="sr-only">Action button</span>
-              Saved Filter Presets
-              <svg
-                className="w-2.5 h-2.5 ms-2.5"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 10 6"
+          <div className="flex gap-6">
+            <div className="relative">
+              <button
+                id="dropdownActionButton"
+                className="inline-flex text-nowrap items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-2 "
+                type="button"
+                onClick={() => setSavedPresets((prev) => !prev)}
               >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="m1 1 4 4 4-4"
-                />
-              </svg>
-            </button>
-            <div
-              id="dropdownAction"
-              className={` ${
-                savedPresets ? "" : "hidden"
-              } absolute top-full z-10  bg-white divide-y divide-gray-100 rounded-lg shadow w-44  `}
-            >
-              <ul
-                className="py-1 text-sm text-gray-700 "
-                aria-labelledby="dropdownActionButton"
+                <span className="sr-only">Action button</span>
+                Saved Filter Presets
+                <svg
+                  className="w-2.5 h-2.5 ms-2.5"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 6"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m1 1 4 4 4-4"
+                  />
+                </svg>
+              </button>
+              <div
+                id="dropdownAction"
+                className={` ${
+                  savedPresets ? "" : "hidden"
+                } absolute top-full z-10  bg-white divide-y divide-gray-100 rounded-lg shadow w-44  `}
               >
-                <li>
-                  <a href="#" className="block px-4 py-2 hover:bg-gray-100  ">
-                    No saved presets filter
-                  </a>
-                </li>
-              </ul>
+                <ul
+                  className="py-1 text-sm text-gray-700 "
+                  aria-labelledby="dropdownActionButton"
+                >
+                  <li>
+                    <a href="#" className="block px-4 py-2 hover:bg-gray-100  ">
+                      No saved presets filter
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
+
+            <PageLimitEditor
+              localStorageKey="viewAttendeesPageLimit"
+              setLimit={(limit) => setPageLimit(limit)}
+
+            />
           </div>
 
           {assignedButton && (

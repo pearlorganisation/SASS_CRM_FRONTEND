@@ -9,12 +9,16 @@ import { useLocation } from "react-router-dom";
 import {
   getAttendeeContactDetails,
   updateAttendeeDetails,
+  updateAttendeeLeadType,
 } from "../../features/actions/webinarContact";
 import { useDispatch, useSelector } from "react-redux";
 import AddNoteForm from "./AddNoteForm";
 import { FaRegEdit } from "react-icons/fa";
 import { getNotes } from "../../features/actions/assign";
 import EditModal from "./Modal/EditModal";
+import { formatDate } from "../../utils/extra";
+import { getColor, LeadTypeOptions } from "../../utils/LeadType";
+import { resetAttendeeContactDetails } from "../../features/slices/webinarContact";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -36,16 +40,37 @@ const ViewParticularContact = () => {
 
   useEffect(() => {
     dispatch(getAttendeeContactDetails({ email, recordType }));
-    console.log(email, recordType);
+
+   return () => {
+      // console.log('resetting');
+      dispatch(resetAttendeeContactDetails());
+    };
   }, []);
+
   useEffect(() => {
-    if (!attendeeContactDetails) return;
+    // console.log(attendeeContactDetails)
+    if (
+      !attendeeContactDetails ||
+      !attendeeContactDetails?.data ||
+      !Array.isArray(attendeeContactDetails?.data) ||
+      !attendeeContactDetails?.data.length
+    )
+      return;
+
+    const tempLead = attendeeContactDetails?.data[0]?.leadType;
+
+    if (tempLead) {
+      const leadType = LeadTypeOptions.find((item) => item?.value === tempLead);
+      setSelectedOption(leadType || null);
+    } else {
+      setSelectedOption(null);
+    }
+
     const uniquePhonesArr = Array.from(
       new Set(
         attendeeContactDetails?.data?.map((item) => item?.phone).filter(Boolean)
       )
     );
-    console.log(uniquePhonesArr);
     setUniquePhones(uniquePhonesArr);
 
     const namesArr = attendeeContactDetails?.data
@@ -60,7 +85,6 @@ const ViewParticularContact = () => {
 
     const uniqueNamesArr = Array.from(new Set(namesArr));
 
-    console.log(uniqueNamesArr);
     setUniqueNames(uniqueNamesArr);
   }, [attendeeContactDetails]);
 
@@ -89,47 +113,12 @@ const ViewParticularContact = () => {
 
   //  LEAD TYPE SECTION
 
-  const getColor = (option) => {
-    switch (option?.value) {
-      case "Hot":
-        return "#ef4444"; // Orange
-      case "Mild":
-        return "#ffab00"; // Yellow
-      case "Cold":
-        return "#3b82f6"; // Blue
-      default:
-        return "white";
-    }
-  };
-
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-
-    // Check if the date is valid
-    if (isNaN(date.getTime())) {
-      return "-";
-    }
-
-    return (
-      date.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }) +
-      " " +
-      date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    );
-  };
-
   const customStyles = {
     control: (provided, state) => ({
       ...provided,
       border: "1px solid #CBD5E1", // Custom border style
       borderRadius: "7px",
-      backgroundColor: getColor(selectedOption),
+      backgroundColor: getColor(selectedOption?.value),
       boxShadow: "none", // Remove the default box shadow
       "&:hover": {
         borderColor: "none", // Keep the border color consistent on hover
@@ -154,6 +143,13 @@ const ViewParticularContact = () => {
     dispatch(updateAttendeeDetails(data)).then(() => {
       dispatch(getAttendeeContactDetails({ email, recordType }));
     });
+  };
+
+  const handleLeadChange = (option) => {
+    setSelectedOption(option);
+    dispatch(
+      updateAttendeeLeadType({ email, recordType, leadType: option?.value })
+    );
   };
 
   if (!attendeeContactDetails) return null;
@@ -287,14 +283,9 @@ const ViewParticularContact = () => {
                 <div className="outline-none">
                   <Select
                     isClearable="true"
-                    options={[
-                      { value: "Hot", label: "Hot" },
-                      { value: "Mild", label: "Mild" },
-                      { value: "Cold", label: "Cold" },
-                    ]}
-                    onChange={(selectedOption) =>
-                      setSelectedOption(selectedOption)
-                    }
+                    options={LeadTypeOptions}
+                    onChange={handleLeadChange}
+                    value={selectedOption}
                     className=" font-semibold shadow  min-w-36"
                     placeholder="Lead Type "
                     styles={customStyles}
@@ -397,7 +388,6 @@ const ViewParticularContact = () => {
       </div>
       {noteModalData && (
         <ViewFullDetailsModal
-          formatDate={formatDate}
           modalData={noteModalData}
           setModalData={setNoteModalData}
         />

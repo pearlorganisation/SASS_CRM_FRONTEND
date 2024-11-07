@@ -14,9 +14,7 @@ const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
 
   const onSubmit = (data) => {
     data['id'] = initialData?._id;
-    console.log(data);
     onConfirmEdit(data);
-   
   };
 
   return (

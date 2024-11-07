@@ -8,7 +8,6 @@ import { roles } from "../../utils/roles";
 
 const ViewSettings = () => {
   const { role } = useSelector((state) => state.auth.userData);
-  console.log(role);
 
   return (
     <div className="mt-10 text-center">

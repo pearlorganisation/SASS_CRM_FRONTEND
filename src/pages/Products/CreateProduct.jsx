@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../../features/actions/product";
 import { useNavigate } from "react-router-dom";
+import { getAllWebinars } from "../../features/actions/webinarContact";
 
 const CreateProduct = () => {
   const {
@@ -14,10 +15,12 @@ const CreateProduct = () => {
   const navigate = useNavigate();
   const { productData } = useSelector((state) => state.product);
   const { userData } = useSelector((state) => state.auth);
+  const { webinarData } = useSelector((state) => state.webinarContact);
   const dispatch = useDispatch();
 
   const onSubmit = (data) => {
     const newData = { ...data, adminId: userData.id };
+    console.log(newData);
     dispatch(addProduct(newData));
   };
 
@@ -26,6 +29,11 @@ const CreateProduct = () => {
       navigate("/products");
     }
   }, [productData]);
+
+  useEffect(() => {
+    dispatch(getAllWebinars(1));
+  }, []);
+  console.log(webinarData);
 
   return (
     <div className="">
@@ -80,23 +88,21 @@ const CreateProduct = () => {
               <div className="w-full">
                 <label className="font-medium">Webinar</label>
                 <select
-                  {...register("webinar", { required: true })}
+                  {...register("webinarName", { required: true })}
                   className="w-full mt-2 px-5 py-2 text-gray-500 border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
                 >
                   <option value="" selected disabled>
                     Select a webinar
                   </option>
-                  <option value="webinar1">
-                    Webinar 1: Introduction to Marketing
-                  </option>
-                  <option value="webinar2">
-                    Webinar 2: Advanced SEO Strategies
-                  </option>
-                  <option value="webinar3">
-                    Webinar 3: Social Media Management
-                  </option>
+
+                  {webinarData &&
+                    webinarData?.map((item, index) => (
+                      <option key={index} value={item.csvName}>
+                        {item.csvName}
+                      </option>
+                    ))}
                 </select>
-                {errors.webinar && (
+                {errors.webinarName && (
                   <span className="text-red-500">Please select a webinar</span>
                 )}
               </div>

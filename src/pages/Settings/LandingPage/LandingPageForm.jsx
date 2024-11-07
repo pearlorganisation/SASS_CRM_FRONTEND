@@ -18,7 +18,6 @@ const LandingPageForm = () => {
       const dispatch = useDispatch();
     
       const onSubmit = (data) => {
-        console.log(data);
         data['file'] = data['file'][0];
         data['fileType'] = selectedType;
         dispatch(createGlobalData(data));
@@ -38,7 +37,6 @@ const LandingPageForm = () => {
       };
     
       const handleRadioChange = (e) => {
-        console.log(e.target.value);
         setSelectedType(e.target.value);
       };
   return (
