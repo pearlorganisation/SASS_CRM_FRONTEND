@@ -83,7 +83,7 @@ const ViewTimerModal = ({ setModal }) => {
               <div className="  w-full flex  items-center gap-3 p-1">
                 <input
                   className="border bg-white w-12 h-10 rounded-md text-center"
-                  type="text"
+                  type="number"
                   value={hours}
                   onChange={handleHoursChange}
                   onBlur={handleHoursBlur}
@@ -92,7 +92,7 @@ const ViewTimerModal = ({ setModal }) => {
                 :
                 <input
                   className="border bg-white w-12 h-10 rounded-md text-center"
-                  type="text"
+                  type="number"
                   value={minutes}
                   onChange={handleMinutesChange}
                   onBlur={handleMinutesBlur}

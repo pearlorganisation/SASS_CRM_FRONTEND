@@ -11,3 +11,8 @@ export const getRoleNameByID = (roleId) => {
   const matchedRole = roleEntries.find(([roleName, id]) => id === roleId);
   return matchedRole ? matchedRole[0].replace("_", " ") : "Unknown Role";
 };
+
+export const isEmployeeId = (roleId) => {
+  const employeeRoles = [roles.EMPLOYEE_SALES, roles.EMPLOYEE_REMINDER];
+  return employeeRoles.includes(roleId);
+};

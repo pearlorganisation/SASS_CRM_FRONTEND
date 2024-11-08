@@ -3,68 +3,62 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { addProduct, getAllProducts } from "../actions/product";
-
-
+import { addUserActivity, getUserActivity } from "../actions/userActivity.js";
 
 const initialState = {
   isLoading: false,
-  productData: [],
-  totalPages: 1,
+  userActivities: [],
   errorMessage: "",
+  isEmployee: false,
 };
 
 // ---------------------------------------------------------------------------------------
 
-export const productSlice = createSlice({
-  name: "product",
+export const userActivitySlice = createSlice({
+  name: "webinarContact",
   initialState,
-  reducers: {},
+  reducers: {
+    resetUserActivities: (state) => {
+      state.userActivities = [];
+    },
+    setIsEmployee: (state, action) => {
+      state.isEmployee = action.payload;
+    }
+  },
   extraReducers: (builder) => {
     builder
-
-      .addCase(addProduct.pending, (state, action) => {
+      .addCase(addUserActivity.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
       })
-      .addCase(addProduct.fulfilled, (state, action) => {
+      .addCase(addUserActivity.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.productData = action.payload.data;
-        toast.success("Product Added Successfully", {
-          position: "top-center",
-        });
       })
-      .addCase(addProduct.rejected, (state, action) => {
+      .addCase(addUserActivity.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong");
       })
-      .addCase(getAllProducts.pending, (state, action) => {
+      .addCase(getUserActivity.pending, (state) => {
         state.isLoading = true;
         state.errorMessage = "";
       })
-      .addCase(getAllProducts.fulfilled, (state, action) => {
+      .addCase(getUserActivity.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.productData = action.payload?.data;
-        state.totalPages = action.payload?.pagination?.totalPages || 1;
+        state.userActivities = action.payload;
       })
-      .addCase(getAllProducts.rejected, (state, action) => {
+      .addCase(getUserActivity.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
-      })
- 
+      });
   },
 });
 
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {} = productSlice.actions;
-export default productSlice.reducer;
+export const { resetUserActivities ,setIsEmployee } = userActivitySlice.actions;
+export default userActivitySlice.reducer;
 
 // ================================================== THE END ==================================================

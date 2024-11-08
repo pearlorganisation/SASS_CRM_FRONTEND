@@ -47,7 +47,7 @@ const ViewContacts = () => {
           assignmentData={attendeeData?.result}
           isLoading={isLoading}
           page={page}
-          LIMIT={25}
+          LIMIT={30}
         />
 
       </div>

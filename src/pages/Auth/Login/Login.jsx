@@ -6,6 +6,7 @@ import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { clearLoadingAndData } from "../../../features/slices/auth";
 import { getGlobalData } from "../../../features/actions/globalData";
+import { addUserActivity } from "../../../features/actions/userActivity";
 
 function Login() {
   const dispatch = useDispatch();
@@ -13,7 +14,7 @@ function Login() {
   const navigate = useNavigate();
   const [fileType, setFileType] = useState("");
   const { landingGlobalData } = useSelector((state) => state.globalData);
-  console.log(landingGlobalData, "dksdfsd");
+  const {isEmployee} = useSelector(state => state.userActivity);
 
   const {
     register,
@@ -32,7 +33,16 @@ function Login() {
   };
 
   const onSubmit = (data) => {
-    dispatch(logIn(data));
+    dispatch(logIn(data)).then(() => {
+      if (isEmployee) {
+        dispatch(
+          addUserActivity({
+            action: "login",
+            details: "User logged in successfully",
+          })
+        );
+      }
+    });
   };
 
   useEffect(() => {
@@ -69,7 +79,7 @@ function Login() {
                       />
                     ) : (
                       <video
-                        className="top-0 left-0 w-full h-full object-cover"
+                        className="top-0 left-0 w-full h-full"
                         autoPlay
                         muted
                         loop

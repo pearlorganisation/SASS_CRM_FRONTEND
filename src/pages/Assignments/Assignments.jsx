@@ -11,13 +11,11 @@ const Assignments = () => {
     (state) => state.webinarContact
   );
 
-  console.log(assignmentData)
   const [searchParams, setSearchParams] = useSearchParams();
   const LIMIT = 10;
   const [page, setPage] = useState( searchParams.get("page") || 1);
 
   useEffect(() => {
-    console.log("useEffect");
     dispatch(getAllAssignments({ page: page, limit: LIMIT }));
   }, [page]);
 

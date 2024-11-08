@@ -8,7 +8,7 @@ import { ClipLoader } from "react-spinners";
 const AddNoteForm = (props) => {
   const dispatch = useDispatch();
   const { isFormLoading } = useSelector((state) => state.assign);
-  const { email, recordType, uniquePhones } = props;
+  const { email, recordType, uniquePhones, addUserActivityLog } = props;
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -61,15 +61,36 @@ const AddNoteForm = (props) => {
       ? data.callDuration.sec
       : "00";
 
-    console.log(data);
-    dispatch(addNote(data));
+    const note = data?.note;
+
+    dispatch(addNote(data)).then(() => {
+      addUserActivityLog({
+        action: "addNote",
+        details: `User added a note for Attendee with Email: ${email} - Note: ${note}`,
+      });
+    });
   };
 
   const handleFileChange = (e) => {
-    console.log(e.target.files[0]);
     const file = e.target.files[0];
     setSelectedFile(file);
     setValue("image", file);
+  };
+
+  const handleInput = (e, maxValue) => {
+    const value = e.target.value;
+
+    // Limit to numeric input and two characters
+    if (/^\d{0,2}$/.test(value)) {
+      const num = Number(value);
+
+      // Enforce range based on maxValue
+      if (num <= maxValue) {
+        e.target.value = value;
+      } else {
+        e.target.value = maxValue.toString().padStart(2, "0");
+      }
+    }
   };
 
   return (
@@ -108,7 +129,7 @@ const AddNoteForm = (props) => {
                       : "1px solid #CBD5E1",
                     borderRadius: "7px",
                   }),
-                  placeholder: (provided) => ({
+                  placeHolder: (provided) => ({
                     ...provided,
                     color: "#9CA3AF",
                   }),
@@ -131,25 +152,31 @@ const AddNoteForm = (props) => {
             <input
               {...register("callDuration.hr")}
               type="text"
-              placeHolder={"00"}
+              placeholder={"00"}
               className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
               maxLength={2}
+              onInput={(e) => handleInput(e, 23)} // Hours range: 00-12
+              onClick={(e) => e.target.select()}
             />
             <span className="font-light px-1">:</span>
             <input
               {...register("callDuration.min")}
               type="text"
-              placeHolder={"00"}
+              placeholder={"00"}
               className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
               maxLength={2}
+              onInput={(e) => handleInput(e, 59)} // Minutes range: 00-59
+              onClick={(e) => e.target.select()}
             />
             <span className="font-light px-1">:</span>
             <input
               {...register("callDuration.sec")}
               type="text"
-              placeHolder={"00"}
+              placeholder={"00"}
               className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
               maxLength={2}
+              onInput={(e) => handleInput(e, 59)} // Seconds range: 00-59
+              onClick={(e) => e.target.select()}
             />
           </div>
         </div>
@@ -187,7 +214,7 @@ const AddNoteForm = (props) => {
                     : "1px solid #CBD5E1", // Red border if there's an error
                   borderRadius: "7px",
                 }),
-                placeholder: (provided) => ({
+                placeHolder: (provided) => ({
                   ...provided,
                   color: "#9CA3AF",
                 }),
