@@ -6,6 +6,7 @@ import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { clearLoadingAndData } from "../../../features/slices/auth";
 import { getGlobalData } from "../../../features/actions/globalData";
+import { addUserActivity } from "../../../features/actions/userActivity";
 
 function Login() {
   const dispatch = useDispatch();
@@ -13,6 +14,7 @@ function Login() {
   const navigate = useNavigate();
   const [fileType, setFileType] = useState("");
   const { landingGlobalData } = useSelector((state) => state.globalData);
+  const {isEmployee} = useSelector(state => state.userActivity);
 
   const {
     register,
@@ -31,7 +33,16 @@ function Login() {
   };
 
   const onSubmit = (data) => {
-    dispatch(logIn(data));
+    dispatch(logIn(data)).then(() => {
+      if (isEmployee) {
+        dispatch(
+          addUserActivity({
+            action: "login",
+            details: "User logged in successfully",
+          })
+        );
+      }
+    });
   };
 
   useEffect(() => {

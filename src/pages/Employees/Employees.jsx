@@ -50,14 +50,14 @@ dispatch(getAllEmployees(userData?.id))
 
   
 
-      <div class="p-10 ">
+      <div className="p-10 ">
         
           <div className="flex justify-end items-center gap-4 pb-4">
 
             <button className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-2 py-1 font-medium" onClick={navigateToAdd}>Add Employee</button>
             </div>
       
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
          
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50  ">
@@ -109,13 +109,22 @@ dispatch(getAllEmployees(userData?.id))
                 </th>
                 <td className="px-6 py-4">{item?.phone}</td>
                 <td className="px-6 py-4">{item?.role?.name}</td>
-                <td className="px-6 py-4">
-                  <Link
+                <td className="">
+                 <div className="flex items-center gap-5">
+                 <Link
                     to={`/employees/assignments/${item?._id}`}
                     className="font-medium text-blue-600  hover:underline"
                   >
                     View Details
                   </Link>
+                  <Link
+                    to={`/employees/Activity/${item?._id}/${item?.userName}/${item?.role?.name}`}
+                    className="font-medium text-blue-600  hover:underline"
+                  >
+                    Activity
+                  </Link>
+
+                 </div>
                 </td>
               </tr>)
               )) }

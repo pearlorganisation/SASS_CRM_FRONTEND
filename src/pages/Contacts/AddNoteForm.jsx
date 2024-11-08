@@ -8,7 +8,7 @@ import { ClipLoader } from "react-spinners";
 const AddNoteForm = (props) => {
   const dispatch = useDispatch();
   const { isFormLoading } = useSelector((state) => state.assign);
-  const { email, recordType, uniquePhones } = props;
+  const { email, recordType, uniquePhones, addUserActivityLog } = props;
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -61,7 +61,14 @@ const AddNoteForm = (props) => {
       ? data.callDuration.sec
       : "00";
 
-    dispatch(addNote(data));
+    const note = data?.note;
+
+    dispatch(addNote(data)).then(() => {
+      addUserActivityLog({
+        action: "addNote",
+        details: `User added a note for Attendee with Email: ${email} - Note: ${note}`,
+      });
+    });
   };
 
   const handleFileChange = (e) => {

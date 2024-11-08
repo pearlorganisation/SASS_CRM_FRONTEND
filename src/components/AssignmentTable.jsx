@@ -1,16 +1,37 @@
 import { Skeleton, Stack } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getColor } from "../utils/LeadType";
+import { useDispatch, useSelector } from "react-redux";
+import { addUserActivity } from "../features/actions/userActivity";
 
 const AssignmentTable = (props) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const {isEmployee} = useSelector(state => state.userActivity)
   const {
     isLoading,
     assignmentData = [],
     page = 1,
     LIMIT = 10,
     setAssigned = null,
-    checkboxRefs
+    checkboxRefs,
   } = props;
+
+  const handleViewFullDetails = (item) => {
+    navigate(
+      `/particularContact?email=${encodeURIComponent(
+        item?._id
+      )}&recordType=${encodeURIComponent(item?.records[0]?.recordType)}`
+    );
+    if(isEmployee){
+      dispatch(addUserActivity({
+        action: "viewDetails",
+        details: `User viewed details of Attendee with Email: ${item?._id} and Record Type: ${item?.records[0]?.recordType}`
+      }))
+    }
+
+  };
+
   return (
     <div className="mt-7 shadow-lg rounded-lg overflow-x-auto">
       {assignmentData.length <= 0 ? (
@@ -20,8 +41,8 @@ const AssignmentTable = (props) => {
       ) : (
         <table className="w-full table-auto text-sm text-left">
           <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
-            <tr className="stickyRow" >
-            <th className=""></th>
+            <tr className="stickyRow">
+              <th className=""></th>
               {setAssigned && <th className=""></th>}
               <th className="py-3 px-6 text-center">S No.</th>
               <th className="py-3 px-6">Email</th>
@@ -53,14 +74,17 @@ const AssignmentTable = (props) => {
                 return (
                   <tr key={index}>
                     <td className="text-center whitespace-nowrap relative">
-                    <div className="w-[7px] h-full inset-0 absolute"
-                    style={{ backgroundColor: getColor(item?.records[0]?.leadType) }}
-                    ></div>
+                      <div
+                        className="w-[7px] h-full inset-0 absolute"
+                        style={{
+                          backgroundColor: getColor(item?.records[0]?.leadType),
+                        }}
+                      ></div>
                     </td>
                     {setAssigned && (
                       <td className="ps-4 py-4 whitespace-nowrap">
                         <input
-                        ref={(el) => (checkboxRefs.current[index] = el)}
+                          ref={(el) => (checkboxRefs.current[index] = el)}
                           onClick={(e) => {
                             if (e.target.checked) {
                               setAssigned((prev) => [
@@ -105,12 +129,9 @@ const AssignmentTable = (props) => {
                     </td>
                     <td className="px-3 whitespace-nowrap stickyFieldRight">
                       <Link
-                        to={`/particularContact?email=${encodeURIComponent(
-                          item?._id
-                        )}&recordType=${encodeURIComponent(
-                          item?.records[0]?.recordType
-                        )}`}
-                        state={item}
+                        onClick={() => {
+                          handleViewFullDetails(item);
+                        }}
                         className="cursor-pointer py-2 px-3 font-semibold text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50 rounded-lg
                       "
                       >

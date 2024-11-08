@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
 import { IoLogOut } from "react-icons/io5";
 import { HiUserGroup } from "react-icons/hi2";
@@ -13,18 +13,28 @@ import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // for dropdown ico
 import { getAllSidebarLinks } from "../../../features/actions/sidebarLink";
 import { roles } from "../../../utils/roles";
 import { MdAssignment } from "react-icons/md";
+import { addUserActivity } from "../../../features/actions/userActivity";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { sidebarLinkData, isLoading } = useSelector(
     (state) => state.sidebarLink
   );
   const { role } = useSelector((state) => state.auth.userData);
-
+  const { isEmployee } = useSelector((state) => state.userActivity);
   const [showImportantLinks, setShowImportantLinks] = useState(false); // toggle state for sub-links
 
   const handleLogout = () => {
     dispatch(logout());
+    if (isEmployee) {
+      dispatch(
+        addUserActivity({
+          action: "logout",
+          details: "User logged out successfully",
+        })
+      );
+    }
   };
 
   const toggleImportantLinks = () => {
@@ -34,6 +44,22 @@ const Sidebar = () => {
   useEffect(() => {
     dispatch(getAllSidebarLinks());
   }, []);
+
+  const handleNavigation = (link) => {
+    navigate(link);
+    addUserActivityLog(link, "page")
+  };
+
+  const addUserActivityLog = (link, type) => {
+    if (isEmployee) {
+      dispatch(
+        addUserActivity({
+          action: "navigate",
+          details: `User navigated to the ${type}: ${link}`,
+        })
+      );
+    }
+  };
 
   return (
     <aside
@@ -93,15 +119,15 @@ const Sidebar = () => {
           {(roles.EMPLOYEE_SALES === role ||
             roles.EMPLOYEE_REMINDER === role) && (
             <li>
-              <Link
-                to="/assignments"
-                className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+              <div
+                onClick={() => handleNavigation("/assignments")}
+                className="flex cursor-pointer items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
               >
                 <MdAssignment size={30} />
                 <span className="flex-1 ms-3 whitespace-nowrap">
                   Assignments
                 </span>
-              </Link>
+              </div>
             </li>
           )}
 
@@ -120,13 +146,13 @@ const Sidebar = () => {
             roles.EMPLOYEE_SALES === role ||
             roles.EMPLOYEE_REMINDER === role) && (
             <li>
-              <Link
-                to="/products"
-                className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+              <div
+                onClick={() => handleNavigation("/products")}
+                className="flex cursor-pointer items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
               >
                 <AiFillProduct size={30} />
                 <span className="flex-1 ms-3 whitespace-nowrap">Products</span>
-              </Link>
+              </div>
             </li>
           )}
 
@@ -154,6 +180,7 @@ const Sidebar = () => {
                   <li>
                     <a
                       href={item?.link}
+                      onClick={() => addUserActivityLog(item.title, "important link")}
                       target="_blank" // Opens the link in a new tab
                       rel="noopener noreferrer" // Security measure to prevent tab nabbing
                       className="flex items-center p-2 cursor-pointer text-gray-600 hover:bg-gray-100 rounded-lg"

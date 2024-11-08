@@ -2,6 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 
 const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
+  
   const { register, handleSubmit } = useForm({
     defaultValues: {
         firstName: initialData?.firstName || "",

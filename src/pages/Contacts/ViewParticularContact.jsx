@@ -19,6 +19,7 @@ import EditModal from "./Modal/EditModal";
 import { formatDate } from "../../utils/extra";
 import { getColor, LeadTypeOptions } from "../../utils/LeadType";
 import { resetAttendeeContactDetails } from "../../features/slices/webinarContact";
+import { addUserActivity } from "../../features/actions/userActivity";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -37,11 +38,11 @@ const ViewParticularContact = () => {
     (state) => state.webinarContact
   );
   const { noteData, isFormLoading } = useSelector((state) => state.assign);
-
+  const { isEmployee } = useSelector((state) => state.userActivity);
   useEffect(() => {
     dispatch(getAttendeeContactDetails({ email, recordType }));
 
-   return () => {
+    return () => {
       // console.log('resetting');
       dispatch(resetAttendeeContactDetails());
     };
@@ -139,8 +140,13 @@ const ViewParticularContact = () => {
   };
 
   const onConfirmEdit = (data) => {
-    setEditModalData(null);
     dispatch(updateAttendeeDetails(data)).then(() => {
+      setEditModalData(null);
+
+      addUserActivityLog({
+        action: "update",
+        details: `User updated information of Attendee with Email: ${email}`,
+      });
       dispatch(getAttendeeContactDetails({ email, recordType }));
     });
   };
@@ -149,7 +155,18 @@ const ViewParticularContact = () => {
     setSelectedOption(option);
     dispatch(
       updateAttendeeLeadType({ email, recordType, leadType: option?.value })
-    );
+    ).then(() => {
+      addUserActivityLog({
+        action: "update",
+        details: `User updated the Lead Type to '${option?.label}' for the Attendee with Email: ${email}`,
+      });
+    });
+  };
+
+  const addUserActivityLog = (data) => {
+    if (isEmployee) {
+      dispatch(addUserActivity(data));
+    }
   };
 
   if (!attendeeContactDetails) return null;
@@ -302,6 +319,7 @@ const ViewParticularContact = () => {
                 uniquePhones={uniquePhones}
                 email={email}
                 recordType={recordType}
+                addUserActivityLog={addUserActivityLog}
               />
               <div></div>
             </div>

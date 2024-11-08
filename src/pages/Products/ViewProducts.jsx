@@ -5,6 +5,7 @@ import { getAllProducts } from "../../features/actions/product";
 import { Skeleton, Stack } from "@mui/material";
 import { roles } from "../../utils/roles";
 import ProductDetailsModal from "./Modal/ProductDetailsModal";
+import { addUserActivity } from "../../features/actions/userActivity";
 
 const ViewProducts = () => {
   const [showFilters, setShowFilters] = useState(false);
@@ -13,10 +14,23 @@ const ViewProducts = () => {
   const { productData, isLoading } = useSelector((state) => state.product);
   const { userData } = useSelector((state) => state.auth);
   const [modalData, setModalData] = useState(null);
+  const { isEmployee } = useSelector((state) => state.userActivity);
 
   useEffect(() => {
     dispatch(getAllProducts(userData?.id));
   }, []);
+
+  const handleViewDetails = (product) => {
+    setModalData(product);
+    if (isEmployee) {
+      dispatch(
+        addUserActivity({
+          action: "viewDetails",
+          details: `User viewed details of Product Name: ${product?.name}`,
+        })
+      );
+    }
+  };
 
   return (
     <div>
@@ -181,9 +195,10 @@ const ViewProducts = () => {
                     <td className="px-6 py-4">₹ {item?.price}</td>
 
                     <td className="px-6 py-4">
-                      <span 
-                      onClick={() => setModalData(item)}
-                      className="font-medium text-blue-600 cursor-pointer hover:underline">
+                      <span
+                        onClick={() => handleViewDetails(item)}
+                        className="font-medium text-blue-600 cursor-pointer hover:underline"
+                      >
                         View Details
                       </span>
                     </td>
@@ -195,14 +210,12 @@ const ViewProducts = () => {
         </div>
       </div>
 
-      {
-        modalData && (
-          <ProductDetailsModal
-            setModalData={setModalData}
-            modalData={modalData}
-          />
-        )
-      }
+      {modalData && (
+        <ProductDetailsModal
+          setModalData={setModalData}
+          modalData={modalData}
+        />
+      )}
     </div>
   );
 };
