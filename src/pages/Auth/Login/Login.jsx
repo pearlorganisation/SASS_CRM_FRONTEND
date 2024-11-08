@@ -79,7 +79,7 @@ function Login() {
                       />
                     ) : (
                       <video
-                        className="top-0 left-0 w-full h-full object-cover"
+                        className="top-0 left-0 w-full h-full"
                         autoPlay
                         muted
                         loop

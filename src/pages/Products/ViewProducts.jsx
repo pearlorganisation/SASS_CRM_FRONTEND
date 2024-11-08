@@ -2,23 +2,25 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAllProducts } from "../../features/actions/product";
-import { Skeleton, Stack } from "@mui/material";
+import { Pagination, Skeleton, Stack } from "@mui/material";
 import { roles } from "../../utils/roles";
 import ProductDetailsModal from "./Modal/ProductDetailsModal";
 import { addUserActivity } from "../../features/actions/userActivity";
+import { formatDate } from "../../utils/extra";
 
 const ViewProducts = () => {
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { productData, isLoading } = useSelector((state) => state.product);
+  const { productData, isLoading, totalPages } = useSelector((state) => state.product);
   const { userData } = useSelector((state) => state.auth);
   const [modalData, setModalData] = useState(null);
   const { isEmployee } = useSelector((state) => state.userActivity);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    dispatch(getAllProducts(userData?.id));
-  }, []);
+    dispatch(getAllProducts({page}));
+  }, [page]);
 
   const handleViewDetails = (product) => {
     setModalData(product);
@@ -30,6 +32,10 @@ const ViewProducts = () => {
         })
       );
     }
+  };
+
+  const handlePagination = (e, p) => {
+    setPage(p);
   };
 
   return (
@@ -165,6 +171,9 @@ const ViewProducts = () => {
                 <th scope="col" className="px-6 py-3">
                   Price
                 </th>
+                <th scope="col" className="px-6 py-3">
+                  Date
+                </th>
 
                 <th scope="col" className="px-6 py-3">
                   Action
@@ -193,7 +202,7 @@ const ViewProducts = () => {
                   >
                     <td className="px-6 py-4">{item?.name}</td>
                     <td className="px-6 py-4">₹ {item?.price}</td>
-
+                    <td className="px-6 py-4">{formatDate(item?.updatedAt)}</td>
                     <td className="px-6 py-4">
                       <span
                         onClick={() => handleViewDetails(item)}
@@ -208,6 +217,15 @@ const ViewProducts = () => {
             </tbody>
           </table>
         </div>
+      </div>
+
+      <div className="flex justify-center mt-5">
+        <Pagination
+          count={totalPages}
+          page={page}
+          color="primary"
+          onChange={handlePagination}
+        />
       </div>
 
       {modalData && (

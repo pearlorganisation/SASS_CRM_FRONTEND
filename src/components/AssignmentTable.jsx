@@ -70,7 +70,7 @@ const AssignmentTable = (props) => {
               </tr>
             ) : Array.isArray(assignmentData) && assignmentData?.length > 0 ? (
               assignmentData.map((item, index) => {
-                const serialNumber = (page - 1) * LIMIT + index + 1;
+                const serialNumber = ((page - 1) * LIMIT) + ( index + 1);
                 return (
                   <tr key={index}>
                     <td className="text-center whitespace-nowrap relative">

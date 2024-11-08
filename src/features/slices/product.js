@@ -10,7 +10,7 @@ import { addProduct, getAllProducts } from "../actions/product";
 const initialState = {
   isLoading: false,
   productData: [],
-  totalPages: null,
+  totalPages: 1,
   errorMessage: "",
 };
 
@@ -47,7 +47,8 @@ export const productSlice = createSlice({
       .addCase(getAllProducts.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.productData = action.payload;
+        state.productData = action.payload?.data;
+        state.totalPages = action.payload?.pagination?.totalPages || 1;
       })
       .addCase(getAllProducts.rejected, (state, action) => {
         state.isLoading = false;
