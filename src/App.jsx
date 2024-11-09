@@ -36,6 +36,7 @@ import { isEmployeeId } from "./utils/roles";
 import { setIsEmployee } from "./features/slices/userActivity";
 import EmployeeActivity from "./pages/Employees/EmployeeActivity";
 import { getEmployeeStats } from "./features/actions/employee";
+import PabblyToken from "./pages/Settings/PabblyToken/PabblyToken";
 
 
 const App = () => {
@@ -145,6 +146,10 @@ const App = () => {
         {
           path: "/update-landing-page",
           element: <LandingPageForm/>,
+        },
+        {
+          path: "/pabblyToken",
+          element: <PabblyToken/>,
         },
 
       

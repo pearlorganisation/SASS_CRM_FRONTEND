@@ -3,10 +3,10 @@ import { toast } from "sonner";
 import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { addWebinarContacts } from "../../features/actions/webinarContact";
+import { addWebinarContacts, updateAttendeeDetails } from "../../features/actions/webinarContact";
 import * as XLSX from "xlsx";
 
-const UploadXslxModal = ({ setModal }) => {
+const UploadXslxModal = ({ setModal,update }) => {
   const [mapUI, setMapUI] = useState(false);
   const [selectedValues, setSelectedValues] = useState({}); // State to store selected values
   const [meetingData, setMeetingData] = useState([]);
@@ -80,7 +80,7 @@ const UploadXslxModal = ({ setModal }) => {
   console.log(meetingData);
   const onSubmit = (data2) => {
     console.log(data2);
-    const { email, firstName, lastName, phoneNumber, sessionMinutes, csvName } =
+    const { email, firstName, lastName, phoneNumber, sessionMinutes, csvName,location,gender } =
       data2;
 
     const emailField = email?.label;
@@ -88,10 +88,13 @@ const UploadXslxModal = ({ setModal }) => {
     const lastNameField = lastName?.label;
     const phoneNumberField = phoneNumber?.label;
     const sessionMinutesField = sessionMinutes?.label;
+    const locationField = location?.label;
+    const genderField = gender?.label;
 
     const mergeDataByEmail = (data) => {
       const mergedData = {};
-      console.log(data);
+
+    if(!update) { 
       data.forEach((item) => {
         const email = item[emailField];
         if (!mergedData[email]) {
@@ -100,6 +103,8 @@ const UploadXslxModal = ({ setModal }) => {
             firstName: item[firstNameField],
             lastName: item[lastNameField],
             phone: item[phoneNumberField],
+            location: item[locationField],
+            gender:item[genderField],
             totalTimeInSession: parseInt(item[sessionMinutesField], 10) || 0,
             actualWebinarDate: date,
           };
@@ -109,23 +114,64 @@ const UploadXslxModal = ({ setModal }) => {
             parseInt(item[sessionMinutesField], 10) || 0;
         }
       });
+    }
+      else{
+        data.forEach((item) => {
+          const email = item[emailField];
+          if (!mergedData[email]) {
+            mergedData[email] = {
+              email: item[emailField],
+              firstName: item[firstNameField],
+              lastName: item[lastNameField],
+              phone: item[phoneNumberField],
+              location: item[locationField],
+            gender:item[genderField],
+              totalTimeInSession: parseInt(item[sessionMinutesField], 10) || 0,
+            };
+          } else {
+            const existing = mergedData[email];
+            existing.totalTimeInSession +=
+              parseInt(item[sessionMinutesField], 10) || 0;
+          }
+        });
+      }
       console.log(mergedData);
 
-      return Object.values(mergedData).map((item) => ({
+      if(!update) {
+return  Object.values(mergedData).map((item) => ({
         email: item.email,
         firstName: item.firstName,
         lastName: item.lastName,
         phone: item.phone,
         timeInSession: item.totalTimeInSession,
+        location : item.location,
+        gender: item.gender,
         date: date,
         csvName: csvName,
-      }));
+      }));}
+      
+      else {
+return   Object.values(mergedData).map((item) => ({
+          email: item.email,
+          firstName: item.firstName,
+          lastName: item.lastName,
+          phone: item.phone,
+          location : item.location,
+          gender: item.gender,
+          timeInSession: item.totalTimeInSession,
+      
+        }));
+       }
     };
 
     const mergedResult = mergeDataByEmail(meetingData);
     console.log(mergedResult);
     setMeetingData(mergedResult);
-    dispatch(addWebinarContacts(mergedResult));
+    if(!update)
+    {dispatch(addWebinarContacts(mergedResult));}
+    else {
+      dispatch(updateAttendeeDetails({csvId:update,data:mergedResult}))
+    }
     setModal(false);
   };
 
@@ -197,6 +243,83 @@ const UploadXslxModal = ({ setModal }) => {
                     </tr>
                   </thead>
                   <tbody>
+                  <tr>
+                      <td className="px-6 ">Email</td>
+                      <td className="px-6 pb-2 ">
+                        {" "}
+                        <Controller
+                          control={control}
+                          name="email"
+                          render={({ field }) => (
+                            <Select
+                              value={field.value}
+                              options={generateOptions(meetingData)}
+                              onChange={(selectedOption) => {
+                                field.onChange(selectedOption);
+                                handleSelectChange("email", selectedOption);
+                              }}
+                              className="mt-2"
+                              placeholder="Select a custom field"
+                            />
+                          )}
+                          rules={{ required: true }}
+                        />
+                      </td>
+                      <td className="px-6 pb-2">
+                        <span className="bg-slate-100 rounded-lg p-1">
+                          {/* //here i want to display the value of react-select by selecting the label */}
+                          {selectedValues.email}
+                        </span>
+                        {errors.email && (
+                          <span className=" bg-slate-100 p-1 rounded-lg text-sm font-medium text-red-500">
+                            Email is required
+                          </span>
+                        )}{" "}
+                      </td>
+                    </tr>
+                    {  !update &&      
+        <>  
+                    <tr>
+                      <td className="px-6 ">Actual Webinar Date</td>
+                      <td className="px-6 py-2 ">
+                        <input
+                          type="date"
+                          className="border rounded-[4px] border-gray-300 w-full px-2 outline-none py-[4px]"
+                          onChange={(e) => {
+                            setDate(e.target.value);
+                          }}
+                        />
+                      </td>
+                      <td className="px-6 pb-2">
+                        <span className="bg-slate-100 rounded-lg p-1">
+                          {date}
+                        </span>
+                        {dateErrorMessage && (
+                          <span className=" bg-slate-100 p-1 rounded-lg text-sm font-medium text-red-500">
+                            {dateErrorMessage}
+                          </span>
+                        )}{" "}
+                      </td>
+                    </tr>
+                    <tr className="">
+                      <td className="px-6 ">Webinar Name</td>
+                      <td className="px-6 py-2 ">
+                        <input
+                          {...register("csvName", { required: true })}
+                          type="text"
+                          className="border rounded-[4px] border-gray-300 w-full px-2 outline-none py-[4px]"
+                        />
+                      </td>
+                      <td className="px-6 pb-2">
+                        {" "}
+                        {errors.csvName && (
+                          <span className=" bg-slate-100 p-1  rounded-lg text-sm font-medium text-red-500">
+                            Webinar Name is required
+                          </span>
+                        )}
+                      </td>
+                    </tr></>
+                    }
                     <tr className="">
                       <td className="px-6 ">First Name</td>
                       <td className="px-6 pb-2 ">
@@ -253,40 +376,7 @@ const UploadXslxModal = ({ setModal }) => {
                         </span>
                       </td>
                     </tr>
-                    <tr>
-                      <td className="px-6 ">Email</td>
-                      <td className="px-6 pb-2 ">
-                        {" "}
-                        <Controller
-                          control={control}
-                          name="email"
-                          render={({ field }) => (
-                            <Select
-                              value={field.value}
-                              options={generateOptions(meetingData)}
-                              onChange={(selectedOption) => {
-                                field.onChange(selectedOption);
-                                handleSelectChange("email", selectedOption);
-                              }}
-                              className="mt-2"
-                              placeholder="Select a custom field"
-                            />
-                          )}
-                          rules={{ required: true }}
-                        />
-                      </td>
-                      <td className="px-6 pb-2">
-                        <span className="bg-slate-100 rounded-lg p-1">
-                          {/* //here i want to display the value of react-select by selecting the label */}
-                          {selectedValues.email}
-                        </span>
-                        {errors.email && (
-                          <span className=" bg-slate-100 p-1 rounded-lg text-sm font-medium text-red-500">
-                            Email is required
-                          </span>
-                        )}{" "}
-                      </td>
-                    </tr>
+                 
                     <tr>
                       <td className="px-6 ">Phone Number</td>
                       <td className="px-6 pb-2 ">
@@ -350,46 +440,8 @@ const UploadXslxModal = ({ setModal }) => {
                       </td>
                     </tr>
 
-                    <tr>
-                      <td className="px-6 ">Actual Webinar Date</td>
-                      <td className="px-6 py-2 ">
-                        <input
-                          type="date"
-                          className="border rounded-[4px] border-gray-300 w-full px-2 outline-none py-[4px]"
-                          onChange={(e) => {
-                            setDate(e.target.value);
-                          }}
-                        />
-                      </td>
-                      <td className="px-6 pb-2">
-                        <span className="bg-slate-100 rounded-lg p-1">
-                          {date}
-                        </span>
-                        {dateErrorMessage && (
-                          <span className=" bg-slate-100 p-1 rounded-lg text-sm font-medium text-red-500">
-                            {dateErrorMessage}
-                          </span>
-                        )}{" "}
-                      </td>
-                    </tr>
-                    <tr className="">
-                      <td className="px-6 ">Webinar Name</td>
-                      <td className="px-6 py-2 ">
-                        <input
-                          {...register("csvName", { required: true })}
-                          type="text"
-                          className="border rounded-[4px] border-gray-300 w-full px-2 outline-none py-[4px]"
-                        />
-                      </td>
-                      <td className="px-6 pb-2">
-                        {" "}
-                        {errors.csvName && (
-                          <span className=" bg-slate-100 p-1  rounded-lg text-sm font-medium text-red-500">
-                            Webinar Name is required
-                          </span>
-                        )}
-                      </td>
-                    </tr>
+           
+                 
 
                     <tr>
                       <td className="px-6 ">Location</td>
