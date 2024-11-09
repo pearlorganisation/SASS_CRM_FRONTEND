@@ -57,6 +57,11 @@ const ViewAttendees = () => {
   const [pills, setPills] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const checkboxRefs = useRef([]);
+
+  useEffect(() => {
+    console.log("pills", pills)
+  }, [pills])
+
   const handleOptionClick = (option) => {
     if (option.show === selectedOption?.show) {
       // If the clicked option is already selected, hide the input field
@@ -303,7 +308,7 @@ const ViewAttendees = () => {
 
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
   const [page, setPage] = useState(searchParams.get("page") || 1);
-  // const [pageLimit, setPageLimit] = useState(10);
+  const [pageLimit, setPageLimit] = useState(10);
 
   const [selectedType, setSelectedType] = useState("EMPLOYEE_SALES");
 
@@ -313,7 +318,7 @@ const ViewAttendees = () => {
     const option = empOptions.find((option) => option.value === recordType);
     if (option) {
       dispatch(
-        getAllAttendees({ page, recordType: option.label.toLocaleLowerCase() })
+        getAllAttendees({ page, recordType: option.label.toLocaleLowerCase(), limit: pageLimit })
       );
     }
   };
@@ -326,8 +331,8 @@ const ViewAttendees = () => {
   useEffect(() => {
     console.log("parent useEffect")
     const filters = buildQueryString(pills);
-    dispatch(getAllAttendees({ page, filters, recordType: ""  }));
-  }, [page, pills]);
+    dispatch(getAllAttendees({ page, filters, recordType: "", limit: pageLimit  }));
+  }, [page, pills,pageLimit]);
 
   useEffect(() => {
     if (assigned?.length > 0) {
@@ -436,15 +441,21 @@ const ViewAttendees = () => {
                 </div>
               );
             })}
+            {pills?.length > 0 ? <button onClick={() => {
+              const temp = pills.map(ite => {
+                return `${ite?.option}=${ite?.value}`
+              })
+              console.log(`?${temp.join('&')}`)
+            }} className="bg-blue-600 text-white font-medium px-5 rounded-lg" type="button">Save Presets</button> : ''}
           </div>
         </div>
 
         <div className="flex justify-between gap-4">
           <div className="flex gap-6">
-            <div className="relative">
+            <div className="relative w-56">
               <button
                 id="dropdownActionButton"
-                className="inline-flex text-nowrap items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-2 "
+                className="inline-flex w-full text-nowrap justify-between items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-2 "
                 type="button"
                 onClick={() => setSavedPresets((prev) => !prev)}
               >
@@ -468,27 +479,36 @@ const ViewAttendees = () => {
               </button>
               <div
                 id="dropdownAction"
-                className={` ${
-                  savedPresets ? "" : "hidden"
-                } absolute top-full z-10  bg-white divide-y divide-gray-100 rounded-lg shadow w-44  `}
+                className={` ${savedPresets ? "" : "hidden"
+                  } absolute top-full z-10  bg-white divide-y divide-gray-100 rounded-lg shadow w-full  `}
               >
                 <ul
                   className="py-1 text-sm text-gray-700 "
                   aria-labelledby="dropdownActionButton"
                 >
-                  <li>
-                    <a href="#" className="block px-4 py-2 hover:bg-gray-100  ">
-                      No saved presets filter
-                    </a>
-                  </li>
+                  {
+                    pills?.length > 0 ? pills?.map(pres => {
+                      return <li>
+                        <a href="#" className="block px-4 line-clamp-1 py-2 hover:bg-gray-100  ">
+                          <span className="font-medium ">{pres?.option} : </span>
+                          {pres?.value}
+                        </a>
+                      </li>
+                    }) : <li>
+                      <a href="#" className="block px-4 py-2 hover:bg-gray-100  ">
+                        No saved presets filter
+                      </a>
+                    </li>
+                  }
+
                 </ul>
               </div>
             </div>
 
-            {/* <PageLimitEditor
+            <PageLimitEditor
               localStorageKey="viewAttendeesPageLimit"
               setLimit={(limit) => setPageLimit(limit)}
-            /> */}
+            />
           </div>
 
           {assignedButton && (
@@ -506,6 +526,7 @@ const ViewAttendees = () => {
           isLoading={isLoading}
           checkboxRefs={checkboxRefs}
           assignmentData={attendeeData?.result}
+          LIMIT={pageLimit}
           page={page}
           setAssigned={setAssigned}
         />

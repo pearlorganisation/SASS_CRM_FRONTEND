@@ -35,6 +35,8 @@ import { addUserActivity } from "./features/actions/userActivity";
 import { isEmployeeId } from "./utils/roles";
 import { setIsEmployee } from "./features/slices/userActivity";
 import EmployeeActivity from "./pages/Employees/EmployeeActivity";
+import { getEmployeeStats } from "./features/actions/employee";
+import PabblyToken from "./pages/Settings/PabblyToken/PabblyToken";
 
 
 const App = () => {
@@ -45,10 +47,10 @@ const App = () => {
   console.log("checking if user is logged in", isUserLoggedIn, isEmployeeId(role));
   if (isUserLoggedIn && isEmployeeId(role)) {
     dispatch(setIsEmployee(true));
-    // dispatch(addUserActivity({
-    //   action: "login/refresh",
-    //   details: "User logged in or refreshed successfully",
-    // }))
+    dispatch(addUserActivity({
+      action: "login/refresh",
+      details: "User logged in or refreshed successfully",
+    }))
   } else {
     dispatch(setIsEmployee(false));
   }
@@ -144,6 +146,10 @@ const App = () => {
         {
           path: "/update-landing-page",
           element: <LandingPageForm/>,
+        },
+        {
+          path: "/pabblyToken",
+          element: <PabblyToken/>,
         },
 
       
