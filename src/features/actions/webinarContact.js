@@ -20,7 +20,7 @@ export const getAllAttendees = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await instance.get(
-        `/attendee/${payload.page}?${payload.filters}&recordType=${payload.recordType}` // &limit=${payload.limit || 10}
+        `/attendee/${payload.page}?${payload.filters}&recordType=${payload.recordType}&limit=${payload.limit || 10}` //
       );
       return response?.data;
     } catch (e) {

@@ -303,7 +303,7 @@ const ViewAttendees = () => {
 
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
   const [page, setPage] = useState(searchParams.get("page") || 1);
-  // const [pageLimit, setPageLimit] = useState(10);
+  const [pageLimit, setPageLimit] = useState(10);
 
   const [selectedType, setSelectedType] = useState("EMPLOYEE_SALES");
 
@@ -313,7 +313,7 @@ const ViewAttendees = () => {
     const option = empOptions.find((option) => option.value === recordType);
     if (option) {
       dispatch(
-        getAllAttendees({ page, recordType: option.label.toLocaleLowerCase() })
+        getAllAttendees({ page, recordType: option.label.toLocaleLowerCase(), limit: pageLimit })
       );
     }
   };
@@ -326,8 +326,8 @@ const ViewAttendees = () => {
   useEffect(() => {
     console.log("parent useEffect")
     const filters = buildQueryString(pills);
-    dispatch(getAllAttendees({ page, filters, recordType: ""  }));
-  }, [page, pills]);
+    dispatch(getAllAttendees({ page, filters, recordType: "", limit: pageLimit  }));
+  }, [page, pills,pageLimit]);
 
   useEffect(() => {
     if (assigned?.length > 0) {
@@ -485,10 +485,10 @@ const ViewAttendees = () => {
               </div>
             </div>
 
-            {/* <PageLimitEditor
+            <PageLimitEditor
               localStorageKey="viewAttendeesPageLimit"
               setLimit={(limit) => setPageLimit(limit)}
-            /> */}
+            />
           </div>
 
           {assignedButton && (
@@ -506,6 +506,7 @@ const ViewAttendees = () => {
           isLoading={isLoading}
           checkboxRefs={checkboxRefs}
           assignmentData={attendeeData?.result}
+          LIMIT={pageLimit}
           page={page}
           setAssigned={setAssigned}
         />
