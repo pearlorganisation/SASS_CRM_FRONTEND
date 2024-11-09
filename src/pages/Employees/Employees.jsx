@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { getAllEmployees } from "../../features/actions/employee";
+import { changeEmployeeStatus, getAllEmployees } from "../../features/actions/employee";
 import { Skeleton, Stack } from "@mui/material";
+import ConfirmActionModal from "./modal/ConfirmActionModal";
 
 const Employees = () => {
   const [showFilters, setShowFilters] = useState(false);
@@ -10,6 +11,7 @@ const navigate = useNavigate()
 const dispatch= useDispatch()
 const {employeeData,isLoading}= useSelector((state)=>state.employee)
 const {userData}= useSelector((state)=>state.auth)
+const [statusModalData, setStatusModalData] = useState(null);
 
   const navigateToAdd = () =>{
     navigate("/createEmployee")
@@ -19,7 +21,13 @@ const {userData}= useSelector((state)=>state.auth)
 dispatch(getAllEmployees(userData?.id))
   },[userData])
 
+  const handleStatusChange = (item) => {
+    
+    setStatusModalData(item); 
+  };
+
   return (
+    <>
     <div>
       <div
         className={`${showFilters ? "" : "hidden"} fixed w-screen h-screen z-2`}
@@ -72,7 +80,9 @@ dispatch(getAllEmployees(userData?.id))
                 <th scope="col" className="px-6 py-3">
                   Role
                 </th>
-
+                <th scope="col" className="px-6 py-3">
+                  Status
+                </th>
                 <th scope="col" className="px-6 py-3">
                   Action
                 </th>
@@ -109,6 +119,7 @@ dispatch(getAllEmployees(userData?.id))
                 </th>
                 <td className="px-6 py-4">{item?.phone}</td>
                 <td className="px-6 py-4">{item?.role?.name}</td>
+                <td className="px-6 py-4">{item?.isActive ? "Active" : "Inactive"}</td>
                 <td className="">
                  <div className="flex items-center gap-5">
                  <Link
@@ -124,21 +135,36 @@ dispatch(getAllEmployees(userData?.id))
                     Activity
                   </Link>
 
+                  <button
+                    className="font-medium text-blue-600  hover:underline"
+                    onClick={ () => { handleStatusChange(item)  }}
+                  >
+                    Change Status
+                  </button>
+
                  </div>
                 </td>
               </tr>)
               )) }
 
-               
-        
-        
-      
-      
             </tbody>
           </table>
         </div>
       </div>
     </div>
+
+    {
+      statusModalData &&
+      <ConfirmActionModal
+      setModal={setStatusModalData}
+      handleAction={() => { dispatch(changeEmployeeStatus(statusModalData?._id))
+
+        setStatusModalData(null);
+       }}
+      modalData={statusModalData}
+      action={statusModalData?.isActive ? "deactivate" : "activate"}/>
+    }
+    </>
   );
 };
 

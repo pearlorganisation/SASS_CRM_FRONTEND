@@ -28,6 +28,20 @@ export const getAllEmployees = createAsyncThunk(
   }
 );
 
+// toggle employee Status
+export const changeEmployeeStatus = createAsyncThunk(
+  "employee/toggleStatus",
+  async (id, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.patch(`/employee/${id}`);
+
+      return data?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 // get employee data
 export const getAllClients = createAsyncThunk(
   "clients/fetchData",
