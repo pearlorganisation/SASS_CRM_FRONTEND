@@ -13,7 +13,7 @@ const Dashboard = () => {
   return (
     <div  className='mt-10 flex flex-col font-medium items-center gap-4'>
 
- Last Site Updated on <span className='text-2xl font-bold font-mono'>10 October 2024</span></div>
+ Last Site Updated on <span className='text-2xl font-bold font-mono'>18 October 2024</span></div>
 
   )
 }

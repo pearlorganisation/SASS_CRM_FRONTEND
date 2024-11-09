@@ -206,66 +206,31 @@ setModal(false)
             </tr>
             </thead>
             <tbody>
-            <tr className=''>
-              <td className='px-6 '>First Name</td>
-              <td className='px-6 pb-2 '>  <Controller 
-                                      control={control}
-                                      name="firstName"
-                                      render={({ field }) => (
-                                          <Select
-                                              value={field.value}
-                                              options={generateOptions(meetingData)}
-                                              onChange={(selectedOption) => {
-                                                field.onChange(selectedOption);
-                                                handleSelectChange('firstName', selectedOption);
-                                              }}
-                                              className="mt-2"
-                                              placeholder="Select a custom field"
-                                             
-                                          />
-                                     )}
-                                      rules={{ required: true }}
-                                      
-                                  /></td>
-              <td className='px-6 pb-2'><span className='bg-slate-100 rounded-lg p-1'> 
-              {/* //here i want to display the value of react-select by selecting the label */}
-              {selectedValues.firstName}
-              </span> {errors.firstName && (
-                    <span className=" bg-slate-100 p-1 rounded-lg text-sm font-medium text-red-500">
-                      First Name is required
+            <tr className=''><td className='px-6 '>Webinar Name *</td>
+                  <td className='px-6 py-2 '>
+              <input {...register("csvName", { required: true })} type='text' className='border rounded-[4px] border-gray-300 w-full px-2 outline-none py-[4px]'
+            />
+             </td>
+            <td className='px-6 pb-2'>  {errors.csvName && (
+                    <span className=" bg-slate-100 p-1  rounded-lg text-sm font-medium text-red-500">
+                      Webinar Name is required
                     </span>
-                  )}  </td>
-              
-              </tr>
-            <tr><td className='px-6 '>Last Name</td>
-            <td className='px-6 pb-2 '>  <Controller 
-                                      control={control}
-                                      name="lastName"
-                                      render={({ field }) => (
-                                          <Select
-                                              value={field.value}
-                                              options={generateOptions(meetingData)}
-                                              onChange={(selectedOption) => {
-                                                field.onChange(selectedOption);
-                                                handleSelectChange('lastName', selectedOption);
-                                              }}
-                                              className="mt-2"
-                                              placeholder="Select a custom field"
-                                             
-                                          />
-                                     )}
-                                      rules={{ required: true }}
-                                      
-                                  /></td>
+                  )}</td>
+             </tr>
+            <tr><td className='px-6 '>Actual Webinar Date *</td>
+            <td className='px-6 py-2 '>
+              <input type='date' className='border rounded-[4px] border-gray-300 w-full px-2 outline-none py-[4px]'
+            onChange={(e)=>{setDate(e.target.value)}}/>
+             </td>
                                   <td className='px-6 pb-2'><span className='bg-slate-100 rounded-lg p-1'> 
-              {/* //here i want to display the value of react-select by selecting the label */}
-              {selectedValues.lastName}
-              </span> {errors.lastName && (
+              {date}
+              </span>{dateErrorMessage && (
                     <span className=" bg-slate-100 p-1 rounded-lg text-sm font-medium text-red-500">
-                      Last Name is required
+                      {dateErrorMessage}
                     </span>
-                  )} </td></tr>
-            <tr><td className='px-6 '>Email</td>
+                  )}  </td></tr>
+      
+            <tr><td className='px-6 '>Email *</td>
             <td className='px-6 pb-2 '>  <Controller 
                                       control={control}
                                       name="email"
@@ -293,6 +258,57 @@ setModal(false)
                       Email is required
                     </span>
                   )}  </td></tr>
+                       <tr className=''>
+              <td className='px-6 '>First Name </td>
+              <td className='px-6 pb-2 '>  <Controller 
+                                      control={control}
+                                      name="firstName"
+                                      render={({ field }) => (
+                                          <Select
+                                              value={field.value}
+                                              options={generateOptions(meetingData)}
+                                              onChange={(selectedOption) => {
+                                                field.onChange(selectedOption);
+                                                handleSelectChange('firstName', selectedOption);
+                                              }}
+                                              className="mt-2"
+                                              placeholder="Select a custom field"
+                                             
+                                          />
+                                     )}
+                                    
+                                      
+                                  /></td>
+              <td className='px-6 pb-2'><span className='bg-slate-100 rounded-lg p-1'> 
+              {/* //here i want to display the value of react-select by selecting the label */}
+              {selectedValues.firstName}
+              </span>  </td>
+              
+              </tr>
+            <tr><td className='px-6 '>Last Name</td>
+            <td className='px-6 pb-2 '>  <Controller 
+                                      control={control}
+                                      name="lastName"
+                                      render={({ field }) => (
+                                          <Select
+                                              value={field.value}
+                                              options={generateOptions(meetingData)}
+                                              onChange={(selectedOption) => {
+                                                field.onChange(selectedOption);
+                                                handleSelectChange('lastName', selectedOption);
+                                              }}
+                                              className="mt-2"
+                                              placeholder="Select a custom field"
+                                             
+                                          />
+                                     )}
+                                     
+                                      
+                                  /></td>
+                                  <td className='px-6 pb-2'><span className='bg-slate-100 rounded-lg p-1'> 
+              {/* //here i want to display the value of react-select by selecting the label */}
+              {selectedValues.lastName}
+              </span> </td></tr>
             <tr><td className='px-6 '>Phone Number</td>
             <td className='px-6 pb-2 '>  <Controller 
                                       control={control}
@@ -310,17 +326,13 @@ setModal(false)
                                              
                                           />
                                      )}
-                                      rules={{ required: true }}
+                                   
                                       
                                   /></td>
                                   <td className='px-6 pb-2'><span className='bg-slate-100 rounded-lg p-1'> 
               {/* //here i want to display the value of react-select by selecting the label */}
               {selectedValues.phoneNumber}
-              </span> {errors.phoneNumber && (
-                    <span className=" bg-slate-100 p-1 rounded-lg text-sm font-medium text-red-500">
-                      Phone Number is required
-                    </span>
-                  )}  </td></tr>
+              </span> </td></tr>
             <tr><td className='px-6 '>Session Minutes</td>
             <td className='px-6 pb-2 '>  <Controller 
                                       control={control}
@@ -338,41 +350,16 @@ setModal(false)
                                              
                                           />
                                      )}
-                                      rules={{ required: true }}
+                                    
                                       
                                   /></td>
                                   <td className='px-6 pb-2'><span className='bg-slate-100 rounded-lg p-1'> 
               {/* //here i want to display the value of react-select by selecting the label */}
               {selectedValues.sessionMinutes}
-              </span>{errors.sessionMinutes && (
-                    <span className=" bg-slate-100 p-1 rounded-lg text-sm font-medium text-red-500">
-                      Session Minutes is required
-                    </span>
-                  )}  </td></tr>
+              </span>
+            </td></tr>
           
-            <tr><td className='px-6 '>Actual Webinar Date</td>
-            <td className='px-6 py-2 '>
-              <input type='date' className='border rounded-[4px] border-gray-300 w-full px-2 outline-none py-[4px]'
-            onChange={(e)=>{setDate(e.target.value)}}/>
-             </td>
-                                  <td className='px-6 pb-2'><span className='bg-slate-100 rounded-lg p-1'> 
-              {date}
-              </span>{dateErrorMessage && (
-                    <span className=" bg-slate-100 p-1 rounded-lg text-sm font-medium text-red-500">
-                      {dateErrorMessage}
-                    </span>
-                  )}  </td></tr>
-                  <tr className=''><td className='px-6 '>Webinar Name</td>
-                  <td className='px-6 py-2 '>
-              <input {...register("csvName", { required: true })} type='text' className='border rounded-[4px] border-gray-300 w-full px-2 outline-none py-[4px]'
-            />
-             </td>
-            <td className='px-6 pb-2'>  {errors.csvName && (
-                    <span className=" bg-slate-100 p-1  rounded-lg text-sm font-medium text-red-500">
-                      Webinar Name is required
-                    </span>
-                  )}</td>
-             </tr>
+   
                   </tbody>
           </table>
          
