@@ -9,6 +9,7 @@ const EmployeeAssignments = () => {
     const dispatch = useDispatch();
     const { id } = useParams();
     const { isLoading, employeeAssignments } = useSelector((state) => state.employee);
+    console.log('empassignments',employeeAssignments);
     useEffect(() => {
         dispatch(getEmployeeAssignments(id));
 

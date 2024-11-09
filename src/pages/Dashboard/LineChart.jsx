@@ -22,7 +22,7 @@ ChartJS.register(
   Legend
 );
 
-const LineChart = () => {
+const LineChart = ({webinarData}) => {
   const rawData = [
     {
       date: "2024-10-22",
@@ -51,7 +51,7 @@ const LineChart = () => {
   ];
 
   // Sort data by date
-  const sortedData = [...rawData].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const sortedData = [...webinarData].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   // Format dates
   const formatDate = (dateStr) => {
@@ -110,7 +110,7 @@ const LineChart = () => {
   };
 
   return (
-    <div className="w-full h-96 p-4">
+    <div className="w-96 h-96">
       <Line options={options} data={data} />
     </div>
   );

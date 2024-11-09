@@ -17,9 +17,6 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 // Define the component
 export default function PieChart({pieData}) {
 
-    console.log(pieData,'pieData')
-
-
     const data = {
         labels: ['Sales', 'Reminder'],
         datasets: [

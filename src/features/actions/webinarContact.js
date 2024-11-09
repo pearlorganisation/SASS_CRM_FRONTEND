@@ -122,7 +122,6 @@ export const updateAttendeeDetails = createAsyncThunk(
   }
 );
 
-
 export const updateAttendeeLeadType = createAsyncThunk(
   "attendeeLeadType/updateData",
   async (payload, { rejectWithValue }) => {

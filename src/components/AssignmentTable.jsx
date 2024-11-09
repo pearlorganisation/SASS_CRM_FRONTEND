@@ -32,9 +32,11 @@ const AssignmentTable = (props) => {
 
   };
 
+  console.log(assignmentData,'daa');
+
   return (
     <div className="mt-7 shadow-lg rounded-lg overflow-x-auto">
-      {assignmentData.length <= 0 ? (
+      { assignmentData.length <= 0 ? (
         <div className="text-lg p-2 flex justify-center w-full">
           No record found
         </div>
@@ -68,7 +70,7 @@ const AssignmentTable = (props) => {
                   </Stack>
                 </td>
               </tr>
-            ) : Array.isArray(assignmentData) && assignmentData?.length > 0 ? (
+            ) : Array.isArray(assignmentData) && assignmentData?.length > 0 && assignmentData[0]?.records ? (
               assignmentData.map((item, index) => {
                 const serialNumber = ((page - 1) * LIMIT) + ( index + 1);
                 return (
