@@ -11,6 +11,7 @@ import sidebarLink from "./slices/sidebarLink";
 import assign from "./slices/assign";
 import globalData from "./slices/globalData";
 import userActivityReducer from "./slices/userActivity";
+import pabblyToken from "./slices/pabblyToken";
 
 
 
@@ -24,6 +25,7 @@ const rootReducer = combineReducers({
   assign,
   globalData,
   userActivity: userActivityReducer,
+  pabblyToken
   });
 
 // Custom root reducer handling a clear action
