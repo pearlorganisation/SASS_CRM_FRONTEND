@@ -35,6 +35,7 @@ import { addUserActivity } from "./features/actions/userActivity";
 import { isEmployeeId } from "./utils/roles";
 import { setIsEmployee } from "./features/slices/userActivity";
 import EmployeeActivity from "./pages/Employees/EmployeeActivity";
+import { getEmployeeStats } from "./features/actions/employee";
 
 
 const App = () => {

@@ -70,3 +70,19 @@ export const getEmployeeAssignments = createAsyncThunk(
     }
   }
 );
+
+
+// get employee Statistics
+export const getEmployeeStats = createAsyncThunk(
+  "employeeStats/fetchData",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(
+        `/users/employeeStats`
+      );
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
