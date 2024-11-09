@@ -1,147 +1,164 @@
 import { Skeleton, Stack } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllAttendees } from "../../features/actions/webinarContact";
 import Pagination from "@mui/material/Pagination";
 import { IoClose } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
-import Select from "react-select"
+import Select from "react-select";
 import { addAssign } from "../../features/actions/assign";
 import { toast } from "sonner";
+import AssignmentTable from "../../components/AssignmentTable";
+import EmployeeAssignModal from "./Modal/EmployeeAssignModal";
+import PageLimitEditor from "../../components/PageLimitEditor";
 
 const ViewAttendees = () => {
   const [savedPresets, setSavedPresets] = useState(false);
   const [assignedButton, setAssignedButton] = useState(false);
-  const [assignedEmployee,setAssignedEmployee]= useState();
   const [assigned, setAssigned] = useState([]);
   const dispatch = useDispatch();
   const { attendeeData, isLoading } = useSelector(
     (state) => state.webinarContact
   );
-  const { employeeData } = useSelector(
-    (state) => state.employee
-  );
+  const { employeeData } = useSelector((state) => state.employee);
 
   const pageCount = attendeeData?.totalPages;
 
-
   const options = [
-    { show: "Email", backend: 'email' },
-    { show: "Start - End Time", backend: 'time' },
-    { show: "Gender", backend: 'gender' },
-    { show: "Location", backend: 'location' },
-    { show: "Min Age Range", backend: 'ageRangeMin' },
-    { show: "Max Age Range", backend: 'ageRangeMax' },
-    { show: "Search From Mobile Number", backend: 'phone' }
+    { show: "Email", backend: "email" },
+    { show: "Start - End Time", backend: "time" },
+    { show: "Gender", backend: "gender" },
+    { show: "Location", backend: "location" },
+    { show: "Min Age Range", backend: "ageRangeMin" },
+    { show: "Max Age Range", backend: "ageRangeMax" },
+    { show: "Search From Mobile Number", backend: "phone" },
+  ];
+  const empOptions = [
+    {
+      label: "Sales",
+      value: "EMPLOYEE_SALES",
+    },
+    {
+      label: "Reminder",
+      value: "EMPLOYEE_REMINDER",
+    },
   ];
 
   const [selectedOption, setSelectedOption] = useState(null);
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [ageRangeMin, setAgeRangeMin] = useState();
   const [ageRangeMax, setAgeRangeMax] = useState();
   const [phone, setPhone] = useState();
-  const [email, setEmail] = useState('');
-  const [gender, setGender] = useState('');
-  const [location, setLocation] = useState('');
+  const [email, setEmail] = useState("");
+  const [gender, setGender] = useState("");
+  const [location, setLocation] = useState("");
   const [pills, setPills] = useState([]);
-
+  const [showModal, setShowModal] = useState(false);
+  const checkboxRefs = useRef([]);
   const handleOptionClick = (option) => {
     if (option.show === selectedOption?.show) {
       // If the clicked option is already selected, hide the input field
       setSelectedOption(null);
-      setStartTime('');
-      setEndTime('');
-      setAgeRangeMin('');
-      setAgeRangeMax('');
-      setPhone('');
-      setEmail('');
-      setGender('');
-      setLocation('');
+      setStartTime("");
+      setEndTime("");
+      setAgeRangeMin("");
+      setAgeRangeMax("");
+      setPhone("");
+      setEmail("");
+      setGender("");
+      setLocation("");
     } else {
       // Otherwise, show the input field for the new option
       setSelectedOption(option);
     }
   };
 
- 
-const handleInputSubmit = () => {
+  const handleInputSubmit = () => {
     if (selectedOption) {
       let newPills = [];
-      
+
       switch (selectedOption.backend) {
-        case 'time':
+        case "time":
           // Ensure startTime is less than endTime
           if (startTime && endTime && Number(startTime) < Number(endTime)) {
-            newPills = [{ option: 'time', value: `${startTime} - ${endTime}` }];
+            newPills = [{ option: "time", value: `${startTime} - ${endTime}` }];
           } else {
             alert("Start Time must be smaller than End Time.");
             return; // Exit the function if the condition is not met
           }
           break;
-          
-          case 'ageRangeMin':
-            // Ensure ageRangeMin is less than ageRangeMax, if both are present
-            if (ageRangeMin && ageRangeMax && Number(ageRangeMin) >= Number(ageRangeMax)) {
-              alert("hello",)
-              alert("Min Age must be smaller than Max Age.");
-              return; // Exit the function if the condition is not met
-            }
-            if (ageRangeMin) {
-              newPills = [{ option: 'ageRangeMin', value: ageRangeMin }];
-             
-            }
-            break;
 
-          case 'ageRangeMax':
-              // Ensure ageRangeMin is less than ageRangeMax, if both are present
-              if (ageRangeMin && ageRangeMax && Number(ageRangeMin) >= Number(ageRangeMax)) {
-                toast.error("Min Age must be smaller than Max Age.");
-                return; // Exit the function if the condition is not met
-              }
-              if (ageRangeMax) {
-                newPills = [{ option: 'ageRangeMax', value: ageRangeMax }];
-              }
-              break;
-              
-          
-        case 'phone':
+        case "ageRangeMin":
+          // Ensure ageRangeMin is less than ageRangeMax, if both are present
+          if (
+            ageRangeMin &&
+            ageRangeMax &&
+            Number(ageRangeMin) >= Number(ageRangeMax)
+          ) {
+            alert("hello");
+            alert("Min Age must be smaller than Max Age.");
+            return; // Exit the function if the condition is not met
+          }
+          if (ageRangeMin) {
+            newPills = [{ option: "ageRangeMin", value: ageRangeMin }];
+          }
+          break;
+
+        case "ageRangeMax":
+          // Ensure ageRangeMin is less than ageRangeMax, if both are present
+          if (
+            ageRangeMin &&
+            ageRangeMax &&
+            Number(ageRangeMin) >= Number(ageRangeMax)
+          ) {
+            toast.error("Min Age must be smaller than Max Age.");
+            return; // Exit the function if the condition is not met
+          }
+          if (ageRangeMax) {
+            newPills = [{ option: "ageRangeMax", value: ageRangeMax }];
+          }
+          break;
+
+        case "phone":
           if (phone) {
-            newPills = [{ option: 'phone', value: phone }];
+            newPills = [{ option: "phone", value: phone }];
           }
           break;
-          
-        case 'email':
+
+        case "email":
           if (email) {
-            newPills = [{ option: 'email', value: email }];
+            newPills = [{ option: "email", value: email }];
           }
           break;
-          
-        case 'gender':
+
+        case "gender":
           if (gender) {
-            newPills = [{ option: 'gender', value: gender }];
+            newPills = [{ option: "gender", value: gender }];
           }
           break;
-          
-        case 'location':
+
+        case "location":
           if (location) {
-            newPills = [{ option: 'location', value: location }];
+            newPills = [{ option: "location", value: location }];
           }
           break;
-          
+
         default:
           break;
       }
-  
-      if (newPills.length) {
-        const updatedPills = pills.filter(pill => !newPills.some(newPill => newPill.option === pill.option));
+
+      if (newPills?.length) {
+        const updatedPills = pills.filter(
+          (pill) => !newPills.some((newPill) => newPill.option === pill.option)
+        );
         setPills([...updatedPills, ...newPills]);
         // Clear inputs
         switch (selectedOption.backend) {
-          case 'time':
-            setStartTime('');
-            setEndTime('');
+          case "time":
+            setStartTime("");
+            setEndTime("");
             break;
           // case 'ageRangeMin':
           //   setAgeRangeMin('');
@@ -149,17 +166,17 @@ const handleInputSubmit = () => {
           // case 'ageRangeMax':
           //   setAgeRangeMax(');
           //   break;
-          case 'phone':
-            setPhone('');
+          case "phone":
+            setPhone("");
             break;
-          case 'email':
-            setEmail('');
+          case "email":
+            setEmail("");
             break;
-          case 'gender':
-            setGender('');
+          case "gender":
+            setGender("");
             break;
-          case 'location':
-            setLocation('');
+          case "location":
+            setLocation("");
             break;
           default:
             break;
@@ -168,7 +185,7 @@ const handleInputSubmit = () => {
       }
     }
   };
-  
+
   const removePill = (indexToRemove) => {
     setPills(pills.filter((_, index) => index !== indexToRemove));
   };
@@ -177,7 +194,7 @@ const handleInputSubmit = () => {
     const commonStyle = "border p-[6px] rounded-md w-full"; // Common style for all input fields
     const timeInputStyle = "border p-[6px] rounded-md w-[150px]"; // Smaller width for time inputs
 
-    if (selectedOption?.backend === 'time') {
+    if (selectedOption?.backend === "time") {
       return (
         <div className="flex gap-2">
           <input
@@ -198,8 +215,7 @@ const handleInputSubmit = () => {
       );
     }
 
-
-    if (selectedOption?.backend === 'ageRangeMin') {
+    if (selectedOption?.backend === "ageRangeMin") {
       return (
         <input
           type="Number"
@@ -210,7 +226,7 @@ const handleInputSubmit = () => {
         />
       );
     }
-    if (selectedOption?.backend === 'ageRangeMax') {
+    if (selectedOption?.backend === "ageRangeMax") {
       return (
         <input
           type="Number"
@@ -222,7 +238,7 @@ const handleInputSubmit = () => {
       );
     }
 
-    if (selectedOption?.backend === 'phone') {
+    if (selectedOption?.backend === "phone") {
       return (
         <input
           type="Number"
@@ -234,7 +250,7 @@ const handleInputSubmit = () => {
       );
     }
 
-    if (selectedOption?.backend === 'email') {
+    if (selectedOption?.backend === "email") {
       return (
         <input
           type="email"
@@ -246,7 +262,7 @@ const handleInputSubmit = () => {
       );
     }
 
-    if (selectedOption?.backend === 'gender') {
+    if (selectedOption?.backend === "gender") {
       return (
         <select
           value={gender}
@@ -261,7 +277,7 @@ const handleInputSubmit = () => {
       );
     }
 
-    if (selectedOption?.backend === 'location') {
+    if (selectedOption?.backend === "location") {
       return (
         <input
           type="text"
@@ -277,11 +293,30 @@ const handleInputSubmit = () => {
   };
 
   const buildQueryString = (pills) => {
-    return pills.map((pill) => `${encodeURIComponent(pill.option)}=${encodeURIComponent(pill.value)}`).join('&');
+    return pills
+      .map(
+        (pill) =>
+          `${encodeURIComponent(pill.option)}=${encodeURIComponent(pill.value)}`
+      )
+      .join("&");
   };
 
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
   const [page, setPage] = useState(searchParams.get("page") || 1);
+  // const [pageLimit, setPageLimit] = useState(10);
+
+  const [selectedType, setSelectedType] = useState("EMPLOYEE_SALES");
+
+  const handleSelectChange = (event) => {
+    const recordType = event.target.value;
+    setSelectedType(recordType);
+    const option = empOptions.find((option) => option.value === recordType);
+    if (option) {
+      dispatch(
+        getAllAttendees({ page, recordType: option.label.toLocaleLowerCase() })
+      );
+    }
+  };
 
   const handlePagination = (e, p) => {
     setPage(p);
@@ -289,33 +324,61 @@ const handleInputSubmit = () => {
   };
 
   useEffect(() => {
+    console.log("parent useEffect")
     const filters = buildQueryString(pills);
-    console.log(filters);
-    dispatch(getAllAttendees({ page, filters, recordType:"" }));
-  }, [page, pills, dispatch]);
+    dispatch(getAllAttendees({ page, filters, recordType: ""  }));
+  }, [page, pills]);
 
-  useEffect(()=>{
-    if(assigned.length >0){
-      setAssignedButton(true)
-    }else{
-      setAssignedButton(false)
+  useEffect(() => {
+    if (assigned?.length > 0) {
+      setAssignedButton(true);
+    } else {
+      setAssignedButton(false);
     }
-    console.log(assigned)
-    console.log(assignedEmployee)
-  },[assigned])
+  }, [assigned]);
 
+  const handleAssignNow = (selectedEmployee) => {
+    dispatch(
+      addAssign({
+        userId: selectedEmployee,
+        attendees: assigned,
+      })
+    ).then(() => {
+      setShowModal(false);
+      setAssigned([]);
+      clearCheckboxes();
+    });
+  };
+
+  const clearCheckboxes = () => {
+    checkboxRefs.current.forEach((checkbox) => {
+      if (checkbox) checkbox.checked = false;
+    });
+  };
 
   return (
     <>
-      <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-10">
-       <div className="flex justify-between">
-        <h3 className="text-gray-800 text-xl font-bold sm:text-2xl mb-5">
-          Manage Attendees Details
-        </h3>
-        <div className="space-x-5  ">
-          <button onClick={()=>dispatch(getAllAttendees({ page, recordType:"sales" }))} className="bg-green-700 hover:bg-green-600 text-white rounded-md px-5 py-1 font-medium">Sales</button>
-          <button onClick={()=>dispatch(getAllAttendees({ page, recordType:"reminder" })) } className="bg-blue-700 hover:bg-blue-600 text-white rounded-md px-5 py-1 font-medium">Reminder</button>
-        </div>
+      <div className="px-4 md:px-8 py-10">
+        <div className="flex justify-between">
+          <h3 className="text-gray-800 text-xl font-bold sm:text-2xl mb-5">
+            Manage Attendees Details
+          </h3>
+          <div className="relative inline-block text-left">
+            <select
+              value={selectedType}
+              onChange={handleSelectChange}
+              className="bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 cursor-pointer transition duration-150 ease-in-out"
+            >
+              <option value="" disabled>
+                Select Record Type
+              </option>
+              {empOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div>
@@ -355,11 +418,19 @@ const handleInputSubmit = () => {
           {/* Pills */}
           <div className="flex gap-2 flex-wrap mb-5">
             {pills.map((pill, index) => {
-              const optionLabel = options.find(opt => opt.backend === pill.option)?.show || pill.option;
+              const optionLabel =
+                options.find((opt) => opt.backend === pill.option)?.show ||
+                pill.option;
               return (
-                <div key={index} className="text-sm hover:border-gray-400 cursor-pointer border p-2 rounded-full flex items-center">
+                <div
+                  key={index}
+                  className="text-sm hover:border-gray-400 cursor-pointer border p-2 rounded-full flex items-center"
+                >
                   <span>{`${optionLabel}: ${pill.value}`}</span>
-                  <button onClick={() => removePill(index)} className="ml-2 text-lg">
+                  <button
+                    onClick={() => removePill(index)}
+                    className="ml-2 text-lg"
+                  >
                     <IoClose />
                   </button>
                 </div>
@@ -368,159 +439,76 @@ const handleInputSubmit = () => {
           </div>
         </div>
 
-            <div className="flex justify-between gap-4">
-
-              <div className="relative">
-                <button
-                  id="dropdownActionButton"
-                  className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-2 "
-                  type="button"
-                  onClick={() => setSavedPresets((prev) => !prev)}
+        <div className="flex justify-between gap-4">
+          <div className="flex gap-6">
+            <div className="relative">
+              <button
+                id="dropdownActionButton"
+                className="inline-flex text-nowrap items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-2 "
+                type="button"
+                onClick={() => setSavedPresets((prev) => !prev)}
+              >
+                <span className="sr-only">Action button</span>
+                Saved Filter Presets
+                <svg
+                  className="w-2.5 h-2.5 ms-2.5"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 10 6"
                 >
-                  <span className="sr-only">Action button</span>
-                  Saved Filter Presets
-                  <svg
-                    className="w-2.5 h-2.5 ms-2.5"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 10 6"
-                  >
-                    <path
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="m1 1 4 4 4-4"
-                    />
-                  </svg>
-                </button>
-                <div
-                  id="dropdownAction"
-                  className={` ${
-                    savedPresets ? "" : "hidden"
-                  } absolute top-full z-10  bg-white divide-y divide-gray-100 rounded-lg shadow w-44  `}
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m1 1 4 4 4-4"
+                  />
+                </svg>
+              </button>
+              <div
+                id="dropdownAction"
+                className={` ${
+                  savedPresets ? "" : "hidden"
+                } absolute top-full z-10  bg-white divide-y divide-gray-100 rounded-lg shadow w-44  `}
+              >
+                <ul
+                  className="py-1 text-sm text-gray-700 "
+                  aria-labelledby="dropdownActionButton"
                 >
-                  <ul
-                    className="py-1 text-sm text-gray-700 "
-                    aria-labelledby="dropdownActionButton"
-                  >
-                    <li>
-                      <a
-                        href="#"
-                        className="block px-4 py-2 hover:bg-gray-100  "
-                      >
-                        No saved presets filter
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                  <li>
+                    <a href="#" className="block px-4 py-2 hover:bg-gray-100  ">
+                      No saved presets filter
+                    </a>
+                  </li>
+                </ul>
               </div>
-            
-             {assignedButton && <div className="flex gap-4">
-              <Select 
-
-              options={Array.isArray(employeeData) && employeeData.map((item)=>({value:item?._id ,label:item?.userName})) }
-              onChange={(selectedOption) => setAssignedEmployee(selectedOption.value)}
-              />
-             {assignedEmployee && <button onClick={()=>dispatch(addAssign({userId:assignedEmployee,attendees:assigned}))} 
-             className="bg-blue-600 rounded-md px-1 text-white">Assign Now</button>}</div>}
             </div>
-        <div className="mt-7 shadow-lg rounded-lg overflow-x-auto">
-          <table className="w-full table-auto text-sm text-left">
-            <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
-              <tr>
-                <th className=""></th>
-                <th className="py-3 px-6 text-center">S No.</th>
-                <th className="py-3 px-6">Email</th>
-                <th className="py-3 px-6">First Name</th>
-                {/* <th className="py-3 px-6">Last Name</th> */}
-                <th className="py-3 text-center px-6">Webinar Minutes</th>
-                <th className="py-3 text-center px-6">Record Type</th>
-                <th className="py-3 text-center px-6">Total Records</th>
-                <th className="py-3 px-6">Action</th>
-              </tr>
-            </thead>
-            <tbody className="text-gray-600 divide-y">
-              {isLoading ? (
-                <tr>
-                  <td colSpan="8" className="text-center px-6 py-8">
-                    <Stack spacing={4}>
-                      <Skeleton variant="rounded" height={30} />
-                      <Skeleton variant="rounded" height={25} />
-                      <Skeleton variant="rounded" height={20} />
-                      <Skeleton variant="rounded" height={20} />
-                      <Skeleton variant="rounded" height={20} />
-                    </Stack>
-                  </td>
-                </tr>
-              ) : (
-                Array.isArray(attendeeData?.result) &&
-                attendeeData?.result.length > 0 ?
-                attendeeData?.result?.map((item, idx) => {
-                  const serialNumber = (page - 1) * 25 + idx + 1;
-                  return (
-                    <tr key={idx}>
-                      <td className="ps-4 py-4 whitespace-nowrap">
-                      <input onClick={(e)=>{
-                         if(e.target.checked){
-                          setAssigned(prev => [...prev,{ attendeeId:item?._id,email:item?.email}])
-                        }else{
-                          setAssigned(prev => prev.filter(attendeeObj => attendeeObj.attendeeId !== item?._id))
-                        }
 
-                      }} type="checkbox" className="scale-125"/>
-                      </td>
-                      <td className="px-6 py-4 text-center whitespace-nowrap">
-                        {serialNumber}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                      {item._id}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                      {item?.records[0]?.firstName}
-                      </td>
-                      {/* <td className="px-6 py-4 whitespace-nowrap">
-                      {item?.records[0]?.lastName?.match(/:-\)/)
-                            ? "--"
-                            : item?.lastName}
-                      </td> */}
-               
-                      <td className="px-6 py-4 text-center whitespace-nowrap">
-                      {item?.records?.reduce((acc,time)=>
-                            acc + time?.timeInSession
-                          ,0)}
-                      </td>
-                      <td className="px-6 py-4 capitalize text-center whitespace-nowrap">
-                      {item?.records[0]?.recordType}
-                      </td>
-                      <td className="px-6 py-4  text-center whitespace-nowrap">
-                      {item?.records?.length}
-                      </td>
-                      <td className="px-3 whitespace-nowrap">
-                      <Link to={"/particularContact"} state={item}
-                            className="cursor-pointer py-2 px-3 font-semibold text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50 rounded-lg
-                    "
-                          >
-                            View full details
-                          </Link>
-                        <button
-                          onClick={() => {
-                            handleDeleteModal(item?._id);
-                          }}
-                          className="py-2 px-3 leading-none font-semibold text-red-500 hover:text-red-600 duration-150 hover:bg-gray-50 rounded-lg"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-                : <div className="text-gray-700 p-3">No Data Found</div>
-              )}
-            </tbody>
-          </table>
+            {/* <PageLimitEditor
+              localStorageKey="viewAttendeesPageLimit"
+              setLimit={(limit) => setPageLimit(limit)}
+            /> */}
+          </div>
+
+          {assignedButton && (
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowModal(true)}
+                className="bg-blue-600 rounded-md px-1 text-white"
+              >
+                Assign Employee
+              </button>
+            </div>
+          )}
         </div>
+        <AssignmentTable
+          isLoading={isLoading}
+          checkboxRefs={checkboxRefs}
+          assignmentData={attendeeData?.result}
+          page={page}
+          setAssigned={setAssigned}
+        />
       </div>
       <div className="flex justify-center mt-5">
         <Pagination
@@ -530,6 +518,15 @@ const handleInputSubmit = () => {
           onChange={handlePagination}
         />
       </div>
+
+      {showModal && (
+        <EmployeeAssignModal
+          employeeData={employeeData}
+          selectedType={selectedType}
+          onClose={() => setShowModal(false)}
+          onAssign={handleAssignNow}
+        />
+      )}
     </>
   );
 };

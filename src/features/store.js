@@ -9,6 +9,8 @@ import employee from "./slices/employee";
 import product from "./slices/product";
 import sidebarLink from "./slices/sidebarLink";
 import assign from "./slices/assign";
+import globalData from "./slices/globalData";
+import userActivityReducer from "./slices/userActivity";
 
 
 
@@ -19,7 +21,9 @@ const rootReducer = combineReducers({
   employee,
   product,
   sidebarLink,
-  assign
+  assign,
+  globalData,
+  userActivity: userActivityReducer,
   });
 
 // Custom root reducer handling a clear action

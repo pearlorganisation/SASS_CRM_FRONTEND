@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { getAttendees } from "../../features/actions/webinarContact";
 import Pagination from "@mui/material/Pagination";
 import { Skeleton, Stack } from "@mui/material";
+import AssignmentTable from "../../components/AssignmentTable";
 
 const ViewContacts = () => {
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
@@ -42,89 +43,13 @@ const ViewContacts = () => {
             </p>
           </div>
         </div>
-        <div className="mt-12 shadow-lg rounded-lg overflow-x-auto">
-          {attendeeData?.result?.length <= 0 ? (
-            <div className="text-lg p-2 flex justify-center w-full">
-              No record found
-            </div>
-          ) : (
-            <table className="w-full table-auto text-sm text-left ">
-              <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
-                <tr>
-                  <th className="py-3 px-2 ">S No.</th>
-                  <th className="py-3 px-2 ">Email</th>
-                  <th className="py-3 px-2 ">First Name</th>
-                  <th className="py-3 px-2 ">Last Name</th>
-                  <th className="py-3 px-2 text-center">Webinar Minutes</th>
-                  <th className="py-3 px-2 text-center ">Total Records</th>
+        <AssignmentTable
+          assignmentData={attendeeData?.result}
+          isLoading={isLoading}
+          page={page}
+          LIMIT={30}
+        />
 
-                  <th className="py-3 px-6">Action</th>
-                </tr>
-              </thead>
-
-              <tbody className="text-gray-600 divide-y">
-                {isLoading ? (
-                  <tr>
-                    <td colSpan="8" className="text-center px-6 py-8">
-                      <Stack spacing={4}>
-                        <Skeleton variant="rounded" height={30} />
-                        <Skeleton variant="rounded" height={25} />
-                        <Skeleton variant="rounded" height={20} />
-                        <Skeleton variant="rounded" height={20} />
-                        <Skeleton variant="rounded" height={20} />
-                      </Stack>
-                    </td>
-                  </tr>
-                ) : (
-                  Array.isArray(attendeeData?.result) &&
-                  attendeeData?.result?.length > 0 &&
-                  attendeeData?.result?.map((item, idx) => {
-                    const serialNumber = (page - 1) * 25 + idx + 1;
-              
-                    return (
-                      <tr>
-                        <td
-                          className={`px-2 py-4 whitespace-nowrap border-l-8 border-red-500`}
-                        >
-                          {serialNumber}
-                        </td>
-                        <td className="px-2 py-4 whitespace-nowrap">
-                          {item._id}
-                        </td>
-
-                        <td className="px-2 py-4 whitespace-nowrap ">
-                          {item?.records[0]?.firstName}
-                        </td>
-                        <td className="px-2 py-4 whitespace-nowrap">
-                          {item?.records[0]?.lastName?.match(/:-\)/)
-                            ? "--"
-                            : item?.lastName}
-                        </td>
-                        <td className="px-2  text-center py-4 whitespace-nowrap">
-                          {item?.records?.reduce((acc,time)=>
-                            acc + time?.timeInSession
-                          ,0)}
-                        </td>
-                        <td className="px-2 text-center  py-4 whitespace-nowrap">
-                          {item?.records?.length}
-                        </td>
-
-                        <td className="px-2 whitespace-nowrap">
-                          <Link to={"/particularContact"} state={item}
-                            className="cursor-pointer py-2 px-3 font-semibold text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50 rounded-lg
-                    "
-                          >
-                            View full details
-                          </Link>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          )}
-        </div>
       </div>
       <div className="flex justify-center mt-5">
         <Pagination

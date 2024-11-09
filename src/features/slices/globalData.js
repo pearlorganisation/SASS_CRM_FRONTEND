@@ -3,60 +3,55 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { addProduct, getAllProducts } from "../actions/product";
-
+import { createGlobalData, getGlobalData } from "../actions/globalData";
 
 
 const initialState = {
   isLoading: false,
-  productData: [],
-  totalPages: 1,
+  landingGlobalData: [],
   errorMessage: "",
+  isSuccess: false
 };
 
 // ---------------------------------------------------------------------------------------
 
-export const productSlice = createSlice({
-  name: "product",
+export const globalDataSlice = createSlice({
+  name: "globalData",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
 
-      .addCase(addProduct.pending, (state, action) => {
+      .addCase(createGlobalData.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
       })
-      .addCase(addProduct.fulfilled, (state, action) => {
+      .addCase(createGlobalData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.productData = action.payload.data;
-        toast.success("Product Added Successfully", {
+        toast.info(action.payload.data.message, {
           position: "top-center",
         });
       })
-      .addCase(addProduct.rejected, (state, action) => {
+      .addCase(createGlobalData.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
         toast.error(action?.payload || "Something went wrong");
       })
-      .addCase(getAllProducts.pending, (state, action) => {
+      .addCase(getGlobalData.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
       })
-      .addCase(getAllProducts.fulfilled, (state, action) => {
+      .addCase(getGlobalData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.productData = action.payload?.data;
-        state.totalPages = action.payload?.pagination?.totalPages || 1;
+        state.landingGlobalData = action.payload.data;
       })
-      .addCase(getAllProducts.rejected, (state, action) => {
+      .addCase(getGlobalData.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
       })
+     
  
   },
 });
@@ -64,7 +59,7 @@ export const productSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {} = productSlice.actions;
-export default productSlice.reducer;
+export const {} = globalDataSlice.actions;
+export default globalDataSlice.reducer;
 
 // ================================================== THE END ==================================================

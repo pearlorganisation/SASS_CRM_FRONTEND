@@ -5,12 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { clearLoadingAndData } from "../../../features/slices/auth";
-
+import { getGlobalData } from "../../../features/actions/globalData";
 
 
 function SignUp() {
   const dispatch = useDispatch()
   const {isLoading,userData} = useSelector((state)=>state.auth)
+  const {landingGlobalData} = useSelector((state)=>state.globalData)
   const navigate = useNavigate();
 
   const {
@@ -19,8 +20,8 @@ function SignUp() {
     formState: { errors },
     watch
   } = useForm();
+  const [fileType, setFileType] = useState("");
 
-  console.log(userData.status)
   const onSubmit = (data) => {
     dispatch(signUp(data))
 
@@ -35,6 +36,10 @@ function SignUp() {
 dispatch(clearLoadingAndData())
 
   },[])
+
+  useEffect(() => {
+    dispatch(getGlobalData())
+  },[]);
 
   return (
     <>

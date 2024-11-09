@@ -19,11 +19,13 @@ export const addProduct = createAsyncThunk(
 // get product data
 export const getAllProducts = createAsyncThunk(
   "getAllProducts",
-  async (id, { rejectWithValue }) => {
+  async ({page = 1, limit = 10}, { rejectWithValue }) => {
     try {
-      const {data} = await instance.get(`/product`);
+      const {data} = await instance.get(`/product`,{
+        params: {page, limit}
+      });
 
-      return data?.data;
+      return data;
     } catch (e) {
       return rejectWithValue(e);
     }

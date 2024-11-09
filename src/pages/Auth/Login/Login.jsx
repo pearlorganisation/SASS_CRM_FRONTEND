@@ -1,50 +1,64 @@
-import {useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { logIn } from "../../../features/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { clearLoadingAndData } from "../../../features/slices/auth";
-
+import { getGlobalData } from "../../../features/actions/globalData";
+import { addUserActivity } from "../../../features/actions/userActivity";
 
 function Login() {
-  const dispatch = useDispatch()
-  const {isLoading} = useSelector((state)=>state.auth)
+  const dispatch = useDispatch();
+  const { isLoading } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const [fileType, setFileType] = useState("");
+  const { landingGlobalData } = useSelector((state) => state.globalData);
+  const {isEmployee} = useSelector(state => state.userActivity);
 
-  
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  
+
   const [isPasswordHidden, setPasswordHidden] = useState(true);
-  
+
   const togglePasswordVisibility = () => {
     setPasswordHidden(!isPasswordHidden);
-    const passwordInput = document.getElementById('hs-toggle-password');
+    const passwordInput = document.getElementById("hs-toggle-password");
     if (passwordInput) {
       passwordInput.type = isPasswordHidden ? "text" : "password";
     }
   };
 
-  
-
   const onSubmit = (data) => {
-    dispatch(logIn(data))
-}
+    dispatch(logIn(data)).then(() => {
+      if (isEmployee) {
+        dispatch(
+          addUserActivity({
+            action: "login",
+            details: "User logged in successfully",
+          })
+        );
+      }
+    });
+  };
 
-useEffect(() => {
-  // Navigate to the root URL if the user is on the login page
-  if (window.location.pathname !== "/") {
-    navigate("/", { replace: true });
-  }
-}, [navigate]);
+  useEffect(() => {
+    // Navigate to the root URL if the user is on the login page
+    if (window.location.pathname !== "/") {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
 
-useEffect(()=>{
-  dispatch(clearLoadingAndData())
-    },[])
+  useEffect(() => {
+    dispatch(clearLoadingAndData());
+  }, []);
+
+  useEffect(() => {
+    dispatch(getGlobalData());
+  }, []);
 
   return (
     <>
@@ -54,34 +68,47 @@ useEffect(()=>{
             <div className="w-full h-full">
               <div className="block rounded-lg bg-white shadow-lg h-full">
                 <div className="g-0 grid grid-cols-[60%_auto] h-full">
-                <div
-  className="relative  rounded-b-lg lg:rounded-r-lg lg:rounded-bl-none h-screen w-full"
->
-  <div className="absolute  bg-black/40 h-full w-full"> </div>  
-  
-  <video className="top-0 left-0 w-full h-full object-cover" autoPlay muted loop>
-    <source src="https://videos.pexels.com/video-files/2325093/2325093-hd_1920_1080_25fps.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
+                  <div className="relative  rounded-b-lg lg:rounded-r-lg lg:rounded-bl-none h-screen w-full">
+                    <div className="absolute  bg-black/40 h-full w-full"> </div>
 
-  <div className="absolute bottom-0  px-4 py-6 text-white md:mx-6 md:p-12">
-    <h4 className="mb-6 text-4xl font-bold">
-      We are more than just an application
-    </h4>
-    <p className="text-sm font-bold tracking-wide">
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua.
-    </p>
-  </div>
-</div>
+                    {landingGlobalData?.itemType === "image" ? (
+                      <img
+                        className="top-0 left-0 w-full h-full object-cover"
+                        src={landingGlobalData?.item}
+                        alt=""
+                      />
+                    ) : (
+                      <video
+                        className="top-0 left-0 w-full h-full"
+                        autoPlay
+                        muted
+                        loop
+                        preload="auto"
+                      >
+                        <source
+                          src={landingGlobalData?.item}
+                          type="video/mp4"
+                        />
+                        Your browser does not support the video tag.
+                      </video>
+                    )}
 
-     
-                  <div className="w-full flex flex-col justify-center h-full  bg-white rounded-lg shadow md:mt-0 xl:p-0" >
+                    <div className="absolute bottom-0  px-4 py-6 text-white md:mx-6 md:p-12">
+                      <h4 className="mb-6 text-4xl font-bold">
+                        {landingGlobalData?.title}
+                      </h4>
+                      <p className="text-sm font-bold tracking-wide">
+                        {landingGlobalData?.subTitle}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="w-full flex flex-col justify-center h-full  bg-white rounded-lg shadow md:mt-0 xl:p-0">
                     <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
                       <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
                         Sign in to your account
                       </h1>
-          
+
                       <form
                         className="space-y-4 md:space-y-6"
                         onSubmit={handleSubmit(onSubmit)}
@@ -103,7 +130,7 @@ useEffect(()=>{
                             required
                           />
                         </div>
-                    
+
                         <div className="relative">
                           <label
                             htmlFor="password"
@@ -164,11 +191,15 @@ useEffect(()=>{
                           </button>
                         </div>
                         <button
-                         disabled={isLoading}
+                          disabled={isLoading}
                           type="submit"
                           className="w-full text-white bg-[#2563eb] hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
                         >
-                          {isLoading ? <ClipLoader color="#c4c2c2" /> : "Sign in to your account"}
+                          {isLoading ? (
+                            <ClipLoader color="#c4c2c2" />
+                          ) : (
+                            "Sign in to your account"
+                          )}
                         </button>
                         <p className="text-sm font-light text-gray-500">
                           Don’t have an account yet?{" "}
@@ -189,7 +220,7 @@ useEffect(()=>{
         </div>
       </section>
     </>
-  )
+  );
 }
 
 export default Login;

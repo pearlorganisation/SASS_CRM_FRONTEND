@@ -2,18 +2,41 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAllProducts } from "../../features/actions/product";
-import { Skeleton, Stack } from "@mui/material";
+import { Pagination, Skeleton, Stack } from "@mui/material";
+import { roles } from "../../utils/roles";
+import ProductDetailsModal from "./Modal/ProductDetailsModal";
+import { addUserActivity } from "../../features/actions/userActivity";
+import { formatDate } from "../../utils/extra";
 
 const ViewProducts = () => {
   const [showFilters, setShowFilters] = useState(false);
-  const navigate = useNavigate()
-  const dispatch =useDispatch()
-  const {productData,isLoading} = useSelector((state)=>state.product)
-  const {userData} = useSelector((state)=>state.auth)
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { productData, isLoading, totalPages } = useSelector((state) => state.product);
+  const { userData } = useSelector((state) => state.auth);
+  const [modalData, setModalData] = useState(null);
+  const { isEmployee } = useSelector((state) => state.userActivity);
+  const [page, setPage] = useState(1);
 
-  useEffect(()=>{
-    dispatch(getAllProducts(userData?.id))
-  },[])
+  useEffect(() => {
+    dispatch(getAllProducts({page}));
+  }, [page]);
+
+  const handleViewDetails = (product) => {
+    setModalData(product);
+    if (isEmployee) {
+      dispatch(
+        addUserActivity({
+          action: "viewDetails",
+          details: `User viewed details of Product Name: ${product?.name}`,
+        })
+      );
+    }
+  };
+
+  const handlePagination = (e, p) => {
+    setPage(p);
+  };
 
   return (
     <div>
@@ -37,78 +60,73 @@ const ViewProducts = () => {
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            clip-rule="evenodd"
-            fill-rule="evenodd"
+            clipRule="evenodd"
+            fillRule="evenodd"
             d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
           ></path>
         </svg>
       </button>
 
-  
-
-      <div class="p-10 ">
-      <div class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-8 bg-white ">
-            <div className="relative">
-              <button
-                id="dropdownActionButton"
-                className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 "
-                type="button"
-                onClick={() => setShowFilters((prev) => !prev)}
+      <div className="p-10 ">
+        <div className="flex justify-between">
+          <h3 className="text-gray-800 text-xl font-bold sm:text-2xl mb-5">
+            Product Details
+          </h3>
+        </div>
+        <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-8 bg-white ">
+          <div className="relative">
+            <button
+              id="dropdownActionButton"
+              className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 "
+              type="button"
+              onClick={() => setShowFilters((prev) => !prev)}
+            >
+              <span className="sr-only">Action button</span>
+              Filter
+              <svg
+                className="w-2.5 h-2.5 ms-2.5"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 10 6"
               >
-                <span className="sr-only">Action button</span>
-                Filter
-                <svg
-                  className="w-2.5 h-2.5 ms-2.5"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 10 6"
-                >
-                  <path
-                    stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="m1 1 4 4 4-4"
-                  />
-                </svg>
-              </button>
-              {/* <!-- Dropdown menu --> */}
-              <div
-                id="dropdownAction"
-                className={` ${
-                  showFilters ? "" : "hidden"
-                } absolute top-full z-10  bg-white divide-y divide-gray-100 rounded-lg shadow w-44  `}
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="m1 1 4 4 4-4"
+                />
+              </svg>
+            </button>
+            {/* <!-- Dropdown menu --> */}
+            <div
+              id="dropdownAction"
+              className={` ${
+                showFilters ? "" : "hidden"
+              } absolute top-full z-10  bg-white divide-y divide-gray-100 rounded-lg shadow w-44  `}
+            >
+              <ul
+                className="py-1 text-sm text-gray-700 "
+                aria-labelledby="dropdownActionButton"
               >
-                <ul
-                  className="py-1 text-sm text-gray-700 "
-                  aria-labelledby="dropdownActionButton"
-                >
-                  <li>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 hover:bg-gray-100  "
-                    >
-                      Ascending
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 hover:bg-gray-100  "
-                    >
-                      Descending
-                    </a>
-                  </li>
-            
-                </ul>
-             
-              </div>
+                <li>
+                  <a href="#" className="block px-4 py-2 hover:bg-gray-100  ">
+                    Ascending
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="block px-4 py-2 hover:bg-gray-100  ">
+                    Descending
+                  </a>
+                </li>
+              </ul>
             </div>
-            {/* <label for="table-search" className="sr-only">
+          </div>
+          {/* <label for="table-search" className="sr-only">
               Search
             </label> */}
-            {/* <div className="relative">
+          {/* <div className="relative">
               <div className="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
                 <svg
                   className="w-4 h-4 text-gray-500 "
@@ -119,7 +137,7 @@ const ViewProducts = () => {
                 >
                   <path
                     stroke="currentColor"
-                    stroke-linecap="round"
+                    strokeLinecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
                     d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
@@ -133,21 +151,30 @@ const ViewProducts = () => {
                 placeholder="Search for users"
               />
             </div> */}
-            <button onClick={()=>navigate("/products/addProduct")} className="bg-blue-600 rounded-md text-white px-3 py-1 font-semibold ">Add Product</button>
-          </div>
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-         
+          {roles.SUPER_ADMIN === userData?.role ||
+            (roles.ADMIN === userData?.role && (
+              <button
+                onClick={() => navigate("/products/addProduct")}
+                className="bg-blue-600 rounded-md text-white px-3 py-1 font-semibold "
+              >
+                Add Product
+              </button>
+            ))}
+        </div>
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50  ">
               <tr>
- 
                 <th scope="col" className="px-6 py-3">
                   Product Name
                 </th>
                 <th scope="col" className="px-6 py-3">
-                 Price
+                  Price
                 </th>
-    
+                <th scope="col" className="px-6 py-3">
+                  Date
+                </th>
+
                 <th scope="col" className="px-6 py-3">
                   Action
                 </th>
@@ -166,33 +193,47 @@ const ViewProducts = () => {
                     </Stack>
                   </td>
                 </tr>
-              ) : ( Array.isArray(productData) && productData.map((item,idx)=>
-                (
-                <tr key={idx} className="bg-white border-b   hover:bg-gray-50 ">
-
-                <td className="px-6 py-4">{item?.name}</td>
-                <td className="px-6 py-4">₹ {item?.price}</td>
-
-                <td className="px-6 py-4">
-                  <a
-                    href="#"
-                    className="font-medium text-blue-600  hover:underline"
+              ) : (
+                Array.isArray(productData) &&
+                productData.map((item, idx) => (
+                  <tr
+                    key={idx}
+                    className="bg-white border-b   hover:bg-gray-50 "
                   >
-                    View Details
-                  </a>
-                </td>
-              </tr>)
-              )) }
-
-               
-        
-        
-      
-      
+                    <td className="px-6 py-4">{item?.name}</td>
+                    <td className="px-6 py-4">₹ {item?.price}</td>
+                    <td className="px-6 py-4">{formatDate(item?.updatedAt)}</td>
+                    <td className="px-6 py-4">
+                      <span
+                        onClick={() => handleViewDetails(item)}
+                        className="font-medium text-blue-600 cursor-pointer hover:underline"
+                      >
+                        View Details
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      <div className="flex justify-center mt-5">
+        <Pagination
+          count={totalPages}
+          page={page}
+          color="primary"
+          onChange={handlePagination}
+        />
+      </div>
+
+      {modalData && (
+        <ProductDetailsModal
+          setModalData={setModalData}
+          modalData={modalData}
+        />
+      )}
     </div>
   );
 };

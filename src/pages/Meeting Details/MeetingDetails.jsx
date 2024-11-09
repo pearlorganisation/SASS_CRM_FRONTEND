@@ -11,6 +11,7 @@ import {
 import Delete from "../../components/delete";
 import UploadXslxModal from "./UploadXslxModal";
 import Pagination from "@mui/material/Pagination";
+import UpdateCsvXslxModal from "./UpdateCsvXslxModal";
 
 const MeetingDetails = () => {
   const navigate = useNavigate();
@@ -21,14 +22,18 @@ const MeetingDetails = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [showXslxModal, setShowXslxModal] = useState(false);
+  const [showUpdateModal,setShowUpdateModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [id, setId] = useState();
+  const [webinarName,setWebinarName] = useState(null);
 
   const handleModal = () => setShowModal(true);
   const handleXslxModal = () => setShowXslxModal(true);
-  const handleDeleteModal = (ID) => {
+  const handleUpdateModal = () => setShowUpdateModal(true);
+  const handleDeleteModal = (ID, name) => {
     setShowDeleteModal(true);
     setId(ID);
+    setWebinarName(name);
   };
 
   const handleDelete = () => {
@@ -133,13 +138,20 @@ const MeetingDetails = () => {
                       </td>
                       <td className="px-3 whitespace-nowrap">
                         <a
+                          onClick={handleUpdateModal}
+                          className="cursor-pointer py-2 px-3 font-semibold text-green-500 hover:text-green-600 duration-150 hover:bg-gray-50 rounded-lg"
+                        >
+                          Update Details
+                        </a>
+                        {showUpdateModal && createPortal(<UpdateCsvXslxModal setModal={setShowUpdateModal} csvId={item?._id} />, document.body)}
+                        <a
                           onClick={() => navigate(`/contacts/${item?._id}`)}
                           className="cursor-pointer py-2 px-3 font-semibold text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50 rounded-lg"
                         >
                           View Attendees
                         </a>
                         <button
-                          onClick={() => handleDeleteModal(item?._id)}
+                          onClick={() => handleDeleteModal(item?._id, item?.csvName)}
                           className="py-2 px-3 leading-none font-semibold text-red-500 hover:text-red-600 duration-150 hover:bg-gray-50 rounded-lg"
                         >
                           Delete
@@ -168,8 +180,9 @@ const MeetingDetails = () => {
           <UploadXslxModal setModal={setShowXslxModal} />,
           document.body
         )}
+
       {showDeleteModal && (
-        <Delete setModal={setShowDeleteModal} handleDelete={handleDelete} />
+        <Delete setModal={setShowDeleteModal} webinarName={webinarName} handleDelete={handleDelete} />
       )}
     </>
   );

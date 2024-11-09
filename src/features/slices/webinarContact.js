@@ -9,12 +9,18 @@ import {
   getAllAttendees,
   getAttendees,
   getAllWebinars,
+  getAllAssignments,
+  getAttendeeContactDetails,
+  updateAttendeeDetails,
+  updateAttendeeLeadType,
 } from "../actions/webinarContact";
 
 const initialState = {
   isLoading: false,
   webinarData: [],
   attendeeData: [],
+  assignmentData: [],
+  attendeeContactDetails: null,
   totalPages: null,
   errorMessage: "",
 };
@@ -24,7 +30,11 @@ const initialState = {
 export const webinarContactSlice = createSlice({
   name: "webinarContact",
   initialState,
-  reducers: {},
+  reducers: {
+    resetAttendeeContactDetails: (state) => {
+      state.attendeeContactDetails = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
 
@@ -45,6 +55,19 @@ export const webinarContactSlice = createSlice({
         state.errorMessage = action.payload;
         toast.error(action?.payload || "Something went wrong");
       })
+      .addCase(updateAttendeeDetails.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(updateAttendeeDetails.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+      })
+      .addCase(updateAttendeeDetails.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        toast.error(action?.payload || "Something went wrong");
+      })
       .addCase(getAllAttendees.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
@@ -57,6 +80,7 @@ export const webinarContactSlice = createSlice({
       .addCase(getAllAttendees.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
+        state.attendeeData = [];
         toast.error(action?.payload || "Something went wrong", {
           position: "top-center",
         });
@@ -79,7 +103,7 @@ export const webinarContactSlice = createSlice({
       })
       .addCase(getAllWebinars.pending, (state, action) => {
         state.isLoading = true;
-state.errorMessage = "";
+        state.errorMessage = "";
       })
       .addCase(getAllWebinars.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -89,7 +113,7 @@ state.errorMessage = "";
       })
       .addCase(getAllWebinars.rejected, (state, action) => {
         state.isLoading = false;
-    
+
         state.errorMessage = action.payload;
         toast.error(action?.payload || "Something went wrong", {
           position: "top-center",
@@ -97,18 +121,74 @@ state.errorMessage = "";
       })
       .addCase(deleteWebinarContacts.pending, (state, action) => {
         state.isLoading = true;
-        state.isDeleted=false;
+        state.isDeleted = false;
         state.errorMessage = "";
       })
       .addCase(deleteWebinarContacts.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isDeleted=true;
+        state.isDeleted = true;
         state.errorMessage = "";
       })
       .addCase(deleteWebinarContacts.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        state.isDeleted=false;
+        state.isDeleted = false;
+        toast.error(action?.payload || "Something went wrong", {
+          position: "top-center",
+        });
+      })
+      .addCase(getAllAssignments.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getAllAssignments.fulfilled, (state, action) => {
+        console.log(action.payload.data);
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.assignmentData = action.payload?.data || [];
+        state.totalPages = action.payload?.totalPages || 1;
+      })
+      .addCase(getAllAssignments.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        state.assignmentData = [];
+        toast.error(action?.payload || "Something went wrong", {
+          position: "top-center",
+        });
+      })
+      .addCase(getAttendeeContactDetails.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getAttendeeContactDetails.fulfilled, (state, action) => {
+        console.log(action.payload.data);
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.attendeeContactDetails = action.payload;
+        state.totalPages = action.payload?.totalPages || 1;
+      })
+      .addCase(getAttendeeContactDetails.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        state.assignmentData = [];
+        toast.error(action?.payload || "Something went wrong", {
+          position: "top-center",
+        });
+      })
+      .addCase(updateAttendeeLeadType.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(updateAttendeeLeadType.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        toast.success("Lead Type Updated Successfully", {
+          position: "top-center",
+        });
+      })
+      .addCase(updateAttendeeLeadType.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
         toast.error(action?.payload || "Something went wrong", {
           position: "top-center",
         });
@@ -119,7 +199,7 @@ state.errorMessage = "";
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {} = webinarContactSlice.actions;
+export const { resetAttendeeContactDetails } = webinarContactSlice.actions;
 export default webinarContactSlice.reducer;
 
 // ================================================== THE END ==================================================
