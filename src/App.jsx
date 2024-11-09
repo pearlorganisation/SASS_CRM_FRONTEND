@@ -47,10 +47,10 @@ const App = () => {
   console.log("checking if user is logged in", isUserLoggedIn, isEmployeeId(role));
   if (isUserLoggedIn && isEmployeeId(role)) {
     dispatch(setIsEmployee(true));
-    // dispatch(addUserActivity({
-    //   action: "login/refresh",
-    //   details: "User logged in or refreshed successfully",
-    // }))
+    dispatch(addUserActivity({
+      action: "login/refresh",
+      details: "User logged in or refreshed successfully",
+    }))
   } else {
     dispatch(setIsEmployee(false));
   }

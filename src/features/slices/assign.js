@@ -3,13 +3,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { addAssign , addNote, getNotes} from "../actions/assign";
-
-
+import { addAssign, addNote, getNotes } from "../actions/assign";
 
 const initialState = {
   isLoading: false,
-  isFormLoading:false,
+  isFormLoading: false,
   assignData: [],
   noteData: [],
   totalPages: null,
@@ -65,15 +63,12 @@ export const assignSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = "";
         state.noteData = action.payload;
-        
       })
       .addCase(getNotes.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
         toast.error(action?.payload || "Something went wrong");
-      })
-     
- 
+      });
   },
 });
 
