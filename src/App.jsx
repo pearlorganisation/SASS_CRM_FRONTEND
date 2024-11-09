@@ -35,6 +35,7 @@ import { addUserActivity } from "./features/actions/userActivity";
 import { isEmployeeId } from "./utils/roles";
 import { setIsEmployee } from "./features/slices/userActivity";
 import EmployeeActivity from "./pages/Employees/EmployeeActivity";
+import EditPlan from "./pages/Settings/Plans/EditPlan";
 
 
 const App = () => {
@@ -52,16 +53,16 @@ const App = () => {
   } else {
     dispatch(setIsEmployee(false));
   }
- 
+
   const router = createBrowserRouter([
-          
+
     {
       path: "/signUp",
       element: !isUserLoggedIn ? <SignUp /> : <Dashboard />, // Redirect to dashboard if logged in
     },
     {
       path: "/",
-      element: isUserLoggedIn ? <Layout /> :  <Login/> ,
+      element: isUserLoggedIn ? <Layout /> : <Login />,
 
       children: [
         {
@@ -71,11 +72,11 @@ const App = () => {
 
         {
           path: "/webinarDetails",
-          element:<MeetingDetails /> ,
+          element: <MeetingDetails />,
         },
         {
           path: "/contacts/:csvId",
-          element:<ViewContacts />  ,
+          element: <ViewContacts />,
         },
         {
           path: "/particularContact",
@@ -115,40 +116,44 @@ const App = () => {
         },
         {
           path: "/attendees",
-          element: <ViewAttendees/>,
+          element: <ViewAttendees />,
         },
         {
           path: "/createEmployee",
-          element: <CreateEmployee/>,
+          element: <CreateEmployee />,
         },
         {
           path: "/settings",
-          element: <ViewSettings/>,
+          element: <ViewSettings />,
         },
         {
           path: "/plans",
-          element: <ViewPlans/>,
+          element: <ViewPlans />,
         },
         {
           path: "/plans/addPlan",
-          element: <AddPlan/>,
+          element: <AddPlan />,
+        },
+        {
+          path: "/plans/editPlan/:planId",
+          element: <EditPlan />,
         },
         {
           path: "/sidebarLinks",
-          element: <ViewSidebarLinks/>,
+          element: <ViewSidebarLinks />,
         },
         {
           path: "/sidebarLinks/addSidebarLink",
-          element: <CreateSidebarLink/>,
+          element: <CreateSidebarLink />,
         },
         {
           path: "/update-landing-page",
-          element: <LandingPageForm/>,
+          element: <LandingPageForm />,
         },
 
-      
-        
-        
+
+
+
       ],
     },
     {
@@ -158,9 +163,9 @@ const App = () => {
   ]);
 
   return (
-  <div className=''><Toaster position="top-center" richColors/>
-  <RouterProvider router={router} />;
-  </div>
+    <div className=''><Toaster position="top-center" richColors />
+      <RouterProvider router={router} />;
+    </div>
   )
 };
 

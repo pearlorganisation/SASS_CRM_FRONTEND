@@ -1,6 +1,6 @@
-import {combineReducers} from "redux";
+import { combineReducers } from "redux";
 import { encryptTransform } from "redux-persist-transform-encrypt";
-import {persistReducer} from "redux-persist";
+import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { configureStore } from "@reduxjs/toolkit";
 import webinarContact from "./slices/webinarContact";
@@ -11,8 +11,7 @@ import sidebarLink from "./slices/sidebarLink";
 import assign from "./slices/assign";
 import globalData from "./slices/globalData";
 import userActivityReducer from "./slices/userActivity";
-
-
+import pricePlanReducer from "./slices/pricePlan";
 
 // Combine your individual reducers here
 const rootReducer = combineReducers({
@@ -24,20 +23,20 @@ const rootReducer = combineReducers({
   assign,
   globalData,
   userActivity: userActivityReducer,
-  });
+  pricePlans: pricePlanReducer,
+});
 
 // Custom root reducer handling a clear action
 const rootReducerWithClear = (state, action) => {
-    if (action.type === "saasCrm/clearReduxStoreData") {
-      state = undefined;
-      localStorage.clear();
-      sessionStorage.clear();
-    }
-    return rootReducer(state, action);
-  };
-  
+  if (action.type === "saasCrm/clearReduxStoreData") {
+    state = undefined;
+    localStorage.clear();
+    sessionStorage.clear();
+  }
+  return rootReducer(state, action);
+};
 
-  // Redux-persist configuration
+// Redux-persist configuration
 const persistConfig = {
   key: "SaasCrmClientPanel",
   version: 1,
@@ -57,12 +56,13 @@ const persistedReducer = persistReducer(persistConfig, rootReducerWithClear);
 
 // Configure and create the Redux store
 const store = configureStore({
-    reducer: persistedReducer,
-    devTools: import.meta.env.VITE_REACT_APP_WORKING_ENVIRONMENT === "development",
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
-        serializableCheck: false,
-      }),
-  });
+  reducer: persistedReducer,
+  devTools:
+    import.meta.env.VITE_REACT_APP_WORKING_ENVIRONMENT === "development",
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
+});
 
-  export default store;
+export default store;
