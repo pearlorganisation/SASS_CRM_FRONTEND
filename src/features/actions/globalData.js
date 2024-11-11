@@ -31,3 +31,29 @@ export const createGlobalData = createAsyncThunk(
     }
   );
   
+
+
+  //assign  attendee
+  export const createCustomOption = createAsyncThunk(
+    "customOption/create",
+    async (payload, { rejectWithValue }) => {
+      try {
+        const response = await instance.post(`customOptions`, payload);
+        return response;
+      } catch (e) {
+        return rejectWithValue(e);
+      }
+    }
+  );
+    
+  export const getCustomOptions = createAsyncThunk(
+    "customOption/get",
+    async (_, { rejectWithValue }) => {
+      try {
+        const response = await instance.get(`customOptions`);
+        return response?.data;
+      } catch (e) {
+        return rejectWithValue(e);
+      }
+    }
+  );

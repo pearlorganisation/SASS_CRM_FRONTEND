@@ -37,6 +37,7 @@ import { setIsEmployee } from "./features/slices/userActivity";
 import EmployeeActivity from "./pages/Employees/EmployeeActivity";
 import { getEmployeeStats } from "./features/actions/employee";
 import PabblyToken from "./pages/Settings/PabblyToken/PabblyToken";
+import CustomOptions from "./pages/Settings/CustomOptions/CustomOptions";
 
 
 const App = () => {
@@ -126,6 +127,10 @@ const App = () => {
         {
           path: "/settings",
           element: <ViewSettings/>,
+        },
+        {
+          path: "/settings/custom-status",
+          element: <CustomOptions/>,
         },
         {
           path: "/plans",
