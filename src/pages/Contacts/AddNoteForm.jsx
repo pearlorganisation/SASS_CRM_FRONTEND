@@ -6,6 +6,8 @@ import { addNote } from "../../features/actions/assign";
 import { ClipLoader } from "react-spinners";
 
 const AddNoteForm = (props) => {
+  const {customOptions} = useSelector(state => state.globalData);
+console.log(customOptions)
   const dispatch = useDispatch();
   const { isFormLoading } = useSelector((state) => state.assign);
   const { email, recordType, uniquePhones, addUserActivityLog } = props;
@@ -196,6 +198,7 @@ const AddNoteForm = (props) => {
                 { value: "Payment", label: "Payment" },
                 { value: "Discussion", label: "Discussion" },
                 { value: "Other", label: "Other" },
+                ...(customOptions || [])
               ]}
               className="mt-1 text-sm shadow"
               placeholder="Choose Status"

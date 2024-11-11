@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { roles } from "../../utils/roles";
 import { PiLetterCirclePBold } from "react-icons/pi";
+import { MdArrowDropDownCircle } from "react-icons/md";
 
 const ViewSettings = () => {
   const { role } = useSelector((state) => state.auth.userData);
@@ -44,6 +45,18 @@ const ViewSettings = () => {
             >
               <GiPerspectiveDiceSixFacesRandom size={40} /> Landing Page
             </Link>
+          </>
+        )}
+
+{roles.ADMIN === role && (
+          <>
+            <Link
+              to="/settings/custom-status"
+              className="flex items-center justify-center gap-10 font-bold text-xl rounded-lg bg-white h-20 w-56 cursor-pointer hover:bg-green-700 hover:text-white text-green-700"
+            >
+              <MdArrowDropDownCircle size={40} /> Custom Status
+            </Link>
+
           </>
         )}
       </div>

@@ -3,14 +3,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { createGlobalData, getGlobalData } from "../actions/globalData";
+import { createCustomOption, createGlobalData, getCustomOptions, getGlobalData } from "../actions/globalData";
 
 
 const initialState = {
   isLoading: false,
   landingGlobalData: [],
   errorMessage: "",
-  isSuccess: false
+  isSuccess: false,
+  customOptions: [],
 };
 
 // ---------------------------------------------------------------------------------------
@@ -48,6 +49,32 @@ export const globalDataSlice = createSlice({
         state.landingGlobalData = action.payload.data;
       })
       .addCase(getGlobalData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+      })
+      
+      .addCase(getCustomOptions.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getCustomOptions.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.customOptions = action.payload?.data || [];
+      })
+      .addCase(getCustomOptions.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+      })
+      .addCase(createCustomOption.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(createCustomOption.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+      })
+      .addCase(createCustomOption.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
       })

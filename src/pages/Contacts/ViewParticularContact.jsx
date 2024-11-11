@@ -20,6 +20,7 @@ import { formatDate } from "../../utils/extra";
 import { getColor, LeadTypeOptions } from "../../utils/LeadType";
 import { resetAttendeeContactDetails } from "../../features/slices/webinarContact";
 import { addUserActivity } from "../../features/actions/userActivity";
+import { getCustomOptions } from "../../features/actions/globalData";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -41,6 +42,7 @@ const ViewParticularContact = () => {
   const { isEmployee } = useSelector((state) => state.userActivity);
   useEffect(() => {
     dispatch(getAttendeeContactDetails({ email, recordType }));
+    dispatch(getCustomOptions());
 
     return () => {
       // console.log('resetting');
