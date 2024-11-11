@@ -13,6 +13,7 @@ import {
   getAttendeeContactDetails,
   updateAttendeeDetails,
   updateAttendeeLeadType,
+  updateWebinarContacts,
 } from "../actions/webinarContact";
 
 const initialState = {
@@ -51,6 +52,23 @@ export const webinarContactSlice = createSlice({
         });
       })
       .addCase(addWebinarContacts.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        toast.error(action?.payload || "Something went wrong");
+      })
+      .addCase(updateWebinarContacts.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(updateWebinarContacts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.webinarData = action.payload.data;
+        toast.success("Webinar Attendees Updated Successfully", {
+          position: "top-center",
+        });
+      })
+      .addCase(updateWebinarContacts.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
         toast.error(action?.payload || "Something went wrong");

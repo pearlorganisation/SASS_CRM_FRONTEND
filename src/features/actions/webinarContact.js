@@ -13,6 +13,18 @@ export const addWebinarContacts = createAsyncThunk(
     }
   }
 );
+//add webinar contacts
+export const updateWebinarContacts = createAsyncThunk(
+  "updateWebinarContacts",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`/attendee/updateWebinar`, payload);
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
 
 // get all attendees
 export const getAllAttendees = createAsyncThunk(

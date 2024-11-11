@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { addWebinarContacts, updateAttendeeDetails } from "../../features/actions/webinarContact";
+import { addWebinarContacts, updateWebinarContacts } from "../../features/actions/webinarContact";
 import * as XLSX from "xlsx";
 
 const UploadXslxModal = ({ setModal,update }) => {
@@ -170,7 +170,7 @@ return   Object.values(mergedData).map((item) => ({
     if(!update)
     {dispatch(addWebinarContacts(mergedResult));}
     else {
-      dispatch(updateAttendeeDetails({csvId:update,data:mergedResult}))
+      dispatch(updateWebinarContacts({csvId:update,data:mergedResult}))
     }
     setModal(false);
   };
