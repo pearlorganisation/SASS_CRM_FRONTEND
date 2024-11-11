@@ -57,3 +57,15 @@ export const createGlobalData = createAsyncThunk(
       }
     }
   );
+
+  export const deleteCustomOption = createAsyncThunk(
+    "customOption/delete",
+    async (id, { rejectWithValue }) => {
+      try {
+        const response = await instance.delete(`customOptions/${id}`);
+        return response;
+      } catch (e) {
+        return rejectWithValue(e);
+      }
+    }
+  );

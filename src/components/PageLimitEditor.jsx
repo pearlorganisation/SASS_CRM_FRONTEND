@@ -5,7 +5,6 @@ const PageLimitEditor = (props) => {
   const {
     localStorageKey = "defaultPageLimit",
     setLimit = (limit) => {
-      console.log("limit", limit);
     },
   } = props;
   const [isEditing, setIsEditing] = useState(false);
@@ -13,10 +12,10 @@ const PageLimitEditor = (props) => {
 
   useEffect(() => {
     const savedData = parseInt(localStorage.getItem(localStorageKey), 10);
-    console.log(localStorageKey, savedData);
     if (!isNaN(savedData)) {
       setPageLimit(savedData);
     }
+    console.log("setting limit",savedData)
     setLimit(savedData || 10);
   }, [localStorageKey]);
 
@@ -27,7 +26,6 @@ const PageLimitEditor = (props) => {
   const handleSaveClick = () => {
     localStorage.setItem(localStorageKey, pageLimit);
     setIsEditing(false);
-    console.log("Page limit updated:", pageLimit);
     setLimit(pageLimit);
   };
 
@@ -35,11 +33,23 @@ const PageLimitEditor = (props) => {
     <div className="border text-gray-600 rounded-md text-sm items-center px-3 flex  gap-3 w-full">
       {isEditing ? (
         <input
-          type="number"
-          value={pageLimit}
-          onChange={(e) => setPageLimit(e.target.value)}
-          className="border rounded px-2 py-1 w-16"
-        />
+        type="number"
+        value={pageLimit}
+        min={1}
+        max={100}
+        onClick={(e) => e.target.select()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleSaveClick();
+          }
+        }}
+        onChange={(e) => {
+          const value = Math.max(1, Math.min(100, Number(e.target.value)));
+          setPageLimit(value);
+        }}
+        className="border rounded px-2 py-1 w-16"
+      />
+      
       ) : (
         <label>Page Limit: {pageLimit}</label>
       )}

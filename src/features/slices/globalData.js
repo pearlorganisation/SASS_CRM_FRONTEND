@@ -3,7 +3,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { createCustomOption, createGlobalData, getCustomOptions, getGlobalData } from "../actions/globalData";
+import { createCustomOption, createGlobalData, deleteCustomOption, getCustomOptions, getGlobalData } from "../actions/globalData";
 
 
 const initialState = {
@@ -75,6 +75,18 @@ export const globalDataSlice = createSlice({
         state.errorMessage = "";
       })
       .addCase(createCustomOption.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+      })
+      .addCase(deleteCustomOption.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(deleteCustomOption.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+      })
+      .addCase(deleteCustomOption.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
       })
