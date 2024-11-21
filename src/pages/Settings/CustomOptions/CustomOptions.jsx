@@ -12,7 +12,8 @@ import { getRoleNameByID } from "../../../utils/roles";
 const CustomOptions = () => {
   const dispatch = useDispatch();
   const { customOptions } = useSelector((state) => state.globalData);
-  const {role} = useSelector((state) => state.auth.userData);
+  const { userData } = useSelector((state) => state.auth);
+  const role = userData?.role || '';
 
   const [showModal, setShowModal] = useState(false);
 

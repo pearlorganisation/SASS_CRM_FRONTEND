@@ -21,7 +21,9 @@ const Sidebar = () => {
   const { sidebarLinkData, isLoading } = useSelector(
     (state) => state.sidebarLink
   );
-  const { role } = useSelector((state) => state.auth.userData);
+  const { userData } = useSelector((state) => state.auth);
+  const { isSidebarOpen } = useSelector((state) => state.globalData);
+  const role = userData?.role || '';
   const { isEmployee } = useSelector((state) => state.userActivity);
   const [showImportantLinks, setShowImportantLinks] = useState(false); // toggle state for sub-links
 
@@ -62,9 +64,9 @@ const Sidebar = () => {
   };
 
   return (
-    <aside
+    <div
       id="logo-sidebar"
-      className="fixed top-0 left-0 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0"
+      className={`fixed top-0 left-0 w-64 h-screen z-10 pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 ${isSidebarOpen ? 'translate-x-0' : 'sm:translate-x-0'}`}
       aria-label="Sidebar"
     >
       <div className="h-full px-3 pb-4 overflow-y-auto bg-white">
@@ -176,7 +178,7 @@ const Sidebar = () => {
             {showImportantLinks &&
               Array.isArray(sidebarLinkData) &&
               sidebarLinkData.map((item, idx) => (
-                <ul className="pl-10 space-y-1">
+                <ul key={idx} className="pl-10 space-y-1">
                   <li>
                     <a
                       href={item?.link}
@@ -213,7 +215,7 @@ const Sidebar = () => {
           </li>
         </ul>
       </div>
-    </aside>
+    </div>
   );
 };
 

@@ -46,13 +46,11 @@ const ViewParticularContact = () => {
     dispatch(getCustomOptions());
 
     return () => {
-      // console.log('resetting');
       dispatch(resetAttendeeContactDetails());
     };
   }, []);
 
   useEffect(() => {
-    // console.log(attendeeContactDetails)
     if (
       !attendeeContactDetails ||
       !attendeeContactDetails?.data ||
@@ -102,8 +100,6 @@ const ViewParticularContact = () => {
     setShowTimerModal(true);
   };
 
-  // PHONE NUMBER SECTION
-
   const handleCopyClick = (textToCopy) => {
     navigator.clipboard
       .writeText(textToCopy)
@@ -114,8 +110,6 @@ const ViewParticularContact = () => {
         console.error("Failed to copy text: ", err);
       });
   };
-
-  //  LEAD TYPE SECTION
 
   const customStyles = {
     control: (provided, state) => ({

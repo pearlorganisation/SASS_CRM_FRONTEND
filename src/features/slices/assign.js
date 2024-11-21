@@ -4,6 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
 import { addAssign, addNote, getNotes } from "../actions/assign";
+import { errorToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
@@ -37,7 +38,7 @@ export const assignSlice = createSlice({
       .addCase(addAssign.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong");
+        errorToast(action?.payload);
       })
       .addCase(addNote.pending, (state, action) => {
         state.isFormLoading = true;
@@ -53,7 +54,7 @@ export const assignSlice = createSlice({
       .addCase(addNote.rejected, (state, action) => {
         state.isFormLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong");
+        errorToast(action?.payload);
       })
       .addCase(getNotes.pending, (state, action) => {
         state.isLoading = true;
@@ -67,7 +68,7 @@ export const assignSlice = createSlice({
       .addCase(getNotes.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong");
+        errorToast(action?.payload);
       });
   },
 });

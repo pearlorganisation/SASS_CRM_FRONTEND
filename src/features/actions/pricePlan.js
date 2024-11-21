@@ -60,3 +60,18 @@ export const deletePricePlan = createAsyncThunk(
     }
   }
 );
+
+//get Price Plans
+export const getPricePlan = createAsyncThunk(
+  "pricePlan/fetchById",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`plans/${id}`, {
+        withCredentials: true,
+      });
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

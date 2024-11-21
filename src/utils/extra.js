@@ -1,6 +1,7 @@
+import { toast } from "sonner";
 
 /**
- * This function is used by multiple pages/components to format the date and time 
+ * This function is used by multiple pages/components to format the date and time
  * in a readable format.
  */
 export const formatDate = (dateStr) => {
@@ -24,4 +25,10 @@ export const formatDate = (dateStr) => {
       minute: "2-digit",
     })
   );
+};
+
+export const errorToast = (message) => {
+  toast.error(typeof message === "string" ? message : "Something went wrong", {
+    position: "top-center",
+  });
 };

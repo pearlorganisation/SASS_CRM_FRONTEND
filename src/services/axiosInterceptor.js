@@ -23,17 +23,18 @@ instance.interceptors.response.use(
     return response;
   },
   async (error) => {
-    console.log(error)
+    // console.log(error)
 
     let errorMessage = "";
     // Do something with response error
     let loggedInUserName = store.getState()?.auth?.userData?.userName ;
-  console.log(loggedInUserName)
+  // console.log(loggedInUserName)
     let originalRequest = error.config;
 
+    // console.log('eroor lelel biya ------->',error)
     if (
-      error.response.status === 401 ||
-      (error.response.status === 403 && !originalRequest._retry)
+      error?.response?.status === 401 ||
+      (error?.response?.status === 403 && !originalRequest?._retry)
     ) {
       originalRequest._retry = true;
       try {
@@ -55,8 +56,8 @@ instance.interceptors.response.use(
         return Promise.reject(error);
       }
     }
-
-    switch (Number(error.response.status)) {
+// console.error("interceptor",error)
+    switch (Number(error?.response?.status)) {
       case 400:
         errorMessage = error.response.data.message || "Bad Request";
         break;

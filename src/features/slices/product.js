@@ -3,13 +3,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { addProduct, getAllProducts } from "../actions/product";
+import { addProduct, getAllProducts, getAllProductsByAdminId } from "../actions/product";
+import { errorToast } from "../../utils/extra";
 
 
 
 const initialState = {
   isLoading: false,
   productData: [],
+  productDropdownData: [],
   totalPages: 1,
   errorMessage: "",
 };
@@ -38,7 +40,7 @@ export const productSlice = createSlice({
       .addCase(addProduct.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong");
+        errorToast(action?.payload);
       })
       .addCase(getAllProducts.pending, (state, action) => {
         state.isLoading = true;
@@ -53,9 +55,20 @@ export const productSlice = createSlice({
       .addCase(getAllProducts.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
+        errorToast(action?.payload);
+      })
+      .addCase(getAllProductsByAdminId.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getAllProductsByAdminId.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.productDropdownData = action.payload?.data;
+      })
+      .addCase(getAllProductsByAdminId.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
       })
  
   },

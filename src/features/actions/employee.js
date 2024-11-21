@@ -49,7 +49,7 @@ export const getAllClients = createAsyncThunk(
     try {
       const { data } = await instance.get(`/users/clients`);
 
-      return data?.data;
+      return data;
     } catch (e) {
       return rejectWithValue(e);
     }

@@ -4,6 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
 import { createCustomOption, createGlobalData, deleteCustomOption, getCustomOptions, getGlobalData } from "../actions/globalData";
+import { errorToast } from "../../utils/extra";
 
 
 const initialState = {
@@ -12,6 +13,7 @@ const initialState = {
   errorMessage: "",
   isSuccess: false,
   customOptions: [],
+  isSidebarOpen: false
 };
 
 // ---------------------------------------------------------------------------------------
@@ -19,7 +21,11 @@ const initialState = {
 export const globalDataSlice = createSlice({
   name: "globalData",
   initialState,
-  reducers: {},
+  reducers: {
+    toggleSidebar: (state) => {
+      state.isSidebarOpen = !state.isSidebarOpen;
+    }
+  },
   extraReducers: (builder) => {
     builder
 
@@ -37,7 +43,7 @@ export const globalDataSlice = createSlice({
       .addCase(createGlobalData.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong");
+        errorToast(action?.payload);
       })
       .addCase(getGlobalData.pending, (state, action) => {
         state.isLoading = true;
@@ -98,7 +104,7 @@ export const globalDataSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {} = globalDataSlice.actions;
+export const {toggleSidebar} = globalDataSlice.actions;
 export default globalDataSlice.reducer;
 
 // ================================================== THE END ==================================================

@@ -5,6 +5,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { toast } from "sonner";
 
 import { addEmployee, getAllEmployees, getAllClients, getEmployeeAssignments, changeEmployeeStatus, getEmployeeStats } from "../actions/employee";
+import { errorToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
@@ -40,7 +41,7 @@ export const employeeSlice = createSlice({
       .addCase(addEmployee.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong");
+        errorToast(action?.payload);
       })
       .addCase(getAllEmployees.pending, (state, action) => {
         state.isLoading = true;
@@ -54,9 +55,7 @@ export const employeeSlice = createSlice({
       .addCase(getAllEmployees.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
+        errorToast(action?.payload);
       })
       .addCase(changeEmployeeStatus.pending, (state, action) => {
         state.isLoading = true;
@@ -70,9 +69,7 @@ export const employeeSlice = createSlice({
       .addCase(changeEmployeeStatus.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
+        errorToast(action?.payload);
       })
       .addCase(getAllClients.pending, (state, action) => {
         state.isLoading = true;
@@ -86,9 +83,7 @@ export const employeeSlice = createSlice({
       .addCase(getAllClients.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
+        errorToast(action?.payload);
       })
       .addCase(getEmployeeAssignments.pending, (state, action) => {
         state.isLoading = true;
@@ -102,7 +97,7 @@ export const employeeSlice = createSlice({
       .addCase(getEmployeeAssignments.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong");
+        errorToast(action?.payload);
       })
 
       .addCase(getEmployeeStats.pending, (state, action) => {

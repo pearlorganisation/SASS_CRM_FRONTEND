@@ -28,13 +28,13 @@ export const logIn = createAsyncThunk(
     "user/login",
     async (payload, { rejectWithValue }) => {
       try {
-        const { data } = await instance.post("auth/signin", payload, {
+        const { data } = await instance.post("auth/login", payload, {
           withCredentials: true,
         });
         console.log(data)
         return data;
       } catch (error) {
-        console.log(error)
+        console.log("error leleo bhia'",error)
         return rejectWithValue(error);
       }
     }

@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { logIn, signUp } from "../actions/auth";
 import { toast } from "sonner";
+import { errorToast } from "../../utils/extra";
 // -------------------------------------------------------------------------------------------
 
 // initialState -- initial state of authentication
@@ -8,7 +9,7 @@ const initialState = {
   isLoading: false,
   errorMessage: "",
   isUserLoggedIn: false,
-  userData:[],
+  userData:null,
 };
 
 // -------------------------------------- Slices------------------------------------------------
@@ -20,7 +21,7 @@ const authSlice = createSlice({
     state.isUserLoggedIn = false},
    clearLoadingAndData : (state) =>
    { state.isLoading = false,
-    state.userData= []
+    state.userData= null
   },
 },
   extraReducers: (builder) => {
@@ -42,7 +43,7 @@ const authSlice = createSlice({
     .addCase(signUp.rejected, (state, action) => {
       state.isLoading = false; 
       state.errorMessage = action.payload;
-      toast.error(action?.payload || "Something went wrong");
+      errorToast(action?.payload);
     })
 
 // Login cases
@@ -55,7 +56,8 @@ const authSlice = createSlice({
       .addCase(logIn.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isUserLoggedIn = true;
-        state.userData= action.payload.user
+        console.log('fulfilled',action.payload)
+        state.userData= action.payload;
         toast.success(`Login Successfull`, {
             position: "top-center",
           });
@@ -65,7 +67,7 @@ const authSlice = createSlice({
         state.isUserLoggedIn = false;
         state.errorMessage = action.payload;
         console.log(action.payload)
-        toast.error(action?.payload || "Something went wrong");
+        toast.error( "Something went wrong");
       })
   },
 });
