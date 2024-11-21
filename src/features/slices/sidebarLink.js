@@ -38,6 +38,7 @@ export const sidebarLinkSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         console.log('its madafaka console',action.payload);
+   
         errorToast(action.payload);
       })
       .addCase(getAllSidebarLinks.pending, (state, action) => {

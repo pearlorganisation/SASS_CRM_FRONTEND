@@ -9,12 +9,14 @@ import {
   FaEllipsisV,
 } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { deletePricePlan } from "../../../features/actions/pricePlan";
+import { roles } from "../../../utils/roles";
 
 const PlanCard = ({ plan }) => {
   const dispatch = useDispatch();
+  const {userData} = useSelector((state) => state.auth);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const {
@@ -31,35 +33,36 @@ const PlanCard = ({ plan }) => {
 
   return (
     <div className="relative mx-auto border border-gray-200 p-6 overflow-hidden rounded-xl shadow-lg max-w-sm bg-white m-4 transition-all duration-300 hover:shadow-xl">
-      {/* Menu Button */}
-      <div className="absolute top-2 right-2">
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="text-gray-500 hover:text-gray-800 focus:outline-none"
-        >
-          <FaEllipsisV />
-        </button>
-        {menuOpen && (
-          <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg w-40 z-10">
-            <Link to={`/plans/editPlan/${plan?._id}`} state={plan}>
-              <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <FaPencilAlt className="mr-2" />
-                Edit
-              </button>
-            </Link>
-            {/* <button
-              onClick={() => {
-                dispatch(deletePricePlan({ _id: plan?._id }));
-                setMenuOpen(false);
-              }}
-              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              <MdDelete className="mr-2" />
-              Delete
-            </button> */}
-          </div>
-        )}
-      </div>
+      {roles.SUPER_ADMIN === userData?.role && (
+        <div className="absolute top-2 right-2">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="text-gray-500 hover:text-gray-800 focus:outline-none"
+          >
+            <FaEllipsisV />
+          </button>
+          {menuOpen && (
+            <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg w-40 z-10">
+              <Link to={`/plans/editPlan/${plan?._id}`} state={plan}>
+                <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <FaPencilAlt className="mr-2" />
+                  Edit
+                </button>
+              </Link>
+              {/* <button
+            onClick={() => {
+              dispatch(deletePricePlan({ _id: plan?._id }));
+              setMenuOpen(false);
+            }}
+            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            <MdDelete className="mr-2" />
+            Delete
+          </button> */}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Card Content */}
       <div className="text-center mb-6">
