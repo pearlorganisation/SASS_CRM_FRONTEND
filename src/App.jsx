@@ -4,38 +4,39 @@ import { Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 
 ///// pages /////
-
-import Dashboard from "./pages/Dashboard/Dashboard";
-import Login from "./pages/Auth/Login/Login";
-import MeetingDetails from "./pages/Meeting Details/MeetingDetails";
-import Layout from "./components/Layout/Layout";
-import ComingSoon from "./pages/NotFound/ComingSoon";
-import NotFound from "./pages/NotFound/NotFound";
-import Employees from "./pages/Employees/Employees";
-import ViewParticularContact from "./pages/Contacts/ViewParticularContact";
-import ViewContacts from "./pages/Contacts/ViewContacts";
-import ViewProducts from "./pages/Products/ViewProducts";
-import CreateProduct from "./pages/Products/CreateProduct";
-import ViewAttendees from "./pages/Attendees/ViewAttendees";
-import CreateEmployee from "./pages/Employees/CreateEmployee";
-import ViewSettings from "./pages/Settings/ViewSettings";
-import ViewPlans from "./pages/Settings/Plans/ViewPlans";
-import SignUp from "./pages/Auth/SignUp/SignUp";
-import AddPlan from "./pages/Settings/Plans/AddPlan";
-import ViewSidebarLinks from "./pages/Settings/SidebarLinks/ViewSidebarLinks";
-import CreateSidebarLink from "./pages/Settings/SidebarLinks/CreateSidebarLink";
-import Assignments from "./pages/Assignments/Assignments";
-import Clients from "./pages/Clients/Clients";
-import EmployeeAssignments from "./pages/Employees/EmployeeAssignments";
-import LandingPageForm from "./pages/Settings/LandingPage/LandingPageForm";
-import EmployeeActivity from "./pages/Employees/EmployeeActivity";
-import PabblyToken from "./pages/Settings/PabblyToken/PabblyToken";
-import CustomOptions from "./pages/Settings/CustomOptions/CustomOptions";
+import {
+  Dashboard,
+  Login,
+  MeetingDetails,
+  Layout,
+  ComingSoon,
+  NotFound,
+  Employees,
+  ViewParticularContact,
+  ViewContacts,
+  ViewProducts,
+  CreateProduct,
+  ViewAttendees,
+  CreateEmployee,
+  ViewSettings,
+  ViewPlans,
+  SignUp,
+  AddPlan,
+  ViewSidebarLinks,
+  CreateSidebarLink,
+  Assignments,
+  Clients,
+  EmployeeAssignments,
+  LandingPageForm,
+  EmployeeActivity,
+  PabblyToken,
+  CustomOptions,
+} from "./pages";
 import { getEmployeeStats } from "./features/actions/employee";
 import { addUserActivity } from "./features/actions/userActivity";
 import { isEmployeeId } from "./utils/roles";
 import { setIsEmployee } from "./features/slices/userActivity";
-import RouteGuard from "./components/RouteGuard";
+import RouteGuard from "./components/AccessControl/RouteGuard";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -61,10 +62,6 @@ const App = () => {
   // }
 
   const router = createBrowserRouter([
-    {
-      path: "/signUp",
-      element: !isUserLoggedIn ? <SignUp /> : <Dashboard />, // Redirect to dashboard if logged in
-    },
     {
       path: "/",
       element: isUserLoggedIn ? <Layout /> : <Login />,

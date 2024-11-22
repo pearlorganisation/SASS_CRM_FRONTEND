@@ -66,8 +66,8 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isUserLoggedIn = false;
         state.errorMessage = action.payload;
-        console.log(action.payload)
-        toast.error( "Something went wrong");
+        console.log(" ---- > ",action.payload)
+        errorToast(action?.payload);
       })
   },
 });

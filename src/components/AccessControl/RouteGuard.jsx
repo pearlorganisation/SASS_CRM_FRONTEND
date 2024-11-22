@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { roles } from "../utils/roles";
+import { roles } from "../../utils/roles";
 export default function RouteGuard({ children, roleNames = [] }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
