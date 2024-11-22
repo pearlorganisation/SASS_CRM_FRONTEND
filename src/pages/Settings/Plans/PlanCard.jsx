@@ -8,17 +8,18 @@ import {
   FaPencilAlt,
   FaEllipsisV,
 } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
-import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { deletePricePlan } from "../../../features/actions/pricePlan";
 import { roles } from "../../../utils/roles";
+import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
 
-const PlanCard = ({ plan }) => {
-  const dispatch = useDispatch();
-  const {userData} = useSelector((state) => state.auth);
+const PlanCard = (props) => {
   const [menuOpen, setMenuOpen] = useState(false);
-
+  const {
+    plan,
+    isMenuVisible = false,
+    handlePlanSelection = () => {},
+    selectedPlan = null,
+  } = props;
   const {
     name,
     amount,
@@ -33,7 +34,10 @@ const PlanCard = ({ plan }) => {
 
   return (
     <div className="relative mx-auto border border-gray-200 p-6 overflow-hidden rounded-xl shadow-lg max-w-sm bg-white m-4 transition-all duration-300 hover:shadow-xl">
-      {roles.SUPER_ADMIN === userData?.role && (
+      <ComponentGuard
+        allowedRoles={[roles.SUPER_ADMIN]}
+        conditions={[isMenuVisible]}
+      >
         <div className="absolute top-2 right-2">
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -49,21 +53,10 @@ const PlanCard = ({ plan }) => {
                   Edit
                 </button>
               </Link>
-              {/* <button
-            onClick={() => {
-              dispatch(deletePricePlan({ _id: plan?._id }));
-              setMenuOpen(false);
-            }}
-            className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-          >
-            <MdDelete className="mr-2" />
-            Delete
-          </button> */}
             </div>
           )}
         </div>
-      )}
-
+      </ComponentGuard>
       {/* Card Content */}
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">{name}</h2>
@@ -92,8 +85,17 @@ const PlanCard = ({ plan }) => {
         <Feature label="Employee Activity" enabled={employeeActivity} />
       </div>
 
-      <button className="w-full mt-6 bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300">
-        Choose Plan
+      <button
+        onClick={() => handlePlanSelection(plan?._id)}
+        className={` ${
+          selectedPlan === plan?._id ? "bg-blue-600" : "bg-blue-500"
+        } w-full mt-6  text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300`}
+      >
+        {selectedPlan === null
+          ? "Choose Plan"
+          : selectedPlan === plan?._id
+          ? "Selected"
+          : "Choose Plan"}
       </button>
     </div>
   );

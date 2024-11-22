@@ -31,6 +31,7 @@ import {
   EmployeeActivity,
   PabblyToken,
   CustomOptions,
+  CreateClient,
 } from "./pages";
 import { getEmployeeStats } from "./features/actions/employee";
 import { addUserActivity } from "./features/actions/userActivity";
@@ -109,6 +110,14 @@ const App = () => {
           ),
         },
         {
+          path: "/add-client",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN"]}>
+              <CreateClient />
+            </RouteGuard>
+          ),
+        },
+        {
           path: "/products",
           element: <ViewProducts />,
         },
@@ -134,7 +143,11 @@ const App = () => {
         },
         {
           path: "/settings/custom-status",
-          element: <CustomOptions />,
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
+              <CustomOptions />
+            </RouteGuard>
+          ),
         },
         {
           path: "/plans",

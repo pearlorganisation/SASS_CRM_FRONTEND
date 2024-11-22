@@ -1,11 +1,7 @@
 import React, { useEffect } from "react";
-import { FaRupeeSign } from "react-icons/fa";
-import { CiCircleCheck } from "react-icons/ci";
-import { roles } from "../../../utils/roles";
 import { useDispatch, useSelector } from "react-redux";
 import { getPricePlans } from "../../../features/actions/pricePlan";
 import PlanCard from "./PlanCard";
-import { Link } from "react-router-dom";
 
 const ViewPlans = () => {
   const { userData } = useSelector((state) => state.auth);
@@ -49,9 +45,7 @@ const ViewPlans = () => {
           planData?.map((item) => {
             return (
               <div className="">
-                <PlanCard plan={item} key={item?._id} />
-
-                {/* {true ? <button className='border-2 cursor-pointer my-4 sm:my-6 hover:border-green-700 hover:text-green-700 border-green-600 rounded-[5px] py-2 px-6 sm:px-10 font-bold text-green-600 text-sm'>Active</button> : <button className='border-2 cursor-pointer my-4 sm:my-6 hover:border-gray-600 hover:text-gray-700 border-gray-400 rounded-[5px] py-2 px-6 sm:px-10 font-bold text-gray-600 text-sm'>Buy Now</button>} */}
+                <PlanCard plan={item} isMenuVisible={true} key={item?._id} />
               </div>
             );
           })}

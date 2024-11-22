@@ -24,6 +24,7 @@ import LandingPageForm from "./Settings/LandingPage/LandingPageForm";
 import EmployeeActivity from "./Employees/EmployeeActivity";
 import PabblyToken from "./Settings/PabblyToken/PabblyToken";
 import CustomOptions from "./Settings/CustomOptions/CustomOptions";
+import CreateClient from "./Clients/CreateClient";
 
 export {
   Dashboard,
@@ -51,5 +52,6 @@ export {
   LandingPageForm,
   EmployeeActivity,
   PabblyToken,
-  CustomOptions
+  CustomOptions,
+  CreateClient
 };
