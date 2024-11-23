@@ -10,17 +10,20 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-import { signUp } from "../../features/actions/auth";
+import { clientSignup } from "../../features/actions/auth";
 import { getPricePlans } from "../../features/actions/pricePlan";
 import PlanCard from "../Settings/Plans/PlanCard";
 import { errorToast } from "../../utils/extra";
+import { useNavigate } from "react-router-dom";
 
 function CreateClient() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { isLoading } = useSelector((state) => state.auth);
-  const [activeStep, setActiveStep] = useState(0);
   const { planData } = useSelector((state) => state.pricePlans);
+
   const steps = ["Client Information", "Choose Plan"];
+  const [activeStep, setActiveStep] = useState(0);
   const [selectedPlan, setSelectedPlan] = useState(null);
 
   const {
@@ -40,6 +43,13 @@ function CreateClient() {
       }
       data["plan"] = selectedPlan;
       console.log(data);
+      dispatch(clientSignup(data))
+      .then((res) => {
+        if(res.meta.requestStatus === "fulfilled") {
+          navigate('/clients');
+        }
+      })
+      ;
     }
   };
 

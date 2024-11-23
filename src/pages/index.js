@@ -25,7 +25,7 @@ import EmployeeActivity from "./Employees/EmployeeActivity";
 import PabblyToken from "./Settings/PabblyToken/PabblyToken";
 import CustomOptions from "./Settings/CustomOptions/CustomOptions";
 import CreateClient from "./Clients/CreateClient";
-
+import ViewClient from "./Clients/ViewClient";
 export {
   Dashboard,
   Login,
@@ -53,5 +53,6 @@ export {
   EmployeeActivity,
   PabblyToken,
   CustomOptions,
-  CreateClient
+  CreateClient,
+  ViewClient
 };

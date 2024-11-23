@@ -32,6 +32,7 @@ import {
   PabblyToken,
   CustomOptions,
   CreateClient,
+  ViewClient
 } from "./pages";
 import { getEmployeeStats } from "./features/actions/employee";
 import { addUserActivity } from "./features/actions/userActivity";
@@ -114,6 +115,14 @@ const App = () => {
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN"]}>
               <CreateClient />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/view-client/:id",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN"]}>
+              <ViewClient />
             </RouteGuard>
           ),
         },

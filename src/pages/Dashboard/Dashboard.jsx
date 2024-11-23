@@ -1,100 +1,157 @@
-import React from "react";
-// import { Box, Card, CardContent, Typography, Grid } from "@mui/material";
-// import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import React, { useState } from "react";
+import {
+  Card,
+  Typography,
+  Grid,
+  Box,
+  Button,
+  Divider,
+  TextField,
+} from "@mui/material";
+// import { DatePicker } from "@mui/x-date-pickers";
+import { Bar } from "react-chartjs-2";
+// Register the required components
+// Import necessary modules from chart.js
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+  } from "chart.js";
+  
+  // Register the required components
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+  );
 
 const Dashboard = () => {
+  const [dateRange, setDateRange] = useState({ start: null, end: null });
+
   // Dummy data
   const data = {
-    accounts: {
-      totalCreated: 1500,
-      active: 1200,
+    accountsCreated: 120,
+    activeAccounts: 90,
+    revenue: "$15,000",
+    totalAdmins: 12,
+    totalEmployees: 340,
+    totalContacts: {
+      used: 1200,
+      remaining: 800,
     },
-    revenue: 520000,
-    admins: [
-      { name: "Admin 1", employees: 10 },
-      { name: "Admin 2", employees: 20 },
-      { name: "Admin 3", employees: 15 },
-    ],
-    contacts: 3500,
   };
 
-  const accountTrends = [
-    { date: "Jan", created: 200 },
-    { date: "Feb", created: 300 },
-    { date: "Mar", created: 250 },
-    { date: "Apr", created: 350 },
-  ];
+  const contactChartData = {
+    labels: ["Used", "Remaining"],
+    datasets: [
+      {
+        label: "Contacts",
+        data: [data.totalContacts.used, data.totalContacts.remaining],
+        backgroundColor: ["#3b82f6", "#10b981"],
+      },
+    ],
+  };
 
-  return <div></div>
+  return (
+    <Box className="p-10">
+      {/* Header */}
+      <Typography variant="h4" gutterBottom>
+        Dashboard
+      </Typography>
 
-  // return (
-  //   <Box sx={{ padding: 4 }}>
-  //     {/* Header */}
-  //     <Typography variant="h4" gutterBottom>
-  //       Dashboard
-  //     </Typography>
+      {/* Date Range Picker
+      <Box display="flex" gap={2} alignItems="center" marginBottom={4}>
+        <Typography variant="subtitle1">Filter by Date Range:</Typography>
+        <DatePicker
+          label="Start Date"
+          value={dateRange.start}
+          onChange={(newValue) => setDateRange({ ...dateRange, start: newValue })}
+        />
+        <DatePicker
+          label="End Date"
+          value={dateRange.end}
+          onChange={(newValue) => setDateRange({ ...dateRange, end: newValue })}
+        />
+        <Button variant="contained" color="primary">
+          Apply
+        </Button>
+      </Box> */}
 
-  //     {/* Summary Cards */}
-  //     <Grid container spacing={2}>
-  //       <Grid item xs={12} sm={6} md={4}>
-  //         <Card>
-  //           <CardContent>
-  //             <Typography variant="h6">Total Accounts Created</Typography>
-  //             <Typography variant="h4">{data.accounts.totalCreated}</Typography>
-  //           </CardContent>
-  //         </Card>
-  //       </Grid>
-  //       <Grid item xs={12} sm={6} md={4}>
-  //         <Card>
-  //           <CardContent>
-  //             <Typography variant="h6">Active Accounts</Typography>
-  //             <Typography variant="h4">{data.accounts.active}</Typography>
-  //           </CardContent>
-  //         </Card>
-  //       </Grid>
-  //       <Grid item xs={12} sm={6} md={4}>
-  //         <Card>
-  //           <CardContent>
-  //             <Typography variant="h6">Total Revenue</Typography>
-  //             <Typography variant="h4">₹{data.revenue.toLocaleString()}</Typography>
-  //           </CardContent>
-  //         </Card>
-  //       </Grid>
-  //       <Grid item xs={12} sm={6} md={4}>
-  //         <Card>
-  //           <CardContent>
-  //             <Typography variant="h6">Total Admins</Typography>
-  //             <Typography variant="h4">{data.admins.length}</Typography>
-  //           </CardContent>
-  //         </Card>
-  //       </Grid>
-  //       <Grid item xs={12} sm={6} md={4}>
-  //         <Card>
-  //           <CardContent>
-  //             <Typography variant="h6">Total Contacts</Typography>
-  //             <Typography variant="h4">{data.contacts}</Typography>
-  //           </CardContent>
-  //         </Card>
-  //       </Grid>
-  //     </Grid>
+      {/* Metrics Cards */}
+      <Grid container spacing={4}>
+        <Grid item xs={12} sm={6} md={4}>
+          <Card className="p-4 shadow">
+            <Typography variant="h6">Accounts Created</Typography>
+            <Typography variant="h3" color="primary">
+              {data.accountsCreated}
+            </Typography>
+          </Card>
+        </Grid>
 
-  //     {/* Trends Chart */}
-  //     <Box mt={4}>
-  //       <Typography variant="h6" gutterBottom>
-  //         Account Creation Trends
-  //       </Typography>
-  //       <ResponsiveContainer width="100%" height={300}>
-  //         <LineChart data={accountTrends}>
-  //           <CartesianGrid strokeDasharray="3 3" />
-  //           <XAxis dataKey="date" />
-  //           <YAxis />
-  //           <Tooltip />
-  //           <Line type="monotone" dataKey="created" stroke="#8884d8" />
-  //         </LineChart>
-  //       </ResponsiveContainer>
-  //     </Box>
-  //   </Box>
-  // );
+        <Grid item xs={12} sm={6} md={4}>
+          <Card className="p-4 shadow">
+            <Typography variant="h6">Active Accounts</Typography>
+            <Typography variant="h3" color="success">
+              {data.activeAccounts}
+            </Typography>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          <Card className="p-4 shadow">
+            <Typography variant="h6">Overall Revenue</Typography>
+            <Typography variant="h3" color="secondary">
+              {data.revenue}
+            </Typography>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          <Card className="p-4 shadow">
+            <Typography variant="h6">Total Admins</Typography>
+            <Typography variant="h3" color="primary">
+              {data.totalAdmins}
+            </Typography>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          <Card className="p-4 shadow">
+            <Typography variant="h6">Total Employees</Typography>
+            <Typography variant="h3" color="success">
+              {data.totalEmployees}
+            </Typography>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          <Card className="p-4 shadow">
+            <Typography variant="h6">Contacts</Typography>
+            <Typography variant="h4">
+              {data.totalContacts.used} / {data.totalContacts.remaining}
+            </Typography>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Contacts Chart */}
+      <Box marginTop={4}>
+        <Card className="p-6 shadow">
+          <Typography variant="h6" gutterBottom>
+            Contacts Usage Overview
+          </Typography>
+          <Bar data={contactChartData} />
+        </Card>
+      </Box>
+    </Box>
+  );
 };
 
 export default Dashboard;
