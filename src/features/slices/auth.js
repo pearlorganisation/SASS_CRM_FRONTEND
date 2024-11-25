@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { clientSignup, logIn, signUp } from "../actions/auth";
+import {logIn, signUp } from "../actions/auth";
 import { toast } from "sonner";
 import { errorToast } from "../../utils/extra";
 // -------------------------------------------------------------------------------------------
@@ -68,23 +68,6 @@ const authSlice = createSlice({
         errorToast(action?.payload);
       })
 
-      // client SignUp lifecycle methods
-      .addCase(clientSignup.pending, (state, action) => {
-        state.isLoading = true;
-        state.errorMessage = "";
-      })
-      .addCase(clientSignup.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.userData = action.payload.data;
-        toast.success(`New Client Account Created Successfully`, {
-          position: "top-center",
-        });
-      })
-      .addCase(clientSignup.rejected, (state, action) => {
-        state.isLoading = false;
-        state.errorMessage = action.payload;
-        errorToast(action?.payload);
-      });
   },
 });
 

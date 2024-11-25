@@ -28,7 +28,7 @@ const ViewSettings = () => {
             to="/pabblyToken"
             className="flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-52 cursor-pointer  hover:bg-green-700 hover:text-white text-green-700"
           >
-            <PiLetterCirclePBold size={40} /> Pabbly Token
+            <PiLetterCirclePBold size={40} /> External API Token
           </Link>
           <Link
             to="/settings/custom-status"

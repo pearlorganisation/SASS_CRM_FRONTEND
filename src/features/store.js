@@ -13,6 +13,7 @@ import globalData from "./slices/globalData";
 import userActivityReducer from "./slices/userActivity";
 import pabblyToken from "./slices/pabblyToken";
 import pricePlanReducer from "./slices/pricePlan";
+import clientReducer from './slices/client'
 
 // Combine your individual reducers here
 const rootReducer = combineReducers({
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   userActivity: userActivityReducer,
   pabblyToken,
   pricePlans: pricePlanReducer,
+  client: clientReducer
 });
 
 // Custom root reducer handling a clear action

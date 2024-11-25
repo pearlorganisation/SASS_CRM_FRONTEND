@@ -10,7 +10,7 @@ import {
   Button,
   Typography,
 } from "@mui/material";
-import { clientSignup } from "../../features/actions/auth";
+import { clientSignup } from "../../features/actions/client";
 import { getPricePlans } from "../../features/actions/pricePlan";
 import PlanCard from "../Settings/Plans/PlanCard";
 import { errorToast } from "../../utils/extra";
@@ -19,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 function CreateClient() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoading } = useSelector((state) => state.auth);
+  const { isLoading } = useSelector((state) => state.client);
   const { planData } = useSelector((state) => state.pricePlans);
 
   const steps = ["Client Information", "Choose Plan"];
@@ -43,13 +43,12 @@ function CreateClient() {
       }
       data["plan"] = selectedPlan;
       console.log(data);
-      dispatch(clientSignup(data))
-      .then((res) => {
-        if(res.meta.requestStatus === "fulfilled") {
-          navigate('/clients');
+      dispatch(clientSignup(data)).then((res) => {
+        console.log("ressst", res);
+        if (res?.meta?.requestStatus === "fulfilled") {
+          navigate("/clients", { replace: true });
         }
-      })
-      ;
+      });
     }
   };
 
@@ -233,9 +232,9 @@ function CreateClient() {
             <div className="flex overflow-x-auto gap-4 max-">
               {planData &&
                 Array.isArray(planData) &&
-                planData?.map((item) => {
+                planData?.map((item, index) => {
                   return (
-                    <div className="min-w-72">
+                    <div key={index} className="min-w-72">
                       <PlanCard
                         plan={item}
                         key={item?._id}

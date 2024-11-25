@@ -61,7 +61,7 @@ const PlanCard = (props) => {
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">{name}</h2>
         <p className="text-4xl font-extrabold text-blue-600">
-          ${amount}
+        {"\u20B9"}{amount}
           <span className="text-base font-normal text-gray-500">/month</span>
         </p>
       </div>
@@ -88,8 +88,8 @@ const PlanCard = (props) => {
       <button
         onClick={() => handlePlanSelection(plan?._id)}
         className={` ${
-          selectedPlan === plan?._id ? "bg-blue-600" : "bg-blue-500"
-        } w-full mt-6  text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300`}
+          selectedPlan === plan?._id ? "bg-green-600" : "bg-blue-500"
+        } w-full mt-6  text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
       >
         {selectedPlan === null
           ? "Choose Plan"

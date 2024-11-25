@@ -39,6 +39,7 @@ import { addUserActivity } from "./features/actions/userActivity";
 import { isEmployeeId } from "./utils/roles";
 import { setIsEmployee } from "./features/slices/userActivity";
 import RouteGuard from "./components/AccessControl/RouteGuard";
+import { logout } from "./features/slices/auth";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -46,11 +47,15 @@ const App = () => {
   const { isUserLoggedIn } = useSelector((state) => state.auth);
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role || "";
-  console.log(
-    "checking if user is logged in",
-    isUserLoggedIn,
-    isEmployeeId(role)
-  );
+  if(isUserLoggedIn && !role) {
+    dispatch(logout());
+  }
+
+  // console.log(
+  //   "checking if user is logged in",
+  //   isUserLoggedIn,
+  //   userData
+  // );
   // if (isUserLoggedIn && isEmployeeId(role)) {
   //   dispatch(setIsEmployee(true));
   //   dispatch(
@@ -105,9 +110,7 @@ const App = () => {
         {
           path: "/clients",
           element: (
-            <RouteGuard roleNames={["SUPER_ADMIN"]}>
               <Clients />
-            </RouteGuard>
           ),
         },
         {

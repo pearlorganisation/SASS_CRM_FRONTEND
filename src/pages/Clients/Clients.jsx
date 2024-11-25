@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { getAllClients } from "../../features/actions/employee";
+import { getAllClients } from "../../features/actions/client";
 import {
   Skeleton,
   Stack,
@@ -9,17 +9,18 @@ import {
   Tooltip,
   IconButton,
   Pagination,
+  Grid,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { getRoleNameByID, roles } from "../../utils/roles";
 import { formatDateAsNumber } from "../../utils/extra";
+import ClientCard from "../../components/ClientCard";
 
 const Clients = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { clientsData, isLoading } = useSelector((state) => state.employee);
+  const { clientsData=[], isLoading, totalPages } = useSelector((state) => state.client);
   const { userData } = useSelector((state) => state.auth);
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -68,28 +69,46 @@ const Clients = () => {
           Add Client
         </Button>
       </div>
+      
+      <div className="block sm:hidden">
+      {clientsData.map((item, idx) => (
+          <ClientCard
+            key={idx}
+            item={item}
+            handleEditClient={handleEditClient}
+            handleDeleteClient={handleDeleteClient}
+            handleViewClient={handleViewClient}
+          />
+        ))}
+      </div>
 
       {/* Clients Table */}
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <div className="relative hidden sm:block  overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr className="stickyRow">
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-6 py-3 text-nowrap">
                 Username / Email
               </th>
-              <th scope="col" className="px-6 py-3">
-                Plan Expiry
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Phone Number
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Role
-              </th>
-              <th scope="col" className="px-6 py-3">
+              <th scope="col" className="px-6 py-3 text-nowrap">
                 Status
               </th>
-              <th className="py-3 px-6 stickyFieldRight">Action</th>
+              <th scope="col" className="px-6 py-3 text-nowrap">
+                Plan Name
+              </th>
+              <th scope="col" className="px-6 py-3 text-nowrap">
+                Plan Start Date
+              </th>
+              <th scope="col" className="px-6 py-3 text-nowrap">
+                Plan Expiry
+              </th>
+              <th scope="col" className="px-6 py-3 text-nowrap">
+                Contants Limit
+              </th>
+              <th scope="col" className="px-6 py-3 text-nowrap">
+                Phone Number
+              </th>
+              <th className="py-3 text-nowrap px-6 stickyFieldRight">Action</th>
             </tr>
           </thead>
 
@@ -122,13 +141,25 @@ const Clients = () => {
                     </div>
                   </th>
                   <td className="px-6 py-4">
-                    {formatDateAsNumber(item?.currentPlanExpiry)}
-                  </td>
-                  <td className="px-6 py-4">{item?.phone}</td>
-                  <td className="px-6 py-4">{getRoleNameByID(item?.role)}</td>
-                  <td className="px-6 py-4">
                     {item?.isActive ? "Active" : "Inactive"}
                   </td>
+                  <td className="px-6 py-4">{item?.plan?.name || "N/A"}</td>
+                  <td className="px-6 py-4">
+                    {Array.isArray(item?.subscription) &&
+                    item?.subscription.length > 0
+                      ? formatDateAsNumber(item?.subscription[0]?.startDate)
+                      : "N/A"}
+                  </td>
+                  <td className="px-6 py-4">
+                    {formatDateAsNumber(item?.currentPlanExpiry)}
+                  </td>
+                  <td className="px-6 py-4">
+                    {Array.isArray(item?.subscription) &&
+                    item?.subscription.length > 0
+                      ? item?.subscription[0]?.contactLimit
+                      : "N/A"}
+                  </td>
+                  <td className="px-6 py-4">{item?.phone}</td>
                   <td className="px-3   whitespace-nowrap stickyFieldRight">
                     {/* View Icon */}
                     <Tooltip title="View Client Info" arrow>
@@ -168,7 +199,7 @@ const Clients = () => {
       </div>
       <div className="flex justify-center mt-5">
         <Pagination
-          count={1}
+          count={totalPages || 1}
           page={Number(page)}
           color="primary"
           onChange={handlePagination}

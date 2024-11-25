@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   Typography,
@@ -17,28 +17,22 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { getClientById } from "../../features/actions/client";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { formatDate } from "../../utils/extra";
 
 const ViewClient = () => {
-  const clientData = {
-    companyName: "Tech Innovators Inc.",
-    email: "info@techinnovators.com",
-    contactNumber: "+1-800-555-1234",
-    employeeTypes: {
-      sales: 3,
-      reminder: 5,
-    },
-    contactLimit: 500,
-    usedContacts: 320,
-    plan: {
-      type: "Premium",
-      expiry: "2024-12-31",
-      purchaseDate: "2024-01-01",
-    },
-    status: {
-      isActive: true,
-      lastActive: "2024-11-20 14:35:00",
-    },
-  };
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const { singleClientData } = useSelector((state) => state.client);
+
+  const [clientData = null] = singleClientData || [];
+  console.log(clientData, "clientData");
+
+  useEffect(() => {
+    dispatch(getClientById(id));
+  }, []);
 
   return (
     <Box className="p-10 mt-10">
@@ -65,10 +59,11 @@ const ViewClient = () => {
           </Grid>
           <Grid item>
             <Typography variant="h4" component="h1">
-              {clientData.companyName}
+              {clientData?.userName}
             </Typography>
             <Typography variant="subtitle1">
-              {clientData.status.isActive ? "Active Client" : "Inactive Client"}
+              {true ? "Active Client" : "Inactive Client"}{" "}
+              {/* to be added later */}
             </Typography>
           </Grid>
         </Grid>
@@ -86,13 +81,13 @@ const ViewClient = () => {
             <Box display="flex" alignItems="center" mb={2}>
               <EmailIcon color="primary" className="mr-2" />
               <Typography>
-                <strong>Email:</strong> {clientData.email}
+                <strong>Email:</strong> {clientData?.email}
               </Typography>
             </Box>
             <Box display="flex" alignItems="center" mb={2}>
               <PhoneIcon color="primary" className="mr-2" />
               <Typography>
-                <strong>Contact:</strong> {clientData.contactNumber}
+                <strong>Contact:</strong> {clientData?.phone}
               </Typography>
             </Box>
           </Paper>
@@ -108,13 +103,21 @@ const ViewClient = () => {
             <Box display="flex" alignItems="center" mb={2}>
               <PeopleIcon color="primary" className="mr-2" />
               <Typography>
-                <strong>Sales:</strong> {clientData.employeeTypes.sales}
+                <strong>Sales:</strong>{" "}
+                {
+                  clientData?.employees.map((item) => item.type === "sales")
+                    .length
+                }
               </Typography>
             </Box>
             <Box display="flex" alignItems="center" mb={2}>
               <PeopleIcon color="secondary" className="mr-2" />
               <Typography>
-                <strong>Reminder:</strong> {clientData.employeeTypes.reminder}
+                <strong>Reminder:</strong>{" "}
+                {
+                  clientData?.employees.map((item) => item.type === "reminder")
+                    .length
+                }
               </Typography>
             </Box>
           </Paper>
@@ -128,10 +131,14 @@ const ViewClient = () => {
             </Typography>
             <Divider className="mb-3" />
             <Typography variant="body1" gutterBottom>
-              <strong>Limit:</strong> {clientData.contactLimit}
+              <strong>Limit:</strong>{" "}
+              {Array.isArray(clientData?.subscription) &&
+              clientData.subscription.length > 0
+                ? clientData.subscription[0].contactLimit
+                : 0}
             </Typography>
             <Typography variant="body1">
-              <strong>Used:</strong> {clientData.usedContacts}
+              <strong>Used:</strong> {clientData?.contactsCount}
             </Typography>
           </Paper>
         </Grid>
@@ -145,12 +152,12 @@ const ViewClient = () => {
             <Divider className="mb-3" />
             <Box display="flex" alignItems="center" mb={0.5}>
               <Typography>
-                <strong>Type:</strong> {clientData.plan.type}
+                <strong>Type:</strong> {clientData?.plan?.name}
               </Typography>
             </Box>
             <Box display="flex" alignItems="center">
               <Typography>
-                <strong>Expiry:</strong> {clientData.plan.expiry}
+                <strong>Expiry:</strong> {formatDate(clientData?.currentPlanExpiry)}
               </Typography>
             </Box>
           </Paper>
@@ -162,9 +169,7 @@ const ViewClient = () => {
             elevation={3}
             className="p-4"
             style={{
-              backgroundColor: clientData.status.isActive
-                ? "#E8F5E9"
-                : "#FFEBEE",
+              backgroundColor: clientData?.isActive ? "#E8F5E9" : "#FFEBEE",
             }}
           >
             <Typography variant="h6" gutterBottom>
@@ -172,10 +177,10 @@ const ViewClient = () => {
             </Typography>
             <Divider className="mb-3" />
             <Chip
-              label={clientData.status.isActive ? "Active" : "Inactive"}
-              color={clientData.status.isActive ? "success" : "error"}
+              label={clientData?.isActive ? "Active" : "Inactive"}
+              color={clientData?.isActive ? "success" : "error"}
               icon={
-                clientData.status.isActive ? (
+                clientData?.isActive ? (
                   <CheckCircleOutlineIcon />
                 ) : (
                   <ErrorOutlineIcon />
@@ -184,7 +189,7 @@ const ViewClient = () => {
               className="mb-2"
             />
             <Typography>
-              <strong>Last Active:</strong> {clientData.status.lastActive}
+              <strong>Last Active:</strong> 2024-11-20 14:35:00
             </Typography>
           </Paper>
         </Grid>

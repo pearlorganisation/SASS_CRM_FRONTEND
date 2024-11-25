@@ -38,15 +38,3 @@ export const logIn = createAsyncThunk(
   }
 );
 
-// client signup from super admin panel
-export const clientSignup = createAsyncThunk(
-  "client/signup",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response = await instance.post("auth/client", payload);
-      return response;
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  }
-);
