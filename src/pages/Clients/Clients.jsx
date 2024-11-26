@@ -15,7 +15,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { formatDateAsNumber } from "../../utils/extra";
-import ClientCard from "../../components/ClientCard";
+import ClientCard from "../../components/Client/ClientCard";
+import UpdateClientModal from "../../components/Client/UpdateClientModal";
 
 const Clients = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const Clients = () => {
   const { clientsData=[], isLoading, totalPages } = useSelector((state) => state.client);
   const { userData } = useSelector((state) => state.auth);
 
+  const [updateData, setUpdateData] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const LIMIT = 10;
   const [page, setPage] = useState(searchParams.get("page") || 1);
@@ -43,8 +45,8 @@ const Clients = () => {
     navigate("/add-client"); // Replace with your actual add-client route
   };
 
-  const handleEditClient = (clientId) => {
-    navigate(`/edit-client/${clientId}`);
+  const handleEditClient = (client) => {
+    setUpdateData(client);
   };
 
   const handleDeleteClient = (clientId) => {
@@ -175,7 +177,7 @@ const Clients = () => {
                     <Tooltip title="Edit Client" arrow>
                       <IconButton
                         color="primary"
-                        onClick={() => handleEditClient(item?._id)}
+                        onClick={() => handleEditClient(item)}
                       >
                         <EditIcon />
                       </IconButton>
@@ -205,6 +207,15 @@ const Clients = () => {
           onChange={handlePagination}
         />
       </div>
+      <UpdateClientModal
+        open={updateData ? true: false}
+        email={updateData?.email}
+        userName={updateData?.userName}
+        phone={updateData?.phone}
+        _id={updateData?._id}
+        onClose={() => setUpdateData(null)}
+        onUpdate={(data) => console.log(data)}
+      />
     </div>
   );
 };

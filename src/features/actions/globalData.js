@@ -69,3 +69,16 @@ export const createGlobalData = createAsyncThunk(
       }
     }
   );
+
+
+  export const getDashboardData = createAsyncThunk(
+    "Dashboard/fetchData",
+    async (params, { rejectWithValue }) => {
+      try {
+        const response = await instance.get(`dashboard/superAdmin`,{params});
+        return response.data;
+      } catch (e) {
+        return rejectWithValue(e);
+      }
+    }
+  );

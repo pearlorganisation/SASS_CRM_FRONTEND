@@ -3,9 +3,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { createCustomOption, createGlobalData, deleteCustomOption, getCustomOptions, getGlobalData } from "../actions/globalData";
+import {
+  createCustomOption,
+  createGlobalData,
+  deleteCustomOption,
+  getCustomOptions,
+  getDashboardData,
+  getGlobalData,
+} from "../actions/globalData";
 import { errorToast } from "../../utils/extra";
-
 
 const initialState = {
   isLoading: false,
@@ -13,7 +19,8 @@ const initialState = {
   errorMessage: "",
   isSuccess: false,
   customOptions: [],
-  isSidebarOpen: false
+  isSidebarOpen: false,
+  dashBoardCardsData: {},
 };
 
 // ---------------------------------------------------------------------------------------
@@ -24,7 +31,7 @@ export const globalDataSlice = createSlice({
   reducers: {
     toggleSidebar: (state) => {
       state.isSidebarOpen = !state.isSidebarOpen;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -58,7 +65,7 @@ export const globalDataSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
       })
-      
+
       .addCase(getCustomOptions.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
@@ -96,15 +103,29 @@ export const globalDataSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
       })
-     
- 
+      .addCase(getDashboardData.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getDashboardData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.dashBoardCardsData =
+          Array.isArray(action.payload) && action.payload.length > 0
+            ? action.payload[0]
+            : {};
+      })
+      .addCase(getDashboardData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+      });
   },
 });
 
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {toggleSidebar} = globalDataSlice.actions;
+export const { toggleSidebar } = globalDataSlice.actions;
 export default globalDataSlice.reducer;
 
 // ================================================== THE END ==================================================
