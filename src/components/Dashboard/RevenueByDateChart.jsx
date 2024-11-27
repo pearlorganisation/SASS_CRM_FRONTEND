@@ -1,34 +1,49 @@
-import React from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement } from 'chart.js';
-import moment from 'moment';
-import { Card, Typography } from '@mui/material';
+import React from "react";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  Title,
+  Tooltip,
+  Legend,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+} from "chart.js";
+import moment from "moment";
+import { Card, Typography } from "@mui/material";
+import { useSelector } from "react-redux";
 
-ChartJS.register(Title, Tooltip, Legend, LineElement, CategoryScale, LinearScale, PointElement);
+ChartJS.register(
+  Title,
+  Tooltip,
+  Legend,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement
+);
 
 const RevenueByDateChart = () => {
   // Dummy revenue data for 30 days
-  const revenueData = Array.from({ length: 30 }, (_, i) => ({
-    date: moment('2024-11-01').add(i, 'days').format('YYYY-MM-DD'),
-    revenue: Math.floor(Math.random() * 1000) + 100, // Random revenue values between 100 and 1000
-  }));
+  const { revenueGraphData } = useSelector((state) => state.globalData);
 
   // Extract labels (dates) and data (revenue) for the chart
-  const labels = revenueData.map((item) => item.date);
-  const revenues = revenueData.map((item) => item.revenue);
+  const labels = revenueGraphData.map((item) => item?.dateObj?.split("T")[0]);
+  const revenues = revenueGraphData.map((item) => item?.totalRevenue);
 
   const data = {
     labels, // Dates for X-axis
     datasets: [
       {
-        label: 'Revenue',
+        label: "Revenue",
         data: revenues, // Revenue values
         fill: true,
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        borderColor: "rgba(255, 99, 132, 1)",
         borderWidth: 2,
-        pointBackgroundColor: 'rgba(255, 99, 132, 1)',
-        pointBorderColor: '#fff',
+        pointBackgroundColor: "rgba(255, 99, 132, 1)",
+        pointBorderColor: "#fff",
         tension: 0.4, // Smooth line curve
       },
     ],
@@ -40,25 +55,25 @@ const RevenueByDateChart = () => {
     plugins: {
       title: {
         display: true,
-        text: 'Revenue Over Time', // Title of the chart
+        text: "Revenue Over Time", // Title of the chart
       },
       tooltip: {
         callbacks: {
           label: function (context) {
-            return `${context.dataset.label}: $${context.raw.toLocaleString()}`; // Tooltip formatting
+            return `${context.dataset.label}: \u20B9${context.raw.toLocaleString()}`; // Tooltip formatting
           },
         },
       },
       legend: {
         display: true,
-        position: 'top',
+        position: "top",
       },
     },
     scales: {
       x: {
         title: {
           display: true,
-          text: 'Dates',
+          text: "Dates",
         },
         ticks: {
           autoSkip: true, // Automatically skip ticks if too many dates
@@ -68,28 +83,28 @@ const RevenueByDateChart = () => {
       y: {
         title: {
           display: true,
-          text: 'Revenue (in $)',
+          text: "Revenue (in \u20B9)",
         },
         beginAtZero: true,
         ticks: {
           callback: function (value) {
-            return `$${value.toLocaleString()}`; // Format Y-axis labels as currency
+            return `\u20B9${value.toLocaleString()}`; // Format Y-axis labels as currency
           },
         },
       },
     },
     layout: {
-        padding: {
-          bottom: 30, // Add padding to the bottom to make space for labels
-        },
+      padding: {
+        bottom: 30, // Add padding to the bottom to make space for labels
       },
+    },
   };
 
   return (
     <Card className="p-6 shadow w-full  h-[60vh] ">
-    <Typography variant="h6" gutterBottom>
-    Revenue Overview
-    </Typography>
+      <Typography variant="h6" gutterBottom>
+        Revenue Overview
+      </Typography>
       <Line data={data} options={options} />
     </Card>
   );

@@ -10,8 +10,8 @@ import {
   LinearScale,
   PointElement,
 } from "chart.js";
-import moment from "moment"; // For date formatting
 import { Card, Typography } from "@mui/material";
+import { useSelector } from "react-redux";
 
 // Register Chart.js components
 ChartJS.register(
@@ -26,38 +26,11 @@ ChartJS.register(
 
 const UserGrowthByDate = () => {
   // Dummy data: User sign-ups with specific dates
-  const userSignUpData = [
-    { date: "2024-08-01", count: 5 },
-    { date: "2024-08-02", count: 8 },
-    { date: "2024-08-03", count: 12 },
-    { date: "2024-08-04", count: 20 },
-    { date: "2024-08-05", count: 15 },
-    { date: "2024-08-06", count: 25 },
-    { date: "2024-09-01", count: 5 },
-    { date: "2024-09-02", count: 8 },
-    { date: "2024-09-03", count: 12 },
-    { date: "2024-09-04", count: 20 },
-    { date: "2024-09-05", count: 15 },
-    { date: "2024-09-06", count: 25 },
-    { date: "2024-10-01", count: 5 },
-    { date: "2024-10-02", count: 8 },
-    { date: "2024-10-03", count: 12 },
-    { date: "2024-10-04", count: 20 },
-    { date: "2024-10-05", count: 15 },
-    { date: "2024-10-06", count: 25 },
-    { date: "2024-11-01", count: 5 },
-    { date: "2024-11-02", count: 8 },
-    { date: "2024-11-03", count: 12 },
-    { date: "2024-11-04", count: 20 },
-    { date: "2024-11-05", count: 15 },
-    { date: "2024-11-06", count: 25 },
-  ];
+  const { usersGraphData } = useSelector((state) => state.globalData);
 
   // Prepare data for the chart
-  const labels = userSignUpData.map((item) =>
-    moment(item.date).format("YYYY-MM-DD")
-  ); // Format dates for X-axis
-  const dataCounts = userSignUpData.map((item) => item.count); // Y-axis values (sign-ups)
+  const labels = usersGraphData.map((item) => item?.dateObj?.split("T")[0]);
+  const dataCounts = usersGraphData.map((item) => item?.total);
 
   const data = {
     labels, // X-axis (dates)
@@ -112,10 +85,10 @@ const UserGrowthByDate = () => {
       },
     },
     layout: {
-        padding: {
-          bottom: 30, // Add padding to the bottom to make space for labels
-        },
+      padding: {
+        bottom: 30, // Add padding to the bottom to make space for labels
       },
+    },
   };
 
   return (

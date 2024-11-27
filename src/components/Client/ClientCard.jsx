@@ -10,12 +10,9 @@ import {
   Box,
 } from "@mui/material";
 import { formatDateAsNumber } from "../../utils/extra";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const ClientCard = (props) => {
-  const { item, handleDeleteClient, handleEditClient, handleViewClient } =
+  const { item, icons } =
     props;
   return (
     <Grid item xs={12} sm={6} md={4}>
@@ -71,32 +68,7 @@ const ClientCard = (props) => {
               color={item?.isActive ? "success" : "error"}
               size="small"
             />
-            <div>
-              <Tooltip title="View Client Info" arrow>
-                <IconButton
-                  color="primary"
-                  onClick={() => handleViewClient(item?._id)}
-                >
-                  <VisibilityIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Edit Client" arrow>
-                <IconButton
-                  color="primary"
-                  onClick={() => handleEditClient(item?._id)}
-                >
-                  <EditIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Inactivate/Delete Client" arrow>
-                <IconButton
-                  color="error"
-                  onClick={() => handleDeleteClient(item?._id)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
-            </div>
+            {icons}
           </div>
         </CardContent>
       </Card>

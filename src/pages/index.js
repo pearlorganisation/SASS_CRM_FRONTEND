@@ -26,6 +26,7 @@ import PabblyToken from "./Settings/PabblyToken/PabblyToken";
 import CustomOptions from "./Settings/CustomOptions/CustomOptions";
 import CreateClient from "./Clients/CreateClient";
 import ViewClient from "./Clients/ViewClient";
+import Profile from "./Profile/Profile"
 export {
   Dashboard,
   Login,
@@ -54,5 +55,6 @@ export {
   PabblyToken,
   CustomOptions,
   CreateClient,
-  ViewClient
+  ViewClient,
+  Profile
 };
