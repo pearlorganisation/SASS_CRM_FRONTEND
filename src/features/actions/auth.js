@@ -3,8 +3,6 @@ import { instance } from "../../services/axiosInterceptor";
 
 // ------------------------------------Async Actions----------------------------------
 
-
-
 //Signup Api
 export const signUp = createAsyncThunk(
   "user/signup",
@@ -25,18 +23,18 @@ export const signUp = createAsyncThunk(
 
 //Login Api
 export const logIn = createAsyncThunk(
-    "user/login",
-    async (payload, { rejectWithValue }) => {
-      try {
-        const { data } = await instance.post("auth/signin", payload, {
-          withCredentials: true,
-        });
-        console.log(data)
-        return data;
-      } catch (error) {
-        console.log(error)
-        return rejectWithValue(error);
-      }
+  "user/login",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.post("auth/login", payload, {
+        withCredentials: true,
+      });
+      console.log(data);
+      return data;
+    } catch (error) {
+      console.log("error leleo bhia'", error);
+      return rejectWithValue(error);
     }
-  );
-  
+  }
+);
+

@@ -1,29 +1,75 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
-import { IoLogOut } from "react-icons/io5";
+import { IoLogOut, IoPeople, IoSettings } from "react-icons/io5";
 import { HiUserGroup } from "react-icons/hi2";
-import { IoPeople } from "react-icons/io5";
 import { SiGooglemeet } from "react-icons/si";
 import { AiFillProduct } from "react-icons/ai";
-import { IoSettings } from "react-icons/io5";
+import { MdAssignment } from "react-icons/md";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // for dropdown icon
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../features/slices/auth";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // for dropdown icon
 import { getAllSidebarLinks } from "../../../features/actions/sidebarLink";
-import { roles } from "../../../utils/roles";
-import { MdAssignment } from "react-icons/md";
 import { addUserActivity } from "../../../features/actions/userActivity";
+import { roles } from "../../../utils/roles";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { sidebarLinkData, isLoading } = useSelector(
-    (state) => state.sidebarLink
-  );
-  const { role } = useSelector((state) => state.auth.userData);
+  const { sidebarLinkData } = useSelector((state) => state.sidebarLink);
+  const { userData } = useSelector((state) => state.auth);
+  const { isSidebarOpen } = useSelector((state) => state.globalData);
   const { isEmployee } = useSelector((state) => state.userActivity);
   const [showImportantLinks, setShowImportantLinks] = useState(false); // toggle state for sub-links
+  const role = userData?.role || "";
+
+  const navItems = [
+    {
+      roles: [roles.SUPER_ADMIN],
+      items: [
+        {
+          path: "/clients",
+          label: "Clients",
+          icon: <IoPeople size={30} />,
+        },
+      ],
+    },
+    {
+      roles: [roles.ADMIN],
+      items: [
+        {
+          path: "/webinarDetails",
+          label: "Webinars",
+          icon: <SiGooglemeet size={30} />,
+        },
+        {
+          path: "/attendees",
+          label: "Attendees",
+          icon: <HiUserGroup size={30} />,
+        },
+        {
+          path: "/employees",
+          label: "Employees",
+          icon: <IoPeople size={30} />,
+        },
+      ],
+    },
+    {
+      roles: [roles.EMPLOYEE_SALES, roles.EMPLOYEE_REMINDER],
+      items: [
+        {
+          path: "/assignments",
+          label: "Assignments",
+          icon: <MdAssignment size={30} />,
+        },
+        {
+          path: "/products",
+          label: "Products",
+          icon: <AiFillProduct size={30} />,
+        },
+      ],
+    },
+  ];
 
   const handleLogout = () => {
     dispatch(logout());
@@ -41,13 +87,9 @@ const Sidebar = () => {
     setShowImportantLinks((prev) => !prev);
   };
 
-  useEffect(() => {
-    dispatch(getAllSidebarLinks());
-  }, []);
-
   const handleNavigation = (link) => {
     navigate(link);
-    addUserActivityLog(link, "page")
+    addUserActivityLog(link, "page");
   };
 
   const addUserActivityLog = (link, type) => {
@@ -61,14 +103,19 @@ const Sidebar = () => {
     }
   };
 
+  useEffect(() => {
+    dispatch(getAllSidebarLinks());
+  }, [dispatch]);
+
   return (
-    <aside
+    <div
       id="logo-sidebar"
-      className="fixed top-0 left-0 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0"
+      className={`fixed top-0 left-0 w-64 h-screen z-10 pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 ${isSidebarOpen ? 'translate-x-0' : 'sm:translate-x-0'}`}
       aria-label="Sidebar"
     >
       <div className="h-full px-3 pb-4 overflow-y-auto bg-white">
         <ul className="space-y-2 font-medium">
+          {/* Dashboard Link */}
           <li>
             <Link
               to="/"
@@ -78,94 +125,32 @@ const Sidebar = () => {
               <span className="ms-3">Dashboard</span>
             </Link>
           </li>
-          {roles.SUPER_ADMIN === role && (
-            <li>
-              <Link
-                to="/clients"
-                className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
-              >
-                <IoPeople size={30} />
-                <span className="flex-1 ms-3 whitespace-nowrap">Clients</span>
-              </Link>
-            </li>
-          )}
-          {roles.ADMIN === role && (
-            <>
-              <li>
+
+          {/* Render navigation items based on roles */}
+          {navItems.map((navGroup, index) =>
+            navGroup.roles.includes(role) &&
+            navGroup.items.map((item, idx) => (
+              <li key={`${index}-${idx}`}>
                 <Link
-                  to="/webinarDetails"
+                  to={item.path}
+                  onClick={() => handleNavigation(item.path)}
                   className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
                 >
-                  <SiGooglemeet size={30} />
-                  <span className="flex-1 ms-3 whitespace-nowrap">
-                    Webinars
-                  </span>
+                  {item.icon}
+                  <span className="flex-1 ms-3 whitespace-nowrap">{item.label}</span>
                 </Link>
               </li>
-              <li>
-                <Link
-                  to="/attendees"
-                  className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
-                >
-                  <HiUserGroup size={30} />
-                  <span className="flex-1 ms-3 whitespace-nowrap">
-                    Attendees
-                  </span>
-                </Link>
-              </li>
-            </>
+            ))
           )}
 
-          {(roles.EMPLOYEE_SALES === role ||
-            roles.EMPLOYEE_REMINDER === role) && (
-            <li>
-              <div
-                onClick={() => handleNavigation("/assignments")}
-                className="flex cursor-pointer items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
-              >
-                <MdAssignment size={30} />
-                <span className="flex-1 ms-3 whitespace-nowrap">
-                  Assignments
-                </span>
-              </div>
-            </li>
-          )}
-
-          {roles.ADMIN === role && (
-            <li>
-              <Link
-                to="/employees"
-                className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
-              >
-                <IoPeople size={30} />
-                <span className="flex-1 ms-3 whitespace-nowrap">Employees</span>
-              </Link>
-            </li>
-          )}
-          {(roles.ADMIN === role ||
-            roles.EMPLOYEE_SALES === role ||
-            roles.EMPLOYEE_REMINDER === role) && (
-            <li>
-              <div
-                onClick={() => handleNavigation("/products")}
-                className="flex cursor-pointer items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
-              >
-                <AiFillProduct size={30} />
-                <span className="flex-1 ms-3 whitespace-nowrap">Products</span>
-              </div>
-            </li>
-          )}
-
-          {/* Important Links section with subtitles */}
+          {/* Important Links Section */}
           <li>
             <div
               onClick={toggleImportantLinks}
               className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group cursor-pointer"
             >
               <AiFillProduct size={30} />
-              <span className="flex-1 ms-3 whitespace-nowrap">
-                Important Links
-              </span>
+              <span className="flex-1 ms-3 whitespace-nowrap">Important Links</span>
               {showImportantLinks ? (
                 <FiChevronUp size={20} />
               ) : (
@@ -176,7 +161,7 @@ const Sidebar = () => {
             {showImportantLinks &&
               Array.isArray(sidebarLinkData) &&
               sidebarLinkData.map((item, idx) => (
-                <ul className="pl-10 space-y-1">
+                <ul key={idx} className="pl-10 space-y-1">
                   <li>
                     <a
                       href={item?.link}
@@ -192,6 +177,7 @@ const Sidebar = () => {
               ))}
           </li>
 
+          {/* Settings Link */}
           <li>
             <Link
               to="/settings"
@@ -202,6 +188,7 @@ const Sidebar = () => {
             </Link>
           </li>
 
+          {/* Logout Button */}
           <li>
             <button
               onClick={handleLogout}
@@ -213,7 +200,7 @@ const Sidebar = () => {
           </li>
         </ul>
       </div>
-    </aside>
+    </div>
   );
 };
 

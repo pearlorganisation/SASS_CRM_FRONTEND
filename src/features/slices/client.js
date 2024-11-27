@@ -3,69 +3,70 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { addAssign, addNote, getNotes } from "../actions/assign";
+
+import {
+  getAllClients,
+  getClientById,
+  clientSignup,
+} from "../actions/client";
 import { errorToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
-  isFormLoading: false,
-  assignData: [],
-  noteData: [],
   totalPages: null,
   errorMessage: "",
+  clientsData: [],
+  singleClientData: null,
 };
 
 // ---------------------------------------------------------------------------------------
 
-export const assignSlice = createSlice({
-  name: "assign",
+export const clientSlce = createSlice({
+  name: "client",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(addAssign.pending, (state, action) => {
+      .addCase(getAllClients.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
       })
-      .addCase(addAssign.fulfilled, (state, action) => {
+      .addCase(getAllClients.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.assignData = action.payload.data;
-        toast.info(action.payload.data.message, {
-          position: "top-center",
-        });
+        state.clientsData = action.payload?.result || [];
+        state.totalPages = action.payload?.totalPages;
       })
-      .addCase(addAssign.rejected, (state, action) => {
+      .addCase(getAllClients.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
         errorToast(action?.payload);
       })
-      .addCase(addNote.pending, (state, action) => {
-        state.isFormLoading = true;
-        state.errorMessage = "";
-      })
-      .addCase(addNote.fulfilled, (state, action) => {
-        state.isFormLoading = false;
-        state.errorMessage = "";
-        toast.success("Note Added Successfully", {
-          position: "top-center",
-        });
-      })
-      .addCase(addNote.rejected, (state, action) => {
-        state.isFormLoading = false;
-        state.errorMessage = action.payload;
-        errorToast(action?.payload);
-      })
-      .addCase(getNotes.pending, (state, action) => {
+      .addCase(getClientById.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
       })
-      .addCase(getNotes.fulfilled, (state, action) => {
+      .addCase(getClientById.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.noteData = action.payload;
+        state.singleClientData = action.payload;
       })
-      .addCase(getNotes.rejected, (state, action) => {
+      .addCase(getClientById.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        errorToast(action?.payload);
+      })
+      .addCase(clientSignup.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(clientSignup.fulfilled, (state, action) => {
+        state.isLoading = false;
+        toast.success(`New Client Account Created Successfully`, {
+          position: "top-center",
+        });
+      })
+      .addCase(clientSignup.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
         errorToast(action?.payload);
@@ -76,7 +77,7 @@ export const assignSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {} = assignSlice.actions;
-export default assignSlice.reducer;
+export const {} = clientSlce.actions;
+export default clientSlce.reducer;
 
 // ================================================== THE END ==================================================

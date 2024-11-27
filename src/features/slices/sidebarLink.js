@@ -4,9 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
 import { addSidebarLink, getAllSidebarLinks } from "../actions/sidebarLink";
-
-
-
+import { errorToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
@@ -39,7 +37,9 @@ export const sidebarLinkSlice = createSlice({
       .addCase(addSidebarLink.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong");
+        console.log('its madafaka console',action.payload);
+   
+        errorToast(action.payload);
       })
       .addCase(getAllSidebarLinks.pending, (state, action) => {
         state.isLoading = true;
@@ -53,11 +53,8 @@ export const sidebarLinkSlice = createSlice({
       .addCase(getAllSidebarLinks.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
-      })
- 
+        errorToast(action.payload);
+      });
   },
 });
 

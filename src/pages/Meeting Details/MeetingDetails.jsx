@@ -12,20 +12,26 @@ import Delete from "../../components/delete";
 import UploadXslxModal from "./UploadXslxModal";
 import Pagination from "@mui/material/Pagination";
 import UpdateCsvXslxModal from "./UpdateCsvXslxModal";
+import CreateWebinar from "./modal/CreateWebinar";
+import Tooltip from "@mui/material/Tooltip";
+import EditIcon from "@mui/icons-material/Edit";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteIcon from "@mui/icons-material/Delete";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
 
 const MeetingDetails = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isLoading, isDeleted, webinarData ,totalPages} = useSelector(
+  const { isLoading, isDeleted, webinarData, totalPages } = useSelector(
     (state) => state.webinarContact
   );
 
   const [showModal, setShowModal] = useState(false);
   const [showXslxModal, setShowXslxModal] = useState(false);
-  const [showUpdateModal,setShowUpdateModal] = useState(false)
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [id, setId] = useState();
-  const [webinarName,setWebinarName] = useState(null);
+  const [webinarName, setWebinarName] = useState(null);
 
   const handleModal = () => setShowModal(true);
   const handleXslxModal = () => setShowXslxModal(true);
@@ -44,6 +50,34 @@ const MeetingDetails = () => {
 
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
   const [page, setPage] = useState(searchParams.get("page") || 1);
+  const [editWebinarData, setEditWebinarData] = useState(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const dummyWebinars = [
+    {
+      _id: 1,
+      name: "React Basics Webinar",
+      date: "2024-12-01",
+      totalParticipants: 50,
+    },
+    {
+      _id: 2,
+      name: "Advanced JavaScript Techniques",
+      date: "2024-12-10",
+      totalParticipants: 75,
+    },
+    {
+      _id: 3,
+      name: "UI/UX Design Principles",
+      date: "2024-12-15",
+      totalParticipants: 40,
+    },
+    {
+      _id: 4,
+      name: "Tailwind CSS Crash Course",
+      date: "2024-12-20",
+      totalParticipants: 60,
+    },
+  ];
 
   const handlePagination = (e, p) => {
     setPage(p);
@@ -52,19 +86,19 @@ const MeetingDetails = () => {
 
   useEffect(() => {
     dispatch(getAllWebinars(page));
-  }, [dispatch, page]);
+  }, [page]);
 
   useEffect(() => {
     if (webinarData?.status) {
       dispatch(getAllWebinars(page));
     }
-  }, [webinarData, dispatch, page]);
+  }, [webinarData, page]);
 
   useEffect(() => {
     if (isDeleted) {
       dispatch(getAllWebinars(page));
     }
-  }, [isDeleted, dispatch, page]);
+  }, [isDeleted, page]);
 
   return (
     <>
@@ -74,12 +108,18 @@ const MeetingDetails = () => {
             <h3 className="text-gray-800 text-xl font-bold sm:text-2xl">
               Manage Webinar Details
             </h3>
-            <p className="text-gray-600 text-[15px] font-medium mt-2">
+            {/* <p className="text-gray-600 text-[15px] font-medium mt-2">
               This page is for parsing CSV and XLSX file here.
-            </p>
+            </p> */}
           </div>
           <div className="mt-3 md:mt-0 space-x-5">
-            <a
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="cursor-pointer inline-block px-4 py-2 text-white duration-150 font-medium bg-indigo-600 rounded-lg hover:bg-indigo-700 active:bg-indigo-700 md:text-sm"
+            >
+              Create Webinar
+            </button>
+            {/* <a
               onClick={handleXslxModal}
               className="cursor-pointer inline-block px-4 py-2 text-white duration-150 font-medium bg-indigo-600 rounded-lg hover:bg-indigo-700 active:bg-indigo-700 md:text-sm"
             >
@@ -90,7 +130,7 @@ const MeetingDetails = () => {
               className="cursor-pointer inline-block px-4 py-2 text-white duration-150 font-medium bg-indigo-600 rounded-lg hover:bg-indigo-700 active:bg-indigo-700 md:text-sm"
             >
               Upload CSV File
-            </a>
+            </a> */}
           </div>
         </div>
         <div className="mt-5 shadow-lg rounded-lg overflow-x-auto">
@@ -118,9 +158,9 @@ const MeetingDetails = () => {
                   </td>
                 </tr>
               ) : (
-                Array.isArray(webinarData) &&
-                webinarData.length > 0 &&
-                webinarData?.map((item, idx) => {
+                Array.isArray(dummyWebinars) &&
+                dummyWebinars.length > 0 &&
+                dummyWebinars?.map((item, idx) => {
                   const serialNumber = (page - 1) * 8 + idx + 1;
                   return (
                     <tr key={idx}>
@@ -128,34 +168,70 @@ const MeetingDetails = () => {
                         {serialNumber}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {item?.csvName}
+                        {item?.name}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {item?.date || "N/A"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {item?.count}
+                        {item?.totalParticipants}
                       </td>
-                      <td className="px-3 whitespace-nowrap">
-                        <a
-                          onClick={handleUpdateModal}
-                          className="cursor-pointer py-2 px-3 font-semibold text-green-500 hover:text-green-600 duration-150 hover:bg-gray-50 rounded-lg"
-                        >
-                          Update Details
-                        </a>
-                        {showUpdateModal && createPortal(<UpdateCsvXslxModal setModal={setShowUpdateModal} csvId={item?._id} />, document.body)}
-                        <a
-                          onClick={() => navigate(`/contacts/${item?._id}`)}
-                          className="cursor-pointer py-2 px-3 font-semibold text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50 rounded-lg"
-                        >
-                          View Attendees
-                        </a>
-                        <button
-                          onClick={() => handleDeleteModal(item?._id, item?.csvName)}
-                          className="py-2 px-3 leading-none font-semibold text-red-500 hover:text-red-600 duration-150 hover:bg-gray-50 rounded-lg"
-                        >
-                          Delete
-                        </button>
+                      {showUpdateModal &&
+                        createPortal(
+                          <UpdateCsvXslxModal
+                            setModal={setShowUpdateModal}
+                            csvId={item?._id}
+                          />,
+                          document.body
+                        )}
+                      <td className="px-3 whitespace-nowrap flex gap-2">
+                        {/* Update Details */}
+                        <Tooltip title="Update Details" arrow>
+                          <button
+                            onClick={() => {
+                              setEditWebinarData(item);
+                              setIsCreateModalOpen(true);
+                            }}
+                            className="p-2 rounded-lg text-[#006A67] hover:text-[#1b3d3c] duration-150 hover:bg-gray-50"
+                          >
+                            <EditIcon />
+                          </button>
+                        </Tooltip>
+
+                        {/* View Attendees */}
+                        <Tooltip className="px-3" title="View Attendees" arrow>
+                          <button
+                            onClick={() => navigate(`/contacts/${item?._id}`)}
+                            className="p-2 rounded-lg text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50"
+                          >
+                            <VisibilityIcon />
+                          </button>
+                        </Tooltip>
+
+                        {/* Delete */}
+                        <Tooltip title="Delete" arrow>
+                          <button
+                            onClick={() =>
+                              handleDeleteModal(item?._id, item?.name)
+                            }
+                            className="p-2 rounded-lg text-red-400 hover:text-red-600 duration-150 hover:bg-gray-50"
+                          >
+                            <DeleteIcon />
+                          </button>
+                        </Tooltip>
+
+                        <Tooltip title="Upload File" arrow>
+                          <button
+                            onClick={() => {
+                              // Your upload logic here
+                              setShowUpdateModal(true);
+                              console.log("Upload action triggered!");
+                            }}
+                            className="p-2 rounded-lg text-blue-500 hover:text-blue-600 duration-150 hover:bg-gray-50"
+                          >
+                            <UploadFileIcon />
+                          </button>
+                        </Tooltip>
                       </td>
                     </tr>
                   );
@@ -182,8 +258,23 @@ const MeetingDetails = () => {
         )}
 
       {showDeleteModal && (
-        <Delete setModal={setShowDeleteModal} webinarName={webinarName} handleDelete={handleDelete} />
+        <Delete
+          setModal={setShowDeleteModal}
+          webinarName={webinarName}
+          handleDelete={handleDelete}
+        />
       )}
+
+      <CreateWebinar
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSubmit={(data) => console.log(data)}
+        webinarData={editWebinarData}
+        clearData={() => {
+          console.log("clearing data");
+          setEditWebinarData(null);
+        }}
+      />
     </>
   );
 };

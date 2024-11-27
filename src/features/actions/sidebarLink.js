@@ -6,7 +6,7 @@ export const addSidebarLink = createAsyncThunk(
   "addSidebarLink",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.post(`globalData/sidebarLinks`, payload);
+      const response = await instance.post(`sidebar-links`, payload);
       return response;
     } catch (e) {
       return rejectWithValue(e);
@@ -21,9 +21,9 @@ export const getAllSidebarLinks = createAsyncThunk(
   "getAllSidebarLinks",
   async (id, { rejectWithValue }) => {
     try {
-      const {data} = await instance.get(`globalData/sidebarLinks`);
+      const {data} = await instance.get(`sidebar-links`);
 
-      return data?.data;
+      return data;
     } catch (e) {
       return rejectWithValue(e);
     }

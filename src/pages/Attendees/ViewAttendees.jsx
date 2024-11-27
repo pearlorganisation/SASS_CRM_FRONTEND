@@ -58,9 +58,6 @@ const ViewAttendees = () => {
   const [showModal, setShowModal] = useState(false);
   const checkboxRefs = useRef([]);
 
-  useEffect(() => {
-    console.log("pills", pills)
-  }, [pills])
 
   const handleOptionClick = (option) => {
     if (option.show === selectedOption?.show) {
@@ -329,7 +326,7 @@ const ViewAttendees = () => {
   };
 
   useEffect(() => {
-    console.log("parent useEffect")
+    console.log("parent useEffect", pageLimit)
     const filters = buildQueryString(pills);
     dispatch(getAllAttendees({ page, filters, recordType: "", limit: pageLimit  }));
   }, [page, pills,pageLimit]);
@@ -445,7 +442,7 @@ const ViewAttendees = () => {
               const temp = pills.map(ite => {
                 return `${ite?.option}=${ite?.value}`
               })
-              console.log(`?${temp.join('&')}`)
+              
             }} className="bg-blue-600 text-white font-medium px-5 rounded-lg" type="button">Save Presets</button> : ''}
           </div>
         </div>

@@ -14,6 +14,7 @@ import {
   updateAttendeeDetails,
   updateAttendeeLeadType,
 } from "../actions/webinarContact";
+import { errorToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
@@ -53,7 +54,7 @@ export const webinarContactSlice = createSlice({
       .addCase(addWebinarContacts.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong");
+        errorToast(action?.payload);
       })
       .addCase(updateAttendeeDetails.pending, (state, action) => {
         state.isLoading = true;
@@ -66,8 +67,7 @@ export const webinarContactSlice = createSlice({
       .addCase(updateAttendeeDetails.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong");
-      })
+        errorToast(action?.payload);      })
       .addCase(getAllAttendees.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
@@ -81,9 +81,7 @@ export const webinarContactSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.attendeeData = [];
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
+        errorToast(action?.payload);
       })
       .addCase(getAttendees.pending, (state, action) => {
         state.isLoading = true;
@@ -97,9 +95,7 @@ export const webinarContactSlice = createSlice({
       .addCase(getAttendees.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
+        errorToast(action?.payload);
       })
       .addCase(getAllWebinars.pending, (state, action) => {
         state.isLoading = true;
@@ -115,9 +111,7 @@ export const webinarContactSlice = createSlice({
         state.isLoading = false;
 
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
+        errorToast(action?.payload);
       })
       .addCase(deleteWebinarContacts.pending, (state, action) => {
         state.isLoading = true;
@@ -133,9 +127,7 @@ export const webinarContactSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.isDeleted = false;
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
+        errorToast(action?.payload);
       })
       .addCase(getAllAssignments.pending, (state, action) => {
         state.isLoading = true;
@@ -152,9 +144,7 @@ export const webinarContactSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.assignmentData = [];
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
+        errorToast(action?.payload);
       })
       .addCase(getAttendeeContactDetails.pending, (state, action) => {
         state.isLoading = true;
@@ -171,9 +161,7 @@ export const webinarContactSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.assignmentData = [];
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
+        errorToast(action?.payload);
       })
       .addCase(updateAttendeeLeadType.pending, (state, action) => {
         state.isLoading = true;
@@ -189,9 +177,7 @@ export const webinarContactSlice = createSlice({
       .addCase(updateAttendeeLeadType.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong", {
-          position: "top-center",
-        });
+        errorToast(action?.payload);
       });
   },
 });

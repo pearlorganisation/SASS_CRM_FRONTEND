@@ -3,8 +3,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { createCustomOption, createGlobalData, getCustomOptions, getGlobalData } from "../actions/globalData";
-
+import {
+  createCustomOption,
+  createGlobalData,
+  deleteCustomOption,
+  getCustomOptions,
+  getDashboardData,
+  getGlobalData,
+} from "../actions/globalData";
+import { errorToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
@@ -12,6 +19,8 @@ const initialState = {
   errorMessage: "",
   isSuccess: false,
   customOptions: [],
+  isSidebarOpen: false,
+  dashBoardCardsData: {},
 };
 
 // ---------------------------------------------------------------------------------------
@@ -19,7 +28,11 @@ const initialState = {
 export const globalDataSlice = createSlice({
   name: "globalData",
   initialState,
-  reducers: {},
+  reducers: {
+    toggleSidebar: (state) => {
+      state.isSidebarOpen = !state.isSidebarOpen;
+    },
+  },
   extraReducers: (builder) => {
     builder
 
@@ -37,7 +50,7 @@ export const globalDataSlice = createSlice({
       .addCase(createGlobalData.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error(action?.payload || "Something went wrong");
+        errorToast(action?.payload);
       })
       .addCase(getGlobalData.pending, (state, action) => {
         state.isLoading = true;
@@ -52,7 +65,7 @@ export const globalDataSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
       })
-      
+
       .addCase(getCustomOptions.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
@@ -78,15 +91,41 @@ export const globalDataSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
       })
-     
- 
+      .addCase(deleteCustomOption.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(deleteCustomOption.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+      })
+      .addCase(deleteCustomOption.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+      })
+      .addCase(getDashboardData.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getDashboardData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.dashBoardCardsData =
+          Array.isArray(action.payload) && action.payload.length > 0
+            ? action.payload[0]
+            : {};
+      })
+      .addCase(getDashboardData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+      });
   },
 });
 
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {} = globalDataSlice.actions;
+export const { toggleSidebar } = globalDataSlice.actions;
 export default globalDataSlice.reducer;
 
 // ================================================== THE END ==================================================

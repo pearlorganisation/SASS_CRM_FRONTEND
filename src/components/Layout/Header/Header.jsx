@@ -1,11 +1,14 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { getRoleNameByID } from "../../../utils/roles";
+import { toggleSidebar } from "../../../features/slices/globalData";
 
 const Header = () => {
+  const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.auth);
   console.log(userData);
+
 
 
   return (
@@ -17,6 +20,7 @@ const Header = () => {
               data-drawer-target="logo-sidebar"
               data-drawer-toggle="logo-sidebar"
               aria-controls="logo-sidebar"
+              onClick={() => dispatch(toggleSidebar())}
               type="button"
               className="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200   "
             >
@@ -49,8 +53,8 @@ const Header = () => {
             <div className="flex items-center ms-3">
               <div className="flex items-center space-x-3">
                 <div className="text-sm text-white">
-                  <p className="font-medium text-black">{userData.userName}</p>
-                  <p className="text-gray-400">{getRoleNameByID(userData.role)}</p>
+                  <p className="font-medium text-black">{userData?.userName}</p>
+                  <p className="text-gray-400">{getRoleNameByID(userData?.role)}</p>
                 </div>
                
               </div>

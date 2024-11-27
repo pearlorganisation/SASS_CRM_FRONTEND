@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   addPricePlans,
   deletePricePlan,
+  getPricePlan,
   getPricePlans,
   updatePricePlans,
 } from "../actions/pricePlan";
@@ -14,6 +15,7 @@ const initialState = {
   isPlanDeleted: false,
   errorMessage: "",
   planData: null,
+  singlePlanData: null,
 };
 
 const pricePlans = createSlice({
@@ -52,6 +54,22 @@ const pricePlans = createSlice({
         state.planData = action.payload;
       })
       .addCase(getPricePlans.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        toast.error("Error On Getting Plan!", { position: "top-center" });
+      })
+      .addCase(getPricePlan.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isPlanUpdated = false;
+        state.isPlanDeleted = false;
+        state.isSuccess = false;
+      })
+      .addCase(getPricePlan.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.singlePlanData = action.payload;
+      })
+      .addCase(getPricePlan.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
         toast.error("Error On Getting Plan!", { position: "top-center" });

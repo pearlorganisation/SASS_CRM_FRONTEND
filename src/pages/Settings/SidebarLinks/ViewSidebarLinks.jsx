@@ -9,6 +9,10 @@ const ViewSidebarLinks = () => {
   const dispatch =useDispatch()
   const {sidebarLinkData,isLoading} = useSelector((state)=>state.sidebarLink)
 
+  useEffect(() => {
+    dispatch(getAllSidebarLinks())  
+  },[])
+
 
   return (
     <div>
@@ -17,13 +21,13 @@ const ViewSidebarLinks = () => {
 
   
 
-      <div class="p-10 ">
-      <div class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-8 bg-white ">
+      <div className="p-10 ">
+      <div className="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-8 bg-white ">
           
       
             <button onClick={()=>navigate("/sidebarLinks/addSidebarLink")} className="bg-blue-600 rounded-md text-white px-3 py-1 font-semibold ">Add Sidebar Link</button>
           </div>
-        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
          
           <table className="w-full text-sm text-left rtl:text-right text-gray-500 ">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50  ">

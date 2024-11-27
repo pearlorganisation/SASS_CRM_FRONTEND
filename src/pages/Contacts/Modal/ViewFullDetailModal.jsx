@@ -19,81 +19,81 @@ const ViewFullDetailsModal = (props) => {
       >
         <div className="flex gap-5">
           <table
-            class=" w-full rounded text-left"
+            className=" w-full rounded text-left"
             cellspacing="0"
           >
-            <tbody class="space-y-1">
-              <tr class="flex ">
+            <tbody className="space-y-1">
+              <tr className="flex ">
                 <td
                   scope="col"
-                  class="flex h-12 items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
+                  className="flex h-12 items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
                 >
                   Date
                 </td>
-                <td class="flex h-12 w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 text-sm text-slate-500 transition duration-300">
+                <td className="flex h-12 w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 text-sm text-slate-500 transition duration-300">
                   {formatDate(modalData?.updatedAt)}
                 </td>
               </tr>
-              <tr class="flex ">
+              <tr className="flex ">
                 <td
                   scope="col"
-                  class="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
+                  className="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
                 >
                   Phone Number
                 </td>
-                <td class="flex h-auto w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 py-3 text-sm text-slate-500 transition duration-300">
+                <td className="flex h-auto w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 py-3 text-sm text-slate-500 transition duration-300">
                   {modalData?.phone}
                 </td>
               </tr>
-              <tr class="flex ">
+              <tr className="flex ">
                 <td
                   scope="col"
-                  class="flex h-12 items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
+                  className="flex h-12 items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
                 >
                   Call Duration
                 </td>
-                <td class="flex h-12 w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 text-sm text-slate-500 transition duration-300">
+                <td className="flex h-12 w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 text-sm text-slate-500 transition duration-300">
                   {`${modalData?.callDuration?.hr} hr ${modalData?.callDuration?.min} min ${modalData?.callDuration?.sec} sec`}
                 </td>
               </tr>
 
-              <tr class="flex ">
+              <tr className="flex ">
                 <td
                   scope="col"
-                  class="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
+                  className="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
                 >
                   Status
                 </td>
-                <td class="flex h-auto w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 py-3 text-sm text-slate-500 transition duration-300">
+                <td className="flex h-auto w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 py-3 text-sm text-slate-500 transition duration-300">
                   {modalData?.status}
                 </td>
               </tr>
-              {/* <tr class="flex ">
+              <tr className="flex ">
                 <td
                   scope="col"
-                  class="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
+                  className="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
                 >
-                  Email
+                  Product
                 </td>
-                <td class="flex h-auto w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 py-3 text-sm text-slate-500 transition duration-300">
-                  {modalData?.email}
+                <td className="flex h-auto w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 py-3 text-sm text-slate-500 transition duration-300">
+                  {modalData?.product || "-"}
                 </td>
-              </tr> */}
-              {/* <tr class="flex ">
+              </tr>
+              {/* <tr className="flex ">
                 <td
                   scope="col"
-                  class="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
+                  className="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
                 >
                   Record Type
                 </td>
-                <td class="flex h-auto w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 py-3 text-sm text-slate-500 transition duration-300">
+                <td className="flex h-auto w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 py-3 text-sm text-slate-500 transition duration-300">
                   {modalData?.recordType}
                 </td>
               </tr> */}
-              <tr class="flex ">
+              <tr className="flex ">
                 <td
                   scope="col"
-                  class="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
+                  className="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
                 >
                   Image
                 </td>
@@ -109,14 +109,14 @@ const ViewFullDetailsModal = (props) => {
                   )}
                 </td>
               </tr>
-              <tr class="flex ">
+              <tr className="flex ">
                 <td
                   scope="col"
-                  class="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
+                  className="flex h-auto items-center justify-start bg-slate-100 stroke-slate-700 px-6 text-sm font-medium text-slate-700 w-96"
                 >
                   Note
                 </td>
-                <td class="flex h-auto w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 py-3 text-sm text-slate-500 transition duration-300">
+                <td className="flex h-auto w-full items-center justify-start border-slate-200 bg-slate-50 stroke-slate-500 px-6 py-3 text-sm text-slate-500 transition duration-300">
                   {modalData?.note}
                 </td>
               </tr>

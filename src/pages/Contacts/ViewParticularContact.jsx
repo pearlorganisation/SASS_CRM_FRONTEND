@@ -21,6 +21,7 @@ import { getColor, LeadTypeOptions } from "../../utils/LeadType";
 import { resetAttendeeContactDetails } from "../../features/slices/webinarContact";
 import { addUserActivity } from "../../features/actions/userActivity";
 import { getCustomOptions } from "../../features/actions/globalData";
+import NoteItem from "../../components/NoteItem";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -45,13 +46,11 @@ const ViewParticularContact = () => {
     dispatch(getCustomOptions());
 
     return () => {
-      // console.log('resetting');
       dispatch(resetAttendeeContactDetails());
     };
   }, []);
 
   useEffect(() => {
-    // console.log(attendeeContactDetails)
     if (
       !attendeeContactDetails ||
       !attendeeContactDetails?.data ||
@@ -101,8 +100,6 @@ const ViewParticularContact = () => {
     setShowTimerModal(true);
   };
 
-  // PHONE NUMBER SECTION
-
   const handleCopyClick = (textToCopy) => {
     navigator.clipboard
       .writeText(textToCopy)
@@ -113,8 +110,6 @@ const ViewParticularContact = () => {
         console.error("Failed to copy text: ", err);
       });
   };
-
-  //  LEAD TYPE SECTION
 
   const customStyles = {
     control: (provided, state) => ({
@@ -185,106 +180,78 @@ const ViewParticularContact = () => {
             <span className="text-green-600">5:00 PM</span> by James{" "}
           </p>
         </div>
-        <div className="grid grid-cols-[47%_auto]  max-h-fit gap-10 ">
-          <div className=" flex-col space-y-3 h-full ">
-            <div className="border rounded-lg py-2  px-3 shadow-md">
-              <p>
-                Email :{" "}
-                <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
-                  {attendeeContactDetails?._id}
-                </span>
-              </p>
-            </div>
-            <div className="flex justify-between border rounded-lg py-2 px-3 shadow-md">
-              <p>
-                Name :{" "}
-                {uniqueNames.map(
-                  (item, index) =>
-                    item && (
-                      <span
-                        key={index}
-                        className="ms-2 bg-slate-100 rounded-md px-3 py-1"
-                      >
-                        {item}
-                      </span>
-                    )
-                )}
-              </p>
-            </div>
-
-            <div className="border rounded-lg py-1  px-3  shadow-md">
-              <p className="flex items-center">
-                {" "}
-                Phone Number :
-                <span className="ms-2 grid lg:grid-cols-2 gap-3">
-                  {uniquePhones.map(
+        <div className="grid grid-cols-2  gap-10 ">
+          <div className="flex flex-col h-full relative overflow-hidden">
+            <div className="space-y-3 relative top-0 left-0 right-0 z-10">
+              <div className="border rounded-lg py-2 px-3 shadow-md">
+                <p>
+                  Email :{" "}
+                  <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
+                    {attendeeContactDetails?._id}
+                  </span>
+                </p>
+              </div>
+              <div className="flex justify-between border rounded-lg py-2 px-3 shadow-md">
+                <p>
+                  Name :{" "}
+                  {uniqueNames.map(
                     (item, index) =>
                       item && (
                         <span
                           key={index}
-                          onClick={() => handleCopyClick(item)}
-                          className="flex justify-center items-center gap-1 bg-red-500 ms-2 p-1 text-white cursor-pointer rounded-md px-2 py-1"
+                          className="ms-2 bg-slate-100 rounded-md px-3 py-1"
                         >
                           {item}
-                          {/* 9876543210 */}
-                          <BiSolidCopy color="#050A30" size={12} />
                         </span>
                       )
                   )}
-                </span>
-              </p>
-            </div>
+                </p>
+              </div>
 
-            <div className="flex justify-between gap-20 min-h-[73%] ">
-              <div className="border rounded-lg  shadow-md  w-full ">
-                <div className="border-b-4 py-2">
-                  {" "}
-                  <span className="font-semibold  px-3 ">Notes</span>{" "}
-                </div>
-                <div className="overflow-auto max-h-96 scrollbar-thin w-full">
-                  {noteData &&
-                    noteData.map((item, index) => (
-                      <div
-                        key={index}
-                        className="border-b-2 bg-white hover:bg-gray-100 relative cursor-pointer transition duration-300 text-black"
-                        onClick={() => setNoteModalData(item)}
-                      >
-                        {/* <div className="bg-red-500 w-[7px] h-full absolute"></div> */}
-                        <div className="flex  pl-4 pr-2 pt-2 justify-between ">
-                          <div className="text-xs font-semibold ">
-                            Note {index + 1} :{" "}
-                          </div>
-                          <div className="flex gap-2">
-                            <p className="text-xs">
-                              Date :{" "}
-                              <span className="  rounded-md px-2 ">
-                                {formatDate(item?.updatedAt)}{" "}
-                              </span>
-                            </p>
-                            <p className="text-xs">
-                              Call Duration:{" "}
-                              <span className="rounded-md px-2">
-                                {`${item?.callDuration?.hr}-${item?.callDuration?.min}-${item?.callDuration?.sec}`}
-                              </span>
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex pt-3 px-3">
-                          <p className="text-sm  rounded-md px-2 py-2 bg-slate-100 ">
-                            {item?.note}
-                          </p>
-                        </div>
-                        <div className="px-2 py-2 flex justify-end">
-                          {/* <button onClick={handleModal} className='text-sm rounded-md px-2 text-white bg-blue-600 hover:bg-blue-700'>View Full Details</button> */}
-                        </div>
-                      </div>
-                    ))}
+              <div className="border rounded-lg py-1 px-3 shadow-md">
+                <p className="flex items-center">
+                  Phone Number :
+                  <span className="ms-2 grid lg:grid-cols-2 gap-3">
+                    {uniquePhones.map(
+                      (item, index) =>
+                        item && (
+                          <span
+                            key={index}
+                            onClick={() => handleCopyClick(item)}
+                            className="flex justify-center items-center gap-1 bg-red-500 ms-2 p-1 text-white cursor-pointer rounded-md px-2 py-1"
+                          >
+                            {item}
+                            <BiSolidCopy color="#050A30" size={12} />
+                          </span>
+                        )
+                    )}
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div className="h-full flex-1 relative">
+              <div className="absolute inset-x-0 top-0 bottom-0 overflow-hidden mt-2">
+                <div className="border rounded-lg shadow-md w-full h-full">
+                  <div className="border-b-4 py-2">
+                    <span className="font-semibold px-3">Notes</span>
+                  </div>
+                  <div className="overflow-y-auto pb-10 max-h-full scrollbar-thin w-full px-3">
+                    {noteData &&
+                      noteData.map((item, index) => (
+                        <NoteItem
+                          key={index}
+                          index={index}
+                          item={item}
+                          setNoteModalData={setNoteModalData}
+                        />
+                      ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="space-y-3  h-full">
+          <div className="space-y-3 flex-col h-full">
             <div className="flex  justify-between gap-10  items-center">
               <div className="flex items-center gap-3">
                 <div>
@@ -313,7 +280,7 @@ const ViewParticularContact = () => {
               </div>
             </div>
 
-            <div className="border rounded-lg space-y-3 shadow-md min-h-[91%] ">
+            <div className="border rounded-lg space-y-3 shadow-md  ">
               <div className="border-b-4 py-2">
                 <span className="font-semibold px-5 ">Add Note</span>
               </div>

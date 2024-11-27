@@ -201,7 +201,7 @@ function Login() {
                             "Sign in to your account"
                           )}
                         </button>
-                        <p className="text-sm font-light text-gray-500">
+                        {/* <p className="text-sm font-light text-gray-500">
                           Don’t have an account yet?{" "}
                           <a
                             href="/signUp"
@@ -209,7 +209,7 @@ function Login() {
                           >
                             Sign up
                           </a>
-                        </p>
+                        </p> */}
                       </form>
                     </div>
                   </div>

@@ -4,16 +4,17 @@ import Select from "react-select";
 import { useDispatch, useSelector } from "react-redux";
 import { addNote } from "../../features/actions/assign";
 import { ClipLoader } from "react-spinners";
+import { createAttendeeProduct, getAllProductsByAdminId } from "../../features/actions/product";
 
 const AddNoteForm = (props) => {
-  const {customOptions} = useSelector(state => state.globalData);
-console.log(customOptions)
+  const { customOptions } = useSelector((state) => state.globalData);
   const dispatch = useDispatch();
   const { isFormLoading } = useSelector((state) => state.assign);
   const { email, recordType, uniquePhones, addUserActivityLog } = props;
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const { productDropdownData } = useSelector((state) => state.product);
 
   const {
     register,
@@ -33,6 +34,10 @@ console.log(customOptions)
       image: null,
     },
   });
+
+  useEffect(() => {
+    dispatch(getAllProductsByAdminId());
+  }, []);
 
   useEffect(() => {
     if (!isFormLoading) {
@@ -64,6 +69,16 @@ console.log(customOptions)
       : "00";
 
     const note = data?.note;
+    console.log(data)
+
+    if(data?.product && data?.product !== ""){
+      console.log(data?.product)
+      const payload = {
+        email, 
+        productId : productDropdownData.find((item) => item.name === data?.product)?._id,
+      }
+      dispatch(createAttendeeProduct(payload))
+    }
 
     dispatch(addNote(data)).then(() => {
       addUserActivityLog({
@@ -197,8 +212,9 @@ console.log(customOptions)
               options={[
                 { value: "Payment", label: "Payment" },
                 { value: "Discussion", label: "Discussion" },
+                { value: "Product", label: "Product" },
                 { value: "Other", label: "Other" },
-                ...(customOptions || [])
+                ...(customOptions || []),
               ]}
               className="mt-1 text-sm shadow"
               placeholder="Choose Status"
@@ -232,6 +248,54 @@ console.log(customOptions)
           </span>
         )}
       </div>
+
+      {selectedStatus === "Product" && (
+        <div className="pt-4">
+          <div className="font-medium">Product</div>
+          <Controller
+            name="product"
+            control={control}
+            rules={{ required: "Product is required" }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                options={productDropdownData.map((product) => ({
+                  label: product?.name,
+                  value: product?.name,
+                  ...product,
+                }))}
+                className="mt-1 text-sm shadow"
+                placeholder="Choose Product"
+                value={
+                  field.value
+                    ? { value: field.value, label: field.value }
+                    : null
+                }
+                onChange={(selected) => field.onChange(selected.value)}
+                styles={{
+                  control: (provided) => ({
+                    ...provided,
+                    border: errors.product
+                      ? "1px solid #EF4444"
+                      : "1px solid #CBD5E1", // Red border if there's an error
+                    borderRadius: "7px",
+                  }),
+                  placeHolder: (provided) => ({
+                    ...provided,
+                    color: "#9CA3AF",
+                  }),
+                }}
+              />
+            )}
+          />
+
+          {errors.product && (
+            <span className="text-red-500 text-sm mt-1">
+              {errors.product.message}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Note Textarea */}
       <div className="pt-2">
