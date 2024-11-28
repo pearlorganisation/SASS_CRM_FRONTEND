@@ -8,12 +8,13 @@ import {
   getCustomOptions,
 } from "../../../features/actions/globalData";
 import { getRoleNameByID } from "../../../utils/roles";
+import { Button, Modal, TextField, IconButton } from "@mui/material"; // Importing MUI components
 
 const CustomOptions = () => {
   const dispatch = useDispatch();
   const { customOptions } = useSelector((state) => state.globalData);
   const { userData } = useSelector((state) => state.auth);
-  const role = userData?.role || '';
+  const role = userData?.role || "";
 
   const [showModal, setShowModal] = useState(false);
 
@@ -29,36 +30,31 @@ const CustomOptions = () => {
   const onSubmit = (data) => {
     data["value"] = data["label"];
     dispatch(createCustomOption(data)).then(() => {
-      dispatch(getCustomOptions());
-      reset();
-      setShowModal(false);
+      if (res.meta.requestStatus === "fulfilled"){
+        dispatch(getCustomOptions());
+        reset();
+        setShowModal(false);
+      }
     });
   };
 
   useEffect(() => {
     dispatch(getCustomOptions());
-  }, []);
+  }, [dispatch]);
 
   const handleDelete = (optionId) => {
-    console.log("delete", optionId);
-
-    dispatch(deleteCustomOption(optionId)).then(() => {
-      dispatch(getCustomOptions());
+    dispatch(deleteCustomOption(optionId)).then((res) => {
+      if (res.meta.requestStatus === "fulfilled") dispatch(getCustomOptions());
     });
   };
-
-  if(getRoleNameByID(role) !== "ADMIN") return null;
 
   return (
     <div className="container mx-auto mt-10 p-4">
       <div className="flex justify-between py-6 items-center">
         <h1 className="text-2xl font-bold">Custom Options</h1>
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          onClick={handleModalToggle}
-        >
+        <Button variant="contained" color="primary" onClick={handleModalToggle}>
           Add Custom Option
-        </button>
+        </Button>
       </div>
 
       {/* Display Table */}
@@ -77,9 +73,12 @@ const CustomOptions = () => {
                 <td className="p-4">{index + 1}</td>
                 <td className="p-4">{option.label}</td>
                 <td className="p-4">
-                  <button onClick={() => handleDelete(option?._id)}>
-                    <MdDelete className="text-red-500 hover:text-red-700" />
-                  </button>
+                  <IconButton
+                    onClick={() => handleDelete(option?._id)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <MdDelete />
+                  </IconButton>
                 </td>
               </tr>
             ))}
@@ -87,44 +86,47 @@ const CustomOptions = () => {
         </table>
       </div>
 
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-lg w-80">
-            <h2 className="text-xl font-semibold mb-4">Add Custom Option</h2>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Label
-                </label>
-                <input
-                  type="text"
-                  {...register("label", { required: "Label is required" })}
-                  className="mt-1 p-2 w-full border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-200"
-                />
-                {errors.label && (
-                  <p className="text-red-500 text-sm">{errors.label.message}</p>
-                )}
-              </div>
+      {/* Modal for Adding Custom Option */}
+      <Modal
+        open={showModal}
+        onClose={handleModalToggle}
+        className="flex items-center justify-center"
+      >
+        <div className="bg-white p-6 rounded shadow-lg w-80">
+          <h2 className="text-xl font-semibold mb-4">Add Custom Option</h2>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div className="mb-4">
+              <TextField
+                label="Label"
+                variant="outlined"
+                fullWidth
+                {...register("label", { required: "Label is required" })}
+                error={!!errors.label}
+                helperText={errors.label?.message}
+                className="mb-4"
+              />
+            </div>
 
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                  onClick={handleModalToggle}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                  Add Option
-                </button>
-              </div>
-            </form>
-          </div>
+            <div className="flex justify-end space-x-4">
+              <Button
+                variant="outlined"
+                onClick={handleModalToggle}
+                className="px-4 py-2"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                className="px-4 py-2"
+              >
+                Add Option
+              </Button>
+            </div>
+          </form>
         </div>
-      )}
+      </Modal>
     </div>
   );
 };

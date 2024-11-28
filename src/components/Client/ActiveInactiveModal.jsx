@@ -4,11 +4,16 @@ import CloseIcon from "@mui/icons-material/Close";
 
 const ActiveInactiveModal = ({ clientData, setModal, handleAction }) => {
   const [inputValue, setInputValue] = useState("");
+  const [note, setNote] = useState("");
   const [isInputValid, setIsInputValid] = useState(true);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
     setIsInputValid(e.target.value === clientData.email);
+  };
+
+  const handleNoteChange = (e) => {
+    setNote(e.target.value);
   };
 
   const handleConfirmAction = () => {
@@ -17,7 +22,7 @@ const ActiveInactiveModal = ({ clientData, setModal, handleAction }) => {
       return;
     }
     if (isInputValid) {
-      handleAction(clientData.id);
+      handleAction({ id: clientData.id, note, isActive: !clientData.isActiv });
     }
   };
 
@@ -60,6 +65,17 @@ const ActiveInactiveModal = ({ clientData, setModal, handleAction }) => {
                 The email entered does not match.
               </p>
             )}
+          </div>
+
+          {/* Optional Note Section */}
+          <div className="relative">
+            <textarea
+              value={note}
+              onChange={handleNoteChange}
+              placeholder="Add an optional note (e.g., reason for status change)"
+              className="w-full p-2 rounded-md border border-gray-300"
+              rows="4"
+            />
           </div>
         </div>
 

@@ -4,9 +4,11 @@ import { Button, IconButton, TextField } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import PasswordUpdateForm from "../../components/Profile/PasswordUpdateForm";
 import EditUserForm from "../../components/Profile/EditUserForm";
+import {useSelector} from "react-redux";
 
 const ProfilePage = () => {
   const [isEditingInfo, setIsEditingInfo] = useState(false);
+  const {userData} = useSelector((state) => state.auth);
 
   const defaultUserInfo = {
     userName: "John Doe",
@@ -48,10 +50,10 @@ const ProfilePage = () => {
               </div>
               <h2 className="text-xl font-bold mb-4">User Information</h2>
               <p className="mb-2">
-                <strong>Name:</strong> {defaultUserInfo.userName}
+                <strong>Name:</strong> {userData?.userName}
               </p>
               <p className="mb-2">
-                <strong>Email:</strong> {defaultUserInfo.email}
+                <strong>Email:</strong> {userData?.email}
               </p>
               <p className="mb-2">
                 <strong>Phone:</strong> {defaultUserInfo.phone}

@@ -22,7 +22,7 @@ ChartJS.register(
 );
 
 const ContactUsageChart = () => {
-  const { dashBoardCardsData } = useSelector((state) => state.globalData);
+  const { dashBoardCardsData = [] } = useSelector((state) => state.globalData);
 
   const contactChartData = {
     labels: ["Used", "Remaining"],

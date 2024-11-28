@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { getAllClients } from "../../features/actions/client";
+import { getAllClients, updateClient } from "../../features/actions/client";
 import {
   Skeleton,
   Stack,
@@ -12,9 +12,7 @@ import {
   Grid,
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"; // For active
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { formatDateAsNumber } from "../../utils/extra";
 import ClientCard from "../../components/Client/ClientCard";
@@ -30,8 +28,6 @@ const Clients = () => {
     isLoading,
     totalPages,
   } = useSelector((state) => state.client);
-  const { userData } = useSelector((state) => state.auth);
-
   const [activeData, setActiveData] = useState(null);
   const [updateData, setUpdateData] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -51,7 +47,7 @@ const Clients = () => {
   };
 
   const handleAddClient = () => {
-    navigate("/add-client"); 
+    navigate("/add-client");
   };
 
   const handleEditClient = (client) => {
@@ -61,8 +57,7 @@ const Clients = () => {
 
   const handleToggleClientStatus = (client, status) => {
     console.log(`Delete/Inactivate Client : ${client}- ${status}`);
-    setActiveData(client)
-
+    setActiveData(client);
   };
 
   const handleViewClient = (clientId) => {
@@ -71,7 +66,12 @@ const Clients = () => {
 
   const hanldeUpdate = (data) => {
     console.log(data);
-  }
+    dispatch(updateClient({ data, id: data?._id })).then((res) => {
+      if (res?.meta?.requestStatus === "fulfilled") {
+        dispatch(getAllClients({ page: 1, limit: LIMIT }));
+      }
+    });
+  };
 
   const IconRow = ({ item }) => {
     return (
@@ -102,8 +102,7 @@ const Clients = () => {
             onClick={() => handleToggleClientStatus(item, !item?.isActive)}
           >
             {
-              <div 
-              className={`${item?.isActive ? "" : "rotate-180"}`}>
+              <div className={`${item?.isActive ? "" : "rotate-180"}`}>
                 <LogoutIcon />
               </div>
             }
@@ -114,7 +113,7 @@ const Clients = () => {
   };
 
   return (
-    <div className="p-10 mt-10">
+    <div className="py-10 md:px-10 sm:pl-4 mt-10">
       {/* Page Header */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-gray-800">Clients</h1>
@@ -128,19 +127,22 @@ const Clients = () => {
         </Button>
       </div>
 
-      <div className="block sm:hidden">
+      <div className=" gap-4 md:hidden grid  grid-cols-1">
         {clientsData.map((item, idx) => (
           <ClientCard key={idx} icons={<IconRow item={item} />} item={item} />
         ))}
       </div>
 
       {/* Clients Table */}
-      <div className="relative hidden sm:block  overflow-x-auto shadow-md sm:rounded-lg">
+      <div className="relative hidden md:block  overflow-x-auto shadow-md sm:rounded-lg">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr className="stickyRow">
               <th scope="col" className="px-6 py-3 text-nowrap">
                 Username / Email
+              </th>
+              <th scope="col" className="px-6 py-3 text-nowrap">
+                Company Name
               </th>
               <th scope="col" className="px-6 py-3 text-nowrap">
                 Status
@@ -201,6 +203,7 @@ const Clients = () => {
                       </div>
                     </div>
                   </th>
+                  <td className="px-6 py-4">{item?.companyName || "N/A"}</td>
                   <td className="px-6 py-4">
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
@@ -270,15 +273,13 @@ const Clients = () => {
         onUpdate={hanldeUpdate}
       />
 
-      {
-        activeData && (
-          <ActiveInactiveModal
-      clientData={activeData}
-      setModal={setActiveData}
-      handleAction={() => console.log("handleAction")}
-      />
-        )
-      }
+      {activeData && (
+        <ActiveInactiveModal
+          clientData={activeData}
+          setModal={setActiveData}
+          handleAction={(data) => console.log("handleAction", data)}
+        />
+      )}
     </div>
   );
 };

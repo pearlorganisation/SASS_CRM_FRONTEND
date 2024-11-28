@@ -66,7 +66,7 @@ instance.interceptors.response.use(
           break;
   
       case 404:
-        errorMessage = error.response.data.message || "Resource Not Found";
+        errorMessage =  "Resource Not Found";
         break;
 
       case 500:

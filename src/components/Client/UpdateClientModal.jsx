@@ -15,14 +15,16 @@ const UpdateClientModal = ({ open, onClose, defaultUserInfo, onUpdate }) => {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({
-    defaultValues: defaultUserInfo,
-  });
-  console.log("it skdflskdjf",defaultUserInfo)
+  } = useForm();
 
   useEffect(() => {
-    console.log("reseting")
-    reset(defaultUserInfo);
+    reset({
+      userName: defaultUserInfo?.userName,
+      email: defaultUserInfo?.email,
+      phone: defaultUserInfo?.phone,
+      companyName: defaultUserInfo?.companyName,
+      _id: defaultUserInfo?._id
+    });
   },[defaultUserInfo])
 
   const onSubmit = (data) => {
@@ -34,7 +36,7 @@ const UpdateClientModal = ({ open, onClose, defaultUserInfo, onUpdate }) => {
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>Update Client Information</DialogTitle>
       <DialogContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
           {/* Name Field */}
           <TextField
             {...register("userName", {

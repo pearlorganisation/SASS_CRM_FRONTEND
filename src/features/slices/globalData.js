@@ -84,6 +84,7 @@ export const globalDataSlice = createSlice({
       .addCase(getCustomOptions.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
+        errorToast(action?.payload);
       })
       .addCase(createCustomOption.pending, (state, action) => {
         state.isLoading = true;
@@ -96,6 +97,7 @@ export const globalDataSlice = createSlice({
       .addCase(createCustomOption.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
+        errorToast(action?.payload);
       })
       .addCase(deleteCustomOption.pending, (state, action) => {
         state.isLoading = true;
@@ -108,6 +110,7 @@ export const globalDataSlice = createSlice({
       .addCase(deleteCustomOption.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
+        errorToast(action?.payload);
       })
       .addCase(getDashboardCardsData.pending, (state, action) => {
         state.isLoading = true;

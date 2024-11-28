@@ -26,7 +26,7 @@ ChartJS.register(
 
 const RevenueByDateChart = () => {
   // Dummy revenue data for 30 days
-  const { revenueGraphData } = useSelector((state) => state.globalData);
+  const { revenueGraphData = [] } = useSelector((state) => state.globalData);
 
   // Extract labels (dates) and data (revenue) for the chart
   const labels = revenueGraphData.map((item) => item?.dateObj?.split("T")[0]);
@@ -60,7 +60,9 @@ const RevenueByDateChart = () => {
       tooltip: {
         callbacks: {
           label: function (context) {
-            return `${context.dataset.label}: \u20B9${context.raw.toLocaleString()}`; // Tooltip formatting
+            return `${
+              context.dataset.label
+            }: \u20B9${context.raw.toLocaleString()}`; // Tooltip formatting
           },
         },
       },

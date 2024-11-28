@@ -1,12 +1,26 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { TextField, Button } from "@mui/material";
+import { useSelector } from "react-redux";
 
-const EditUserForm = ({ onSubmit, defaultUserInfo }) => {
-    
-      const { register, handleSubmit, reset, formState: { errors }, } = useForm({
-        defaultValues: defaultUserInfo,
+const EditUserForm = ({ onSubmit }) => {
+  const { userData } = useSelector((state) => state.auth);
+  console.log('user -----> ', userData)
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+
+  useEffect(() => {
+    if (userData) {
+      reset({
+        userName: userData?.userName,
+        email: userData?.email,
       });
+    }
+  }, [userData]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
