@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -10,6 +10,8 @@ import {
   LinearScale,
 } from "chart.js";
 import { Card, Typography } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { getDashboardPlansData } from "../../features/actions/globalData";
 
 // Register the necessary Chart.js components
 ChartJS.register(
@@ -23,12 +25,14 @@ ChartJS.register(
 
 const PlanPopularityChart = () => {
   // Dummy data for the plans and their respective subscription counts
+  const { plansGraphData } = useSelector((state) => state.globalData);
+
   const data = {
-    labels: ["Basic Plan", "Standard Plan", "Premium Plan", "Enterprise Plan"], // Plan names
+    labels: plansGraphData.map((plan) => plan?.plan?.name || "-"), // Plan names
     datasets: [
       {
         label: "Number of Subscriptions",
-        data: [120, 200, 350, 150], // Subscription counts for each plan
+        data: plansGraphData.map((plan) => plan?.total || 0), // Subscription counts for each plan
         backgroundColor: [
           "rgba(255, 99, 132, 0.2)", // Color for Basic Plan
           "rgba(54, 162, 235, 0.2)", // Color for Standard Plan
@@ -56,7 +60,7 @@ const PlanPopularityChart = () => {
       },
       legend: {
         display: true,
-        position: 'top', // Position the legend
+        position: "top", // Position the legend
       },
       tooltip: {
         callbacks: {
@@ -82,10 +86,10 @@ const PlanPopularityChart = () => {
       },
     },
     layout: {
-        padding: {
-          bottom: 30, // Add padding to the bottom to make space for labels
-        },
+      padding: {
+        bottom: 30, // Add padding to the bottom to make space for labels
       },
+    },
   };
 
   return (

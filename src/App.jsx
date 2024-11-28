@@ -32,7 +32,8 @@ import {
   PabblyToken,
   CustomOptions,
   CreateClient,
-  ViewClient
+  ViewClient,
+  Profile
 } from "./pages";
 import { getEmployeeStats } from "./features/actions/employee";
 import { addUserActivity } from "./features/actions/userActivity";
@@ -213,6 +214,10 @@ const App = () => {
         {
           path: "/pabblyToken",
           element: <PabblyToken />,
+        },
+        {
+          path: "/profile",
+          element: <Profile />,
         },
       ],
     },

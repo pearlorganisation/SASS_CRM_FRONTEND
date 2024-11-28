@@ -8,6 +8,7 @@ import {
   getAllClients,
   getClientById,
   clientSignup,
+  updateClient,
 } from "../actions/client";
 import { errorToast } from "../../utils/extra";
 
@@ -67,6 +68,21 @@ export const clientSlce = createSlice({
         });
       })
       .addCase(clientSignup.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        errorToast(action?.payload);
+      })
+      .addCase(updateClient.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(updateClient.fulfilled, (state, action) => {
+        state.isLoading = false;
+        toast.success(`Client Updated Successfully`, {
+          position: "top-center",
+        });
+      })
+      .addCase(updateClient.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
         errorToast(action?.payload);

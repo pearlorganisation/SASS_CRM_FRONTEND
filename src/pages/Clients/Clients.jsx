@@ -11,19 +11,28 @@ import {
   Pagination,
   Grid,
 } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle"; // For active
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { formatDateAsNumber } from "../../utils/extra";
 import ClientCard from "../../components/Client/ClientCard";
 import UpdateClientModal from "../../components/Client/UpdateClientModal";
+import { getRoleNameByID } from "../../utils/roles";
+import ActiveInactiveModal from "../../components/Client/ActiveInactiveModal";
 
 const Clients = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { clientsData=[], isLoading, totalPages } = useSelector((state) => state.client);
+  const {
+    clientsData = [],
+    isLoading,
+    totalPages,
+  } = useSelector((state) => state.client);
   const { userData } = useSelector((state) => state.auth);
 
+  const [activeData, setActiveData] = useState(null);
   const [updateData, setUpdateData] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const LIMIT = 10;
@@ -42,19 +51,66 @@ const Clients = () => {
   };
 
   const handleAddClient = () => {
-    navigate("/add-client"); // Replace with your actual add-client route
+    navigate("/add-client"); 
   };
 
   const handleEditClient = (client) => {
+    console.log(client);
     setUpdateData(client);
   };
 
-  const handleDeleteClient = (clientId) => {
-    console.log(`Delete/Inactivate Client ID: ${clientId}`);
+  const handleToggleClientStatus = (client, status) => {
+    console.log(`Delete/Inactivate Client : ${client}- ${status}`);
+    setActiveData(client)
+
   };
 
   const handleViewClient = (clientId) => {
     navigate(`/view-client/${clientId}`);
+  };
+
+  const hanldeUpdate = (data) => {
+    console.log(data);
+  }
+
+  const IconRow = ({ item }) => {
+    return (
+      <div>
+        {/* View Icon */}
+        <Tooltip title="View Client Info" arrow>
+          <IconButton
+            color="primary"
+            className=" group"
+            onClick={() => handleViewClient(item?._id)}
+          >
+            <VisibilityIcon className="text-indigo-500 group-hover:text-indigo-600" />
+          </IconButton>
+        </Tooltip>
+        {/* Edit Icon */}
+        <Tooltip title="Edit Client" arrow>
+          <IconButton color="primary" onClick={() => handleEditClient(item)}>
+            <EditIcon />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip
+          title={item.isActive ? "Set as Inactive" : "Set as Active"}
+          arrow
+        >
+          <IconButton
+            color={item.isActive ? "error" : "success"}
+            onClick={() => handleToggleClientStatus(item, !item?.isActive)}
+          >
+            {
+              <div 
+              className={`${item?.isActive ? "" : "rotate-180"}`}>
+                <LogoutIcon />
+              </div>
+            }
+          </IconButton>
+        </Tooltip>
+      </div>
+    );
   };
 
   return (
@@ -71,16 +127,10 @@ const Clients = () => {
           Add Client
         </Button>
       </div>
-      
+
       <div className="block sm:hidden">
-      {clientsData.map((item, idx) => (
-          <ClientCard
-            key={idx}
-            item={item}
-            handleEditClient={handleEditClient}
-            handleDeleteClient={handleDeleteClient}
-            handleViewClient={handleViewClient}
-          />
+        {clientsData.map((item, idx) => (
+          <ClientCard key={idx} icons={<IconRow item={item} />} item={item} />
         ))}
       </div>
 
@@ -110,6 +160,15 @@ const Clients = () => {
               <th scope="col" className="px-6 py-3 text-nowrap">
                 Phone Number
               </th>
+              <th scope="col" className="px-6 py-3 text-nowrap">
+                Total Employees
+              </th>
+              <th scope="col" className="px-6 py-3 text-nowrap">
+                EMPLOYEE SALES
+              </th>
+              <th scope="col" className="px-6 py-3 text-nowrap">
+                EMPLOYEE REMINDER
+              </th>
               <th className="py-3 text-nowrap px-6 stickyFieldRight">Action</th>
             </tr>
           </thead>
@@ -119,9 +178,9 @@ const Clients = () => {
               <tr>
                 <td colSpan="4" className="text-center px-6 py-8">
                   <Stack spacing={4}>
-                    <Skeleton variant="rounded" height={30} />
-                    <Skeleton variant="rounded" height={25} />
-                    <Skeleton variant="rounded" height={20} />
+                    <Skeleton variant="rounded" height={30} width={1000} />
+                    <Skeleton variant="rounded" height={25} width={1000} />
+                    <Skeleton variant="rounded" height={20} width={1000} />
                   </Stack>
                 </td>
               </tr>
@@ -143,7 +202,15 @@ const Clients = () => {
                     </div>
                   </th>
                   <td className="px-6 py-4">
-                    {item?.isActive ? "Active" : "Inactive"}
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
+                        item?.isActive
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {item?.isActive ? "Active" : "Inactive"}
+                    </span>
                   </td>
                   <td className="px-6 py-4">{item?.plan?.name || "N/A"}</td>
                   <td className="px-6 py-4">
@@ -161,37 +228,26 @@ const Clients = () => {
                       ? item?.subscription[0]?.contactLimit
                       : "N/A"}
                   </td>
-                  <td className="px-6 py-4">{item?.phone}</td>
+                  <td className="px-6 py-4">{item?.phone || "N/A"}</td>
+                  <td className="px-6 py-4">{item?.employees?.length || 0}</td>
+                  <td className="px-6 py-4">
+                    {Array.isArray(item?.employees)
+                      ? item.employees.filter(
+                          (emp, idx) =>
+                            getRoleNameByID(emp?.role) === "EMPLOYEE SALES"
+                        ).length
+                      : 0}
+                  </td>
+                  <td className="px-6 py-4">
+                    {Array.isArray(item?.employees)
+                      ? item.employees.filter(
+                          (emp, idx) =>
+                            getRoleNameByID(emp?.role) === "EMPLOYEE REMINDER"
+                        ).length
+                      : 0}
+                  </td>
                   <td className="px-3   whitespace-nowrap stickyFieldRight">
-                    {/* View Icon */}
-                    <Tooltip title="View Client Info" arrow>
-                      <IconButton
-                        color="primary"
-                        className=" group"
-                        onClick={() => handleViewClient(item?._id)}
-                      >
-                        <VisibilityIcon className="text-indigo-500 group-hover:text-indigo-600" />
-                      </IconButton>
-                    </Tooltip>
-                    {/* Edit Icon */}
-                    <Tooltip title="Edit Client" arrow>
-                      <IconButton
-                        color="primary"
-                        onClick={() => handleEditClient(item)}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </Tooltip>
-
-                    {/* Delete/Inactive Icon */}
-                    <Tooltip title="Inactivate/Delete Client" arrow>
-                      <IconButton
-                        color="error"
-                        onClick={() => handleDeleteClient(item?._id)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
+                    <IconRow item={item} />
                   </td>
                 </tr>
               ))
@@ -208,14 +264,21 @@ const Clients = () => {
         />
       </div>
       <UpdateClientModal
-        open={updateData ? true: false}
-        email={updateData?.email}
-        userName={updateData?.userName}
-        phone={updateData?.phone}
-        _id={updateData?._id}
+        open={updateData ? true : false}
+        defaultUserInfo={updateData}
         onClose={() => setUpdateData(null)}
-        onUpdate={(data) => console.log(data)}
+        onUpdate={hanldeUpdate}
       />
+
+      {
+        activeData && (
+          <ActiveInactiveModal
+      clientData={activeData}
+      setModal={setActiveData}
+      handleAction={() => console.log("handleAction")}
+      />
+        )
+      }
     </div>
   );
 };

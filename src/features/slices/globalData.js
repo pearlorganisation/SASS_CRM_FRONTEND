@@ -8,7 +8,10 @@ import {
   createGlobalData,
   deleteCustomOption,
   getCustomOptions,
-  getDashboardData,
+  getDashboardCardsData,
+  getDashboardPlansData,
+  getDashboardRevenueData,
+  getDashboardUsersData,
   getGlobalData,
 } from "../actions/globalData";
 import { errorToast } from "../../utils/extra";
@@ -21,6 +24,9 @@ const initialState = {
   customOptions: [],
   isSidebarOpen: false,
   dashBoardCardsData: {},
+  plansGraphData: [],
+  usersGraphData: [],
+  revenueGraphData: [],
 };
 
 // ---------------------------------------------------------------------------------------
@@ -103,11 +109,11 @@ export const globalDataSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
       })
-      .addCase(getDashboardData.pending, (state, action) => {
+      .addCase(getDashboardCardsData.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
       })
-      .addCase(getDashboardData.fulfilled, (state, action) => {
+      .addCase(getDashboardCardsData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
         state.dashBoardCardsData =
@@ -115,7 +121,53 @@ export const globalDataSlice = createSlice({
             ? action.payload[0]
             : {};
       })
-      .addCase(getDashboardData.rejected, (state, action) => {
+      .addCase(getDashboardCardsData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+      })
+
+      .addCase(getDashboardPlansData.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getDashboardPlansData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.plansGraphData = Array.isArray(action.payload)
+          ? action.payload
+          : [];
+      })
+      .addCase(getDashboardPlansData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+      })
+      .addCase(getDashboardUsersData.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getDashboardUsersData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.usersGraphData = Array.isArray(action.payload)
+          ? action.payload
+          : [];
+      })
+      .addCase(getDashboardUsersData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+      })
+      .addCase(getDashboardRevenueData.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getDashboardRevenueData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.revenueGraphData = Array.isArray(action.payload)
+          ? action.payload
+          : [];
+      })
+      .addCase(getDashboardRevenueData.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
       });

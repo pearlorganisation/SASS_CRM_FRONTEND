@@ -13,38 +13,24 @@ import {
 } from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { Bar } from "react-chartjs-2";
-// Import necessary modules from chart.js
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import MetricCard from "../../components/Dashboard/MetricCard";
-import PlanPopularityChart from "../../components/Dashboard/PlanPopularityChart";
-import UserGrowthByDate from "../../components/Dashboard/UserGrowthByDate";
-import RevenueByDateChart from "../../components/Dashboard/RevenueByDateChart";
 import { useDispatch, useSelector } from "react-redux";
-import { getDashboardData } from "../../features/actions/globalData";
-
-// Register the required components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+import {
+  getDashboardCardsData,
+  getDashboardPlansData,
+  getDashboardRevenueData,
+  getDashboardUsersData,
+} from "../../features/actions/globalData";
+import {
+  ContactUsageChart,
+  MetricCard,
+  PlanPopularityChart,
+  RevenueByDateChart,
+  UserGrowthByDate,
+} from "../../components/Dashboard";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const { dashBoardCardsData } = useSelector((state) => state.globalData);
-  console.log("dashboardData", dashBoardCardsData);
   const cardData = [
     {
       label: "Accounts Created",
@@ -58,7 +44,7 @@ const Dashboard = () => {
     },
     {
       label: "Overall Revenue",
-      value: dashBoardCardsData?.totalRevenue || 0,
+      value: `\u20B9 ${dashBoardCardsData?.totalRevenue || 0}`,
       color: "secondary",
     },
     {
@@ -79,17 +65,6 @@ const Dashboard = () => {
       color: "textPrimary",
     },
   ];
-
-  const contactChartData = {
-    labels: ["Used", "Remaining"],
-    datasets: [
-      {
-        label: "Contacts",
-        data: [dashBoardCardsData?.totalContactsUsed || 0, dashBoardCardsData?.totalContactsLimit - dashBoardCardsData?.totalContactsUsed || 0],
-        backgroundColor: ["#3b82f6", "#10b981"],
-      },
-    ],
-  };
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -118,9 +93,13 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (startDate && endDate) {
-      dispatch(getDashboardData({ startDate, endDate }));
+      dispatch(getDashboardCardsData({ startDate, endDate }));
+      dispatch(getDashboardPlansData({ startDate, endDate }));
+      dispatch(getDashboardUsersData({ startDate, endDate }));
+      dispatch(getDashboardRevenueData({ startDate, endDate }));
     }
   }, [startDate, endDate]);
+
   useEffect(() => {
     const today = new Date();
     const oneWeekAgo = new Date();
@@ -176,24 +155,7 @@ const Dashboard = () => {
         className="grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4 "
       >
         <PlanPopularityChart />
-        <Card className="p-6 shadow w-full  h-[60vh] ">
-          <Typography variant="h6" gutterBottom>
-            Contacts Usage Overview
-          </Typography>
-
-          <Bar
-            data={contactChartData}
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              layout: {
-                padding: {
-                  bottom: 30, // Add padding to the bottom to make space for labels
-                },
-              },
-            }}
-          />
-        </Card>
+        <ContactUsageChart />
         <UserGrowthByDate />
         <RevenueByDateChart />
       </Box>

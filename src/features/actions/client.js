@@ -41,3 +41,15 @@ export const clientSignup = createAsyncThunk(
     }
   }
 );
+
+export const updateClient = createAsyncThunk(
+  "client/update",
+  async ({data, id}, { rejectWithValue }) => {
+    try {
+      const response = await instance.post(`/users/clients/${id}`, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
