@@ -38,3 +38,16 @@ export const logIn = createAsyncThunk(
   }
 );
 
+//Login Api
+export const updateUser = createAsyncThunk(
+  "user/Update",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.patch("/users", payload);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+

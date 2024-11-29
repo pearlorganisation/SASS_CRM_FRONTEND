@@ -63,7 +63,15 @@ function Login() {
           {landingGlobalData?.file?.mimetype !== "video/mp4" ? (
             <img
               className="w-full h-full object-cover"
-              src={landingGlobalData?.file?.path}
+              src={getFileURL(
+                landingGlobalData?.file?.filename,
+                landingGlobalData?.file?.destination,
+                import.meta.env.VITE_REACT_APP_WORKING_ENVIRONMENT ===
+                  "development"
+                  ? import.meta.env.VITE_REACT_APP_API_BASE_URL_DEVELOPMENT
+                  : import.meta.env
+                      .VITE_REACT_APP_API_BASE_URL_MAIN_PRODUCTION
+              )}
               alt="Banner"
             />
           ) : (

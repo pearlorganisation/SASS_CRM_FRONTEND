@@ -1,23 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, IconButton, TextField } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import PasswordUpdateForm from "../../components/Profile/PasswordUpdateForm";
 import EditUserForm from "../../components/Profile/EditUserForm";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import { updateUser } from "../../features/actions/auth";
 
 const ProfilePage = () => {
+  const dispatch = useDispatch();
   const [isEditingInfo, setIsEditingInfo] = useState(false);
-  const {userData} = useSelector((state) => state.auth);
+  const {userData, isSuccess} = useSelector((state) => state.auth);
 
   const toggleEdit = () => {
     setIsEditingInfo((prev) => !prev);
   };
 
   const saveInfo = (data) => {
-    console.log("Updated User Info:", data);
-    setIsEditingInfo(false);
+    dispatch(updateUser(data));
   };
+
+  useEffect(() => {
+    if(isSuccess){
+      setIsEditingInfo(false);
+    }
+    
+  },[isSuccess])
 
 
   return (

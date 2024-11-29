@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {logIn, signUp } from "../actions/auth";
+import { logIn, signUp, updateUser } from "../actions/auth";
 import { toast } from "sonner";
 import { errorToast } from "../../utils/extra";
 // -------------------------------------------------------------------------------------------
@@ -10,6 +10,7 @@ const initialState = {
   errorMessage: "",
   isUserLoggedIn: false,
   userData: null,
+  isSuccess: false,
 };
 
 // -------------------------------------- Slices------------------------------------------------
@@ -56,7 +57,7 @@ const authSlice = createSlice({
         state.isUserLoggedIn = true;
         console.log("fulfilled", action.payload);
         state.userData = action.payload;
-        toast.success(`Login Successfull`, {
+        toast.success(`Login Successfully`, {
           position: "top-center",
         });
       })
@@ -65,6 +66,25 @@ const authSlice = createSlice({
         state.isUserLoggedIn = false;
         state.errorMessage = action.payload;
         console.log(" ---- > ", action.payload);
+        errorToast(action?.payload);
+      })
+      // Login cases
+      .addCase(updateUser.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+        state.isSuccess = false;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.userData = action.payload;
+        state.isSuccess = true;
+        toast.success(`User Updated Successfully`, {
+          position: "top-center",
+        });
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
         errorToast(action?.payload);
       })
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   TextField,
@@ -9,22 +9,25 @@ import {
   Checkbox,
   Grid,
 } from "@mui/material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import defaultPhoto from "/placeholder.jpg";
 import { MdOutlineInsertPhoto } from "react-icons/md";
-import { createGlobalData } from "../../../features/actions/globalData";
+import { createGlobalData, getGlobalData } from "../../../features/actions/globalData";
 
 const LandingPageForm = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
     setValue,
   } = useForm();
   const [photo, setPhoto] = useState(null);
   const [selectedType, setSelectedType] = useState("image");
   const [isControlsVisible, setIsControlsVisible] = useState(false);
 
+  const { landingGlobalData } = useSelector((state) => state.globalData);
+  console.log('landingGlobalData', landingGlobalData)
   const dispatch = useDispatch();
 
   const onSubmit = (data) => {
@@ -47,6 +50,26 @@ const LandingPageForm = () => {
     setPhoto(null); // Reset the photo preview
     setValue("file", null); // Reset the file in the form
   };
+
+  useEffect(() => {
+    dispatch(getGlobalData());
+  }, []);
+
+  useEffect(() => {
+    if (landingGlobalData) {
+      reset({
+        title: landingGlobalData.title,
+        subTitle: landingGlobalData.subTitle,
+        mediaType: landingGlobalData.mediaType,
+        file: null,
+        videoControls: landingGlobalData.videoControls,
+        buttonName: landingGlobalData.buttonName,
+        link: landingGlobalData.link,
+        buttonHeight: landingGlobalData.buttonHeight,
+        buttonWidth: landingGlobalData.buttonWidth,
+      })}
+  }, [landingGlobalData]);
+
   return (
     <div className="pt-20 px-4 max-w-5xl mx-auto">
       <form

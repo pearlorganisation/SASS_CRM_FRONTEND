@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
 const CreateWebinar = ({ isOpen, onClose, onSubmit, webinarData, clearData }) => {
-    console.log('webinar data',webinarData);
   const {
     register,
     handleSubmit,
