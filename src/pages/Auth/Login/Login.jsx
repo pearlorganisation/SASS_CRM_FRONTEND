@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { Button, TextField } from "@mui/material";
+import { getGlobalData } from "../../../features/actions/globalData";
+import * as path from "path";
 
 function Login() {
   const dispatch = useDispatch();
@@ -35,21 +37,33 @@ function Login() {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    dispatch(getGlobalData());
+  }, []);
+
+  function getFileURL(filename, destination, baseUrl) {
+    // Remove '/api/v1' from the baseUrl if it exists
+    const cleanedBaseUrl = baseUrl.replace(/\/api\/v1$/, '');
+  
+    // Remove leading './' or '/' from the destination for URL safety
+    const normalizedDestination = destination.replace(/^(\.\/|\/)/, '');
+    
+    // Ensure the destination uses forward slashes and combine it with the filename
+    const relativePath = `${normalizedDestination}/${filename}`.replace(/\\/g, '/');
+    
+    // Construct the full URL
+    return `${cleanedBaseUrl}/${relativePath}`;
+  }
   return (
     <div className="flex md:flex-row flex-col h-screen w-full">
       {/* Left Section */}
       <div className="flex flex-col w-full md:w-3/5 bg-gray-100">
         {/* Video/Banner Section */}
         <div className="relative h-3/5">
-          {landingGlobalData?.itemType === "image" ? (
+          {landingGlobalData?.file?.mimetype !== "video/mp4" ? (
             <img
               className="w-full h-full object-cover"
-              src={
-                Array.isArray(landingGlobalData?.item) &&
-                landingGlobalData?.item.length > 0
-                  ? landingGlobalData?.item[0]
-                  : landingGlobalData?.item
-              }
+              src={landingGlobalData?.file?.path}
               alt="Banner"
             />
           ) : (
@@ -61,12 +75,18 @@ function Login() {
               muted
               preload="auto"
             >
-              <source src={
-                Array.isArray(landingGlobalData?.item) &&
-                landingGlobalData?.item.length > 0
-                  ? landingGlobalData?.item[0]
-                  : landingGlobalData?.item
-              } type="video/mp4" />
+              <source
+                src={getFileURL(
+                  landingGlobalData?.file?.filename,
+                  landingGlobalData?.file?.destination,
+                  import.meta.env.VITE_REACT_APP_WORKING_ENVIRONMENT ===
+                    "development"
+                    ? import.meta.env.VITE_REACT_APP_API_BASE_URL_DEVELOPMENT
+                    : import.meta.env
+                        .VITE_REACT_APP_API_BASE_URL_MAIN_PRODUCTION
+                )}
+                type="video/mp4"
+              />
               Your browser does not support the video tag.
             </video>
           )}
@@ -86,12 +106,12 @@ function Login() {
             size="large"
             className="rounded-lg"
             style={{
-              height: 40 || "auto",
-              width: 300 || "auto",
+              height: landingGlobalData?.buttonHeight || "auto",
+              width: landingGlobalData?.buttonWidth || "auto",
             }}
-            onClick={() => window.open("/", "_blank")}
+            onClick={() => window.open(landingGlobalData?.link || "/", "_blank")}
           >
-            {"label" || "Click Me"}
+            {landingGlobalData?.buttonName || "Click Me"}
           </Button>
         </div>
       </div>

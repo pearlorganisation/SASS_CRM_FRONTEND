@@ -40,7 +40,7 @@ import { addUserActivity } from "./features/actions/userActivity";
 import { isEmployeeId } from "./utils/roles";
 import { setIsEmployee } from "./features/slices/userActivity";
 import RouteGuard from "./components/AccessControl/RouteGuard";
-import { logout } from "./features/slices/auth";
+import { clearLoadingAndData, logout } from "./features/slices/auth";
 
 const App = () => {
   const dispatch = useDispatch();

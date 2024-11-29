@@ -15,7 +15,12 @@ import { MdOutlineInsertPhoto } from "react-icons/md";
 import { createGlobalData } from "../../../features/actions/globalData";
 
 const LandingPageForm = () => {
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm();
   const [photo, setPhoto] = useState(null);
   const [selectedType, setSelectedType] = useState("image");
   const [isControlsVisible, setIsControlsVisible] = useState(false);
@@ -24,8 +29,8 @@ const LandingPageForm = () => {
 
   const onSubmit = (data) => {
     data["file"] = data["file"][0];
-    data["fileType"] = selectedType;
-    data["isControlsVisible"] = isControlsVisible;
+    data["videoControls"] = isControlsVisible;
+    console.log(data);
     dispatch(createGlobalData(data));
   };
 
@@ -77,11 +82,7 @@ const LandingPageForm = () => {
         {/* Media Type Selection */}
         <div>
           <h3 className="font-medium mb-2">Landing Page Media Type</h3>
-          <RadioGroup
-            row
-            value={selectedType}
-            onChange={handleTypeChange}
-          >
+          <RadioGroup row value={selectedType} onChange={handleTypeChange}>
             <FormControlLabel value="image" control={<Radio />} label="Image" />
             <FormControlLabel value="video" control={<Radio />} label="Video" />
           </RadioGroup>
@@ -108,7 +109,10 @@ const LandingPageForm = () => {
           )}
 
           <div className="space-y-2">
-            <label htmlFor="file_input" className="flex items-center gap-2 cursor-pointer">
+            <label
+              htmlFor="file_input"
+              className="flex items-center gap-2 cursor-pointer"
+            >
               <MdOutlineInsertPhoto size={24} />
               <span className="px-4 py-2 border rounded-md hover:bg-blue-500 hover:text-white">
                 Upload {selectedType === "image" ? "Image" : "Video"}
@@ -116,7 +120,9 @@ const LandingPageForm = () => {
             </label>
             <input
               {...register("file", {
-                required: `Landing Page ${selectedType === "image" ? "Image" : "Video"} is required`,
+                required: `Landing Page ${
+                  selectedType === "image" ? "Image" : "Video"
+                } is required`,
                 onChange: handlePhotoChange,
               })}
               id="file_input"
@@ -124,7 +130,9 @@ const LandingPageForm = () => {
               className="hidden"
             />
             {errors.file && (
-              <span className="text-sm text-red-500">{errors.file.message}</span>
+              <span className="text-sm text-red-500">
+                {errors.file.message}
+              </span>
             )}
           </div>
         </div>
@@ -133,7 +141,9 @@ const LandingPageForm = () => {
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
             <TextField
-              {...register("buttonName", { required: "Button name is required" })}
+              {...register("buttonName", {
+                required: "Button name is required",
+              })}
               label="Button Name"
               fullWidth
               error={!!errors.buttonName}
@@ -152,28 +162,28 @@ const LandingPageForm = () => {
         </Grid>
 
         {/* Video Dimensions */}
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                {...register("height", { required: "Height is required" })}
-                label="Height (px)"
-                fullWidth
-                type="number"
-                error={!!errors.height}
-                helperText={errors.height?.message}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                {...register("width", { required: "Width is required" })}
-                label="Width (px)"
-                fullWidth
-                type="number"
-                error={!!errors.width}
-                helperText={errors.width?.message}
-              />
-            </Grid>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            <TextField
+              {...register("buttonHeight", { required: "Height is required" })}
+              label="Height (px)"
+              fullWidth
+              type="number"
+              error={!!errors.buttonHeight}
+              helperText={errors.buttonHeight?.message}
+            />
           </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              {...register("buttonWidth", { required: "Width is required" })}
+              label="Width (px)"
+              fullWidth
+              type="number"
+              error={!!errors.buttonWidth}
+              helperText={errors.buttonWidth?.message}
+            />
+          </Grid>
+        </Grid>
 
         {/* Video Controls */}
         {selectedType === "video" && (
