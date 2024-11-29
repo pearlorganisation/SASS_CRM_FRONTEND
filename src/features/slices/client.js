@@ -14,6 +14,8 @@ import { errorToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
+  isUpdating: false,
+  isSuccess: false,
   totalPages: null,
   errorMessage: "",
   clientsData: [],
@@ -25,7 +27,11 @@ const initialState = {
 export const clientSlce = createSlice({
   name: "client",
   initialState,
-  reducers: {},
+  reducers: {
+    resetClientState: (state) => {
+      state.isSuccess = false;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getAllClients.pending, (state, action) => {
@@ -73,17 +79,19 @@ export const clientSlce = createSlice({
         errorToast(action?.payload);
       })
       .addCase(updateClient.pending, (state, action) => {
-        state.isLoading = true;
+        state.isUpdating = true;
+        state.isSuccess = false;
         state.errorMessage = "";
       })
       .addCase(updateClient.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.isUpdating = false;
+        state.isSuccess = true;
         toast.success(`Client Updated Successfully`, {
           position: "top-center",
         });
       })
       .addCase(updateClient.rejected, (state, action) => {
-        state.isLoading = false;
+        state.isUpdating = false;
         state.errorMessage = action.payload;
         errorToast(action?.payload);
       });
@@ -93,7 +101,7 @@ export const clientSlce = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {} = clientSlce.actions;
+export const {resetClientState} = clientSlce.actions;
 export default clientSlce.reducer;
 
 // ================================================== THE END ==================================================

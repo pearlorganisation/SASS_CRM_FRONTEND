@@ -30,5 +30,17 @@ export const getAllSidebarLinks = createAsyncThunk(
   }
 );
 
+export const deleteSidebarLink = createAsyncThunk(
+  "sidebarLink/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      const {data} = await instance.delete(`sidebar-links/${id}`);
+
+      return data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
 
 

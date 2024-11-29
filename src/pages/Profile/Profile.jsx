@@ -10,21 +10,8 @@ const ProfilePage = () => {
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const {userData} = useSelector((state) => state.auth);
 
-  const defaultUserInfo = {
-    userName: "John Doe",
-    email: "johndoe@example.com",
-    phone: "123-456-7890",
-    companyName: "Doe Industries",
-  };
-
-  const { register, handleSubmit, reset } = useForm({
-    defaultValues: defaultUserInfo,
-  });
-
-
   const toggleEdit = () => {
     setIsEditingInfo((prev) => !prev);
-    if (!isEditingInfo) reset(defaultUserInfo);
   };
 
   const saveInfo = (data) => {
@@ -56,14 +43,14 @@ const ProfilePage = () => {
                 <strong>Email:</strong> {userData?.email}
               </p>
               <p className="mb-2">
-                <strong>Phone:</strong> {defaultUserInfo.phone}
+                <strong>Phone:</strong> {userData?.phone || "N/A"}
               </p>
               <p>
-                <strong>Company:</strong> {defaultUserInfo.companyName}
+                <strong>Company:</strong> {userData?.companyName || "N/A"}
               </p>
             </div>
           ) : (
-            <EditUserForm onSubmit={saveInfo} defaultUserInfo={defaultUserInfo} />
+            <EditUserForm onSubmit={saveInfo} onClose={toggleEdit} />
           )}
         </div>
 

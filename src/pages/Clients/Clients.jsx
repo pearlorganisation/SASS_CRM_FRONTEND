@@ -27,6 +27,7 @@ const Clients = () => {
     clientsData = [],
     isLoading,
     totalPages,
+    isSuccess,
   } = useSelector((state) => state.client);
   const [activeData, setActiveData] = useState(null);
   const [updateData, setUpdateData] = useState(null);
@@ -37,6 +38,13 @@ const Clients = () => {
   useEffect(() => {
     dispatch(getAllClients({ page: page, limit: LIMIT }));
   }, [page]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      console.log("issicces ---> called");
+      dispatch(getAllClients({ page: page, limit: LIMIT }));
+    }
+  }, [isSuccess]);
 
   useEffect(() => {
     setSearchParams({ page: page });
@@ -62,15 +70,6 @@ const Clients = () => {
 
   const handleViewClient = (clientId) => {
     navigate(`/view-client/${clientId}`);
-  };
-
-  const hanldeUpdate = (data) => {
-    console.log(data);
-    dispatch(updateClient({ data, id: data?._id })).then((res) => {
-      if (res?.meta?.requestStatus === "fulfilled") {
-        dispatch(getAllClients({ page: 1, limit: LIMIT }));
-      }
-    });
   };
 
   const IconRow = ({ item }) => {
@@ -135,128 +134,134 @@ const Clients = () => {
 
       {/* Clients Table */}
       <div className="relative hidden md:block  overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-            <tr className="stickyRow">
-              <th scope="col" className="px-6 py-3 text-nowrap">
-                Username / Email
-              </th>
-              <th scope="col" className="px-6 py-3 text-nowrap">
-                Company Name
-              </th>
-              <th scope="col" className="px-6 py-3 text-nowrap">
-                Status
-              </th>
-              <th scope="col" className="px-6 py-3 text-nowrap">
-                Plan Name
-              </th>
-              <th scope="col" className="px-6 py-3 text-nowrap">
-                Plan Start Date
-              </th>
-              <th scope="col" className="px-6 py-3 text-nowrap">
-                Plan Expiry
-              </th>
-              <th scope="col" className="px-6 py-3 text-nowrap">
-                Contants Limit
-              </th>
-              <th scope="col" className="px-6 py-3 text-nowrap">
-                Phone Number
-              </th>
-              <th scope="col" className="px-6 py-3 text-nowrap">
-                Total Employees
-              </th>
-              <th scope="col" className="px-6 py-3 text-nowrap">
-                EMPLOYEE SALES
-              </th>
-              <th scope="col" className="px-6 py-3 text-nowrap">
-                EMPLOYEE REMINDER
-              </th>
-              <th className="py-3 text-nowrap px-6 stickyFieldRight">Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan="4" className="text-center px-6 py-8">
-                  <Stack spacing={4}>
-                    <Skeleton variant="rounded" height={30} width={1000} />
-                    <Skeleton variant="rounded" height={25} width={1000} />
-                    <Skeleton variant="rounded" height={20} width={1000} />
-                  </Stack>
-                </td>
+        {isLoading ? (
+          
+              <Stack spacing={4}>
+                <Skeleton variant="rounded" height={35}  />
+                <Skeleton variant="rounded" height={25}  />
+                <Skeleton variant="rounded" height={25}  />
+                <Skeleton variant="rounded" height={25}  />
+                <Skeleton variant="rounded" height={25}  />
+                <Skeleton variant="rounded" height={25}  />
+                <Skeleton variant="rounded" height={25}  />
+                <Skeleton variant="rounded" height={25}  />
+              </Stack>
+        ) : (
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+              <tr className="stickyRow">
+                <th scope="col" className="px-6 py-3 text-nowrap">
+                  Username / Email
+                </th>
+                <th scope="col" className="px-6 py-3 text-nowrap">
+                  Company Name
+                </th>
+                <th scope="col" className="px-6 py-3 text-nowrap">
+                  Status
+                </th>
+                <th scope="col" className="px-6 py-3 text-nowrap">
+                  Plan Name
+                </th>
+                <th scope="col" className="px-6 py-3 text-nowrap">
+                  Plan Start Date
+                </th>
+                <th scope="col" className="px-6 py-3 text-nowrap">
+                  Plan Expiry
+                </th>
+                <th scope="col" className="px-6 py-3 text-nowrap">
+                  Contants Limit
+                </th>
+                <th scope="col" className="px-6 py-3 text-nowrap">
+                  Phone Number
+                </th>
+                <th scope="col" className="px-6 py-3 text-nowrap">
+                  Total Employees
+                </th>
+                <th scope="col" className="px-6 py-3 text-nowrap">
+                  EMPLOYEE SALES
+                </th>
+                <th scope="col" className="px-6 py-3 text-nowrap">
+                  EMPLOYEE REMINDER
+                </th>
+                <th className="py-3 text-nowrap px-6 stickyFieldRight">
+                  Action
+                </th>
               </tr>
-            ) : (
-              Array.isArray(clientsData) &&
-              clientsData.map((item, idx) => (
-                <tr key={idx} className="bg-white border-b hover:bg-gray-50">
-                  <th
-                    scope="row"
-                    className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap"
-                  >
-                    <div>
-                      <div className="text-base font-semibold">
-                        {item?.userName}
-                      </div>
-                      <div className="font-normal text-gray-500">
-                        {item?.email}
-                      </div>
-                    </div>
-                  </th>
-                  <td className="px-6 py-4">{item?.companyName || "N/A"}</td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
-                        item?.isActive
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
+            </thead>
+
+            <tbody>
+              {Array.isArray(clientsData) &&
+                clientsData.map((item, idx) => (
+                  <tr key={idx} className="bg-white border-b hover:bg-gray-50">
+                    <th
+                      scope="row"
+                      className="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap"
                     >
-                      {item?.isActive ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">{item?.plan?.name || "N/A"}</td>
-                  <td className="px-6 py-4">
-                    {Array.isArray(item?.subscription) &&
-                    item?.subscription.length > 0
-                      ? formatDateAsNumber(item?.subscription[0]?.startDate)
-                      : "N/A"}
-                  </td>
-                  <td className="px-6 py-4">
-                    {formatDateAsNumber(item?.currentPlanExpiry)}
-                  </td>
-                  <td className="px-6 py-4">
-                    {Array.isArray(item?.subscription) &&
-                    item?.subscription.length > 0
-                      ? item?.subscription[0]?.contactLimit
-                      : "N/A"}
-                  </td>
-                  <td className="px-6 py-4">{item?.phone || "N/A"}</td>
-                  <td className="px-6 py-4">{item?.employees?.length || 0}</td>
-                  <td className="px-6 py-4">
-                    {Array.isArray(item?.employees)
-                      ? item.employees.filter(
-                          (emp, idx) =>
-                            getRoleNameByID(emp?.role) === "EMPLOYEE SALES"
-                        ).length
-                      : 0}
-                  </td>
-                  <td className="px-6 py-4">
-                    {Array.isArray(item?.employees)
-                      ? item.employees.filter(
-                          (emp, idx) =>
-                            getRoleNameByID(emp?.role) === "EMPLOYEE REMINDER"
-                        ).length
-                      : 0}
-                  </td>
-                  <td className="px-3   whitespace-nowrap stickyFieldRight">
-                    <IconRow item={item} />
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                      <div>
+                        <div className="text-base font-semibold">
+                          {item?.userName}
+                        </div>
+                        <div className="font-normal text-gray-500">
+                          {item?.email}
+                        </div>
+                      </div>
+                    </th>
+                    <td className="px-6 py-4">{item?.companyName || "N/A"}</td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
+                          item?.isActive
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {item?.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">{item?.plan?.name || "N/A"}</td>
+                    <td className="px-6 py-4">
+                      {Array.isArray(item?.subscription) &&
+                      item?.subscription.length > 0
+                        ? formatDateAsNumber(item?.subscription[0]?.startDate)
+                        : "N/A"}
+                    </td>
+                    <td className="px-6 py-4">
+                      {formatDateAsNumber(item?.currentPlanExpiry)}
+                    </td>
+                    <td className="px-6 py-4">
+                      {Array.isArray(item?.subscription) &&
+                      item?.subscription.length > 0
+                        ? item?.subscription[0]?.contactLimit
+                        : "N/A"}
+                    </td>
+                    <td className="px-6 py-4">{item?.phone || "N/A"}</td>
+                    <td className="px-6 py-4">
+                      {item?.employees?.length || 0}
+                    </td>
+                    <td className="px-6 py-4">
+                      {Array.isArray(item?.employees)
+                        ? item.employees.filter(
+                            (emp, idx) =>
+                              getRoleNameByID(emp?.role) === "EMPLOYEE SALES"
+                          ).length
+                        : 0}
+                    </td>
+                    <td className="px-6 py-4">
+                      {Array.isArray(item?.employees)
+                        ? item.employees.filter(
+                            (emp, idx) =>
+                              getRoleNameByID(emp?.role) === "EMPLOYEE REMINDER"
+                          ).length
+                        : 0}
+                    </td>
+                    <td className="px-3   whitespace-nowrap stickyFieldRight">
+                      <IconRow item={item} />
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        )}
       </div>
       <div className="flex justify-center mt-5">
         <Pagination
@@ -270,15 +275,10 @@ const Clients = () => {
         open={updateData ? true : false}
         defaultUserInfo={updateData}
         onClose={() => setUpdateData(null)}
-        onUpdate={hanldeUpdate}
       />
 
       {activeData && (
-        <ActiveInactiveModal
-          clientData={activeData}
-          setModal={setActiveData}
-          handleAction={(data) => console.log("handleAction", data)}
-        />
+        <ActiveInactiveModal clientData={activeData} setModal={setActiveData} />
       )}
     </div>
   );
