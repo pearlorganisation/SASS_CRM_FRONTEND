@@ -42,31 +42,31 @@ const Sidebar = () => {
           label: "Webinars",
           icon: <SiGooglemeet size={30} />,
         },
-        {
-          path: "/attendees",
-          label: "Attendees",
-          icon: <HiUserGroup size={30} />,
-        },
-        {
-          path: "/employees",
-          label: "Employees",
-          icon: <IoPeople size={30} />,
-        },
+        // {
+        //   path: "/attendees",
+        //   label: "Attendees",
+        //   icon: <HiUserGroup size={30} />,
+        // },
+        // {
+        //   path: "/employees",
+        //   label: "Employees",
+        //   icon: <IoPeople size={30} />,
+        // },
       ],
     },
     {
       roles: [roles.EMPLOYEE_SALES, roles.EMPLOYEE_REMINDER],
       items: [
-        {
-          path: "/assignments",
-          label: "Assignments",
-          icon: <MdAssignment size={30} />,
-        },
-        {
-          path: "/products",
-          label: "Products",
-          icon: <AiFillProduct size={30} />,
-        },
+        // {
+        //   path: "/assignments",
+        //   label: "Assignments",
+        //   icon: <MdAssignment size={30} />,
+        // },
+        // {
+        //   path: "/products",
+        //   label: "Products",
+        //   icon: <AiFillProduct size={30} />,
+        // },
       ],
     },
   ];

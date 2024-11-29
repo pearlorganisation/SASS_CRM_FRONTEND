@@ -43,7 +43,6 @@ export const formatDateAsNumber = (dateStr) => {
   return `${month}/${day}/${year}`;
 };
 
-
 export const errorToast = (message) => {
   let errorMessage = "";
   errorMessage = typeof message === "string" ? message : "Something went wrong";
@@ -58,5 +57,9 @@ export const errorToast = (message) => {
 
   toast.error(errorMessage, {
     position: "top-center",
+    hideProgressBar: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "light",
   });
 };

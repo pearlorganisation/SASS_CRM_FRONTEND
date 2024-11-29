@@ -1,14 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IconButton, Tooltip } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { updateClient } from "../../features/actions/client";
+import { useDispatch, useSelector } from "react-redux";
+import { ClipLoader } from "react-spinners";
+import { resetClientState } from "../../features/slices/client";
 
-const ActiveInactiveModal = ({ clientData, setModal, handleAction }) => {
+const ActiveInactiveModal = ({ clientData, setModal }) => {
+  const dispatch = useDispatch();
+  const { isUpdating , isSuccess} = useSelector((state) => state.client);
   const [inputValue, setInputValue] = useState("");
+  const [note, setNote] = useState("");
   const [isInputValid, setIsInputValid] = useState(true);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
     setIsInputValid(e.target.value === clientData.email);
+  };
+
+  const handleNoteChange = (e) => {
+    setNote(e.target.value);
   };
 
   const handleConfirmAction = () => {
@@ -17,9 +28,25 @@ const ActiveInactiveModal = ({ clientData, setModal, handleAction }) => {
       return;
     }
     if (isInputValid) {
-      handleAction(clientData.id);
+      dispatch(
+        updateClient({
+          data: { statusChangeNote: note, isActive: !clientData.isActive },
+          id: clientData?._id,
+        })
+      );
     }
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      setModal(null);
+    }
+    return () => {
+      console.log('retrigngg')
+      dispatch(resetClientState())
+    }
+
+  }, [isSuccess]);
 
   return (
     <div className="fixed inset-0 p-4 flex justify-center items-center z-[1000] bg-black/50">
@@ -29,7 +56,7 @@ const ActiveInactiveModal = ({ clientData, setModal, handleAction }) => {
           <h2 className="text-lg font-semibold">Confirm Action</h2>
           <Tooltip title="Close">
             <IconButton
-              onClick={() => setModal(false)}
+              onClick={() => setModal(null)}
               className="text-gray-600 hover:text-black"
             >
               <CloseIcon />
@@ -61,23 +88,40 @@ const ActiveInactiveModal = ({ clientData, setModal, handleAction }) => {
               </p>
             )}
           </div>
+
+          {/* Optional Note Section */}
+          <div className="relative">
+            <textarea
+              value={note}
+              onChange={handleNoteChange}
+              placeholder="Add an optional note (e.g., reason for status change)"
+              className="w-full p-2 rounded-md border border-gray-300"
+              rows="4"
+            />
+          </div>
         </div>
 
         {/* Modal Actions */}
         <div className="flex flex-col space-y-2 mt-6">
           <button
             onClick={handleConfirmAction}
-            disabled={!isInputValid}
+            disabled={!isInputValid || isUpdating}
             className={`px-6 py-2 rounded-md text-white font-medium ${
               isInputValid
                 ? "bg-blue-500 hover:bg-blue-600"
                 : "bg-gray-300 cursor-not-allowed"
             }`}
           >
-            {clientData.isActive ? "Set as Inactive" : "Set as Active"}
+            {isUpdating ? (
+              <ClipLoader color="#fff" size={20} />
+            ) : clientData.isActive ? (
+              "Set as Inactive"
+            ) : (
+              "Set as Active"
+            )}
           </button>
           <button
-            onClick={() => setModal(false)}
+            onClick={() => setModal(null)}
             className="px-6 py-2 rounded-md bg-gray-200 text-black font-medium"
           >
             Cancel

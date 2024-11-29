@@ -35,7 +35,7 @@ const ViewClient = () => {
   }, []);
 
   return (
-    <Box className="p-10 mt-10">
+    <Box className="py-10 md:px-10 mt-10">
       {/* Header Section */}
       <Card
         className="p-8 shadow-lg"

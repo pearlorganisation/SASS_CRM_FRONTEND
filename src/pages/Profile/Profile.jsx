@@ -4,25 +4,14 @@ import { Button, IconButton, TextField } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import PasswordUpdateForm from "../../components/Profile/PasswordUpdateForm";
 import EditUserForm from "../../components/Profile/EditUserForm";
+import {useSelector} from "react-redux";
 
 const ProfilePage = () => {
   const [isEditingInfo, setIsEditingInfo] = useState(false);
-
-  const defaultUserInfo = {
-    userName: "John Doe",
-    email: "johndoe@example.com",
-    phone: "123-456-7890",
-    companyName: "Doe Industries",
-  };
-
-  const { register, handleSubmit, reset } = useForm({
-    defaultValues: defaultUserInfo,
-  });
-
+  const {userData} = useSelector((state) => state.auth);
 
   const toggleEdit = () => {
     setIsEditingInfo((prev) => !prev);
-    if (!isEditingInfo) reset(defaultUserInfo);
   };
 
   const saveInfo = (data) => {
@@ -48,20 +37,20 @@ const ProfilePage = () => {
               </div>
               <h2 className="text-xl font-bold mb-4">User Information</h2>
               <p className="mb-2">
-                <strong>Name:</strong> {defaultUserInfo.userName}
+                <strong>Name:</strong> {userData?.userName}
               </p>
               <p className="mb-2">
-                <strong>Email:</strong> {defaultUserInfo.email}
+                <strong>Email:</strong> {userData?.email}
               </p>
               <p className="mb-2">
-                <strong>Phone:</strong> {defaultUserInfo.phone}
+                <strong>Phone:</strong> {userData?.phone || "N/A"}
               </p>
               <p>
-                <strong>Company:</strong> {defaultUserInfo.companyName}
+                <strong>Company:</strong> {userData?.companyName || "N/A"}
               </p>
             </div>
           ) : (
-            <EditUserForm onSubmit={saveInfo} defaultUserInfo={defaultUserInfo} />
+            <EditUserForm onSubmit={saveInfo} onClose={toggleEdit} />
           )}
         </div>
 

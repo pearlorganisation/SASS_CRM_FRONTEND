@@ -199,14 +199,14 @@ const MeetingDetails = () => {
                         </Tooltip>
 
                         {/* View Attendees */}
-                        <Tooltip className="px-3" title="View Attendees" arrow>
+                        {/* <Tooltip className="px-3" title="View Attendees" arrow>
                           <button
                             onClick={() => navigate(`/contacts/${item?._id}`)}
                             className="p-2 rounded-lg text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50"
                           >
                             <VisibilityIcon />
                           </button>
-                        </Tooltip>
+                        </Tooltip> */}
 
                         {/* Delete */}
                         <Tooltip title="Delete" arrow>
@@ -220,7 +220,7 @@ const MeetingDetails = () => {
                           </button>
                         </Tooltip>
 
-                        <Tooltip title="Upload File" arrow>
+                        {/* <Tooltip title="Upload File" arrow>
                           <button
                             onClick={() => {
                               // Your upload logic here
@@ -231,7 +231,7 @@ const MeetingDetails = () => {
                           >
                             <UploadFileIcon />
                           </button>
-                        </Tooltip>
+                        </Tooltip> */}
                       </td>
                     </tr>
                   );

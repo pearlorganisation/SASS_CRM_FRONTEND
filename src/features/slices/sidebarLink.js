@@ -3,7 +3,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { addSidebarLink, getAllSidebarLinks } from "../actions/sidebarLink";
+import { addSidebarLink, deleteSidebarLink, getAllSidebarLinks } from "../actions/sidebarLink";
 import { errorToast } from "../../utils/extra";
 
 const initialState = {
@@ -51,6 +51,19 @@ export const sidebarLinkSlice = createSlice({
         state.sidebarLinkData = action.payload;
       })
       .addCase(getAllSidebarLinks.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        errorToast(action.payload);
+      })
+      .addCase(deleteSidebarLink.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(deleteSidebarLink.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+      })
+      .addCase(deleteSidebarLink.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
         errorToast(action.payload);

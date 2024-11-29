@@ -1,17 +1,38 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, IconButton } from "@mui/material";
+import { useSelector } from "react-redux";
+import CloseIcon from "@mui/icons-material/Close";
 
-const EditUserForm = ({ onSubmit, defaultUserInfo }) => {
-    
-      const { register, handleSubmit, reset, formState: { errors }, } = useForm({
-        defaultValues: defaultUserInfo,
+const EditUserForm = ({ onSubmit, onClose }) => {
+  const { userData } = useSelector((state) => state.auth);
+  console.log("user -----> ", userData);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+
+  useEffect(() => {
+    if (userData) {
+      reset({
+        userName: userData?.userName || null,
+        email: userData?.email || null,
+        phone: userData?.phone || null,
+        companyName: userData?.companyName || null,
       });
+    }
+  }, [userData]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <h2 className="text-xl font-bold mb-4">Edit User Information</h2>
-
+      <div className=" flex justify-between items-center mb-3">
+        <h2 className="text-xl font-bold">Edit User Information</h2>
+        <IconButton className="" onClick={onClose} aria-label="Close">
+          <CloseIcon />
+        </IconButton>
+      </div>
       {/* Name Field */}
       <TextField
         {...register("userName", {

@@ -9,6 +9,8 @@ import {
   Box,
   Button,
   Typography,
+  TextField,
+  MenuItem,
 } from "@mui/material";
 import { clientSignup } from "../../features/actions/client";
 import { getPricePlans } from "../../features/actions/pricePlan";
@@ -42,9 +44,7 @@ function CreateClient() {
         return;
       }
       data["plan"] = selectedPlan;
-      console.log(data);
       dispatch(clientSignup(data)).then((res) => {
-        console.log("ressst", res);
         if (res?.meta?.requestStatus === "fulfilled") {
           navigate("/clients", { replace: true });
         }
@@ -58,11 +58,11 @@ function CreateClient() {
 
   useEffect(() => {
     dispatch(getPricePlans());
-  }, []);
+  }, [dispatch]);
 
   return (
-    <section className=" mt-4 flex justify-center items-center bg-gray-100">
-      <div className="w-full bg-white p-8 rounded-lg ">
+    <section className="mt-4 flex justify-center items-center bg-gray-100">
+      <div className="w-full bg-white p-8 rounded-lg">
         <Stepper activeStep={activeStep} alternativeLabel>
           {steps.map((label, index) => (
             <Step key={index}>
@@ -73,7 +73,7 @@ function CreateClient() {
 
         {activeStep === 0 && (
           <form
-            className="space-y-4 w-full mx-auto "
+            className="space-y-4 w-full mx-auto"
             onSubmit={handleSubmit(onSubmit)}
           >
             <Typography
@@ -83,124 +83,69 @@ function CreateClient() {
             >
               Step 1: Fill Client Information
             </Typography>
-            <div className="max-w-xl mx-auto">
-              <div className="pb-5 relative">
-                <label
-                  htmlFor="username"
-                  className="block mb-2 text-sm font-medium text-gray-700"
-                >
-                  Username
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter Username"
-                  {...register("userName", {
-                    required: "Username is required",
-                  })}
-                />
-                {errors.userName && (
-                  <p className="text-red-600 absolute bottom-0 left-0 text-sm mt-1">
-                    {errors.userName.message}
-                  </p>
-                )}
-              </div>
-              <div className="pb-5 relative">
-                <label
-                  htmlFor="email"
-                  className="block mb-2 text-sm font-medium text-gray-700"
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter Email"
-                  {...register("email", { required: "Email is required" })}
-                />
-                {errors.email && (
-                  <p className="text-red-600 absolute bottom-0 left-0 text-sm mt-1">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-              <div className="pb-5 relative">
-                <label
-                  htmlFor="phoneNumber"
-                  className="block mb-2 text-sm font-medium text-gray-700"
-                >
-                  Phone Number
-                </label>
-                <input
-                  type="text"
-                  id="phoneNumber"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter Phone Number"
-                  {...register("phone", {
-                    required: "Phone number is required",
-                    pattern: {
-                      value: /^[0-9]{10}$/,
-                      message: "Phone number must be 10 digits",
-                    },
-                  })}
-                />
-                {errors.phone && (
-                  <p className="text-red-600 absolute bottom-0 left-0 text-sm mt-1">
-                    {errors.phone.message}
-                  </p>
-                )}
-              </div>
-
-              <div className="pb-5 relative">
-                <label
-                  htmlFor="password"
-                  className="block mb-2 text-sm font-medium text-gray-700"
-                >
-                  Password
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter Password"
-                  {...register("password", {
-                    required: "Password is required",
-                  })}
-                />
-                {errors.password && (
-                  <p className="text-red-600 absolute bottom-0 left-0 text-sm mt-1">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
-              <div className="pb-5 relative">
-                <label
-                  htmlFor="confirmPassword"
-                  className="block mb-2 text-sm font-medium text-gray-700"
-                >
-                  Confirm Password
-                </label>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Confirm Password"
-                  {...register("confirmPassword", {
-                    required: "Please confirm your password",
-                    validate: (value) =>
-                      value === watch("password") || "Passwords do not match",
-                  })}
-                />
-                {errors.confirmPassword && (
-                  <p className="text-red-600 absolute bottom-0 left-0 text-sm mt-1">
-                    {errors.confirmPassword.message}
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="flex justify-between mt-4">
+            <Box className="max-w-xl mx-auto space-y-4">
+              <TextField
+                fullWidth
+                label="Username"
+                variant="outlined"
+                {...register("userName", { required: "Username is required" })}
+                error={!!errors.userName}
+                helperText={errors.userName?.message}
+              />
+              <TextField
+                fullWidth
+                label="Company Name"
+                variant="outlined"
+                {...register("companyName", { required: "Company Name is required" })}
+                error={!!errors.companyName}
+                helperText={errors.companyName?.message}
+              />
+              <TextField
+                fullWidth
+                label="Email"
+                variant="outlined"
+                {...register("email", { required: "Email is required" })}
+                error={!!errors.email}
+                helperText={errors.email?.message}
+              />
+              <TextField
+                fullWidth
+                label="Phone Number"
+                variant="outlined"
+                {...register("phone", {
+                  required: "Phone number is required",
+                  pattern: {
+                    value: /^[0-9]{10}$/,
+                    message: "Phone number must be 10 digits",
+                  },
+                })}
+                error={!!errors.phone}
+                helperText={errors.phone?.message}
+              />
+              <TextField
+                fullWidth
+                label="Password"
+                type="password"
+                variant="outlined"
+                {...register("password", { required: "Password is required" })}
+                error={!!errors.password}
+                helperText={errors.password?.message}
+              />
+              <TextField
+                fullWidth
+                label="Confirm Password"
+                type="password"
+                variant="outlined"
+                {...register("confirmPassword", {
+                  required: "Please confirm your password",
+                  validate: (value) =>
+                    value === watch("password") || "Passwords do not match",
+                })}
+                error={!!errors.confirmPassword}
+                helperText={errors.confirmPassword?.message}
+              />
+            </Box>
+            <Box className="flex justify-between mt-4">
               <Button
                 variant="outlined"
                 onClick={handleBack}
@@ -216,7 +161,7 @@ function CreateClient() {
               >
                 {isLoading ? <ClipLoader size={20} color="#fff" /> : "Next"}
               </Button>
-            </div>
+            </Box>
           </form>
         )}
 
@@ -229,23 +174,21 @@ function CreateClient() {
             >
               Step 2: Choose Plan
             </Typography>
-            <div className="flex overflow-x-auto gap-4 max-">
+            <div className="flex overflow-x-auto gap-4">
               {planData &&
                 Array.isArray(planData) &&
-                planData?.map((item, index) => {
-                  return (
-                    <div key={index} className="min-w-72">
-                      <PlanCard
-                        plan={item}
-                        key={item?._id}
-                        selectedPlan={selectedPlan}
-                        handlePlanSelection={(id) => setSelectedPlan(id)}
-                      />
-                    </div>
-                  );
-                })}
+                planData.map((item, index) => (
+                  <div key={index} className="min-w-72">
+                    <PlanCard
+                      plan={item}
+                      key={item._id}
+                      selectedPlan={selectedPlan}
+                      handlePlanSelection={(id) => setSelectedPlan(id)}
+                    />
+                  </div>
+                ))}
             </div>
-            <div className="flex justify-between mt-4">
+            <Box className="flex justify-between mt-4">
               <Button variant="outlined" onClick={handleBack}>
                 Back
               </Button>
@@ -257,7 +200,7 @@ function CreateClient() {
               >
                 {isLoading ? <ClipLoader size={20} color="#fff" /> : "Submit"}
               </Button>
-            </div>
+            </Box>
           </Box>
         )}
       </div>

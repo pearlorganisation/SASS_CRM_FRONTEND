@@ -1,166 +1,200 @@
-import React,{useState} from 'react'
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import defaultPhoto from "/placeholder.jpg";
+import {
+  TextField,
+  Button,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  Checkbox,
+  Grid,
+} from "@mui/material";
 import { useDispatch } from "react-redux";
-
-import { MdAdminPanelSettings, MdOutlineInsertPhoto } from "react-icons/md";
-import { createGlobalData } from '../../../features/actions/globalData';
+import defaultPhoto from "/placeholder.jpg";
+import { MdOutlineInsertPhoto } from "react-icons/md";
+import { createGlobalData } from "../../../features/actions/globalData";
 
 const LandingPageForm = () => {
+  const { register, handleSubmit, formState: { errors }, setValue } = useForm();
+  const [photo, setPhoto] = useState(null);
+  const [selectedType, setSelectedType] = useState("image");
+  const [isControlsVisible, setIsControlsVisible] = useState(false);
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-      } = useForm();
-      const [photo, setPhoto] = useState(null);
-      const [selectedType, setSelectedType] = useState("image"); // State for radio button
-      const dispatch = useDispatch();
-    
-      const onSubmit = (data) => {
-        data['file'] = data['file'][0];
-        data['fileType'] = selectedType;
-        dispatch(createGlobalData(data));
-    
-      };
-    
-      const handlePhotoChange = (e) => {
-        const selectedPhoto = e.target.files[0];
-    
-        if (selectedPhoto) {
-          const reader = new FileReader();
-          reader.readAsDataURL(selectedPhoto);
-          reader.onloadend = () => {
-            setPhoto(reader.result);
-          };
-        }
-      };
-    
-      const handleRadioChange = (e) => {
-        setSelectedType(e.target.value);
-      };
+  const dispatch = useDispatch();
+
+  const onSubmit = (data) => {
+    data["file"] = data["file"][0];
+    data["fileType"] = selectedType;
+    data["isControlsVisible"] = isControlsVisible;
+    dispatch(createGlobalData(data));
+  };
+
+  const handlePhotoChange = (e) => {
+    const selectedPhoto = e.target.files[0];
+    if (selectedPhoto) {
+      const reader = new FileReader();
+      reader.readAsDataURL(selectedPhoto);
+      reader.onloadend = () => setPhoto(reader.result);
+    }
+  };
+  const handleTypeChange = (e) => {
+    setSelectedType(e.target.value);
+    setPhoto(null); // Reset the photo preview
+    setValue("file", null); // Reset the file in the form
+  };
   return (
-    <div className='pt-20'>
-    <form
-      className="space-y-6 mx-8 sm:mx-2 p-4 py-6"
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <h2 className="text-2xl font-bold ">Landing Page Data</h2>
-      <div className="sm:flex space-y-6 sm:space-y-0 justify-between gap-10">
-        <div className="w-full">
-          <label className="font-medium">Heading</label>
-          <input
-            {...register("title", { required: "Heading is required" })}
-            type="text"
-            className="w-full mt-2 px-5 py-2 text-gray-500 border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
-          />
-          {errors?.title && (
-            <span className="text-red-500">{errors.title.message}</span>
-          )}
+    <div className="pt-20 px-4 max-w-5xl mx-auto">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6 bg-white shadow-md p-6 rounded-lg"
+      >
+        <h2 className="text-2xl font-bold mb-6 text-center md:text-left">
+          Landing Page Data
+        </h2>
+
+        {/* Title & Subtitle */}
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            <TextField
+              {...register("title", { required: "Heading is required" })}
+              label="Heading"
+              fullWidth
+              error={!!errors.title}
+              helperText={errors.title?.message}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              {...register("subTitle", { required: "Sub Heading is required" })}
+              label="Sub Heading"
+              fullWidth
+              error={!!errors.subTitle}
+              helperText={errors.subTitle?.message}
+            />
+          </Grid>
+        </Grid>
+
+        {/* Media Type Selection */}
+        <div>
+          <h3 className="font-medium mb-2">Landing Page Media Type</h3>
+          <RadioGroup
+            row
+            value={selectedType}
+            onChange={handleTypeChange}
+          >
+            <FormControlLabel value="image" control={<Radio />} label="Image" />
+            <FormControlLabel value="video" control={<Radio />} label="Video" />
+          </RadioGroup>
         </div>
-        <div className="w-full">
-          <label className="font-medium">Sub Heading </label>
-          <input
-            {...register("subTitle", {
-              required: "Sub Heading is required",
-            })}
-            type="text"
-            className="w-full mt-2 px-5 py-2 text-gray-500 border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
-          />
-          {errors?.subTitle && (
-            <span className="text-red-500">{errors.subTitle.message}</span>
+
+        {/* Media Preview & Upload */}
+        <div className="flex flex-wrap gap-4 items-start">
+          {selectedType === "image" ? (
+            <img
+              src={photo || defaultPhoto}
+              alt="Preview"
+              className="w-44 h-36 object-cover rounded border"
+            />
+          ) : (
+            <video
+              src={photo || ""}
+              poster={defaultPhoto}
+              className="w-44 h-36 object-cover rounded border"
+              muted
+              autoPlay
+              loop
+              controls={isControlsVisible}
+            />
           )}
-        </div>
-      </div>
-      <div className="sm:flex space-y-6 sm:space-y-0 justify-between gap-10">
-        <div className="font-medium w-fit space-y-6">
-          Landing Page {selectedType === 'image' ? 'Image' : 'Video'}
-          <div className="flex items-center gap-12">
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="image"
-                  name="landingPageType"
-                  value="image"
-                  checked={selectedType === "image"}
-                  onChange={handleRadioChange}
-                  className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor="image"
-                  className="ml-2 block text-sm font-medium text-gray-700"
-                >
-                  Image
-                </label>
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="video"
-                  name="landingPageType"
-                  value="video"
-                  checked={selectedType === "video"}
-                  onChange={handleRadioChange}
-                  className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                />
-                <label
-                  htmlFor="video"
-                  className="ml-2 block text-sm font-medium text-gray-700"
-                >
-                  Video
-                </label>
-              </div>
-            </div>
-            {selectedType === "image" ? (
-              <img
-                className="mt-2 w-44 object-cover h-36 rounded border"
-                src={photo || defaultPhoto}
-                alt="No Image"
-              />
-            ) : (
-              <video
-                className="mt-2 w-44 object-cover h-36 rounded border"
-                src={photo || ""}
-                poster={defaultPhoto}
-                muted
-                autoPlay
-                loop
-              />
+
+          <div className="space-y-2">
+            <label htmlFor="file_input" className="flex items-center gap-2 cursor-pointer">
+              <MdOutlineInsertPhoto size={24} />
+              <span className="px-4 py-2 border rounded-md hover:bg-blue-500 hover:text-white">
+                Upload {selectedType === "image" ? "Image" : "Video"}
+              </span>
+            </label>
+            <input
+              {...register("file", {
+                required: `Landing Page ${selectedType === "image" ? "Image" : "Video"} is required`,
+                onChange: handlePhotoChange,
+              })}
+              id="file_input"
+              type="file"
+              className="hidden"
+            />
+            {errors.file && (
+              <span className="text-sm text-red-500">{errors.file.message}</span>
             )}
           </div>
-          <label htmlFor="file_input" className="flex gap-1 cursor-pointer">
-            <MdOutlineInsertPhoto size="25" />
-            <div className="px-2 border rounded-md border-slate-300 hover:bg-red-500 hover:text-white hover:border-none">
-              Click here to upload
-            </div>
-          </label>
-          <input
-            {...register("file", {
-              required: true,
-              onChange: (e) => {
-                handlePhotoChange(e);
-              },
-            })}
-            className="hidden"
-            id="file_input"
-            type="file"
-          />
-          {errors.file && (
-            <span className="text-sm font-medium text-red-500">
-              Landing Page {selectedType === 'image' ? 'Image' : 'Video'} is required
-            </span>
-          )}
         </div>
-      </div>
-      
 
-      <div style={{ marginTop: "4rem" }}>
-        <button className="w-full btn-grad:hover btn-grad">Update</button>
-      </div>
-    </form>
-  </div>
-  )
-}
+        {/* Button & Link */}
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            <TextField
+              {...register("buttonName", { required: "Button name is required" })}
+              label="Button Name"
+              fullWidth
+              error={!!errors.buttonName}
+              helperText={errors.buttonName?.message}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField
+              {...register("link", { required: "Link is required" })}
+              label="Button Link"
+              fullWidth
+              error={!!errors.link}
+              helperText={errors.link?.message}
+            />
+          </Grid>
+        </Grid>
 
-export default LandingPageForm
+        {/* Video Dimensions */}
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+              <TextField
+                {...register("height", { required: "Height is required" })}
+                label="Height (px)"
+                fullWidth
+                type="number"
+                error={!!errors.height}
+                helperText={errors.height?.message}
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <TextField
+                {...register("width", { required: "Width is required" })}
+                label="Width (px)"
+                fullWidth
+                type="number"
+                error={!!errors.width}
+                helperText={errors.width?.message}
+              />
+            </Grid>
+          </Grid>
+
+        {/* Video Controls */}
+        {selectedType === "video" && (
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isControlsVisible}
+                onChange={(e) => setIsControlsVisible(e.target.checked)}
+              />
+            }
+            label="Show Video Controls"
+          />
+        )}
+
+        {/* Submit Button */}
+        <Button type="submit" variant="contained" color="primary" fullWidth>
+          Update Landing Page
+        </Button>
+      </form>
+    </div>
+  );
+};
+
+export default LandingPageForm;
