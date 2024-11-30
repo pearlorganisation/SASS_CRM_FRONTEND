@@ -20,7 +20,7 @@ const ViewSettings = () => {
         SETTINGS
       </Typography>
       {/* Tailwind Grid Layout */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10 my-10 md:mx-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 my-10 md:mx-10">
         {/* For SUPER_ADMIN and ADMIN roles */}
         <ComponentGuard allowedRoles={[roles.SUPER_ADMIN, roles.ADMIN]}>
           <Link

@@ -3,10 +3,10 @@ import { useForm } from "react-hook-form";
 import { TextField, Button, IconButton } from "@mui/material";
 import { useSelector } from "react-redux";
 import CloseIcon from "@mui/icons-material/Close";
+import { ClipLoader } from "react-spinners";
 
 const EditUserForm = ({ onSubmit, onClose }) => {
-  const { userData } = useSelector((state) => state.auth);
-  console.log("user -----> ", userData);
+  const { userData, isLoading } = useSelector((state) => state.auth);
   const {
     register,
     handleSubmit,
@@ -95,7 +95,7 @@ const EditUserForm = ({ onSubmit, onClose }) => {
 
       {/* Submit Button */}
       <Button type="submit" variant="contained" color="primary" fullWidth>
-        Save Info
+        {isLoading ? <ClipLoader color="#fff" size={20} /> : "Save Info"}
       </Button>
     </form>
   );

@@ -40,7 +40,6 @@ const ViewParticularContact = () => {
     (state) => state.webinarContact
   );
   const { noteData, isFormLoading } = useSelector((state) => state.assign);
-  const { isEmployee } = useSelector((state) => state.userActivity);
   useEffect(() => {
     dispatch(getAttendeeContactDetails({ email, recordType }));
     dispatch(getCustomOptions());
@@ -161,9 +160,7 @@ const ViewParticularContact = () => {
   };
 
   const addUserActivityLog = (data) => {
-    if (isEmployee) {
       dispatch(addUserActivity(data));
-    }
   };
 
   if (!attendeeContactDetails) return null;

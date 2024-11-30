@@ -6,7 +6,7 @@ export const createGlobalData = createAsyncThunk(
   "createGlobalData",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.post(`globalData/landingpage`, payload, {
+      const response = await instance.post(`landingpage`, payload, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -22,7 +22,7 @@ export const getGlobalData = createAsyncThunk(
   "getGlobalData",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`globalData/landingpage`);
+      const response = await instance.get(`landingpage`);
       return response.data;
     } catch (e) {
       return rejectWithValue(e);

@@ -38,3 +38,28 @@ export const logIn = createAsyncThunk(
   }
 );
 
+//Update basic Info
+export const updateUser = createAsyncThunk(
+  "user/Update",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.patch("/users", payload);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+//Update basic Info
+export const updatePassword = createAsyncThunk(
+  "userPassword/Update",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.patch("/users/password", payload);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
