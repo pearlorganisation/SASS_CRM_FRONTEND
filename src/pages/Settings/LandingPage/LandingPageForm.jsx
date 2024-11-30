@@ -27,7 +27,7 @@ const LandingPageForm = () => {
   const [isControlsVisible, setIsControlsVisible] = useState(false);
 
   const { landingGlobalData } = useSelector((state) => state.globalData);
-  console.log('landingGlobalData', landingGlobalData)
+  // console.log('landingGlobalData', landingGlobalData)
   const dispatch = useDispatch();
 
   const onSubmit = (data) => {

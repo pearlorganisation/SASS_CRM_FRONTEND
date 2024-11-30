@@ -49,7 +49,7 @@ export const globalDataSlice = createSlice({
       .addCase(createGlobalData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        toast.info(action.payload.data.message, {
+        toast.success("Landing Page Data Updated Successfully", {
           position: "top-center",
         });
       })

@@ -15,7 +15,7 @@ function Login() {
   const { landingGlobalData } = useSelector((state) => state.globalData);
   const [isPasswordHidden, setPasswordHidden] = useState(true);
 
-  console.log("sdkfsdf ---> ", landingGlobalData);
+  // console.log("sdkfsdf ---> ", landingGlobalData);
 
   const {
     register,
@@ -41,7 +41,7 @@ function Login() {
     dispatch(getGlobalData());
   }, []);
 
-  function getFileURL(filename, destination, baseUrl) {
+  function getFileURL(filename="", destination="", baseUrl="") {
     // Remove '/api/v1' from the baseUrl if it exists
     const cleanedBaseUrl = baseUrl.replace(/\/api\/v1$/, '');
   
@@ -78,7 +78,7 @@ function Login() {
             <video
               className="w-full h-full object-cover"
               autoPlay
-              {...(true && { controls: true })}
+              controls={landingGlobalData?.videoControls}
               loop
               muted
               preload="auto"
