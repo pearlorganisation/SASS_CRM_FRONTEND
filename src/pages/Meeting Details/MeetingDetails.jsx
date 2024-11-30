@@ -1,4 +1,4 @@
-import { Skeleton, Stack } from "@mui/material";
+import { Button, Skeleton, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import UploadCsvModal from "./UploadCsvModal";
 import { createPortal } from "react-dom";
@@ -8,17 +8,21 @@ import {
   deleteWebinarContacts,
   getAllWebinars,
 } from "../../features/actions/webinarContact";
-import Delete from "../../components/delete";
+import Delete from "../../components/Webinar/delete";
 import UploadXslxModal from "./UploadXslxModal";
 import Pagination from "@mui/material/Pagination";
 import UpdateCsvXslxModal from "./UpdateCsvXslxModal";
-import CreateWebinar from "./modal/CreateWebinar";
+import CreateWebinar from "../../components/Webinar/CreateWebinar";
 import Tooltip from "@mui/material/Tooltip";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import useAddUserActivity from "../../hooks/useAddUserActivity ";
 
 const MeetingDetails = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const logUserActivity = useAddUserActivity();
+
   const { isLoading, isDeleted, webinarData, totalPages } = useSelector(
     (state) => state.webinarContact
   );
@@ -94,6 +98,15 @@ const MeetingDetails = () => {
     }
   }, [isDeleted, page]);
 
+  const handleRowClick = (id) => {
+    logUserActivity({
+      action: "navigate",
+      navigateType: "page",
+      detailItem: `/attendees/${id}`,
+    });
+    navigate(`/attendees/${id}`);
+  };
+
   return (
     <>
       <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-10">
@@ -107,12 +120,26 @@ const MeetingDetails = () => {
             </p> */}
           </div>
           <div className="mt-3 md:mt-0 space-x-5">
-            <button
+            <Button
               onClick={() => setIsCreateModalOpen(true)}
-              className="cursor-pointer inline-block px-4 py-2 text-white duration-150 font-medium bg-indigo-600 rounded-lg hover:bg-indigo-700 active:bg-indigo-700 md:text-sm"
+              variant="contained"
+              color="primary"
+              className="cursor-pointer inline-block px-4 py-2 duration-150 font-medium rounded-lg md:text-sm"
+              sx={{
+                backgroundColor: "#6366f1", // Tailwind color equivalent for bg-indigo-600
+                textTransform: "none", // Keeps text normal (not uppercase)
+                fontWeight: 500, // Match font weight to Tailwind's 'font-medium'
+                fontSize: { xs: "0.875rem", md: "1rem" }, // Responsive font size
+                "&:hover": {
+                  backgroundColor: "#4f46e5", // Tailwind's hover:bg-indigo-700 color
+                },
+                "&:active": {
+                  backgroundColor: "#4338ca", // Tailwind's active:bg-indigo-700 color
+                },
+              }}
             >
               Create Webinar
-            </button>
+            </Button>
             {/* <a
               onClick={handleXslxModal}
               className="cursor-pointer inline-block px-4 py-2 text-white duration-150 font-medium bg-indigo-600 rounded-lg hover:bg-indigo-700 active:bg-indigo-700 md:text-sm"
@@ -129,7 +156,6 @@ const MeetingDetails = () => {
         </div>
         <div className="mt-5 shadow-lg rounded-lg overflow-x-auto">
           {isLoading ? (
-
             <Stack spacing={4}>
               <Skeleton variant="rounded" height={35} />
               <Skeleton variant="rounded" height={25} />
@@ -137,7 +163,6 @@ const MeetingDetails = () => {
               <Skeleton variant="rounded" height={25} />
               <Skeleton variant="rounded" height={25} />
             </Stack>
-
           ) : (
             <table className="w-full table-auto text-sm text-left">
               <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
@@ -150,9 +175,7 @@ const MeetingDetails = () => {
                 </tr>
               </thead>
               <tbody className="text-gray-600 divide-y">
-
-                {
-                  Array.isArray(dummyWebinars) &&
+                {Array.isArray(dummyWebinars) &&
                   dummyWebinars.length > 0 &&
                   dummyWebinars?.map((item, idx) => {
                     const serialNumber = (page - 1) * 8 + idx + 1;
@@ -160,12 +183,20 @@ const MeetingDetails = () => {
                       <tr
                         key={idx}
                         className="cursor-pointer hover:bg-gray-100"
-                        onClick={() => console.log('Row clicked:', item)}
+                        onClick={() => handleRowClick(item?._id)}
                       >
-                        <td className="px-6 py-4 whitespace-nowrap">{serialNumber}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">{item?.name}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">{item?.date || "N/A"}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">{item?.totalParticipants}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {serialNumber}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {item?.name}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {item?.date || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {item?.totalParticipants}
+                        </td>
 
                         {showUpdateModal &&
                           createPortal(
@@ -196,7 +227,9 @@ const MeetingDetails = () => {
                           {/* Delete */}
                           <Tooltip title="Delete" arrow>
                             <button
-                              onClick={() => handleDeleteModal(item?._id, item?.name)}
+                              onClick={() =>
+                                handleDeleteModal(item?._id, item?.name)
+                              }
                               className="p-2 rounded-lg text-red-400 hover:text-red-600 duration-150 hover:bg-gray-50"
                             >
                               <DeleteIcon />
@@ -204,14 +237,11 @@ const MeetingDetails = () => {
                           </Tooltip>
                         </td>
                       </tr>
-
                     );
-                  })
-                }
+                  })}
               </tbody>
             </table>
           )}
-
         </div>
       </div>
       <div className="flex justify-center mt-5">

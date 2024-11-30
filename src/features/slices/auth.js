@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { logIn, signUp, updateUser } from "../actions/auth";
+import { logIn, signUp, updatePassword, updateUser } from "../actions/auth";
 import { toast } from "sonner";
 import { errorToast } from "../../utils/extra";
 // -------------------------------------------------------------------------------------------
@@ -83,6 +83,23 @@ const authSlice = createSlice({
         });
       })
       .addCase(updateUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        errorToast(action?.payload);
+      })
+      .addCase(updatePassword.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+        state.isSuccess = false;
+      })
+      .addCase(updatePassword.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        toast.success(`User Password Updated Successfully`, {
+          position: "top-center",
+        });
+      })
+      .addCase(updatePassword.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
         errorToast(action?.payload);

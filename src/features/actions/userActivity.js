@@ -6,7 +6,7 @@ export const addUserActivity = createAsyncThunk(
   "userActivity/create",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.post(`/userActivity`, payload);
+      const response = await instance.post(`/user-activities`, payload);
       return response;
     } catch (e) {
       return rejectWithValue(e);
@@ -17,10 +17,10 @@ export const addUserActivity = createAsyncThunk(
 //get user Activity
 export const getUserActivity = createAsyncThunk(
   "userActivity/fetch",
-  async ({ id, page }, { rejectWithValue }) => {
+  async ({ id, page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/userActivity/${id}`, {
-        params: { page },
+      const response = await instance.get(`/user-activities/${id}`, {
+        params: { page, limit },
       });
       console.log(response.data);
       return response.data;

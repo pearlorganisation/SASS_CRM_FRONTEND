@@ -1,20 +1,34 @@
 import { Button, TextField } from "@mui/material";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { ClipLoader } from "react-spinners";
+import { updatePassword } from "../../features/actions/auth";
 
 function PasswordUpdateForm() {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
     watch,
   } = useForm();
+  const dispatch = useDispatch();
+  const { isLoading, isSuccess } = useSelector((state) => state.auth);
 
-  const newPassword = watch("newPassword");
+  const newPassword = watch("password");
 
   const onSubmit = (data) => {
     console.log("Password updated successfully", data);
+    dispatch(updatePassword(data));
     // Your updatePassword function logic
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      reset();
+    }
+  }, [isSuccess]);
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6">
@@ -23,21 +37,21 @@ function PasswordUpdateForm() {
         {/* Current Password Field */}
         <div>
           <TextField
-            {...register("currentPassword", {
+            {...register("oldPassword", {
               required: "Current password is required.",
             })}
             label="Current Password"
             type="password"
             fullWidth
-            error={!!errors.currentPassword}
-            helperText={errors.currentPassword?.message}
+            error={!!errors.oldPassword}
+            helperText={errors.oldPassword?.message}
           />
         </div>
 
         {/* New Password Field */}
         <div>
           <TextField
-            {...register("newPassword", {
+            {...register("password", {
               required: "New password is required.",
               // minLength: {
               //   value: 8,
@@ -49,8 +63,8 @@ function PasswordUpdateForm() {
             label="New Password"
             type="password"
             fullWidth
-            error={!!errors.newPassword}
-            helperText={errors.newPassword?.message}
+            error={!!errors.password}
+            helperText={errors.password?.message}
           />
         </div>
 
@@ -72,7 +86,11 @@ function PasswordUpdateForm() {
 
         {/* Submit Button */}
         <Button type="submit" variant="contained" color="primary" fullWidth>
-          Update Password
+          {isLoading ? (
+            <ClipLoader color="#fff" size={20} />
+          ) : (
+            "Update Password"
+          )}
         </Button>
       </form>
     </div>

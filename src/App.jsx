@@ -33,14 +33,11 @@ import {
   CustomOptions,
   CreateClient,
   ViewClient,
-  Profile
+  Profile,
 } from "./pages";
-import { getEmployeeStats } from "./features/actions/employee";
 import { addUserActivity } from "./features/actions/userActivity";
-import { isEmployeeId } from "./utils/roles";
-import { setIsEmployee } from "./features/slices/userActivity";
 import RouteGuard from "./components/AccessControl/RouteGuard";
-import { clearLoadingAndData, logout } from "./features/slices/auth";
+import { logout } from "./features/slices/auth";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -48,26 +45,20 @@ const App = () => {
   const { isUserLoggedIn } = useSelector((state) => state.auth);
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role || "";
-  if(isUserLoggedIn && !role) {
+  if (isUserLoggedIn && !role) {
     dispatch(logout());
   }
 
-  // console.log(
-  //   "checking if user is logged in",
-  //   isUserLoggedIn,
-  //   userData
-  // );
-  // if (isUserLoggedIn && isEmployeeId(role)) {
-  //   dispatch(setIsEmployee(true));
-  //   dispatch(
-  //     addUserActivity({
-  //       action: "login/refresh",
-  //       details: "User logged in or refreshed successfully",
-  //     })
-  //   );
-  // } else {
-  //   dispatch(setIsEmployee(false));
-  // }
+  useEffect(() => {
+    if (isUserLoggedIn && role) {
+      dispatch(
+        addUserActivity({
+          action: "login/refresh",
+          details: "User logged in or refreshed successfully",
+        })
+      );
+    }
+  }, []);
 
   const router = createBrowserRouter([
     {
@@ -110,9 +101,7 @@ const App = () => {
         },
         {
           path: "/clients",
-          element: (
-              <Clients />
-          ),
+          element: <Clients />,
         },
         {
           path: "/add-client",
@@ -143,8 +132,12 @@ const App = () => {
           element: <CreateProduct />,
         },
         {
-          path: "/attendees",
-          element: <ViewAttendees />,
+          path: "/attendees/:webinarId",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <ViewAttendees />
+            </RouteGuard>
+          ),
         },
         {
           path: "/createEmployee",

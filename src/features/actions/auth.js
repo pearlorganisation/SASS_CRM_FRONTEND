@@ -38,7 +38,7 @@ export const logIn = createAsyncThunk(
   }
 );
 
-//Login Api
+//Update basic Info
 export const updateUser = createAsyncThunk(
   "user/Update",
   async (payload, { rejectWithValue }) => {
@@ -51,3 +51,15 @@ export const updateUser = createAsyncThunk(
   }
 );
 
+//Update basic Info
+export const updatePassword = createAsyncThunk(
+  "userPassword/Update",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.patch("/users/password", payload);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);

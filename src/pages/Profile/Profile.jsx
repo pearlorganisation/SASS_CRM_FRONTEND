@@ -4,13 +4,13 @@ import { Button, IconButton, TextField } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import PasswordUpdateForm from "../../components/Profile/PasswordUpdateForm";
 import EditUserForm from "../../components/Profile/EditUserForm";
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../../features/actions/auth";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const [isEditingInfo, setIsEditingInfo] = useState(false);
-  const {userData, isSuccess} = useSelector((state) => state.auth);
+  const { userData, isSuccess } = useSelector((state) => state.auth);
 
   const toggleEdit = () => {
     setIsEditingInfo((prev) => !prev);
@@ -21,12 +21,10 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    if(isSuccess){
+    if (isSuccess) {
       setIsEditingInfo(false);
     }
-    
-  },[isSuccess])
-
+  }, [isSuccess]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8">
@@ -34,14 +32,11 @@ const ProfilePage = () => {
         {/* User Info Card */}
         <div className="bg-white shadow-md w-full rounded-lg p-6 relative">
           {!isEditingInfo ? (
-            <div >
+            <div>
               <div className="flex justify-end">
-              <IconButton
-                onClick={toggleEdit}
-                className=""
-              >
-                <EditIcon />
-              </IconButton>
+                <IconButton onClick={toggleEdit} className="">
+                  <EditIcon />
+                </IconButton>
               </div>
               <h2 className="text-xl font-bold mb-4">User Information</h2>
               <p className="mb-2">
@@ -63,8 +58,7 @@ const ProfilePage = () => {
         </div>
 
         {/* Password Update Card */}
-        <PasswordUpdateForm/>
-        
+        <PasswordUpdateForm />
       </div>
     </div>
   );

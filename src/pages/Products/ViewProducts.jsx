@@ -12,26 +12,25 @@ const ViewProducts = () => {
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { productData, isLoading, totalPages } = useSelector((state) => state.product);
+  const { productData, isLoading, totalPages } = useSelector(
+    (state) => state.product
+  );
   const { userData } = useSelector((state) => state.auth);
   const [modalData, setModalData] = useState(null);
-  const { isEmployee } = useSelector((state) => state.userActivity);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    dispatch(getAllProducts({page}));
+    dispatch(getAllProducts({ page }));
   }, [page]);
 
   const handleViewDetails = (product) => {
     setModalData(product);
-    if (isEmployee) {
-      dispatch(
-        addUserActivity({
-          action: "viewDetails",
-          details: `User viewed details of Product Name: ${product?.name}`,
-        })
-      );
-    }
+    dispatch(
+      addUserActivity({
+        action: "viewDetails",
+        details: `User viewed details of Product Name: ${product?.name}`,
+      })
+    );
   };
 
   const handlePagination = (e, p) => {
