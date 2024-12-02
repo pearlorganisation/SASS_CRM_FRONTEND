@@ -20,7 +20,9 @@ export const getAllAttendees = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await instance.get(
-        `/attendee/${payload.page}?${payload.filters}&recordType=${payload.recordType}&limit=${payload.limit || 10}` //
+        `/attendee/${payload.page}?${payload.filters}&recordType=${
+          payload.recordType
+        }&limit=${payload.limit || 10}` //
       );
       return response?.data;
     } catch (e) {
@@ -48,11 +50,38 @@ export const getAttendees = createAsyncThunk(
 
 // get webinar data
 export const getAllWebinars = createAsyncThunk(
-  "getAllWebinars",
-  async (page, { rejectWithValue }) => {
+  "webinars/fetchData",
+  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/attendee/csvData/${page}`);
+      const response = await instance.get(`/webinar`, {
+        params: { page, limit },
+      });
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
 
+// add webinar
+export const createWebinar = createAsyncThunk(
+  "webinars/create",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await instance.post(`/webinar`, data);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+// add webinar
+export const updateWebinar = createAsyncThunk(
+  "webinars/update",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`/webinar/${id}`, data);
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);

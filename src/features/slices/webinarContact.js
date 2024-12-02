@@ -13,8 +13,10 @@ import {
   getAttendeeContactDetails,
   updateAttendeeDetails,
   updateAttendeeLeadType,
+  createWebinar,
+  updateWebinar,
 } from "../actions/webinarContact";
-import { errorToast } from "../../utils/extra";
+import { errorToast, successToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
@@ -23,6 +25,7 @@ const initialState = {
   assignmentData: [],
   attendeeContactDetails: null,
   totalPages: null,
+  isSuccess: false,
   errorMessage: "",
 };
 
@@ -67,7 +70,8 @@ export const webinarContactSlice = createSlice({
       .addCase(updateAttendeeDetails.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        errorToast(action?.payload);      })
+        errorToast(action?.payload);
+      })
       .addCase(getAllAttendees.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
@@ -104,12 +108,43 @@ export const webinarContactSlice = createSlice({
       .addCase(getAllWebinars.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.webinarData = action.payload.data;
-        state.totalPages = action.payload.totalPages;
+        state.webinarData = action.payload;
+        state.totalPages = 1;
       })
       .addCase(getAllWebinars.rejected, (state, action) => {
         state.isLoading = false;
-
+        state.errorMessage = action.payload;
+        errorToast(action?.payload);
+      })
+      .addCase(createWebinar.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+        state.isSuccess = false;
+      })
+      .addCase(createWebinar.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.isSuccess = true;
+        successToast("Webinar Created Successfully");
+      })
+      .addCase(createWebinar.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        errorToast(action?.payload);
+      })
+      .addCase(updateWebinar.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+        state.isSuccess = false;
+      })
+      .addCase(updateWebinar.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.isSuccess = true;
+        successToast("Webinar Updated Successfully");
+      })
+      .addCase(updateWebinar.rejected, (state, action) => {
+        state.isLoading = false;
         state.errorMessage = action.payload;
         errorToast(action?.payload);
       })

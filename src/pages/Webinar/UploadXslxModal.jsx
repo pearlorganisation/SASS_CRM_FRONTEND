@@ -1,21 +1,15 @@
 import React, { useState } from "react";
-import CsvParser from "papaparse";
 import { toast } from "sonner";
 import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import {
-  addWebinarContacts,
-  updateAttendeeDetails,
-} from "../../features/actions/webinarContact";
+import { addWebinarContacts, updateAttendeeDetails } from "../../features/actions/webinarContact";
+import * as XLSX from "xlsx";
 
-const UploadCsvModal = ({ setModal, update }) => {
+const UploadXslxModal = ({ setModal,update }) => {
   const [mapUI, setMapUI] = useState(false);
   const [selectedValues, setSelectedValues] = useState({}); // State to store selected values
   const [meetingData, setMeetingData] = useState([]);
-  const [filterRow, setFilterRow] = useState("");
-  const [showFileUpload, setShowFileUpload] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [dateErrorMessage, setDateErrorMessage] = useState("");
   const [date, setDate] = useState("");
 
@@ -38,32 +32,44 @@ const UploadCsvModal = ({ setModal, update }) => {
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      CsvParser.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        beforeFirstChunk: (chunk) => {
-          // Split the CSV content by newlines
-          const rows = chunk.split("\n");
-          // Take the 12th row as the header (index 11) and join it with the rest of the data from the 13th row
-          const newChunk = [rows[filterRow - 1], ...rows.slice(filterRow)].join(
-            "\n"
-          );
-          return newChunk;
-        },
-        complete: (results) => {
-          setMeetingData(results.data);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const workbook = XLSX.read(data, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+  
+        // Specify the row to start processing data from
+        const filterRow = 14; // Example: Start processing from the 12th row (index 11)
+  
+        if (jsonData.length >= filterRow) {
+          // Take the row at index (filterRow - 1) as the header
+          const headers = jsonData[filterRow - 1];
+          // Extract data starting from the row after the header
+          const formattedData = jsonData.slice(filterRow).map((row) => {
+            const obj = {};
+            headers.forEach((header, index) => {
+              obj[header] = row[index];
+            });
+            return obj;
+          });
+  
+          setMeetingData(formattedData);
           console.log("uploaded");
-        },
-        error: (error) => {
-          console.error("Error parsing CSV:", error);
-        },
-      });
+        } else {
+          console.error("Not enough rows in the file to process.");
+          toast.error("Invalid file. Please upload a file with sufficient rows.", {
+            position: "top-center",
+          });
+        }
+      };
+      reader.readAsBinaryString(file); // Use readAsBinaryString to handle the deprecated warning
       setMapUI(true);
       toast.success("File Uploaded Successfully", { position: "top-center" });
     }
   };
-
-  // console.log(meetingData)
+  
   const generateOptions = (data) => {
     if (data.length > 0) {
       const keys = Object.keys(data[0]);
@@ -74,16 +80,6 @@ const UploadCsvModal = ({ setModal, update }) => {
     }
     return [];
   };
-  // console.log(generateOptions(meetingData))
-
-  const handleNextClick = () => {
-    if (filterRow === "") {
-      setErrorMessage("This field is required");
-    } else {
-      setErrorMessage("");
-      setShowFileUpload(true);
-    }
-  };
 
   const dateError = () => {
     if (date === "") {
@@ -92,19 +88,10 @@ const UploadCsvModal = ({ setModal, update }) => {
       setDateErrorMessage("");
     }
   };
-
   const onSubmit = (data2) => {
     console.log(data2);
-    const {
-      email,
-      firstName,
-      lastName,
-      phoneNumber,
-      sessionMinutes,
-      csvName,
-      location,
-      gender,
-    } = data2;
+    const { email, firstName, lastName, phoneNumber, sessionMinutes, csvName,location,gender } =
+      data2;
 
     const emailField = email?.label;
     const firstNameField = firstName?.label;
@@ -117,7 +104,28 @@ const UploadCsvModal = ({ setModal, update }) => {
     const mergeDataByEmail = (data) => {
       const mergedData = {};
 
-      if (!update) {
+    if(!update) { 
+      data.forEach((item) => {
+        const email = item[emailField];
+        if (!mergedData[email]) {
+          mergedData[email] = {
+            email: item[emailField],
+            firstName: item[firstNameField],
+            lastName: item[lastNameField],
+            phone: item[phoneNumberField],
+            location: item[locationField],
+            gender:item[genderField],
+            totalTimeInSession: parseInt(item[sessionMinutesField], 10) || 0,
+            actualWebinarDate: date,
+          };
+        } else {
+          const existing = mergedData[email];
+          existing.totalTimeInSession +=
+            parseInt(item[sessionMinutesField], 10) || 0;
+        }
+      });
+    }
+      else{
         data.forEach((item) => {
           const email = item[emailField];
           if (!mergedData[email]) {
@@ -127,27 +135,7 @@ const UploadCsvModal = ({ setModal, update }) => {
               lastName: item[lastNameField],
               phone: item[phoneNumberField],
               location: item[locationField],
-              gender: item[genderField],
-              totalTimeInSession: parseInt(item[sessionMinutesField], 10) || 0,
-              actualWebinarDate: date,
-            };
-          } else {
-            const existing = mergedData[email];
-            existing.totalTimeInSession +=
-              parseInt(item[sessionMinutesField], 10) || 0;
-          }
-        });
-      } else {
-        data.forEach((item) => {
-          const email = item[emailField];
-          if (!mergedData[email]) {
-            mergedData[email] = {
-              email: item[emailField],
-              firstName: item[firstNameField],
-              lastName: item[lastNameField],
-              phone: item[phoneNumberField],
-              location: item[locationField],
-              gender: item[genderField],
+            gender:item[genderField],
               totalTimeInSession: parseInt(item[sessionMinutesField], 10) || 0,
             };
           } else {
@@ -159,38 +147,40 @@ const UploadCsvModal = ({ setModal, update }) => {
       }
       console.log(mergedData);
 
-      if (!update) {
-        return Object.values(mergedData).map((item) => ({
+      if(!update) {
+return  Object.values(mergedData).map((item) => ({
+        email: item.email,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        phone: item.phone,
+        timeInSession: item.totalTimeInSession,
+        location : item.location,
+        gender: item.gender,
+        date: date,
+        csvName: csvName,
+      }));}
+      
+      else {
+return   Object.values(mergedData).map((item) => ({
           email: item.email,
           firstName: item.firstName,
           lastName: item.lastName,
           phone: item.phone,
-          timeInSession: item.totalTimeInSession,
-          location: item.location,
-          gender: item.gender,
-          date: date,
-          csvName: csvName,
-        }));
-      } else {
-        return Object.values(mergedData).map((item) => ({
-          email: item.email,
-          firstName: item.firstName,
-          lastName: item.lastName,
-          phone: item.phone,
-          location: item.location,
+          location : item.location,
           gender: item.gender,
           timeInSession: item.totalTimeInSession,
+      
         }));
-      }
+       }
     };
 
     const mergedResult = mergeDataByEmail(meetingData);
     console.log(mergedResult);
-    setMeetingData(mergedResult);
-    // if (!update) {
-    //   dispatch(addWebinarContacts(mergedResult));
-    // } else {
-    //   dispatch(updateAttendeeDetails({ csvId: update, data: mergedResult }));
+    // setMeetingData(mergedResult);
+    // if(!update)
+    // {dispatch(addWebinarContacts(mergedResult));}
+    // else {
+    //   dispatch(updateAttendeeDetails({csvId:update,data:mergedResult}))
     // }
     // setModal(false);
   };
@@ -200,7 +190,7 @@ const UploadCsvModal = ({ setModal, update }) => {
       className="fixed top-0 left-0 z-[9999] flex h-screen w-screen items-center justify-center bg-slate-300/20 backdrop-blur-sm"
       aria-labelledby="header-3a content-3a"
       aria-modal="true"
-      tabindex="-1"
+      tabIndex="-1"
       role="dialog"
     >
       {/*    <!-- Modal --> */}
@@ -211,83 +201,44 @@ const UploadCsvModal = ({ setModal, update }) => {
       >
         <div className="flex flex-col justify-center gap-5">
           {!mapUI && (
-            <div className="px-8 space-y-5">
-              {!showFileUpload && (
-                <>
-                  <p className="text-sm font-medium text-red-500">
+            <>
+              {" "}
+              <div className="max-w-md ml-8 px-8 h-40 rounded-lg border-2 border-dashed flex items-center justify-center">
+                <label
+                  htmlFor="file"
+                  className="cursor-pointer text-center p-4 md:p-8"
+                >
+                  <svg
+                    className="w-10 h-10 mx-auto"
+                    viewBox="0 0 41 40"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12.1667 26.6667C8.48477 26.6667 5.5 23.6819 5.5 20C5.5 16.8216 7.72428 14.1627 10.7012 13.4949C10.5695 12.9066 10.5 12.2947 10.5 11.6667C10.5 7.0643 14.231 3.33334 18.8333 3.33334C22.8655 3.33334 26.2288 6.19709 27.0003 10.0016C27.0556 10.0006 27.1111 10 27.1667 10C31.769 10 35.5 13.731 35.5 18.3333C35.5 22.3649 32.6371 25.7279 28.8333 26.5M25.5 21.6667L20.5 16.6667M20.5 16.6667L15.5 21.6667M20.5 16.6667L20.5 36.6667"
+                      stroke="#4F46E5"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <p className="mt-3 text-gray-700 max-w-xs mx-auto">
                     {" "}
-                    Note : For zoom downloaded csv it starts with 14th line{" "}
+                    <span className="font-medium text-indigo-600">
+                      Select a xlsx file
+                    </span>{" "}
+                    or drag and drop a xlsx file here
                   </p>
-                  <div className="flex justify-center items-center gap-3  ">
-                    <label className="font-medium text-sm">
-                      Header Row Starts with :
-                    </label>
-                    <input
-                      type="number"
-                      className="w-full mt-1 px-3 py-2 text-gray-500 border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
-                      placeholder="Type the line number"
-                      onChange={(e) => {
-                        setFilterRow(e.target.value);
-                      }}
-                      required={true}
-                    />
-                    <button
-                      className="bg-blue-700 hover:bg-blue-800 text-white py-2 px-4 rounded-md text-center"
-                      onClick={handleNextClick}
-                    >
-                      Next{" "}
-                    </button>
-                  </div>
-                  <div>
-                    {errorMessage && (
-                      <span className="text-white bg-red-500 rounded-lg px-2 py-1 text-sm">
-                        {errorMessage}
-                      </span>
-                    )}
-                  </div>{" "}
-                </>
-              )}
-              {showFileUpload && (
-                <>
-                  {" "}
-                  <div className="max-w-md h-40 rounded-lg border-2 border-dashed flex items-center justify-center">
-                    <label
-                      htmlFor="file"
-                      className="cursor-pointer text-center p-4 md:p-8"
-                    >
-                      <svg
-                        className="w-10 h-10 mx-auto"
-                        viewBox="0 0 41 40"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M12.1667 26.6667C8.48477 26.6667 5.5 23.6819 5.5 20C5.5 16.8216 7.72428 14.1627 10.7012 13.4949C10.5695 12.9066 10.5 12.2947 10.5 11.6667C10.5 7.0643 14.231 3.33334 18.8333 3.33334C22.8655 3.33334 26.2288 6.19709 27.0003 10.0016C27.0556 10.0006 27.1111 10 27.1667 10C31.769 10 35.5 13.731 35.5 18.3333C35.5 22.3649 32.6371 25.7279 28.8333 26.5M25.5 21.6667L20.5 16.6667M20.5 16.6667L15.5 21.6667M20.5 16.6667L20.5 36.6667"
-                          stroke="#4F46E5"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        />
-                      </svg>
-                      <p className="mt-3 text-gray-700 max-w-xs mx-auto">
-                        {" "}
-                        <span className="font-medium text-indigo-600">
-                          Select a csv file
-                        </span>{" "}
-                        or drag and drop a csv file here
-                      </p>
-                    </label>
-                    <input
-                      id="file"
-                      accept=".csv"
-                      type="file"
-                      className="hidden"
-                      onChange={handleFileUpload}
-                    />
-                  </div>
-                </>
-              )}
-            </div>
+                </label>
+                <input
+                  id="file"
+                  accept=".xlsx"
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileUpload}
+                />
+              </div>
+            </>
           )}
 
           {mapUI && (
@@ -302,7 +253,7 @@ const UploadCsvModal = ({ setModal, update }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
+                  <tr>
                       <td className="px-6 ">Email</td>
                       <td className="px-6 pb-2 ">
                         {" "}
@@ -336,50 +287,49 @@ const UploadCsvModal = ({ setModal, update }) => {
                         )}{" "}
                       </td>
                     </tr>
-                    {!update && (
-                      <>
-                        <tr>
-                          <td className="px-6 ">Actual Webinar Date</td>
-                          <td className="px-6 py-2 ">
-                            <input
-                              type="date"
-                              className="border rounded-[4px] border-gray-300 w-full px-2 outline-none py-[4px]"
-                              onChange={(e) => {
-                                setDate(e.target.value);
-                              }}
-                            />
-                          </td>
-                          <td className="px-6 pb-2">
-                            <span className="bg-slate-100 rounded-lg p-1">
-                              {date}
-                            </span>
-                            {dateErrorMessage && (
-                              <span className=" bg-slate-100 p-1 rounded-lg text-sm font-medium text-red-500">
-                                {dateErrorMessage}
-                              </span>
-                            )}{" "}
-                          </td>
-                        </tr>
-                        <tr className="">
-                          <td className="px-6 ">Webinar Name</td>
-                          <td className="px-6 py-2 ">
-                            <input
-                              {...register("csvName", { required: true })}
-                              type="text"
-                              className="border rounded-[4px] border-gray-300 w-full px-2 outline-none py-[4px]"
-                            />
-                          </td>
-                          <td className="px-6 pb-2">
-                            {" "}
-                            {errors.csvName && (
-                              <span className=" bg-slate-100 p-1  rounded-lg text-sm font-medium text-red-500">
-                                Webinar Name is required
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      </>
-                    )}
+                    {  !update &&      
+        <>  
+                    <tr>
+                      <td className="px-6 ">Actual Webinar Date</td>
+                      <td className="px-6 py-2 ">
+                        <input
+                          type="date"
+                          className="border rounded-[4px] border-gray-300 w-full px-2 outline-none py-[4px]"
+                          onChange={(e) => {
+                            setDate(e.target.value);
+                          }}
+                        />
+                      </td>
+                      <td className="px-6 pb-2">
+                        <span className="bg-slate-100 rounded-lg p-1">
+                          {date}
+                        </span>
+                        {dateErrorMessage && (
+                          <span className=" bg-slate-100 p-1 rounded-lg text-sm font-medium text-red-500">
+                            {dateErrorMessage}
+                          </span>
+                        )}{" "}
+                      </td>
+                    </tr>
+                    <tr className="">
+                      <td className="px-6 ">Webinar Name</td>
+                      <td className="px-6 py-2 ">
+                        <input
+                          {...register("csvName", { required: true })}
+                          type="text"
+                          className="border rounded-[4px] border-gray-300 w-full px-2 outline-none py-[4px]"
+                        />
+                      </td>
+                      <td className="px-6 pb-2">
+                        {" "}
+                        {errors.csvName && (
+                          <span className=" bg-slate-100 p-1  rounded-lg text-sm font-medium text-red-500">
+                            Webinar Name is required
+                          </span>
+                        )}
+                      </td>
+                    </tr></>
+                    }
                     <tr className="">
                       <td className="px-6 ">First Name</td>
                       <td className="px-6 pb-2 ">
@@ -436,7 +386,7 @@ const UploadCsvModal = ({ setModal, update }) => {
                         </span>
                       </td>
                     </tr>
-
+                 
                     <tr>
                       <td className="px-6 ">Phone Number</td>
                       <td className="px-6 pb-2 ">
@@ -499,6 +449,9 @@ const UploadCsvModal = ({ setModal, update }) => {
                         </span>
                       </td>
                     </tr>
+
+           
+                 
 
                     <tr>
                       <td className="px-6 ">Location</td>
@@ -602,4 +555,4 @@ const UploadCsvModal = ({ setModal, update }) => {
   );
 };
 
-export default UploadCsvModal;
+export default UploadXslxModal;

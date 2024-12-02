@@ -40,7 +40,7 @@ export const formatDateAsNumber = (dateStr) => {
   const day = String(date.getDate()).padStart(2, "0");
   const year = date.getFullYear();
 
-  return `${month}/${day}/${year}`;
+  return `${day}/${month}/${year}`;
 };
 
 export const errorToast = (message) => {
@@ -56,6 +56,28 @@ export const errorToast = (message) => {
   }
 
   toast.error(errorMessage, {
+    position: "top-center",
+    hideProgressBar: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "light",
+  });
+};
+
+
+export const successToast = (message) => {
+  let successMessage = "";
+  successMessage = typeof message === "string" ? successMessage : "Successful";
+
+  // if (
+  //   Array.isArray(message) &&
+  //   message.length > 0 &&
+  //   typeof message[0] === "string"
+  // ) {
+  //   errorMessage = message[0];
+  // }
+
+  toast.success(successMessage, {
     position: "top-center",
     hideProgressBar: true,
     pauseOnHover: true,

@@ -5,7 +5,7 @@ export const exportClientExcel = createAsyncThunk(
   "client/exportExcel",
   async ({ limit = 100, columns = "" }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`export-excel`, {
+      const response = await instance.get(`export-excel/client`, {
         params: { limit, columns },
         responseType: 'blob', // Ensure you get the file as a binary Blob
       });
