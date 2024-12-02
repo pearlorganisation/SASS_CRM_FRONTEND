@@ -13,6 +13,7 @@ import {
   Button,
 } from "@mui/material";
 import { ClipLoader } from "react-spinners";
+import { clearSuccess } from "../../features/slices/employee";
 
 const CreateEmployee = () => {
   const {
@@ -63,6 +64,7 @@ const CreateEmployee = () => {
     if (isSuccess) {
       navigate("/employees");
     }
+    return () => dispatch(clearSuccess());
   }, [isSuccess]);
 
   // Numeric validation (positive values only)
@@ -111,8 +113,8 @@ const CreateEmployee = () => {
                         <MenuItem value="" disabled>
                           Choose Employee Type
                         </MenuItem>
-                        <MenuItem value="Sales Employee">Sales</MenuItem>
-                        <MenuItem value="Reminder Employee">Reminder</MenuItem>
+                        <MenuItem value="EMPLOYEE_SALES">Sales</MenuItem>
+                        <MenuItem value="EMPLOYEE_REMINDER">Reminder</MenuItem>
                       </Select>
                     )}
                   />
