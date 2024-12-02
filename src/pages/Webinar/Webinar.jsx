@@ -102,9 +102,9 @@ const MeetingDetails = () => {
     logUserActivity({
       action: "navigate",
       navigateType: "page",
-      detailItem: `/attendees/${id}`,
+      detailItem: `/webinarDetails/${id}`,
     });
-    navigate(`/attendees/${id}`);
+    navigate(`/webinarDetails/${id}`);
   };
 
   return (
