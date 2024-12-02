@@ -10,7 +10,7 @@ const WebinarAttendees = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  const [tabValue, setTabValue] = useState("sales");
+  const [tabValue, setTabValue] = useState("reminder");
   const [showModal, setShowModal] = useState(false);
 
   // Tabs change handler
@@ -29,8 +29,9 @@ const WebinarAttendees = () => {
         textColor="primary"
         indicatorColor="primary"
       >
-        <Tab label="Sales" value="sales" className="text-gray-600" />
         <Tab label="Reminder" value="reminder" className="text-gray-600" />
+        <Tab label="Sales" value="sales" className="text-gray-600" />
+        <Tab label="Enrollments" value="enrollments" className="text-gray-600" />
       </Tabs>
 
       <div className="flex gap-4 justify-end">

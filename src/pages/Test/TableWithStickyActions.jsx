@@ -95,7 +95,7 @@ const TableWithStickyActions = () => {
                   className="sticky right-0 bg-white z-10"
                   sx={tableCellStyles}
                 >
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 ">
                     <IconButton onClick={() => handleView(row.id)}>
                       <VisibilityIcon className="text-gray-600" />
                     </IconButton>

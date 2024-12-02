@@ -39,25 +39,37 @@ const UploadXslxModal = ({ setModal,update }) => {
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-        // Transform jsonData into array of objects
-        const headers = jsonData[0]; // First array is the headers
-        const formattedData = jsonData.slice(1).map((row) => {
-          const obj = {};
-          headers.forEach((header, index) => {
-            obj[header] = row[index];
+  
+        // Specify the row to start processing data from
+        const filterRow = 14; // Example: Start processing from the 12th row (index 11)
+  
+        if (jsonData.length >= filterRow) {
+          // Take the row at index (filterRow - 1) as the header
+          const headers = jsonData[filterRow - 1];
+          // Extract data starting from the row after the header
+          const formattedData = jsonData.slice(filterRow).map((row) => {
+            const obj = {};
+            headers.forEach((header, index) => {
+              obj[header] = row[index];
+            });
+            return obj;
           });
-          return obj;
-        });
-
-        setMeetingData(formattedData);
-        console.log("uploaded");
+  
+          setMeetingData(formattedData);
+          console.log("uploaded");
+        } else {
+          console.error("Not enough rows in the file to process.");
+          toast.error("Invalid file. Please upload a file with sufficient rows.", {
+            position: "top-center",
+          });
+        }
       };
       reader.readAsBinaryString(file); // Use readAsBinaryString to handle the deprecated warning
       setMapUI(true);
       toast.success("File Uploaded Successfully", { position: "top-center" });
     }
   };
+  
   const generateOptions = (data) => {
     if (data.length > 0) {
       const keys = Object.keys(data[0]);
@@ -76,8 +88,6 @@ const UploadXslxModal = ({ setModal,update }) => {
       setDateErrorMessage("");
     }
   };
-
-  console.log(meetingData);
   const onSubmit = (data2) => {
     console.log(data2);
     const { email, firstName, lastName, phoneNumber, sessionMinutes, csvName,location,gender } =
@@ -166,13 +176,13 @@ return   Object.values(mergedData).map((item) => ({
 
     const mergedResult = mergeDataByEmail(meetingData);
     console.log(mergedResult);
-    setMeetingData(mergedResult);
-    if(!update)
-    {dispatch(addWebinarContacts(mergedResult));}
-    else {
-      dispatch(updateAttendeeDetails({csvId:update,data:mergedResult}))
-    }
-    setModal(false);
+    // setMeetingData(mergedResult);
+    // if(!update)
+    // {dispatch(addWebinarContacts(mergedResult));}
+    // else {
+    //   dispatch(updateAttendeeDetails({csvId:update,data:mergedResult}))
+    // }
+    // setModal(false);
   };
 
   return (
@@ -180,7 +190,7 @@ return   Object.values(mergedData).map((item) => ({
       className="fixed top-0 left-0 z-[9999] flex h-screen w-screen items-center justify-center bg-slate-300/20 backdrop-blur-sm"
       aria-labelledby="header-3a content-3a"
       aria-modal="true"
-      tabindex="-1"
+      tabIndex="-1"
       role="dialog"
     >
       {/*    <!-- Modal --> */}

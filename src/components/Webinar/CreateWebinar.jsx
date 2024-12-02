@@ -1,9 +1,23 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+} from "@mui/material";
 import { TextField, Button } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { closeModal } from "../../features/slices/modalSlice";
+import { createWebinar, updateWebinar } from "../../features/actions/webinarContact";
+import { ClipLoader } from "react-spinners";
 
-const CreateWebinar = ({ isOpen, onClose, onSubmit, webinarData, clearData }) => {
+const CreateWebinar = ({ modalName }) => {
+  const dispatch = useDispatch();
+  const { isLoading, isSuccess } = useSelector((state) => state.webinarContact);
+  const { modals, modalData } = useSelector((state) => state.modals);
+  const open = modals[modalName] ? true : false;
+
   const {
     register,
     handleSubmit,
@@ -12,10 +26,19 @@ const CreateWebinar = ({ isOpen, onClose, onSubmit, webinarData, clearData }) =>
   } = useForm();
 
   useEffect(() => {
-    if (webinarData) {
+    if (isSuccess) {
+      handleClose();
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    console.log("modalData  ---->", modalData);
+    if (modalData) {
       reset({
-        webinarName: webinarData.name,
-        webinarDate: webinarData.date,
+        webinarName: modalData?.webinarName,
+        webinarDate: modalData?.webinarDate?.includes("T")
+          ? modalData.webinarDate.split("T")[0]
+          : modalData.webinarDate,
       });
     } else {
       reset({
@@ -23,27 +46,27 @@ const CreateWebinar = ({ isOpen, onClose, onSubmit, webinarData, clearData }) =>
         webinarDate: "",
       });
     }
-  }, [webinarData, reset]);
+  }, [modalData]);
 
   const submitForm = (data) => {
-    onSubmit(data);
-    handleClose();
+    if(modalData) {
+      dispatch(updateWebinar({id: modalData?._id, data}));
+      return;
+    }
+    dispatch(createWebinar(data));
   };
 
   const handleClose = () => {
-    onClose();
+    dispatch(closeModal(modalName));
     reset({
       webinarName: "",
       webinarDate: "",
     });
-    clearData();
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle>
-        {webinarData ? "Edit Webinar" : "Create Webinar"}
-      </DialogTitle>
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+      <DialogTitle>{modalData ? "Edit Webinar" : "Create Webinar"}</DialogTitle>
       <form onSubmit={handleSubmit(submitForm)}>
         <DialogContent>
           <div className="space-y-4">
@@ -80,8 +103,19 @@ const CreateWebinar = ({ isOpen, onClose, onSubmit, webinarData, clearData }) =>
           <Button onClick={handleClose} variant="outlined" color="secondary">
             Cancel
           </Button>
-          <Button type="submit" variant="contained" color="primary">
-            {webinarData ? "Update Webinar" : "Create Webinar"}
+          <Button
+            disabled={isLoading}
+            type="submit"
+            variant="contained"
+            color="primary"
+          >
+            {isLoading ? (
+              <ClipLoader color="#fff" className="mx-14 my-[2px]" size={20} />
+            ) : modalData ? (
+              "Update Webinar"
+            ) : (
+              "Create Webinar"
+            )}
           </Button>
         </DialogActions>
       </form>

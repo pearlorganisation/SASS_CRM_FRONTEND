@@ -1,7 +1,5 @@
 import { Button, Skeleton, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import UploadCsvModal from "./UploadCsvModal";
-import { createPortal } from "react-dom";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -9,27 +7,26 @@ import {
   getAllWebinars,
 } from "../../features/actions/webinarContact";
 import Delete from "../../components/Webinar/delete";
-import UploadXslxModal from "./UploadXslxModal";
 import Pagination from "@mui/material/Pagination";
-import UpdateCsvXslxModal from "./UpdateCsvXslxModal";
 import CreateWebinar from "../../components/Webinar/CreateWebinar";
 import Tooltip from "@mui/material/Tooltip";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useAddUserActivity from "../../hooks/useAddUserActivity ";
+import { openModal } from "../../features/slices/modalSlice";
+import { formatDateAsNumber } from "../../utils/extra";
 
 const MeetingDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const logUserActivity = useAddUserActivity();
 
-  const { isLoading, isDeleted, webinarData, totalPages } = useSelector(
+  const { isLoading, isSuccess, webinarData, totalPages } = useSelector(
     (state) => state.webinarContact
   );
-
-  const [showModal, setShowModal] = useState(false);
-  const [showXslxModal, setShowXslxModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  
+  const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
+  const [page, setPage] = useState(searchParams.get("page") || 1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [id, setId] = useState();
   const [webinarName, setWebinarName] = useState(null);
@@ -46,57 +43,15 @@ const MeetingDetails = () => {
     setId("");
   };
 
-  const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
-  const [page, setPage] = useState(searchParams.get("page") || 1);
-  const [editWebinarData, setEditWebinarData] = useState(null);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const dummyWebinars = [
-    {
-      _id: 1,
-      name: "React Basics Webinar",
-      date: "2024-12-01",
-      totalParticipants: 50,
-    },
-    {
-      _id: 2,
-      name: "Advanced JavaScript Techniques",
-      date: "2024-12-10",
-      totalParticipants: 75,
-    },
-    {
-      _id: 3,
-      name: "UI/UX Design Principles",
-      date: "2024-12-15",
-      totalParticipants: 40,
-    },
-    {
-      _id: 4,
-      name: "Tailwind CSS Crash Course",
-      date: "2024-12-20",
-      totalParticipants: 60,
-    },
-  ];
-
   const handlePagination = (e, p) => {
     setPage(p);
     setSearchParams({ page: p });
   };
 
-  // useEffect(() => {
-  //   dispatch(getAllWebinars(page));
-  // }, [page]);
-
   useEffect(() => {
-    if (webinarData?.status) {
-      dispatch(getAllWebinars(page));
-    }
-  }, [webinarData, page]);
-
-  useEffect(() => {
-    if (isDeleted) {
-      dispatch(getAllWebinars(page));
-    }
-  }, [isDeleted, page]);
+    console.log("soemtsdf");
+    dispatch(getAllWebinars({ page, limit: 10 }));
+  }, [page]);
 
   const handleRowClick = (id) => {
     logUserActivity({
@@ -107,6 +62,13 @@ const MeetingDetails = () => {
     navigate(`/webinarDetails/${id}`);
   };
 
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(getAllWebinars({ page: 1, limit: 10 }));
+    }
+  }, [isSuccess]);
+
+  const createWebinarModalName = "createWebinarModal";
   return (
     <>
       <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-10">
@@ -121,7 +83,7 @@ const MeetingDetails = () => {
           </div>
           <div className="mt-3 md:mt-0 space-x-5">
             <Button
-              onClick={() => setIsCreateModalOpen(true)}
+              onClick={() => dispatch(openModal(createWebinarModalName))}
               variant="contained"
               color="primary"
               className="cursor-pointer inline-block px-4 py-2 duration-150 font-medium rounded-lg md:text-sm"
@@ -140,18 +102,6 @@ const MeetingDetails = () => {
             >
               Create Webinar
             </Button>
-            {/* <a
-              onClick={handleXslxModal}
-              className="cursor-pointer inline-block px-4 py-2 text-white duration-150 font-medium bg-indigo-600 rounded-lg hover:bg-indigo-700 active:bg-indigo-700 md:text-sm"
-            >
-              Upload XSLX File
-            </a>
-            <a
-              onClick={handleModal}
-              className="cursor-pointer inline-block px-4 py-2 text-white duration-150 font-medium bg-indigo-600 rounded-lg hover:bg-indigo-700 active:bg-indigo-700 md:text-sm"
-            >
-              Upload CSV File
-            </a> */}
           </div>
         </div>
         <div className="mt-5 shadow-lg rounded-lg overflow-x-auto">
@@ -175,9 +125,9 @@ const MeetingDetails = () => {
                 </tr>
               </thead>
               <tbody className="text-gray-600 divide-y">
-                {Array.isArray(dummyWebinars) &&
-                  dummyWebinars.length > 0 &&
-                  dummyWebinars?.map((item, idx) => {
+                {Array.isArray(webinarData) &&
+                  webinarData.length > 0 &&
+                  webinarData.map((item, idx) => {
                     const serialNumber = (page - 1) * 8 + idx + 1;
                     return (
                       <tr
@@ -189,23 +139,14 @@ const MeetingDetails = () => {
                           {serialNumber}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {item?.name}
+                          {item?.webinarName}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {item?.date || "N/A"}
+                          {formatDateAsNumber(item?.webinarDate)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {item?.totalParticipants}
+                          {item?.totalParticipants || 0}
                         </td>
-
-                        {showUpdateModal &&
-                          createPortal(
-                            <UpdateCsvXslxModal
-                              setModal={setShowUpdateModal}
-                              csvId={item?._id}
-                            />,
-                            document.body
-                          )}
 
                         <td
                           className="px-3 whitespace-nowrap flex gap-2"
@@ -214,10 +155,14 @@ const MeetingDetails = () => {
                           {/* Update Details */}
                           <Tooltip title="Update Details" arrow>
                             <button
-                              onClick={() => {
-                                setEditWebinarData(item);
-                                setIsCreateModalOpen(true);
-                              }}
+                              onClick={() =>
+                                dispatch(
+                                  openModal({
+                                    modalName: createWebinarModalName,
+                                    data: item,
+                                  })
+                                )
+                              }
                               className="p-2 rounded-lg text-[#006A67] hover:text-[#1b3d3c] duration-150 hover:bg-gray-50"
                             >
                               <EditIcon />
@@ -252,13 +197,6 @@ const MeetingDetails = () => {
           onChange={handlePagination}
         />
       </div>
-      {showModal &&
-        createPortal(<UploadCsvModal setModal={setShowModal} />, document.body)}
-      {showXslxModal &&
-        createPortal(
-          <UploadXslxModal setModal={setShowXslxModal} />,
-          document.body
-        )}
 
       {showDeleteModal && (
         <Delete
@@ -269,14 +207,7 @@ const MeetingDetails = () => {
       )}
 
       <CreateWebinar
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onSubmit={(data) => console.log(data)}
-        webinarData={editWebinarData}
-        clearData={() => {
-          console.log("clearing data");
-          setEditWebinarData(null);
-        }}
+        modalName={createWebinarModalName}
       />
     </>
   );

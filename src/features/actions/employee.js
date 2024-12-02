@@ -3,10 +3,10 @@ import { instance } from "../../services/axiosInterceptor";
 
 //add employee
 export const addEmployee = createAsyncThunk(
-  "addEmployee",
+  "employee/create",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.post(`auth/createEmployee`, payload);
+      const response = await instance.post(`auth/employee`, payload);
       return response;
     } catch (e) {
       return rejectWithValue(e);
@@ -16,12 +16,12 @@ export const addEmployee = createAsyncThunk(
 
 // get employee data
 export const getAllEmployees = createAsyncThunk(
-  "getAllEmployees",
-  async (id, { rejectWithValue }) => {
+  "employees/fetchData",
+  async (_, { rejectWithValue }) => {
     try {
-      const { data } = await instance.get(`/employee?adminId=${id}`);
+      const { data } = await instance.get(`users/employees`);
 
-      return data?.data;
+      return data;
     } catch (e) {
       return rejectWithValue(e);
     }

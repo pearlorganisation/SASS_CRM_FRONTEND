@@ -11,10 +11,11 @@ import {
   changeEmployeeStatus,
   getEmployeeStats,
 } from "../actions/employee";
-import { errorToast } from "../../utils/extra";
+import { errorToast, successToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
+  isSuccess: false,
   employeeData: [],
   totalPages: null,
   errorMessage: "",
@@ -33,15 +34,14 @@ export const employeeSlice = createSlice({
 
       .addCase(addEmployee.pending, (state, action) => {
         state.isLoading = true;
+        state.isSuccess = false;
         state.errorMessage = "";
       })
       .addCase(addEmployee.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.employeeData = action.payload.data;
-        toast.success("Employee Added Successfully", {
-          position: "top-center",
-        });
+        state.isSuccess = true;
+        successToast("Employee Added Successfully");
       })
       .addCase(addEmployee.rejected, (state, action) => {
         state.isLoading = false;
