@@ -14,23 +14,23 @@ import { ClipLoader } from "react-spinners";
 
 const ExportClientExcelModal = ({ modalName }) => {
   const defaultColumns = [
-    { header: "Email", key: "email", width: 50 },
-    { header: "Company Name", key: "companyName", width: 30 },
-    { header: "User Name", key: "userName", width: 20 },
-    { header: "Phone", key: "phone", width: 15 },
-    { header: "Is Active", key: "isActive", width: 10 },
-    { header: "Plan Name", key: "planName", width: 20 },
-    { header: "Plan Start Date", key: "planStartDate", width: 20 },
-    { header: "Plan Expiry", key: "planExpiry", width: 20 },
-    { header: "Contacts Limit", key: "contactsLimit", width: 15 },
-    { header: "Total Employees", key: "totalEmployees", width: 15 },
-    { header: "Employee Sales Count", key: "employeeSalesCount", width: 15 },
+    { header: "Email", key: "email", },
+    { header: "Company Name", key: "companyName", },
+    { header: "User Name", key: "userName", },
+    { header: "Phone", key: "phone", },
+    { header: "Is Active", key: "isActive", },
+    { header: "Plan Name", key: "planName", },
+    { header: "Plan Start Date", key: "planStartDate", },
+    { header: "Plan Expiry", key: "planExpiry", },
+    { header: "Contacts Limit", key: "contactsLimit", },
+    { header: "Total Employees", key: "totalEmployees", },
+    { header: "Employee Sales Count", key: "employeeSalesCount", },
     {
       header: "Employee Reminder Count",
       key: "employeeReminderCount",
-      width: 15,
+
     },
-    { header: "Contacts Count", key: "contactsCount", width: 15 },
+    { header: "Contacts Count", key: "contactsCount", },
   ];
   const dispatch = useDispatch();
 
@@ -119,9 +119,9 @@ const ExportClientExcelModal = ({ modalName }) => {
           <Button variant="contained" color="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button 
-          disabled={isLoading}
-          variant="contained" color="primary" onClick={handleSubmit}>
+          <Button
+            disabled={isLoading}
+            variant="contained" color="primary" onClick={handleSubmit}>
             {isLoading ? <ClipLoader className="mx-8" color="#fff" size={20} /> : "Download"}
           </Button>
         </div>
