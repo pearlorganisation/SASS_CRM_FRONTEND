@@ -18,7 +18,7 @@ export const shouldRetryRequest = (originalRequest, url) => {
   if (retryTracker.get(url) > MAX_RETRY_ATTEMPTS) {
     retryTracker.delete(url);
     console.error(`Max retry attempts reached for ${url}`);
-    errorToast("Token refresh failed. Please log in again.");
+    // errorToast("Token refresh failed. Please log in again.");
     return false;
   }
   return true;

@@ -15,6 +15,7 @@ import {
   updateAttendeeLeadType,
   createWebinar,
   updateWebinar,
+  deleteWebinar,
 } from "../actions/webinarContact";
 import { errorToast, successToast } from "../../utils/extra";
 
@@ -162,6 +163,18 @@ export const webinarContactSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.isDeleted = false;
+        errorToast(action?.payload);
+      })
+      .addCase(deleteWebinar.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(deleteWebinar.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+      })
+      .addCase(deleteWebinar.rejected, (state, action) => {
+        state.isLoading = false;
         errorToast(action?.payload);
       })
       .addCase(getAllAssignments.pending, (state, action) => {

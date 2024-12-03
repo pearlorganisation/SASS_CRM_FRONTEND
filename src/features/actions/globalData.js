@@ -114,3 +114,15 @@ export const getDashboardRevenueData = createAsyncThunk(
     }
   }
 );
+
+export const getAllRoles = createAsyncThunk(
+  "roles/fetchData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`/roles`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

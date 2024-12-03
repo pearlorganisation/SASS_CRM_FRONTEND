@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { addEmployee } from "../../features/actions/employee";
-import { useNavigate } from "react-router-dom";
+import {
+  addEmployee,
+  getEmployee,
+  updateEmployee,
+} from "../../features/actions/employee";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   FormControl,
   InputLabel,
@@ -14,12 +18,18 @@ import {
 } from "@mui/material";
 import { ClipLoader } from "react-spinners";
 import { clearSuccess } from "../../features/slices/employee";
+import ComponentGuard from "../../components/AccessControl/ComponentGuard";
+import { getRoleNameByID } from "../../utils/roles";
 
 const CreateEmployee = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { id } = useParams();
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
     control,
   } = useForm({
@@ -28,11 +38,9 @@ const CreateEmployee = () => {
     },
   });
   const { userData } = useSelector((state) => state.auth);
-  const { employeeData, isLoading, isSuccess } = useSelector(
+  const { isLoading, isSuccess, singleEmployeeData } = useSelector(
     (state) => state.employee
   );
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const onSubmit = (data) => {
     console.log(userData);
@@ -47,7 +55,11 @@ const CreateEmployee = () => {
       adminId: userData?._id,
     };
     console.log(newData);
-    dispatch(addEmployee(newData));
+    if (id) {
+      dispatch(updateEmployee({ id, data: newData }));
+    } else {
+      dispatch(addEmployee(newData));
+    }
   };
 
   const [isPasswordHidden, setPasswordHidden] = useState(true);
@@ -72,13 +84,39 @@ const CreateEmployee = () => {
     return /^[0-9]+$/.test(value) || "Only positive numbers are allowed";
   };
 
+  useEffect(() => {
+    reset({});
+    if (singleEmployeeData && id) {
+      const roleName = getRoleNameByID(singleEmployeeData?.role)
+        .split(" ")
+        .join("_");
+      reset({
+        role: roleName,
+        userName: singleEmployeeData?.userName,
+        email: singleEmployeeData?.email,
+        phone: singleEmployeeData?.phone,
+        validCallTime: singleEmployeeData?.validCallTime,
+        dailyContactLimit: singleEmployeeData?.dailyContactLimit,
+      });
+    }
+  }, [singleEmployeeData]);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(getEmployee(id));
+    }
+    return () => {
+      reset();
+    };
+  }, [id]);
+
   return (
     <div className="p-10">
       <div className="mt-10">
         <div className="flex justify-center"></div>
         <div className="bg-white rounded-lg shadow-lg sm:rounded-lg sm:max-w-5xl mt-8 mx-auto">
           <h3 className="text-gray-700 text-base text-center bg-gray-100 font-medium sm:text-xl p-2 rounded-t-lg uppercase">
-            Add Employee
+            {id ? "Update" : "Add"} Employee
           </h3>
           <form
             className="space-y-6 mx-8 sm:mx-2 p-4 py-6"
@@ -159,44 +197,47 @@ const CreateEmployee = () => {
               </div>
             </div>
 
-            <div className="sm:grid sm:grid-cols-2 sm:gap-6">
-              {/* Password */}
-              <div className="w-full">
-                <TextField
-                  {...register("password", {
-                    required: "Password is required",
-                  })}
-                  label="Password"
-                  type="password"
-                  variant="outlined"
-                  fullWidth
-                  error={Boolean(errors.password)}
-                  helperText={errors.password?.message}
-                  className="mt-2"
-                />
-              </div>
+            {!id ? (
+              <div className="sm:grid sm:grid-cols-2 sm:gap-6">
+                {/* Password */}
+                <div className="w-full">
+                  <TextField
+                    {...register("password", {
+                      required: "Password is required",
+                    })}
+                    label="Password"
+                    type="password"
+                    variant="outlined"
+                    fullWidth
+                    error={Boolean(errors.password)}
+                    helperText={errors.password?.message}
+                    className="mt-2"
+                  />
+                </div>
 
-              {/* Confirm Password */}
-              <div className="w-full">
-                <TextField
-                  {...register("confirmPassword", {
-                    required: "Please confirm your password",
-                    validate: (value) =>
-                      value === watch("password") ||
-                      "The passwords do not match",
-                  })}
-                  id="hs-toggle-password"
-                  label="Confirm Password"
-                  type="password"
-                  variant="outlined"
-                  fullWidth
-                  error={Boolean(errors.confirmPassword)}
-                  helperText={errors.confirmPassword?.message}
-                  className="mt-2"
-                />
+                {/* Confirm Password */}
+                <div className="w-full">
+                  <TextField
+                    {...register("confirmPassword", {
+                      required: "Please confirm your password",
+                      validate: (value) =>
+                        value === watch("password") ||
+                        "The passwords do not match",
+                    })}
+                    id="hs-toggle-password"
+                    label="Confirm Password"
+                    type="password"
+                    variant="outlined"
+                    fullWidth
+                    error={Boolean(errors.confirmPassword)}
+                    helperText={errors.confirmPassword?.message}
+                    className="mt-2"
+                  />
+                </div>
               </div>
-            </div>
-
+            ) : (
+              <></>
+            )}
             <div className="sm:grid sm:grid-cols-2 sm:gap-6">
               {/* Valid Call Time (seconds) */}
               <div className="w-full">
@@ -242,7 +283,13 @@ const CreateEmployee = () => {
                 fullWidth
                 className="btn-grad"
               >
-                {isLoading ? <ClipLoader color="#fff" size={20} /> : "Create"}
+                {isLoading ? (
+                  <ClipLoader color="#fff" size={20} />
+                ) : id ? (
+                  "Update"
+                ) : (
+                  "Create"
+                )}
               </Button>
             </div>
           </form>

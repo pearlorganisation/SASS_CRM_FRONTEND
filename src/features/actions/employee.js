@@ -14,12 +14,38 @@ export const addEmployee = createAsyncThunk(
   }
 );
 
+//add employee
+export const updateEmployee = createAsyncThunk(
+  "employee/update",
+  async ({id,data}, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`users/employee/${id}`, data);
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 // get employee data
 export const getAllEmployees = createAsyncThunk(
   "employees/fetchData",
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await instance.get(`users/employees`);
+      const { data } = await instance.get(`users/employee`);
+
+      return data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const getEmployee = createAsyncThunk(
+  "employee/fetchData", 
+  async (id, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.get(`users/employee/${id}`);
 
       return data;
     } catch (e) {
@@ -47,7 +73,7 @@ export const getAllClients = createAsyncThunk(
   "clients/fetchData",
   async (params, { rejectWithValue }) => {
     try {
-      const { data } = await instance.get(`/users/clients`,{params});
+      const { data } = await instance.get(`/users/clients`, { params });
 
       return data;
     } catch (e) {

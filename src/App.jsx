@@ -38,11 +38,13 @@ import {
 } from "./pages";
 import { addUserActivity } from "./features/actions/userActivity";
 import RouteGuard from "./components/AccessControl/RouteGuard";
-import { clearLoadingAndData, logout } from "./features/slices/auth";
+import { getAllRoles } from "./features/actions/globalData";
 
 const App = () => {
   const dispatch = useDispatch();
 
+  const {roles} = useSelector(state => state.globalData);
+  console.log('roles ---- > ', roles)
   const { isUserLoggedIn } = useSelector((state) => state.auth);
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role || "";
@@ -51,6 +53,7 @@ const App = () => {
   }
 
   useEffect(() => {
+    dispatch(getAllRoles());
     if (isUserLoggedIn && role) {
       dispatch(
         addUserActivity({
@@ -104,7 +107,19 @@ const App = () => {
         },
         {
           path: "/employees",
-          element: <Employees />,
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <Employees />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/employee/edit/:id",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <CreateEmployee />
+            </RouteGuard>
+          ),
         },
         {
           path: "/employees/assignments/:id",

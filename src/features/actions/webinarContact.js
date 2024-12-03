@@ -89,6 +89,19 @@ export const updateWebinar = createAsyncThunk(
   }
 );
 
+//add webinar 
+export const deleteWebinar = createAsyncThunk(
+  "webinar/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await instance.delete(`/webinar/${id}`);
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 //add webinar contacts
 export const deleteWebinarContacts = createAsyncThunk(
   "deleteWebinarContacts",

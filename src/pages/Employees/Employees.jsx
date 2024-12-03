@@ -116,8 +116,8 @@ const Employees = () => {
                     <TableCell sx={tableCellStyles}>
                       {item?.isActive ? "Active" : "Inactive"}
                     </TableCell>
-                    <TableCell sx={tableCellStyles}>20 sec</TableCell>
-                    <TableCell sx={tableCellStyles}>100 Contacts</TableCell>
+                    <TableCell sx={tableCellStyles}>{item?.validCallTime || 0} sec</TableCell>
+                    <TableCell sx={tableCellStyles}>{item?.dailyContactLimit || 0} Contacts</TableCell>
                     <TableCell
                       sx={tableCellStyles}
                       className="sticky right-0 bg-white z-10"
@@ -125,20 +125,20 @@ const Employees = () => {
                       <div className="flex gap-2">
                         <Tooltip title="View Details">
                           <IconButton
-                            onClick={() =>
-                              navigate(`/employees/assignments/${item?._id}`)
-                            }
+                            // onClick={() =>
+                            //   navigate(`/employees/assignments/${item?._id}`)
+                            // }
                             sx={{ color: "blue" }} // Material-UI color styling
                           >
                             <Visibility className="text-blue-600" />{" "}
                             {/* Tailwind class */}
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Activity">
+                        <Tooltip title="Edit Employee Data">
                           <IconButton
                             onClick={() =>
                               navigate(
-                                `/employees/Activity/${item?._id}/${item?.userName}/${item?.role?.name}`
+                                `/employee/edit/${item?._id}`
                               )
                             }
                             sx={{ color: "green" }} // Material-UI color styling

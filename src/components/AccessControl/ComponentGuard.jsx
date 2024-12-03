@@ -7,6 +7,7 @@ const ComponentGuard = ({ allowedRoles=[], children, conditions=[] }) => {
   if(conditions.includes(false))
     return null;
   // Check if the user's role is in the allowedRoles array
+  if(allowedRoles.length === 0) return children
   return allowedRoles.includes(role) ? children : null;
 };
 

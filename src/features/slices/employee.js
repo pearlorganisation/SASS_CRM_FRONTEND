@@ -10,6 +10,8 @@ import {
   getEmployeeAssignments,
   changeEmployeeStatus,
   getEmployeeStats,
+  getEmployee,
+  updateEmployee,
 } from "../actions/employee";
 import { errorToast, successToast } from "../../utils/extra";
 
@@ -17,6 +19,7 @@ const initialState = {
   isLoading: false,
   isSuccess: false,
   employeeData: [],
+  singleEmployeeData: null,
   totalPages: null,
   errorMessage: "",
   employeeAssignments: [],
@@ -31,7 +34,7 @@ export const employeeSlice = createSlice({
   reducers: {
     clearSuccess(state) {
       state.isSuccess = false;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -52,6 +55,19 @@ export const employeeSlice = createSlice({
         state.errorMessage = action.payload;
         errorToast(action?.payload);
       })
+      .addCase(updateEmployee.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(updateEmployee.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        successToast("Employee Updated Successfully");
+      })
+      .addCase(updateEmployee.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
       .addCase(getAllEmployees.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
@@ -62,6 +78,20 @@ export const employeeSlice = createSlice({
         state.employeeData = action.payload;
       })
       .addCase(getAllEmployees.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        errorToast(action?.payload);
+      })
+      .addCase(getEmployee.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getEmployee.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.singleEmployeeData = action.payload;
+      })
+      .addCase(getEmployee.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
         errorToast(action?.payload);
@@ -114,7 +144,7 @@ export const employeeSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { clearSuccess} = employeeSlice.actions;
+export const { clearSuccess } = employeeSlice.actions;
 export default employeeSlice.reducer;
 
 // ================================================== THE END ==================================================

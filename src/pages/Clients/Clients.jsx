@@ -43,7 +43,6 @@ const Clients = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      console.log("issicces ---> called");
       dispatch(getAllClients({ page: page, limit: LIMIT }));
     }
   }, [isSuccess]);
@@ -61,12 +60,10 @@ const Clients = () => {
   };
 
   const handleEditClient = (client) => {
-    console.log(client);
     setUpdateData(client);
   };
 
   const handleToggleClientStatus = (client, status) => {
-    console.log(`Delete/Inactivate Client : ${client}- ${status}`);
     setActiveData(client);
   };
 

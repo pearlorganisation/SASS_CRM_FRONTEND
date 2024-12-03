@@ -7,6 +7,7 @@ import {
   createCustomOption,
   createGlobalData,
   deleteCustomOption,
+  getAllRoles,
   getCustomOptions,
   getDashboardCardsData,
   getDashboardPlansData,
@@ -27,6 +28,8 @@ const initialState = {
   plansGraphData: [],
   usersGraphData: [],
   revenueGraphData: [],
+  isRolesLoading: false,
+  roles: [],
 };
 
 // ---------------------------------------------------------------------------------------
@@ -173,6 +176,16 @@ export const globalDataSlice = createSlice({
       .addCase(getDashboardRevenueData.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
+      })
+      .addCase(getAllRoles.pending, (state, action) => {
+        state.isRolesLoading = true;
+      })
+      .addCase(getAllRoles.fulfilled, (state, action) => {
+        state.isRolesLoading = false;
+        state.roles = action.payload;
+      })
+      .addCase(getAllRoles.rejected, (state, action) => {
+        state.isRolesLoading = false;
       });
   },
 });

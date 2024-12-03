@@ -64,6 +64,7 @@ const MeetingDetails = () => {
 
   useEffect(() => {
     if (isSuccess) {
+      setShowDeleteModal(false)
       dispatch(getAllWebinars({ page: 1, limit: 10 }));
     }
   }, [isSuccess]);
@@ -202,7 +203,7 @@ const MeetingDetails = () => {
         <Delete
           setModal={setShowDeleteModal}
           webinarName={webinarName}
-          handleDelete={handleDelete}
+          id={id}
         />
       )}
 
