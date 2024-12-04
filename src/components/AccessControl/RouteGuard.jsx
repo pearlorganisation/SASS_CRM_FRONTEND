@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { roles } from "../../utils/roles";
+import useRoles from "../../hooks/useRoles";
+// import { roles } from "../../utils/roles";
 export default function RouteGuard({ children, roleNames = [] }) {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loader, setLoader] = useState(true);
+  const roles = useRoles();
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role || "";
 
@@ -17,7 +18,7 @@ export default function RouteGuard({ children, roleNames = [] }) {
       let isAllowed = false;
       roleNames.forEach((roleName) => {
         if (roles[roleName] === role) {
-      // console.log("aio aio", roles[roleName] === role);
+          // console.log("aio aio", roles[roleName] === role);
 
           isAllowed = true;
           return;

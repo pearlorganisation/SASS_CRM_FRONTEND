@@ -64,7 +64,6 @@ export const errorToast = (message) => {
   });
 };
 
-
 export const successToast = (message) => {
   let successMessage = "";
   successMessage = typeof message === "string" ? message : "Successful";

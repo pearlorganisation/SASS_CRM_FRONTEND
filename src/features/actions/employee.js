@@ -27,6 +27,19 @@ export const updateEmployee = createAsyncThunk(
   }
 );
 
+//update employee Status
+export const updateEmployeeStatus = createAsyncThunk(
+  "employeeStatus/update",
+  async ({id,isActive}, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`users/employee/status/${id}`, {isActive});
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 // get employee data
 export const getAllEmployees = createAsyncThunk(
   "employees/fetchData",

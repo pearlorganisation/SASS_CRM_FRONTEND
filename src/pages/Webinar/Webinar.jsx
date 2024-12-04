@@ -12,15 +12,15 @@ import CreateWebinar from "../../components/Webinar/CreateWebinar";
 import Tooltip from "@mui/material/Tooltip";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import useAddUserActivity from "../../hooks/useAddUserActivity ";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { openModal } from "../../features/slices/modalSlice";
 import { formatDateAsNumber } from "../../utils/extra";
+import { resetWebinarSuccess } from "../../features/slices/webinarContact";
 
 const MeetingDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const logUserActivity = useAddUserActivity();
-
   const { isLoading, isSuccess, webinarData, totalPages } = useSelector(
     (state) => state.webinarContact
   );
@@ -66,6 +66,7 @@ const MeetingDetails = () => {
     if (isSuccess) {
       setShowDeleteModal(false)
       dispatch(getAllWebinars({ page: 1, limit: 10 }));
+      dispatch(resetWebinarSuccess());
     }
   }, [isSuccess]);
 

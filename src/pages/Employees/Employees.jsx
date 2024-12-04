@@ -19,9 +19,12 @@ import { Edit, Visibility, ToggleOn, ToggleOff } from "@mui/icons-material";
 import {
   changeEmployeeStatus,
   getAllEmployees,
+  updateEmployeeStatus,
 } from "../../features/actions/employee";
 import ConfirmActionModal from "./modal/ConfirmActionModal";
 import { getRoleNameByID } from "../../utils/roles";
+import { clearSuccess } from "../../features/slices/employee";
+import { openModal } from "../../features/slices/modalSlice";
 
 const tableCellStyles = {
   paddingTop: "8px",
@@ -30,10 +33,14 @@ const tableCellStyles = {
 };
 
 const Employees = () => {
+  const activeInactiveModalName = 'activeInactiveModal';
+
   const [statusModalData, setStatusModalData] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { employeeData, isLoading } = useSelector((state) => state.employee);
+  const { employeeData, isLoading, isSuccess } = useSelector(
+    (state) => state.employee
+  );
   const { userData } = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -41,10 +48,25 @@ const Employees = () => {
   }, [userData]);
 
   const handleStatusChange = (item) => {
+    
     setStatusModalData(item);
+    dispatch(
+      openModal({
+        modalName: activeInactiveModalName,
+        data: item,
+      })
+    )
+
   };
 
   const navigateToAdd = () => navigate("/createEmployee");
+
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(getAllEmployees(userData?.id));
+      dispatch(clearSuccess());
+    }
+  }, [isSuccess]);
 
   return (
     <>
@@ -116,8 +138,12 @@ const Employees = () => {
                     <TableCell sx={tableCellStyles}>
                       {item?.isActive ? "Active" : "Inactive"}
                     </TableCell>
-                    <TableCell sx={tableCellStyles}>{item?.validCallTime || 0} sec</TableCell>
-                    <TableCell sx={tableCellStyles}>{item?.dailyContactLimit || 0} Contacts</TableCell>
+                    <TableCell sx={tableCellStyles}>
+                      {item?.validCallTime || 0} sec
+                    </TableCell>
+                    <TableCell sx={tableCellStyles}>
+                      {item?.dailyContactLimit || 0} Contacts
+                    </TableCell>
                     <TableCell
                       sx={tableCellStyles}
                       className="sticky right-0 bg-white z-10"
@@ -137,9 +163,7 @@ const Employees = () => {
                         <Tooltip title="Edit Employee Data">
                           <IconButton
                             onClick={() =>
-                              navigate(
-                                `/employee/edit/${item?._id}`
-                              )
+                              navigate(`/employee/edit/${item?._id}`)
                             }
                             sx={{ color: "green" }} // Material-UI color styling
                           >
@@ -155,9 +179,15 @@ const Employees = () => {
                             sx={{ color: item?.isActive ? "red" : "green" }} // Material-UI dynamic color styling
                           >
                             {item?.isActive ? (
-                              <ToggleOff  fontSize="large" className="text-red-600" /> // Tailwind class
+                              <ToggleOff
+                                fontSize="large"
+                                className="text-red-600"
+                              /> // Tailwind class
                             ) : (
-                              <ToggleOn fontSize="large"  className="text-green-600" />
+                              <ToggleOn
+                                fontSize="large"
+                                className="text-green-600"
+                              />
                             )}
                           </IconButton>
                         </Tooltip>
@@ -174,9 +204,15 @@ const Employees = () => {
       {/* Confirm Action Modal */}
       {statusModalData && (
         <ConfirmActionModal
+          modalName={activeInactiveModalName}
           setModal={setStatusModalData}
           handleAction={() => {
-            dispatch(changeEmployeeStatus(statusModalData?._id));
+            dispatch(
+              updateEmployeeStatus({
+                id: statusModalData?._id,
+                isActive: !statusModalData?.isActive,
+              })
+            );
             setStatusModalData(null);
           }}
           modalData={statusModalData}

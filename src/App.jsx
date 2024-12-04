@@ -38,13 +38,11 @@ import {
 } from "./pages";
 import { addUserActivity } from "./features/actions/userActivity";
 import RouteGuard from "./components/AccessControl/RouteGuard";
-import { getAllRoles } from "./features/actions/globalData";
+import { getAllRoles } from "./features/actions/auth";
 
 const App = () => {
   const dispatch = useDispatch();
 
-  const {roles} = useSelector(state => state.globalData);
-  console.log('roles ---- > ', roles)
   const { isUserLoggedIn } = useSelector((state) => state.auth);
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role || "";
@@ -53,7 +51,11 @@ const App = () => {
   }
 
   useEffect(() => {
-    dispatch(getAllRoles());
+    function initFunctions() {
+      dispatch(getAllRoles());
+    }
+    initFunctions();
+
     if (isUserLoggedIn && role) {
       dispatch(
         addUserActivity({

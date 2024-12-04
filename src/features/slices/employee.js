@@ -12,6 +12,7 @@ import {
   getEmployeeStats,
   getEmployee,
   updateEmployee,
+  updateEmployeeStatus,
 } from "../actions/employee";
 import { errorToast, successToast } from "../../utils/extra";
 
@@ -65,6 +66,19 @@ export const employeeSlice = createSlice({
         successToast("Employee Updated Successfully");
       })
       .addCase(updateEmployee.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(updateEmployeeStatus.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(updateEmployeeStatus.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        successToast("Employee Status Updated Successfully");
+      })
+      .addCase(updateEmployeeStatus.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       })

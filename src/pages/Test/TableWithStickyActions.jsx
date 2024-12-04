@@ -11,6 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { useSelector } from "react-redux";
 
 // Dummy Data
 const dummyData = [
@@ -27,6 +28,9 @@ const tableCellStyles = {
 }
 
 const TableWithStickyActions = () => {
+  const {attendeeData , isLoading, isSuccess } = useSelector(state => state.attendee);
+  console.log(" ----- > ",attendeeData)
+
   const [selectedRows, setSelectedRows] = useState([]);
 
   const handleCheckboxChange = (id) => {
@@ -57,8 +61,10 @@ const TableWithStickyActions = () => {
           <TableHead className="bg-gray-100">
             <TableRow>
               <TableCell className="font-semibold text-gray-700">Select</TableCell>
-              <TableCell className="font-semibold text-gray-700">Name</TableCell>
               <TableCell className="font-semibold text-gray-700">Email</TableCell>
+              <TableCell className="font-semibold text-gray-700">First Name</TableCell>
+              <TableCell className="font-semibold text-gray-700">Last Name</TableCell>
+
               <TableCell className="font-semibold text-gray-700">Gender</TableCell>
               <TableCell className="font-semibold text-gray-700">City</TableCell>
               <TableCell className="font-semibold text-gray-700">Product</TableCell>

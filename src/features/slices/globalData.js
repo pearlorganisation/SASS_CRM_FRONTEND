@@ -6,8 +6,7 @@ import { toast } from "sonner";
 import {
   createCustomOption,
   createGlobalData,
-  deleteCustomOption,
-  getAllRoles,
+  deleteCustomOption, 
   getCustomOptions,
   getDashboardCardsData,
   getDashboardPlansData,
@@ -28,8 +27,6 @@ const initialState = {
   plansGraphData: [],
   usersGraphData: [],
   revenueGraphData: [],
-  isRolesLoading: false,
-  roles: [],
 };
 
 // ---------------------------------------------------------------------------------------
@@ -177,16 +174,6 @@ export const globalDataSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
       })
-      .addCase(getAllRoles.pending, (state, action) => {
-        state.isRolesLoading = true;
-      })
-      .addCase(getAllRoles.fulfilled, (state, action) => {
-        state.isRolesLoading = false;
-        state.roles = action.payload;
-      })
-      .addCase(getAllRoles.rejected, (state, action) => {
-        state.isRolesLoading = false;
-      });
   },
 });
 

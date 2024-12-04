@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CsvParser from "papaparse";
 import { toast } from "sonner";
 import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
-import { useDispatch } from "react-redux";
-import {
-  addWebinarContacts,
-  updateAttendeeDetails,
-} from "../../features/actions/webinarContact";
+import { useDispatch, useSelector } from "react-redux";
+import { addAttendees } from "../../features/actions/attendees";
+import { useParams } from "react-router-dom";
+import { ClipLoader } from "react-spinners";
+import { clearSuccess } from "../../features/slices/attendees";
 
 const UploadCsvModal = ({ setModal, update }) => {
+  const { tabValue, isLoading, isSuccess } = useSelector(
+    (state) => state.attendee
+  );
+  const { id } = useParams();
+
   const [mapUI, setMapUI] = useState(false);
   const [selectedValues, setSelectedValues] = useState({}); // State to store selected values
   const [meetingData, setMeetingData] = useState([]);
@@ -115,7 +120,7 @@ const UploadCsvModal = ({ setModal, update }) => {
     const genderField = gender?.label;
 
     const mergeDataByEmail = (data) => {
-      console.log('data ----> ', data);
+      console.log("data ----> ", data);
       const mergedData = {};
 
       if (!update) {
@@ -186,8 +191,17 @@ const UploadCsvModal = ({ setModal, update }) => {
     };
 
     const mergedResult = mergeDataByEmail(meetingData);
-    console.log('mergedResult --- >',mergedResult);
+    console.log("mergedResult --- >", mergedResult);
     setMeetingData(mergedResult);
+
+    const payloadData = {
+      webinarId: id,
+      isAttended: tabValue === "postWebinar" ? true : false,
+      data: mergedResult,
+    };
+
+    dispatch(addAttendees(payloadData));
+
     // if (!update) {
     //   dispatch(addWebinarContacts(mergedResult));
     // } else {
@@ -195,6 +209,19 @@ const UploadCsvModal = ({ setModal, update }) => {
     // }
     // setModal(false);
   };
+
+  function handleCloseModal(){
+    setModal(false);
+    dispatch(clearSuccess());
+  }
+
+  useEffect(() => {
+    console.log("isSucess ",isSuccess)
+    if(isSuccess){
+      handleCloseModal();
+    }
+    
+  },[isSuccess]);
 
   return (
     <div
@@ -565,9 +592,10 @@ const UploadCsvModal = ({ setModal, update }) => {
               </div>
               <button
                 onClick={dateError}
+                disabled={isLoading}
                 className="bg-blue-700 hover:bg-blue-800 w-full text-white p-2 rounded-md text-center mt-7 mb-3"
               >
-                Submit{" "}
+                {isLoading ? <ClipLoader color="#fff" size={20} /> : "Submit"}
               </button>
             </form>
           )}
