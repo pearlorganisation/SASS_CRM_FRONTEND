@@ -30,7 +30,7 @@ const ExportClientExcelModal = ({ modalName }) => {
       key: "employeeReminderCount",
 
     },
-    { header: "Contacts Count", key: "contactsCount", },
+    // { header: "Contacts Count", key: "contactsCount", },
   ];
   const dispatch = useDispatch();
 

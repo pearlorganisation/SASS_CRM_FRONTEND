@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Box, TextField, Grid, Tabs, Tab } from "@mui/material";
 import TableWithStickyActions from "../Test/TableWithStickyActions"; // Assuming this is your table component
@@ -12,17 +12,28 @@ const WebinarAttendees = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  const { tabValue, attendeeData } = useSelector((state) => state.attendee);
+  const { tabValue } = useSelector((state) => state.attendee);
   const [showModal, setShowModal] = useState(false);
 
+  const LIMIT = 10;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [page, setPage] = useState(searchParams.get("page") || 1);
+
+  useEffect(() => {
+    setSearchParams({ page: page });
+  }, [page]);
+
   // Tabs change handler
-  const handleTabChange = (event, newValue) => {
+  const handleTabChange = (_, newValue) => {
     dispatch(setTabValue(newValue));
+    setPage(1);
   };
 
   useEffect(() => {
-    dispatch(getAttendees({ id, isAttended: tabValue }));
-  }, [tabValue]);
+    dispatch(getAttendees({ id, isAttended: tabValue, page, limit: LIMIT }));
+  }, [page, tabValue]);
+
+
 
   return (
     <div className="px-6 md:px-10 pt-10 space-y-6">
@@ -55,7 +66,10 @@ const WebinarAttendees = () => {
       </div>
 
       {/* Table Component */}
-      <TableWithStickyActions />
+      <TableWithStickyActions
+      page={page}
+      setPage={setPage}
+      />
 
       {showModal &&
         createPortal(
