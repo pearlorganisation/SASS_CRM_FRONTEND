@@ -67,7 +67,7 @@ export const errorToast = (message) => {
 
 export const successToast = (message) => {
   let successMessage = "";
-  successMessage = typeof message === "string" ? successMessage : "Successful";
+  successMessage = typeof message === "string" ? message : "Successful";
 
   // if (
   //   Array.isArray(message) &&
@@ -76,12 +76,12 @@ export const successToast = (message) => {
   // ) {
   //   errorMessage = message[0];
   // }
+  console.log(successMessage)
 
   toast.success(successMessage, {
     position: "top-center",
     hideProgressBar: true,
     pauseOnHover: true,
     draggable: true,
-    theme: "light",
   });
 };
