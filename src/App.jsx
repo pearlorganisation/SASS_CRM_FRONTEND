@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Dashboard,
   Login,
-  MeetingDetails,
+  Webinar,
   Layout,
   ComingSoon,
   NotFound,
@@ -34,10 +34,11 @@ import {
   CreateClient,
   ViewClient,
   Profile,
+  WebinarAttendees,
 } from "./pages";
 import { addUserActivity } from "./features/actions/userActivity";
 import RouteGuard from "./components/AccessControl/RouteGuard";
-import { logout } from "./features/slices/auth";
+import { getAllRoles } from "./features/actions/auth";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -50,6 +51,11 @@ const App = () => {
   }
 
   useEffect(() => {
+    function initFunctions() {
+      dispatch(getAllRoles());
+    }
+    initFunctions();
+
     if (isUserLoggedIn && role) {
       dispatch(
         addUserActivity({
@@ -59,6 +65,8 @@ const App = () => {
       );
     }
   }, []);
+
+  // dispatch(clearLoadingAndData())
 
   const router = createBrowserRouter([
     {
@@ -73,7 +81,19 @@ const App = () => {
 
         {
           path: "/webinarDetails",
-          element: <MeetingDetails />,
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <Webinar />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/webinarDetails/:id",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <WebinarAttendees />
+            </RouteGuard>
+          ),
         },
         {
           path: "/contacts/:csvId",
@@ -89,7 +109,19 @@ const App = () => {
         },
         {
           path: "/employees",
-          element: <Employees />,
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <Employees />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/employee/edit/:id",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <CreateEmployee />
+            </RouteGuard>
+          ),
         },
         {
           path: "/employees/assignments/:id",
@@ -132,7 +164,7 @@ const App = () => {
           element: <CreateProduct />,
         },
         {
-          path: "/attendees/:webinarId",
+          path: "/attendees",
           element: (
             <RouteGuard roleNames={["ADMIN"]}>
               <ViewAttendees />

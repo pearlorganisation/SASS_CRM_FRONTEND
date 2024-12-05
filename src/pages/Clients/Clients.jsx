@@ -19,6 +19,8 @@ import ClientCard from "../../components/Client/ClientCard";
 import UpdateClientModal from "../../components/Client/UpdateClientModal";
 import { getRoleNameByID } from "../../utils/roles";
 import ActiveInactiveModal from "../../components/Client/ActiveInactiveModal";
+import {openModal} from '../../features/slices/modalSlice';
+import ExportClientExcelModal from "../../components/Export/ExportClientExcelModal";
 
 const Clients = () => {
   const navigate = useNavigate();
@@ -41,7 +43,6 @@ const Clients = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      console.log("issicces ---> called");
       dispatch(getAllClients({ page: page, limit: LIMIT }));
     }
   }, [isSuccess]);
@@ -59,12 +60,10 @@ const Clients = () => {
   };
 
   const handleEditClient = (client) => {
-    console.log(client);
     setUpdateData(client);
   };
 
   const handleToggleClientStatus = (client, status) => {
-    console.log(`Delete/Inactivate Client : ${client}- ${status}`);
     setActiveData(client);
   };
 
@@ -110,20 +109,25 @@ const Clients = () => {
       </div>
     );
   };
+  const exportExcelModal = "ExportClientExcel";
 
   return (
     <div className="py-10 md:px-10 sm:pl-4 mt-10">
       {/* Page Header */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold text-gray-800">Clients</h1>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAddClient}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          Add Client
-        </Button>
+        <div className="flex gap-5">
+          <Button variant="contained" color="primary" onClick={handleAddClient}>
+            Add Client
+          </Button>
+
+          <Button
+          
+          onClick={() => dispatch(openModal(exportExcelModal))}
+          variant="outlined" color="primary">
+            Export
+          </Button>
+        </div>
       </div>
 
       <div className=" gap-4 md:hidden grid  grid-cols-1">
@@ -135,17 +139,16 @@ const Clients = () => {
       {/* Clients Table */}
       <div className="relative hidden md:block  overflow-x-auto shadow-md sm:rounded-lg">
         {isLoading ? (
-          
-              <Stack spacing={4}>
-                <Skeleton variant="rounded" height={35}  />
-                <Skeleton variant="rounded" height={25}  />
-                <Skeleton variant="rounded" height={25}  />
-                <Skeleton variant="rounded" height={25}  />
-                <Skeleton variant="rounded" height={25}  />
-                <Skeleton variant="rounded" height={25}  />
-                <Skeleton variant="rounded" height={25}  />
-                <Skeleton variant="rounded" height={25}  />
-              </Stack>
+          <Stack spacing={4}>
+            <Skeleton variant="rounded" height={35} />
+            <Skeleton variant="rounded" height={25} />
+            <Skeleton variant="rounded" height={25} />
+            <Skeleton variant="rounded" height={25} />
+            <Skeleton variant="rounded" height={25} />
+            <Skeleton variant="rounded" height={25} />
+            <Skeleton variant="rounded" height={25} />
+            <Skeleton variant="rounded" height={25} />
+          </Stack>
         ) : (
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50">
@@ -280,6 +283,7 @@ const Clients = () => {
       {activeData && (
         <ActiveInactiveModal clientData={activeData} setModal={setActiveData} />
       )}
+      <ExportClientExcelModal modalName={exportExcelModal}/>
     </div>
   );
 };

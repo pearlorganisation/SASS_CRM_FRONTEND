@@ -1,58 +1,15 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { instance } from "../../services/axiosInterceptor";
 
-//add webinar contacts
-export const addWebinarContacts = createAsyncThunk(
-  "addWebinarContacts",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response = await instance.post(`/attendee`, payload);
-      return response;
-    } catch (e) {
-      return rejectWithValue(e);
-    }
-  }
-);
-
-// get all attendees
-export const getAllAttendees = createAsyncThunk(
-  "getAllWebinarContacts",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response = await instance.get(
-        `/attendee/${payload.page}?${payload.filters}&recordType=${payload.recordType}&limit=${payload.limit || 10}` //
-      );
-      return response?.data;
-    } catch (e) {
-      return rejectWithValue(e);
-    }
-  }
-);
-
-//get webinar attendees as per csvId
-// req - POST
-export const getAttendees = createAsyncThunk(
-  "getWebinarContacts",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response = await instance.post(
-        `/attendee/${payload.page}`,
-        payload.data
-      );
-      return response?.data;
-    } catch (e) {
-      return rejectWithValue(e);
-    }
-  }
-);
 
 // get webinar data
 export const getAllWebinars = createAsyncThunk(
-  "getAllWebinars",
-  async (page, { rejectWithValue }) => {
+  "webinars/fetchData",
+  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/attendee/csvData/${page}`);
-
+      const response = await instance.get(`/webinar`, {
+        params: { page, limit },
+      });
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
@@ -60,73 +17,38 @@ export const getAllWebinars = createAsyncThunk(
   }
 );
 
-//add webinar contacts
-export const deleteWebinarContacts = createAsyncThunk(
-  "deleteWebinarContacts",
+// add webinar
+export const createWebinar = createAsyncThunk(
+  "webinars/create",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await instance.post(`/webinar`, data);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+// update webinar
+export const updateWebinar = createAsyncThunk(
+  "webinars/update",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`/webinar/${id}`, data);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+//delete webinar 
+export const deleteWebinar = createAsyncThunk(
+  "webinar/delete",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await instance.delete(`/attendee/${id}`);
-      return response;
-    } catch (e) {
-      return rejectWithValue(e);
-    }
-  }
-);
-
-// get all assignments
-export const getAllAssignments = createAsyncThunk(
-  "getAllAssignments",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response = await instance.get(`/attendee/employee/assignments`, {
-        params: payload,
-      });
-      return response?.data;
-    } catch (e) {
-      return rejectWithValue(e);
-    }
-  }
-);
-
-export const getAttendeeContactDetails = createAsyncThunk(
-  "attendeeContact/fetchData",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response = await instance.get(`/attendee`, {
-        params: payload,
-      });
-      if (
-        response &&
-        response?.data &&
-        Array.isArray(response.data?.data) &&
-        response.data.data.length > 0
-      ) {
-        return response.data.data[0];
-      }
-      return null;
-    } catch (e) {
-      return rejectWithValue(e);
-    }
-  }
-);
-
-export const updateAttendeeDetails = createAsyncThunk(
-  "attendeeDetails/updateData",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response = await instance.patch(`/attendee`, payload);
-      return response;
-    } catch (e) {
-      return rejectWithValue(e);
-    }
-  }
-);
-
-export const updateAttendeeLeadType = createAsyncThunk(
-  "attendeeLeadType/updateData",
-  async (payload, { rejectWithValue }) => {
-    try {
-      const response = await instance.patch(`/attendee/leadType`, payload);
+      const response = await instance.delete(`/webinar/${id}`);
       return response;
     } catch (e) {
       return rejectWithValue(e);

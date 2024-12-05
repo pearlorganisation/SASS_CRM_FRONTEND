@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Checkbox from "@mui/material/Checkbox";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -11,23 +11,21 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-
-// Dummy Data
-const dummyData = [
-  { id: 1, name: "John Doe", email: "johndoe@example.com", gender: "Male", city: "New York", product: "Laptop", mobile: "123-456-7890" },
-  { id: 2, name: "Jane Smith", email: "janesmith@example.com", gender: "Female", city: "Los Angeles", product: "Smartphone", mobile: "987-654-3210" },
-  { id: 3, name: "Alice Johnson", email: "alicej@example.com", gender: "Female", city: "Chicago", product: "Tablet", mobile: "555-123-4567" },
-  { id: 4, name: "Bob Brown", email: "bobbrown@example.com", gender: "Male", city: "Houston", product: "Camera", mobile: "666-789-1234" },
-];
+import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
+import { Pagination } from "@mui/material";
 
 const tableCellStyles = {
-    paddingTop: '6px',
-    paddingBottom:'6px',
-    textWrap: 'nowrap'
-}
+  paddingTop: "6px",
+  paddingBottom: "6px",
+  textWrap: "nowrap",
+};
 
-const TableWithStickyActions = () => {
+const TableWithStickyActions = ({page, setPage}) => {
   const [selectedRows, setSelectedRows] = useState([]);
+  const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
+    (state) => state.attendee
+  );
 
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
@@ -48,6 +46,7 @@ const TableWithStickyActions = () => {
   const handleView = (id) => {
     console.log(`Viewing details for row with id: ${id}`);
   };
+  const thStyles = "font-semibold  text-gray-700 whitespace-nowrap";
 
   return (
     <div className="p-6 bg-gray-50">
@@ -56,53 +55,53 @@ const TableWithStickyActions = () => {
         <Table>
           <TableHead className="bg-gray-100">
             <TableRow>
-              <TableCell className="font-semibold text-gray-700">Select</TableCell>
-              <TableCell className="font-semibold text-gray-700">Name</TableCell>
-              <TableCell className="font-semibold text-gray-700">Email</TableCell>
-              <TableCell className="font-semibold text-gray-700">Gender</TableCell>
-              <TableCell className="font-semibold text-gray-700">City</TableCell>
-              <TableCell className="font-semibold text-gray-700">Product</TableCell>
-              <TableCell className="font-semibold text-gray-700">Mobile No</TableCell>
-              <TableCell
-                className="font-semibold text-gray-700 sticky right-0 bg-gray-100 z-10"
-              >
+              <TableCell className="">Select</TableCell>
+              <TableCell className={thStyles}>Email</TableCell>
+              <TableCell className={thStyles}>First Name</TableCell>
+              <TableCell className={thStyles}>Last Name</TableCell>
+              <TableCell className={thStyles}>Time in Session</TableCell>
+              <TableCell className={thStyles}>Gender</TableCell>
+              <TableCell className={thStyles}>Location</TableCell>
+              <TableCell className={thStyles}>Mobile No</TableCell>
+              <TableCell className="font-semibold text-gray-700 sticky right-0 bg-gray-100 z-10">
                 Actions
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {dummyData.map((row) => (
+            {attendeeData.map((row) => (
               <TableRow
-                key={row.id}
+                key={row?._id}
                 className={`${
-                  isRowSelected(row.id) ? "bg-blue-50" : "bg-white"
+                  isRowSelected(row?._id) ? "bg-blue-50" : "bg-white"
                 } hover:bg-gray-50`}
               >
                 <TableCell sx={tableCellStyles}>
                   <Checkbox
                     color="primary"
-                    checked={isRowSelected(row.id)}
-                    onChange={() => handleCheckboxChange(row.id)}
+                    checked={isRowSelected(row?._id)}
+                    onChange={() => handleCheckboxChange(row?._id)}
                   />
                 </TableCell>
-                <TableCell sx={tableCellStyles}>{row.name}</TableCell>
-                <TableCell sx={tableCellStyles}>{row.email}</TableCell>
-                <TableCell sx={tableCellStyles}>{row.gender}</TableCell>
-                <TableCell sx={tableCellStyles}>{row.city}</TableCell>
-                <TableCell sx={tableCellStyles}>{row.product}</TableCell>
-                <TableCell sx={tableCellStyles}>{row.mobile}</TableCell>
+                <TableCell sx={tableCellStyles}>{row?.email ?? "N/A"}</TableCell>
+                <TableCell sx={tableCellStyles}>{row?.firstName ?? "N/A"}</TableCell>
+                <TableCell sx={tableCellStyles}>{row?.lastName ?? "N/A"}</TableCell>
+                <TableCell sx={tableCellStyles}>{row?.timeInSession ?? "N/A"}</TableCell>
+                <TableCell sx={tableCellStyles}>{row?.gender ?? "N/A"}</TableCell>
+                <TableCell sx={tableCellStyles}>{row?.location ?? "N/A"}</TableCell>
+                <TableCell sx={tableCellStyles}>{row?.phone ?? "N/A"}</TableCell>
                 <TableCell
                   className="sticky right-0 bg-white z-10"
                   sx={tableCellStyles}
                 >
-                  <div className="flex gap-2">
-                    <IconButton onClick={() => handleView(row.id)}>
+                  <div className="flex gap-2 ">
+                    <IconButton onClick={() => handleView(row?.id)}>
                       <VisibilityIcon className="text-gray-600" />
                     </IconButton>
-                    <IconButton onClick={() => handleEdit(row.id)}>
+                    <IconButton onClick={() => handleEdit(row?.id)}>
                       <EditIcon className="text-blue-600" />
                     </IconButton>
-                    <IconButton onClick={() => handleDelete(row.id)}>
+                    <IconButton onClick={() => handleDelete(row?.id)}>
                       <DeleteIcon className="text-red-600" />
                     </IconButton>
                   </div>
@@ -112,13 +111,13 @@ const TableWithStickyActions = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <div className="mt-4">
-        <p>
-          <strong>Selected Rows:</strong>{" "}
-          {selectedRows.length > 0
-            ? selectedRows.join(", ")
-            : "No rows selected"}
-        </p>
+      <div className="flex justify-center mt-5">
+        <Pagination
+          count={totalPages}
+          page={Number(page)}
+          color="primary"
+          onChange={(_, page) => setPage(page)}
+        />
       </div>
     </div>
   );

@@ -1,83 +1,53 @@
 import axios from "axios";
+import {
+  delay,
+  getErrorMessage,
+  shouldRetryRequest,
+} from "../utils/interceptorUtils";
 
-// This code is used to access redux store in this file.
 let store;
 export const injectStore = (_store) => {
   store = _store;
 };
 
-// Creating new axios instance
 export const instance = axios.create({
-    withCredentials: true,
-    baseURL: `${
-      import.meta.env.VITE_REACT_APP_WORKING_ENVIRONMENT === "development"
-        ? import.meta.env.VITE_REACT_APP_API_BASE_URL_DEVELOPMENT
-        : import.meta.env.VITE_REACT_APP_API_BASE_URL_MAIN_PRODUCTION
-    }`,
-  });
-
+  withCredentials: true,
+  baseURL: `${
+    import.meta.env.VITE_REACT_APP_WORKING_ENVIRONMENT === "development"
+      ? import.meta.env.VITE_REACT_APP_API_BASE_URL_DEVELOPMENT
+      : import.meta.env.VITE_REACT_APP_API_BASE_URL_MAIN_PRODUCTION ||
+        "https://fallback-url.com"
+  }`,
+});
 
 instance.interceptors.response.use(
-  (response) => {
-// save username from response in redux or localstorage for future use and when calling use it in userName variable while generating refresh token
-    return response;
-  },
+  (response) => response,
   async (error) => {
-    // console.log(error)
+    const originalRequest = error.config;
+    const loggedInUserName = store.getState()?.auth?.userData?.userName;
 
-    let errorMessage = "";
-    // Do something with response error
-    let loggedInUserName = store.getState()?.auth?.userData?.userName ;
-  // console.log(loggedInUserName)
-    let originalRequest = error.config;
-
-    // console.log('eroor lelel biya ------->',error)
     if (
-      error?.response?.status === 401 ||
-      (error?.response?.status === 403 && !originalRequest?._retry)
+      (error?.response?.status === 401 || error?.response?.status === 403) &&
+      shouldRetryRequest(originalRequest, originalRequest.url)
     ) {
-      originalRequest._retry = true;
       try {
-        if (loggedInUserName) {
-          await instance.post(
-            "/auth/refresh",
-            { userName: loggedInUserName },
-            {
-              withCredentials: true,
-            }
-          );
-          return instance(originalRequest);
-        } else {
-          console.log(error)
-          errorMessage = "Incorrect Username / Password";
-          return Promise.reject(errorMessage);
-        }
-      } catch (error) {
-        return Promise.reject(error);
+        console.log("Refreshing token...");
+        // await delay(1000 * retryTracker.get(originalRequest.url)); // Exponential backoff
+        console.log('sf --- > ')
+        await instance.post("/auth/refresh", { userName: loggedInUserName });
+        console.log('< ---- sf --- > ')
+
+        return instance(originalRequest);
+      } catch (refreshError) {
+        console.error("Token refresh failed. Logging out user.");
+        return Promise.reject("Token refresh failed. Please log in again.");
       }
     }
-// console.error("interceptor",error)
-    switch (Number(error?.response?.status)) {
-      case 400:
-        errorMessage = error.response.data.message || "Bad Request";
-        break;
-        case 401:
-          errorMessage = error.response.data.message || "Unauthorized Access";
-          break;
-  
-      case 404:
-        errorMessage =  "Resource Not Found";
-        break;
 
-      case 500:
-        errorMessage = error.response.data.message || "Internal Server Error";
-        break;
-
-      default:
-        errorMessage =
-          error.response.data.message ||
-          "Sorry, something went wrong. Please try again later.";
-    }
+    const errorMessage = getErrorMessage(
+      error?.response?.status,
+      error?.response?.data?.message
+    );
     return Promise.reject(errorMessage);
   }
 );

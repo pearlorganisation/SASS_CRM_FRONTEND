@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getAllAssignments } from "../../features/actions/webinarContact";
 import { Pagination, Skeleton, Stack } from "@mui/material";
 import { Link, useSearchParams } from "react-router-dom";
 import AssignmentTable from "../../components/AssignmentTable";
@@ -16,7 +15,6 @@ const Assignments = () => {
   const [page, setPage] = useState( searchParams.get("page") || 1);
 
   useEffect(() => {
-    dispatch(getAllAssignments({ page: page, limit: LIMIT }));
   }, [page]);
 
   useEffect(() => {

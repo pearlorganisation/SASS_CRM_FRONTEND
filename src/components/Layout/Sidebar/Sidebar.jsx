@@ -46,11 +46,11 @@ const Sidebar = () => {
         //   label: "Attendees",
         //   icon: <HiUserGroup size={30} />,
         // },
-        // {
-        //   path: "/employees",
-        //   label: "Employees",
-        //   icon: <IoPeople size={30} />,
-        // },
+        {
+          path: "/employees",
+          label: "Employees",
+          icon: <IoPeople size={30} />,
+        },
       ],
     },
     {
@@ -61,11 +61,15 @@ const Sidebar = () => {
         //   label: "Assignments",
         //   icon: <MdAssignment size={30} />,
         // },
-        // {
-        //   path: "/products",
-        //   label: "Products",
-        //   icon: <AiFillProduct size={30} />,
-        // },
+      ],
+    },
+    {
+      roles: [roles.EMPLOYEE_SALES, roles.EMPLOYEE_REMINDER, roles.ADMIN],
+      items: [        {
+        path: "/products",
+        label: "Products",
+        icon: <AiFillProduct size={30} />,
+      },
       ],
     },
   ];

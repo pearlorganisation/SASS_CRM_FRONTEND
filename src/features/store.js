@@ -14,6 +14,9 @@ import userActivityReducer from "./slices/userActivity";
 import pabblyToken from "./slices/pabblyToken";
 import pricePlanReducer from "./slices/pricePlan";
 import clientReducer from './slices/client'
+import exportReducer from './slices/export-excel'
+import modalReducer from './slices/modalSlice'
+import attendeeReducer from './slices/attendees'
 
 // Combine your individual reducers here
 const rootReducer = combineReducers({
@@ -27,7 +30,10 @@ const rootReducer = combineReducers({
   userActivity: userActivityReducer,
   pabblyToken,
   pricePlans: pricePlanReducer,
-  client: clientReducer
+  client: clientReducer,
+  modals: modalReducer,
+  export:exportReducer,
+  attendee: attendeeReducer
 });
 
 // Custom root reducer handling a clear action
@@ -45,6 +51,7 @@ const persistConfig = {
   key: "SaasCrmClientPanel",
   version: 1,
   storage,
+  blacklist: ["export", "modals", 'employee', 'attendee'],
   transforms: [
     encryptTransform({
       secretKey: `${import.meta.env.VITE_REACT_APP_REDUX_PERSIST_SECRET_KEY}`,

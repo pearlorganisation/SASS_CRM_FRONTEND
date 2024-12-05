@@ -1,6 +1,6 @@
 import Dashboard from "./Dashboard/Dashboard";
 import Login from "./Auth/Login/Login";
-import MeetingDetails from "./Meeting Details/MeetingDetails";
+import Webinar from "./Webinar/Webinar";
 import Layout from "../components/Layout/Layout";
 import ComingSoon from "./NotFound/ComingSoon";
 import NotFound from "./NotFound/NotFound";
@@ -27,10 +27,11 @@ import CustomOptions from "./Settings/CustomOptions/CustomOptions";
 import CreateClient from "./Clients/CreateClient";
 import ViewClient from "./Clients/ViewClient";
 import Profile from "./Profile/Profile"
+import WebinarAttendees from "./Webinar/WebinarAttendees";
 export {
   Dashboard,
   Login,
-  MeetingDetails,
+  Webinar,
   Layout,
   ComingSoon,
   NotFound,
@@ -56,5 +57,6 @@ export {
   CustomOptions,
   CreateClient,
   ViewClient,
-  Profile
+  Profile,
+  WebinarAttendees
 };

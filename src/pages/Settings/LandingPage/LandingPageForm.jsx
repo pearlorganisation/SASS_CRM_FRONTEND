@@ -12,7 +12,10 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import defaultPhoto from "/placeholder.jpg";
 import { MdOutlineInsertPhoto } from "react-icons/md";
-import { createGlobalData, getGlobalData } from "../../../features/actions/globalData";
+import {
+  createGlobalData,
+  getGlobalData,
+} from "../../../features/actions/globalData";
 
 const LandingPageForm = () => {
   const {
@@ -31,7 +34,9 @@ const LandingPageForm = () => {
   const dispatch = useDispatch();
 
   const onSubmit = (data) => {
-    data["file"] = data["file"][0];
+    if (data["file"])
+      data["file"] = data["file"][0];
+    else data["file"] = null;
     data["videoControls"] = isControlsVisible;
     console.log(data);
     dispatch(createGlobalData(data));
@@ -67,7 +72,8 @@ const LandingPageForm = () => {
         link: landingGlobalData.link,
         buttonHeight: landingGlobalData.buttonHeight,
         buttonWidth: landingGlobalData.buttonWidth,
-      })}
+      });
+    }
   }, [landingGlobalData]);
 
   return (
@@ -143,9 +149,9 @@ const LandingPageForm = () => {
             </label>
             <input
               {...register("file", {
-                required: `Landing Page ${
-                  selectedType === "image" ? "Image" : "Video"
-                } is required`,
+                // required: `Landing Page ${
+                //   selectedType === "image" ? "Image" : "Video"
+                // } is required`,
                 onChange: handlePhotoChange,
               })}
               id="file_input"

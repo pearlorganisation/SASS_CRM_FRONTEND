@@ -1,22 +1,30 @@
 import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../../features/actions/product";
 import { useNavigate } from "react-router-dom";
 import { getAllWebinars } from "../../features/actions/webinarContact";
+import {
+  TextField,
+  Button,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
 
 const CreateProduct = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
     control,
+    formState: { errors },
   } = useForm();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { productData } = useSelector((state) => state.product);
   const { userData } = useSelector((state) => state.auth);
   const { webinarData } = useSelector((state) => state.webinarContact);
-  const dispatch = useDispatch();
 
   const onSubmit = (data) => {
     const newData = { ...data, adminId: userData.id };
@@ -33,91 +41,161 @@ const CreateProduct = () => {
   useEffect(() => {
     dispatch(getAllWebinars(1));
   }, []);
-  console.log(webinarData);
 
   return (
-    <div className="">
-      <div className="mt-10 ">
-        <div className=" flex justify-center"></div>
-        <div className="bg-white rounded-lg shadow-lg  sm:rounded-lg sm:max-w-5xl mt-8 mx-auto">
-          <h3 className="text-gray-700 text-base text-center bg-gray-100 font-medium sm:text-xl p-2 rounded-t-lg uppercase">
-            {" "}
-            Add Product{" "}
-          </h3>
-          <form
-            className="space-y-6 mx-8 sm:mx-2  p-4 py-6"
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            <div className="sm:flex space-y-6 sm:space-y-0 justify-between gap-10">
-              <div className="w-full">
-                <label className="font-medium">Product Name</label>
-                <input
-                  {...register("name", { required: true })}
-                  type="text"
-                  className="w-full mt-2  px-5 py-2 text-gray-500 border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
-                />
-                {errors.name && (
-                  <span className="text-red-500">Product Name is required</span>
+    <div className="container mx-auto px-4 mt-10">
+      <div className="bg-white shadow-lg rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-center mb-5 bg-gray-100 py-3 rounded-t-lg">
+          Add Product
+        </h3>
+        <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid sm:grid-cols-2 gap-6">
+            {/* Product Name */}
+            <div>
+              <Controller
+                name="name"
+                control={control}
+                rules={{ required: "Product Name is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Product Name"
+                    variant="outlined"
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
+                  />
                 )}
-              </div>
-              <div className="w-full">
-                <label className="font-medium">Price</label>
-                <input
-                  {...register("price", { required: true })}
-                  type="number"
-                  className="w-full mt-2  px-5 py-2 text-gray-500 border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
-                />
-                {errors.price && (
-                  <span className="text-red-500">Price is required</span>
-                )}
-              </div>
+              />
             </div>
 
-            <div className="sm:flex space-y-6 sm:space-y-0 justify-between gap-10">
-              <div className="w-full">
-                <label className="font-medium">Description</label>
-                <input
-                  {...register("description", { required: true })}
-                  type="text"
-                  className="w-full mt-2  px-5 py-2 text-gray-500 border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
-                />
-                {errors.description && (
-                  <span className="text-red-500">Description is required</span>
+            {/* Price */}
+            <div>
+              <Controller
+                name="price"
+                control={control}
+                rules={{ required: "Price is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    type="number"
+                    label="Price"
+                    variant="outlined"
+                    error={!!errors.price}
+                    helperText={errors.price?.message}
+                  />
                 )}
-              </div>
-              <div className="w-full">
-                <label className="font-medium">Webinar</label>
-                <select
-                  {...register("webinarName", { required: true })}
-                  className="w-full mt-2 px-5 py-2 text-gray-500 border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
-                >
-                  <option value="" selected disabled>
-                    Select a webinar
-                  </option>
+              />
+            </div>
 
-                  {webinarData &&
-                    webinarData?.map((item, index) => (
-                      <option key={index} value={item.csvName}>
-                        {item.csvName}
-                      </option>
-                    ))}
-                </select>
+            {/* Purchase Date */}
+            <div>
+              <Controller
+                name="purchaseDate"
+                control={control}
+                rules={{ required: "Purchase Date is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    type="date"
+                    label="Purchase Date"
+                    InputLabelProps={{ shrink: true }}
+                    variant="outlined"
+                    error={!!errors.purchaseDate}
+                    helperText={errors.purchaseDate?.message}
+                  />
+                )}
+              />
+            </div>
+
+            {/* Webinar */}
+            <div>
+              <FormControl fullWidth variant="outlined" error={!!errors.webinarName}>
+                <InputLabel>Webinar</InputLabel>
+                <Controller
+                  name="webinarName"
+                  control={control}
+                  rules={{ required: "Please select a webinar" }}
+                  render={({ field }) => (
+                    <Select {...field} label="Webinar">
+                      <MenuItem value="" disabled>
+                        Select a webinar
+                      </MenuItem>
+                      {webinarData &&
+                        webinarData.map((item, index) => (
+                          <MenuItem key={index} value={item.csvName}>
+                            {item.csvName}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  )}
+                />
                 {errors.webinarName && (
-                  <span className="text-red-500">Please select a webinar</span>
+                  <p className="text-red-500 mt-1 text-sm">{errors.webinarName.message}</p>
                 )}
-              </div>
+              </FormControl>
             </div>
 
-            <div style={{ marginTop: "4rem" }}>
-              <button className="w-full btn-grad:hover btn-grad">
-                {/* {isLoading ? (
-            <ClipLoader color="#c4c2c2" />
-          ) : (<>Create</>)} */}
-                Create
-              </button>
+            {/* Description */}
+            <div className="sm:col-span-2">
+              <Controller
+                name="description"
+                control={control}
+                rules={{ required: "Description is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Description"
+                    variant="outlined"
+                    error={!!errors.description}
+                    helperText={errors.description?.message}
+                  />
+                )}
+              />
             </div>
-          </form>
-        </div>
+
+            {/* Product Level */}
+            <div>
+              <FormControl fullWidth variant="outlined" error={!!errors.productLevel}>
+                <InputLabel>Product Level</InputLabel>
+                <Controller
+                  name="productLevel"
+                  control={control}
+                  rules={{ required: "Please select a product level" }}
+                  render={({ field }) => (
+                    <Select {...field} label="Product Level">
+                      <MenuItem value="" disabled>
+                        Select a level
+                      </MenuItem>
+                      <MenuItem value="L1">L1</MenuItem>
+                      <MenuItem value="L2">L2</MenuItem>
+                      <MenuItem value="L3">L3</MenuItem>
+                    </Select>
+                  )}
+                />
+                {errors.productLevel && (
+                  <p className="text-red-500 mt-1 text-sm">{errors.productLevel.message}</p>
+                )}
+              </FormControl>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="mt-8">
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              className="bg-gradient-to-r from-teal-500 to-blue-600 text-white"
+            >
+              Create
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );

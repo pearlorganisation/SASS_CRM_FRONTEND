@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   createCustomOption,
   createGlobalData,
-  deleteCustomOption,
+  deleteCustomOption, 
   getCustomOptions,
   getDashboardCardsData,
   getDashboardPlansData,
@@ -173,7 +173,7 @@ export const globalDataSlice = createSlice({
       .addCase(getDashboardRevenueData.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-      });
+      })
   },
 });
 
