@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  deleteWebinarContacts,
   getAllWebinars,
 } from "../../features/actions/webinarContact";
 import Delete from "../../components/Webinar/delete";
@@ -37,11 +36,6 @@ const MeetingDetails = () => {
     setWebinarName(name);
   };
 
-  const handleDelete = () => {
-    dispatch(deleteWebinarContacts(id));
-    setShowDeleteModal(false);
-    setId("");
-  };
 
   const handlePagination = (e, p) => {
     setPage(p);

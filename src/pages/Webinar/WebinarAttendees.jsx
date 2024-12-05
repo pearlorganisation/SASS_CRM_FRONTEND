@@ -5,14 +5,14 @@ import { Button, Modal, Box, TextField, Grid, Tabs, Tab } from "@mui/material";
 import TableWithStickyActions from "../Test/TableWithStickyActions"; // Assuming this is your table component
 import { createPortal } from "react-dom";
 import UpdateCsvXslxModal from "./UpdateCsvXslxModal";
-import { setTabValue } from "../../features/slices/attendees";
+import { clearSuccess, setTabValue } from "../../features/slices/attendees";
 import { getAttendees } from "../../features/actions/attendees";
 
 const WebinarAttendees = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  const { tabValue } = useSelector((state) => state.attendee);
+  const { tabValue, isSuccess } = useSelector((state) => state.attendee);
   const [showModal, setShowModal] = useState(false);
 
   const LIMIT = 10;
@@ -33,7 +33,14 @@ const WebinarAttendees = () => {
     dispatch(getAttendees({ id, isAttended: tabValue, page, limit: LIMIT }));
   }, [page, tabValue]);
 
-
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(
+        getAttendees({ id, isAttended: tabValue, page: 1, limit: LIMIT })
+      );
+      dispatch(clearSuccess());
+    }
+  }, [isSuccess]);
 
   return (
     <div className="px-6 md:px-10 pt-10 space-y-6">
@@ -66,10 +73,7 @@ const WebinarAttendees = () => {
       </div>
 
       {/* Table Component */}
-      <TableWithStickyActions
-      page={page}
-      setPage={setPage}
-      />
+      <TableWithStickyActions page={page} setPage={setPage} />
 
       {showModal &&
         createPortal(

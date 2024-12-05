@@ -6,11 +6,6 @@ import Select from "react-select";
 import ViewFullDetailsModal from "./Modal/ViewFullDetailModal";
 import ViewTimerModal from "./Modal/ViewTimerModal";
 import { useLocation } from "react-router-dom";
-import {
-  getAttendeeContactDetails,
-  updateAttendeeDetails,
-  updateAttendeeLeadType,
-} from "../../features/actions/webinarContact";
 import { useDispatch, useSelector } from "react-redux";
 import AddNoteForm from "./AddNoteForm";
 import { FaRegEdit } from "react-icons/fa";
@@ -41,7 +36,6 @@ const ViewParticularContact = () => {
   );
   const { noteData, isFormLoading } = useSelector((state) => state.assign);
   useEffect(() => {
-    dispatch(getAttendeeContactDetails({ email, recordType }));
     dispatch(getCustomOptions());
 
     return () => {
@@ -136,15 +130,15 @@ const ViewParticularContact = () => {
   };
 
   const onConfirmEdit = (data) => {
-    dispatch(updateAttendeeDetails(data)).then(() => {
-      setEditModalData(null);
+    // dispatch(updateAttendeeDetails(data)).then(() => {
+    //   setEditModalData(null);
 
-      addUserActivityLog({
-        action: "update",
-        details: `User updated information of Attendee with Email: ${email}`,
-      });
-      dispatch(getAttendeeContactDetails({ email, recordType }));
-    });
+    //   addUserActivityLog({
+    //     action: "update",
+    //     details: `User updated information of Attendee with Email: ${email}`,
+    //   });
+    //   dispatch(getAttendeeContactDetails({ email, recordType }));
+    // });
   };
 
   const handleLeadChange = (option) => {

@@ -2,7 +2,6 @@ import { Skeleton, Stack } from "@mui/material";
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllAttendees } from "../../features/actions/webinarContact";
 import Pagination from "@mui/material/Pagination";
 import { IoClose } from "react-icons/io5";
 import { IoIosArrowDown } from "react-icons/io";
@@ -314,9 +313,7 @@ const ViewAttendees = () => {
     setSelectedType(recordType);
     const option = empOptions.find((option) => option.value === recordType);
     if (option) {
-      dispatch(
-        getAllAttendees({ page, recordType: option.label.toLocaleLowerCase(), limit: pageLimit })
-      );
+     
     }
   };
 

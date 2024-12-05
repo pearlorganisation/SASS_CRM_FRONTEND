@@ -1,7 +1,6 @@
 import React, { useEffect, useState} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { getAttendees } from "../../features/actions/webinarContact";
 import Pagination from "@mui/material/Pagination";
 import { Skeleton, Stack } from "@mui/material";
 import AssignmentTable from "../../components/AssignmentTable";
@@ -27,7 +26,6 @@ const ViewContacts = () => {
   };
 
   useEffect(() => {
-    dispatch(getAttendees({ page, data: { csvId: csvId } }));
   }, [page]);
 
   return (

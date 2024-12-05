@@ -201,13 +201,6 @@ const UploadCsvModal = ({ setModal, update }) => {
     };
 
     dispatch(addAttendees(payloadData));
-
-    // if (!update) {
-    //   dispatch(addWebinarContacts(mergedResult));
-    // } else {
-    //   dispatch(updateAttendeeDetails({ csvId: update, data: mergedResult }));
-    // }
-    // setModal(false);
   };
 
   function handleCloseModal(){

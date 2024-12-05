@@ -14,7 +14,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { Pagination } from "@mui/material";
-import { getAttendees } from "../../features/actions/attendees";
 
 const tableCellStyles = {
   paddingTop: "6px",

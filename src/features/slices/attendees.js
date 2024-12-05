@@ -11,8 +11,7 @@ const initialState = {
   singleAttendeeData: null,
   totalPages: 1,
   errorMessage: "",
-  tabValue: 'preWebinar'
-
+  tabValue: "preWebinar",
 };
 // ---------------------------------------------------------------------------------------
 
@@ -44,18 +43,16 @@ export const attendeeSlice = createSlice({
       })
       .addCase(getAttendees.pending, (state) => {
         state.isLoading = true;
-        state.isSuccess = false;
       })
       .addCase(getAttendees.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isSuccess = true;
         state.attendeeData = action.payload?.result || [];
         state.totalPages = action.payload?.totalPages || 1;
       })
       .addCase(getAttendees.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
-      })
+      });
   },
 });
 

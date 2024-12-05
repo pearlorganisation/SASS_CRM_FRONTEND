@@ -1,17 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import UploadCsvModal from "./UploadCsvModal";
 import UploadXslxModal from "./UploadXslxModal";
 import { createPortal } from "react-dom";
 import { Button } from "@mui/material";
+import { useSelector } from "react-redux";
 
 const UpdateCsvXslxModal = ({ setModal, csvId }) => {
   const [showModal, setShowModal] = useState(false);
   const [showXslxModal, setShowXslxModal] = useState(false);
-
   const handleModal = () => setShowModal(true);
-
   const handleXslxModal = () => setShowXslxModal(true);
+
+  const { isSuccess } = useSelector((state) => state.attendee);
+
+  useEffect(() => {
+    if (isSuccess) {
+      setModal(false);
+    }
+  }, [isSuccess]);
 
   return (
     <div
@@ -32,12 +39,12 @@ const UpdateCsvXslxModal = ({ setModal, csvId }) => {
           <Button variant="contained" onClick={handleXslxModal}>
             Upload XSLX File
           </Button>
-          <Button variant="contained" onClick={handleModal} >
+          <Button variant="contained" onClick={handleModal}>
             Upload CSV File
           </Button>
         </div>
         <Button
-        variant="outlined"
+          variant="outlined"
           onClick={() => setModal(false)}
           className=" hover:text-red-600"
           aria-label="close dialog"
