@@ -36,8 +36,8 @@ export const webinarContactSlice = createSlice({
       .addCase(getAllWebinars.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.webinarData = action.payload;
-        state.totalPages = 1;
+        state.webinarData = action.payload.result || [];
+        state.totalPages = action.payload.totalPages;
       })
       .addCase(getAllWebinars.rejected, (state, action) => {
         state.isLoading = false;
