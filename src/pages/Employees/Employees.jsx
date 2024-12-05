@@ -25,6 +25,7 @@ import ConfirmActionModal from "./modal/ConfirmActionModal";
 import { getRoleNameByID } from "../../utils/roles";
 import { clearSuccess } from "../../features/slices/employee";
 import { openModal } from "../../features/slices/modalSlice";
+import { getUserSubscription } from "../../features/actions/auth";
 
 const tableCellStyles = {
   paddingTop: "8px",
@@ -33,7 +34,7 @@ const tableCellStyles = {
 };
 
 const Employees = () => {
-  const activeInactiveModalName = 'activeInactiveModal';
+  const activeInactiveModalName = "activeInactiveModal";
 
   const [statusModalData, setStatusModalData] = useState(null);
   const navigate = useNavigate();
@@ -48,15 +49,13 @@ const Employees = () => {
   }, [userData]);
 
   const handleStatusChange = (item) => {
-    
     setStatusModalData(item);
     dispatch(
       openModal({
         modalName: activeInactiveModalName,
         data: item,
       })
-    )
-
+    );
   };
 
   const navigateToAdd = () => navigate("/createEmployee");
@@ -64,6 +63,7 @@ const Employees = () => {
   useEffect(() => {
     if (isSuccess) {
       dispatch(getAllEmployees(userData?.id));
+      dispatch(getUserSubscription());
       dispatch(clearSuccess());
     }
   }, [isSuccess]);
@@ -201,24 +201,10 @@ const Employees = () => {
         </TableContainer>
       </div>
 
-      {/* Confirm Action Modal */}
-      {statusModalData && (
-        <ConfirmActionModal
-          modalName={activeInactiveModalName}
-          setModal={setStatusModalData}
-          handleAction={() => {
-            dispatch(
-              updateEmployeeStatus({
-                id: statusModalData?._id,
-                isActive: !statusModalData?.isActive,
-              })
-            );
-            setStatusModalData(null);
-          }}
-          modalData={statusModalData}
-          action={statusModalData?.isActive ? "deactivate" : "activate"}
-        />
-      )}
+      <ConfirmActionModal
+        modalName={activeInactiveModalName}
+        
+      />
     </>
   );
 };

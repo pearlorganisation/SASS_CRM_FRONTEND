@@ -76,3 +76,15 @@ export const getAllRoles = createAsyncThunk(
     }
   }
 );
+
+export const getUserSubscription = createAsyncThunk(
+  "subscription/fetchData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`/subscription`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

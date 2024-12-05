@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, Modal, Box, TextField, Grid, Tabs, Tab } from "@mui/material";
 import TableWithStickyActions from "../Test/TableWithStickyActions"; // Assuming this is your table component
 import { createPortal } from "react-dom";
-import UpdateCsvXslxModal from "./UpdateCsvXslxModal";
+import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
 import { clearSuccess, setTabValue } from "../../features/slices/attendees";
 import { getAttendees } from "../../features/actions/attendees";
 
@@ -15,7 +15,7 @@ const WebinarAttendees = () => {
   const { tabValue, isSuccess } = useSelector((state) => state.attendee);
   const [showModal, setShowModal] = useState(false);
 
-  const LIMIT = 10;
+  const LIMIT = useSelector((state) => state.pageLimits['attendeeTable'] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(searchParams.get("page") || 1);
 
@@ -31,7 +31,7 @@ const WebinarAttendees = () => {
 
   useEffect(() => {
     dispatch(getAttendees({ id, isAttended: tabValue, page, limit: LIMIT }));
-  }, [page, tabValue]);
+  }, [page, tabValue, LIMIT]);
 
   useEffect(() => {
     if (isSuccess) {

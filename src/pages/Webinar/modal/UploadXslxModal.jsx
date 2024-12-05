@@ -4,9 +4,9 @@ import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import * as XLSX from "xlsx";
-import { clearSuccess } from "../../features/slices/attendees";
+import { clearSuccess } from "../../../features/slices/attendees";
 import { useParams } from "react-router-dom";
-import { addAttendees } from "../../features/actions/attendees";
+import { addAttendees } from "../../../features/actions/attendees";
 import { ClipLoader } from "react-spinners";
 
 const UploadXslxModal = ({ setModal, update }) => {

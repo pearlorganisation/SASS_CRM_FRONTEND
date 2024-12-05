@@ -17,6 +17,7 @@ import clientReducer from './slices/client'
 import exportReducer from './slices/export-excel'
 import modalReducer from './slices/modalSlice'
 import attendeeReducer from './slices/attendees'
+import pageLimitReducer from './slices/pageLimits'
 
 // Combine your individual reducers here
 const rootReducer = combineReducers({
@@ -33,7 +34,8 @@ const rootReducer = combineReducers({
   client: clientReducer,
   modals: modalReducer,
   export:exportReducer,
-  attendee: attendeeReducer
+  attendee: attendeeReducer,
+  pageLimits: pageLimitReducer
 });
 
 // Custom root reducer handling a clear action

@@ -41,11 +41,11 @@ const Sidebar = () => {
           label: "Webinars",
           icon: <SiGooglemeet size={30} />,
         },
-        // {
-        //   path: "/attendees",
-        //   label: "Attendees",
-        //   icon: <HiUserGroup size={30} />,
-        // },
+        {
+          path: "/attendees",
+          label: "Attendees",
+          icon: <HiUserGroup size={30} />,
+        },
         {
           path: "/employees",
           label: "Employees",

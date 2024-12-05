@@ -21,6 +21,7 @@ import { getRoleNameByID } from "../../utils/roles";
 import ActiveInactiveModal from "../../components/Client/ActiveInactiveModal";
 import {openModal} from '../../features/slices/modalSlice';
 import ExportClientExcelModal from "../../components/Export/ExportClientExcelModal";
+import ClientFilterModal from "../../components/Client/ClientFilterModal";
 
 const Clients = () => {
   const navigate = useNavigate();
@@ -110,6 +111,7 @@ const Clients = () => {
     );
   };
   const exportExcelModal = "ExportClientExcel";
+  const clientFilterModal = "ClientFilterModal";
 
   return (
     <div className="py-10 md:px-10 sm:pl-4 mt-10">
@@ -119,6 +121,12 @@ const Clients = () => {
         <div className="flex gap-5">
           <Button variant="contained" color="primary" onClick={handleAddClient}>
             Add Client
+          </Button>
+          <Button
+          
+          onClick={() => dispatch(openModal(clientFilterModal))}
+          variant="outlined" color="primary">
+            Filter
           </Button>
 
           <Button
@@ -284,6 +292,7 @@ const Clients = () => {
         <ActiveInactiveModal clientData={activeData} setModal={setActiveData} />
       )}
       <ExportClientExcelModal modalName={exportExcelModal}/>
+      <ClientFilterModal modalName={clientFilterModal} />
     </div>
   );
 };
