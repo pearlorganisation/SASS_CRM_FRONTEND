@@ -1,63 +1,101 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import {
+  Modal,
+  Box,
+  Typography,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  Button,
+} from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { closeModal } from "../../../features/slices/modalSlice";
 
-function EmployeeAssignModal({ employeeData, selectedType, onClose, onAssign }) {
+function EmployeeAssignModal({ modalName, onAssign }) {
+  const dispatch = useDispatch();
+  const { modals } = useSelector((state) => state.modals);
+  const open = modals[modalName] ? true : false;
+
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
-  const options =
-    Array.isArray(employeeData) &&
-    employeeData
-      .filter((item) => item?.role?.name === selectedType)
-      .map((item) => ({
-        value: item?._id,
-        label: item?.userName,
-      }));
+  // Dummy employee data
+  const employeeData = [
+    { _id: "1", userName: "Alice Johnson", role: { name: "Manager" } },
+    { _id: "2", userName: "Bob Smith", role: { name: "Developer" } },
+    { _id: "3", userName: "Charlie Brown", role: { name: "Manager" } },
+  ];
+
+  const selectedType = "Manager"; // Dummy selected type
+
+  // Filter employees based on the selected role
+  const options = employeeData
+    .filter((item) => item?.role?.name === selectedType)
+    .map((item) => ({
+      value: item?._id,
+      label: item?.userName,
+    }));
+
+  const handleAssign = () => {
+    if (selectedEmployee) {
+      onAssign(selectedEmployee); // Callback to assign employee
+    }
+  };
+
+  const onClose = () => {
+    dispatch(closeModal(modalName));
+    setSelectedEmployee(null);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-md p-6 space-y-4">
-        <h2 className="text-xl font-semibold text-gray-800">Select an Employee</h2>
-        <form>
-          <div className="space-y-3">
-            {options.map((option) => (
-              <div key={option.value} className="flex items-center">
-                <input
-                  type="radio"
-                  id={option.value}
-                  name="employee"
-                  value={option.value}
-                  onChange={() => setSelectedEmployee(option.value)}
-                  className="text-blue-600 focus:ring-2 focus:ring-blue-500"
-                />
-                <label htmlFor={option.value} className="ml-2 text-gray-700">
-                  {option.label}
-                </label>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6 flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={() => onAssign(selectedEmployee)}
-              disabled={!selectedEmployee}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                selectedEmployee
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-            >
-              Assign
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-lg font-medium text-gray-600 bg-gray-200 hover:bg-gray-300"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <Modal open={open} onClose={onClose}>
+      <Box
+        className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto mt-20 space-y-4"
+        sx={{ outline: "none" }}
+      >
+        {/* Modal Header */}
+        <Typography variant="h6" className="text-gray-800 font-semibold">
+          Select an Employee
+        </Typography>
+
+        {/* Employee Options */}
+        <RadioGroup
+          value={selectedEmployee}
+          onChange={(e) => setSelectedEmployee(e.target.value)}
+          className="space-y-3"
+        >
+          {options.map((option) => (
+            <FormControlLabel
+              key={option.value}
+              value={option.value}
+              control={<Radio color="primary" />}
+              label={<span className="text-gray-700">{option.label}</span>}
+              className="flex items-center"
+            />
+          ))}
+        </RadioGroup>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end space-x-3 mt-4">
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!selectedEmployee}
+            onClick={handleAssign}
+            className="capitalize"
+          >
+            Assign
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={onClose}
+            className="capitalize"
+          >
+            Cancel
+          </Button>
+        </div>
+      </Box>
+    </Modal>
   );
 }
 

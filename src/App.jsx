@@ -38,7 +38,7 @@ import {
 } from "./pages";
 import { addUserActivity } from "./features/actions/userActivity";
 import RouteGuard from "./components/AccessControl/RouteGuard";
-import { getAllRoles } from "./features/actions/auth";
+import { getAllRoles, getUserSubscription } from "./features/actions/auth";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -53,6 +53,7 @@ const App = () => {
   useEffect(() => {
     function initFunctions() {
       dispatch(getAllRoles());
+      dispatch(getUserSubscription());
     }
     initFunctions();
 
@@ -133,7 +134,11 @@ const App = () => {
         },
         {
           path: "/clients",
-          element: <Clients />,
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN"]}>
+              <Clients />
+            </RouteGuard>
+          ),
         },
         {
           path: "/add-client",

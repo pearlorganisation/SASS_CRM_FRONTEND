@@ -11,9 +11,12 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
-import { Pagination } from "@mui/material";
+import { Button, Pagination } from "@mui/material";
+import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
+import { openModal } from "../../features/slices/modalSlice";
+import PageLimitEditor from "../../components/PageLimitEditor";
 
 const tableCellStyles = {
   paddingTop: "6px",
@@ -21,19 +24,24 @@ const tableCellStyles = {
   textWrap: "nowrap",
 };
 
-const TableWithStickyActions = ({page, setPage}) => {
+const TableWithStickyActions = ({ page, setPage }) => {
+  const dispatch = useDispatch()  ; 
+  const { attendeeData, isLoading, isSuccess, totalPages, tabValue } =
+    useSelector((state) => state.attendee);
   const [selectedRows, setSelectedRows] = useState([]);
-  const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
-    (state) => state.attendee
-  );
 
   const handleCheckboxChange = (id) => {
-    setSelectedRows((prev) =>
-      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
-    );
+    if (setSelectedRows) {
+      setSelectedRows((prev) =>
+        prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+      );
+    }
   };
 
-  const isRowSelected = (id) => selectedRows.includes(id);
+  const isRowSelected = (id) => {
+    if (!selectedRows) return false;
+    selectedRows.includes(id);
+  };
 
   const handleEdit = (id) => {
     console.log(`Editing row with id: ${id}`);
@@ -47,10 +55,25 @@ const TableWithStickyActions = ({page, setPage}) => {
     console.log(`Viewing details for row with id: ${id}`);
   };
   const thStyles = "font-semibold  text-gray-700 whitespace-nowrap";
+  const employeeAssignModalName = "employeeAssignModal";
 
   return (
     <div className="p-6 bg-gray-50">
-      <h2 className="text-2xl font-bold mb-4 text-gray-700">Attendee Table</h2>
+      <div className="flex justify-between  mb-2">
+        <h2 className="text-2xl font-bold mb-2 text-gray-700">
+          Attendee Table
+        </h2>
+        <div className="flex gap-2">
+        {
+          selectedRows.length > 0 && (
+            <Button
+            onClick={() => dispatch(openModal(employeeAssignModalName))}
+            className="h-fit" variant="contained">Assign</Button>
+          )
+        }
+        <PageLimitEditor pageId={"attendeeTable"} />
+        </div>
+      </div>
       <TableContainer component={Paper} className="shadow-md">
         <Table>
           <TableHead className="bg-gray-100">
@@ -83,13 +106,27 @@ const TableWithStickyActions = ({page, setPage}) => {
                     onChange={() => handleCheckboxChange(row?._id)}
                   />
                 </TableCell>
-                <TableCell sx={tableCellStyles}>{row?.email ?? "N/A"}</TableCell>
-                <TableCell sx={tableCellStyles}>{row?.firstName ?? "N/A"}</TableCell>
-                <TableCell sx={tableCellStyles}>{row?.lastName ?? "N/A"}</TableCell>
-                <TableCell sx={tableCellStyles}>{row?.timeInSession ?? "N/A"}</TableCell>
-                <TableCell sx={tableCellStyles}>{row?.gender ?? "N/A"}</TableCell>
-                <TableCell sx={tableCellStyles}>{row?.location ?? "N/A"}</TableCell>
-                <TableCell sx={tableCellStyles}>{row?.phone ?? "N/A"}</TableCell>
+                <TableCell sx={tableCellStyles}>
+                  {row?.email ?? "N/A"}
+                </TableCell>
+                <TableCell sx={tableCellStyles}>
+                  {row?.firstName ?? "N/A"}
+                </TableCell>
+                <TableCell sx={tableCellStyles}>
+                  {row?.lastName ?? "N/A"}
+                </TableCell>
+                <TableCell sx={tableCellStyles}>
+                  {row?.timeInSession ?? "N/A"}
+                </TableCell>
+                <TableCell sx={tableCellStyles}>
+                  {row?.gender ?? "N/A"}
+                </TableCell>
+                <TableCell sx={tableCellStyles}>
+                  {row?.location ?? "N/A"}
+                </TableCell>
+                <TableCell sx={tableCellStyles}>
+                  {row?.phone ?? "N/A"}
+                </TableCell>
                 <TableCell
                   className="sticky right-0 bg-white z-10"
                   sx={tableCellStyles}
@@ -119,6 +156,7 @@ const TableWithStickyActions = ({page, setPage}) => {
           onChange={(_, page) => setPage(page)}
         />
       </div>
+      <EmployeeAssignModal modalName={employeeAssignModalName}/>
     </div>
   );
 };

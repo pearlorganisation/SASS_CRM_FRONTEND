@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Backdrop,
   Box,
@@ -10,13 +10,17 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useDispatch, useSelector } from "react-redux";
+import { closeModal } from "../../../features/slices/modalSlice";
+import { updateEmployeeStatus } from "../../../features/actions/employee";
 
-export default function ConfirmActionModal({
-  setModal,
-  handleAction,
-  modalData,
-  action,
-}) {
+export default function ConfirmActionModal({ modalName }) {
+  const dispatch = useDispatch();
+  const { subscription } = useSelector((state) => state.auth);
+  const { modals, modalData } = useSelector((state) => state.modals);
+  const open = modals[modalName] ? true : false;
+
+  const { isSuccess } = useSelector((state) => state.employee);
   const [inputValue, setInputValue] = useState("");
   const [isInputValid, setIsInputValid] = useState(true);
 
@@ -31,30 +35,59 @@ export default function ConfirmActionModal({
       return;
     }
     if (isInputValid) {
-      handleAction();
+      dispatch(
+        updateEmployeeStatus({
+          id: modalData?._id,
+          isActive: !modalData?.isActive,
+        })
+      );
     }
   };
 
+  const handleClose = () => {
+    dispatch(closeModal(modalName));
+    setInputValue("");
+  };
+
+  useEffect(() => {
+    if (isSuccess) {
+      handleClose();
+    }
+  }, [isSuccess]);
+
   return (
-    <Modal open={true} onClose={() => setModal(false)} closeAfterTransition>
-      <Fade in={true}>
+    <Modal open={open} onClose={handleClose} closeAfterTransition>
+      <Fade in={open}>
         <Box className="relative w-full max-w-md bg-white rounded-md shadow-lg p-6 mx-auto mt-20">
           {/* Header */}
           <div className="flex justify-between items-center border-b pb-2 mb-4">
             <Typography variant="h6" className="font-semibold">
-              {action === "activate" ? "Activate" : "Deactivate"} Account
+              {!modalData?.isActive ? "Activate" : "Deactivate"} Account
             </Typography>
             <IconButton
-              onClick={() => setModal(false)}
+              onClick={handleClose}
               className="text-black hover:text-red-500"
             >
               <CloseIcon />
             </IconButton>
           </div>
 
+         
+
+          {/* Note About Feature Usage */}
+          <div className="flex justify-center mb-4">
+          <Typography
+            variant="caption"
+            className="text-gray-600 text-center mb-4"
+          >
+            You can only activate/deactivate an Employee Account {subscription?.toggleLimit || 0} times.
+          </Typography>
+          </div>
+           
+
           {/* Confirmation Message */}
           <Typography variant="body1" className="text-center mb-6">
-            Confirm {action === "activate" ? "activation" : "deactivation"} by
+            Confirm {!modalData?.isActive ? "activation" : "deactivation"} by
             entering Email: <strong>{modalData?.email}</strong>
           </Typography>
 
@@ -82,12 +115,12 @@ export default function ConfirmActionModal({
               disabled={!isInputValid}
               className="w-full"
             >
-              {action === "activate" ? "Activate" : "Deactivate"}
+              {!modalData?.isActive ? "Activate" : "Deactivate"}
             </Button>
             <Button
               variant="outlined"
               color="secondary"
-              onClick={() => setModal(false)}
+              onClick={handleClose}
               className="w-full"
             >
               Cancel

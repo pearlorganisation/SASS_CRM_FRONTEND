@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllRoles, logIn, signUp, updatePassword, updateUser } from "../actions/auth";
+import { getAllRoles, getUserSubscription, logIn, signUp, updatePassword, updateUser } from "../actions/auth";
 import { toast } from "sonner";
 import { errorToast } from "../../utils/extra";
 // -------------------------------------------------------------------------------------------
@@ -13,6 +13,7 @@ const initialState = {
   isSuccess: false,
   isRolesLoading: false,
   roles: [],
+  subscription: null
 };
 
 // -------------------------------------- Slices------------------------------------------------
@@ -115,6 +116,12 @@ const authSlice = createSlice({
       })
       .addCase(getAllRoles.rejected, (state, action) => {
         state.isRolesLoading = false;
+      })
+      .addCase(getUserSubscription.fulfilled, (state, action) => {
+        state.subscription = action.payload;
+      })
+      .addCase(getUserSubscription.rejected, (state, action) => {
+        errorToast(action?.payload || 'Error getting user subscription');
       });
 
   },

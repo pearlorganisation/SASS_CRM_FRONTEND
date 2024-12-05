@@ -4,10 +4,10 @@ import { toast } from "sonner";
 import Select from "react-select";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { addAttendees } from "../../features/actions/attendees";
+import { addAttendees } from "../../../features/actions/attendees";
 import { useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import { clearSuccess } from "../../features/slices/attendees";
+import { clearSuccess } from "../../../features/slices/attendees";
 
 const UploadCsvModal = ({ setModal, update }) => {
   const { tabValue, isLoading, isSuccess } = useSelector(

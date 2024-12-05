@@ -10,6 +10,7 @@ const modalSlice = createSlice({
   initialState,
   reducers: {
     openModal: (state, action) => {
+      console.log("open modal ----> ", action.payload);
       if (typeof action.payload === "string") {
         state.modalData = null;
         state.modals[action.payload] = true;
@@ -25,6 +26,8 @@ const modalSlice = createSlice({
       }
     },
     closeModal: (state, action) => {
+      console.log("close modal ----> ", action.payload);
+
       state.modals[action.payload] = false;
     },
     resetModals: (state) => {
