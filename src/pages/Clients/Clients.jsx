@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { getAllClients, updateClient } from "../../features/actions/client";
+import { getAllClients } from "../../features/actions/client";
 import {
   Skeleton,
   Stack,
@@ -9,7 +9,6 @@ import {
   Tooltip,
   IconButton,
   Pagination,
-  Grid,
 } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import EditIcon from "@mui/icons-material/Edit";
@@ -17,7 +16,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { formatDateAsNumber } from "../../utils/extra";
 import ClientCard from "../../components/Client/ClientCard";
 import UpdateClientModal from "../../components/Client/UpdateClientModal";
-import { getRoleNameByID } from "../../utils/roles";
 import ActiveInactiveModal from "../../components/Client/ActiveInactiveModal";
 import { openModal } from "../../features/slices/modalSlice";
 import ExportClientExcelModal from "../../components/Export/ExportClientExcelModal";
@@ -45,7 +43,7 @@ const Clients = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      dispatch(getAllClients({ page: page, limit: LIMIT }));
+      dispatch(getAllClients({ page: page, limit: LIMIT, filters: filters }));
     }
   }, [isSuccess]);
 
