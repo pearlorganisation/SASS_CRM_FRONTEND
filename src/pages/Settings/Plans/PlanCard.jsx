@@ -7,6 +7,7 @@ import {
   FaAddressBook,
   FaPencilAlt,
   FaEllipsisV,
+  FaToggleOn,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { roles } from "../../../utils/roles";
@@ -26,6 +27,7 @@ const PlanCard = (props) => {
     planDuration,
     employeeCount,
     contactLimit,
+    toggleLimit,
     employeeReminder,
     purchaseHistory,
     employeeStatus,
@@ -75,6 +77,10 @@ const PlanCard = (props) => {
         <Feature
           icon={<FaAddressBook />}
           label={`${contactLimit} contact uploads`}
+        />
+        <Feature
+          icon={<FaToggleOn  />}
+          label={`${toggleLimit} Toggle Limit`}
         />
       </div>
 

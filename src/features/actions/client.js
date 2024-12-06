@@ -4,9 +4,12 @@ import { instance } from "../../services/axiosInterceptor";
 // get employee data
 export const getAllClients = createAsyncThunk(
   "clients/fetchData",
-  async (params, { rejectWithValue }) => {
+  async ({ page=1, limit=10, filters={} }, { rejectWithValue }) => {
     try {
-      const { data } = await instance.get(`/users/clients`,{params});
+      const params = { page, limit };
+      const { data } = await instance.post(`/users/clients`, filters, {
+        params,
+      });
 
       return data;
     } catch (e) {
@@ -44,7 +47,7 @@ export const clientSignup = createAsyncThunk(
 
 export const updateClient = createAsyncThunk(
   "client/update",
-  async ({data, id}, { rejectWithValue }) => {
+  async ({ data, id }, { rejectWithValue }) => {
     try {
       const response = await instance.patch(`/users/clients/${id}`, data);
       return response;

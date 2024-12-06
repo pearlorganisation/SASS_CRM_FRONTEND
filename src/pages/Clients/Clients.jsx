@@ -19,7 +19,7 @@ import ClientCard from "../../components/Client/ClientCard";
 import UpdateClientModal from "../../components/Client/UpdateClientModal";
 import { getRoleNameByID } from "../../utils/roles";
 import ActiveInactiveModal from "../../components/Client/ActiveInactiveModal";
-import {openModal} from '../../features/slices/modalSlice';
+import { openModal } from "../../features/slices/modalSlice";
 import ExportClientExcelModal from "../../components/Export/ExportClientExcelModal";
 import ClientFilterModal from "../../components/Client/ClientFilterModal";
 
@@ -37,10 +37,11 @@ const Clients = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const LIMIT = 10;
   const [page, setPage] = useState(searchParams.get("page") || 1);
+  const [filters, setFilters] = useState({});
 
   useEffect(() => {
-    dispatch(getAllClients({ page: page, limit: LIMIT }));
-  }, [page]);
+    dispatch(getAllClients({ page: page, limit: LIMIT, filters: filters }));
+  }, [page, filters]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -123,16 +124,18 @@ const Clients = () => {
             Add Client
           </Button>
           <Button
-          
-          onClick={() => dispatch(openModal(clientFilterModal))}
-          variant="outlined" color="primary">
+            onClick={() => dispatch(openModal(clientFilterModal))}
+            variant="outlined"
+            color="primary"
+          >
             Filter
           </Button>
 
           <Button
-          
-          onClick={() => dispatch(openModal(exportExcelModal))}
-          variant="outlined" color="primary">
+            onClick={() => dispatch(openModal(exportExcelModal))}
+            variant="outlined"
+            color="primary"
+          >
             Export
           </Button>
         </div>
@@ -186,6 +189,9 @@ const Clients = () => {
                   Phone Number
                 </th>
                 <th scope="col" className="px-6 py-3 text-nowrap">
+                  Toggle Limit
+                </th>
+                <th scope="col" className="px-6 py-3 text-nowrap">
                   Total Employees
                 </th>
                 <th scope="col" className="px-6 py-3 text-nowrap">
@@ -229,41 +235,24 @@ const Clients = () => {
                         {item?.isActive ? "Active" : "Inactive"}
                       </span>
                     </td>
-                    <td className="px-6 py-4">{item?.plan?.name || "N/A"}</td>
+                    <td className="px-6 py-4">{item?.planName || "N/A"}</td>
                     <td className="px-6 py-4">
-                      {Array.isArray(item?.subscription) &&
-                      item?.subscription.length > 0
-                        ? formatDateAsNumber(item?.subscription[0]?.startDate)
-                        : "N/A"}
+                      {formatDateAsNumber(item?.planStartDate) || "N/A"}
                     </td>
                     <td className="px-6 py-4">
-                      {formatDateAsNumber(item?.currentPlanExpiry)}
+                      {formatDateAsNumber(item?.planExpiry)}
                     </td>
                     <td className="px-6 py-4">
-                      {Array.isArray(item?.subscription) &&
-                      item?.subscription.length > 0
-                        ? item?.subscription[0]?.contactLimit
-                        : "N/A"}
+                      {item?.contactsLimit || "N/A"}
                     </td>
                     <td className="px-6 py-4">{item?.phone || "N/A"}</td>
+                    <td className="px-6 py-4">{item?.toggleLimit || 0}</td>
                     <td className="px-6 py-4">
-                      {item?.employees?.length || 0}
+                      {item.totalEmployees || 0}
                     </td>
+                    <td className="px-6 py-4">{item.employeeSalesCount || 0}</td>
                     <td className="px-6 py-4">
-                      {Array.isArray(item?.employees)
-                        ? item.employees.filter(
-                            (emp, idx) =>
-                              getRoleNameByID(emp?.role) === "EMPLOYEE SALES"
-                          ).length
-                        : 0}
-                    </td>
-                    <td className="px-6 py-4">
-                      {Array.isArray(item?.employees)
-                        ? item.employees.filter(
-                            (emp, idx) =>
-                              getRoleNameByID(emp?.role) === "EMPLOYEE REMINDER"
-                          ).length
-                        : 0}
+                      {item.employeeReminderCount || 0}
                     </td>
                     <td className="px-3   whitespace-nowrap stickyFieldRight">
                       <IconRow item={item} />
@@ -291,8 +280,8 @@ const Clients = () => {
       {activeData && (
         <ActiveInactiveModal clientData={activeData} setModal={setActiveData} />
       )}
-      <ExportClientExcelModal modalName={exportExcelModal}/>
-      <ClientFilterModal modalName={clientFilterModal} />
+      <ExportClientExcelModal modalName={exportExcelModal} />
+      <ClientFilterModal setFilters={setFilters} filters={filters} modalName={clientFilterModal} />
     </div>
   );
 };

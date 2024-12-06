@@ -2,9 +2,7 @@ import { Button, Skeleton, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getAllWebinars,
-} from "../../features/actions/webinarContact";
+import { getAllWebinars } from "../../features/actions/webinarContact";
 import Delete from "../../components/Webinar/delete";
 import Pagination from "@mui/material/Pagination";
 import CreateWebinar from "../../components/Webinar/CreateWebinar";
@@ -23,7 +21,7 @@ const MeetingDetails = () => {
   const { isLoading, isSuccess, webinarData, totalPages } = useSelector(
     (state) => state.webinarContact
   );
-  
+
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -35,7 +33,6 @@ const MeetingDetails = () => {
     setId(ID);
     setWebinarName(name);
   };
-
 
   const handlePagination = (e, p) => {
     setPage(p);
@@ -58,7 +55,7 @@ const MeetingDetails = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      setShowDeleteModal(false)
+      setShowDeleteModal(false);
       dispatch(getAllWebinars({ page: 1, limit: 10 }));
       dispatch(resetWebinarSuccess());
     }
@@ -116,6 +113,8 @@ const MeetingDetails = () => {
                   <th className="py-3 px-6">S No.</th>
                   <th className="py-3 px-6">Webinar Name</th>
                   <th className="py-3 px-6">Webinar Date</th>
+                  <th className="py-3 px-6">Total Registrations</th>
+                  <th className="py-3 px-6">Total Attendees</th>
                   <th className="py-3 px-6">Total Participants</th>
                   <th className="py-3 px-6">Action</th>
                 </tr>
@@ -141,7 +140,13 @@ const MeetingDetails = () => {
                           {formatDateAsNumber(item?.webinarDate)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {item?.totalParticipants || 0}
+                          {item?.totalRegistrations || 0}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {item?.totalAttendees || 0}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {item?.totalRegistrations + item?.totalAttendees}
                         </td>
 
                         <td
@@ -202,9 +207,7 @@ const MeetingDetails = () => {
         />
       )}
 
-      <CreateWebinar
-        modalName={createWebinarModalName}
-      />
+      <CreateWebinar modalName={createWebinarModalName} />
     </>
   );
 };
