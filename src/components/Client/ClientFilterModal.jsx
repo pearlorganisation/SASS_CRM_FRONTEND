@@ -13,6 +13,7 @@ import "react-datepicker/dist/react-datepicker.css"; // Required CSS for the dat
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../features/slices/modalSlice";
 import FormInput from "../FormInput";
+import { filterTruthyValues } from "../../utils/extra";
 
 const FilterModal = ({ modalName, setFilters, filters }) => {
   const dispatch = useDispatch();
@@ -21,67 +22,9 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   const { control, handleSubmit, register, reset } = useForm();
 
   const onSubmit = (data) => {
-    const filterData = {
-      email: data.email || undefined,
-      companyName: data.companyName || undefined,
-      userName: data.userName || undefined,
-      phone: data.phone || undefined,
-      isActive: data.isActive || undefined,
-      planName: data.planName || undefined,
-      toggleLimit: data.toggleLimit || undefined,
-      planStartDate:
-        data.planStartDateStart || data.planStartDateEnd
-          ? {
-              $gte: data.planStartDateStart || undefined,
-              $lte: data.planStartDateEnd || undefined,
-            }
-          : undefined,
-      planExpiry:
-        data.planExpiryStart || data.planExpiryEnd
-          ? {
-              $gte: data.planExpiryStart || undefined,
-              $lte: data.planExpiryEnd || undefined,
-            }
-          : undefined,
-      contactsLimit:
-        data.contactsLimitStart || data.contactsLimitEnd
-          ? {
-              $gte: Number(data.contactsLimitStart) || undefined,
-              $lte: Number(data.contactsLimitEnd) || undefined,
-            }
-          : undefined,
-      totalEmployees:
-        data.totalEmployeesStart || data.totalEmployeesEnd
-          ? {
-              $gte: Number(data.totalEmployeesStart) || undefined,
-              $lte: Number(data.totalEmployeesEnd) || undefined,
-            }
-          : undefined,
-      employeeSalesCount:
-        data.employeeSalesCountStart || data.employeeSalesCountEnd
-          ? {
-              $gte: Number(data.employeeSalesCountStart) || undefined,
-              $lte: Number(data.employeeSalesCountEnd) || undefined,
-            }
-          : undefined,
-      employeeReminderCount:
-        data.employeeReminderCountStart || data.employeeReminderCountEnd
-          ? {
-              $gte: Number(data.employeeReminderCountStart) || undefined,
-              $lte: Number(data.employeeReminderCountEnd) || undefined,
-            }
-          : undefined,
-      // contactsCount:
-      //   data.contactsCountStart || data.contactsCountEnd
-      //     ? {
-      //         $gte: data.contactsCountStart || undefined,
-      //         $lte: data.contactsCountEnd || undefined,
-      //       }
-      //     : undefined,
-    };
+    const filterData = filterTruthyValues(data);
     setFilters(filterData);
     dispatch(closeModal(modalName));
-    console.log("filterData", filterData);
   };
 
   const resetForm = () => {
@@ -92,20 +35,13 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
       phone: "",
       planName: "",
       isActive: false,
-      planStartDateStart: null,
-      planStartDateEnd: null,
-      planExpiryStart: null,
-      planExpiryEnd: null,
-      contactsLimitStart: "",
-      contactsLimitEnd: "",
-      totalEmployeesStart: "",
-      totalEmployeesEnd: "",
-      employeeSalesCountStart: "",
-      employeeSalesCountEnd: "",
-      employeeReminderCountStart: "",
-      employeeReminderCountEnd: "",
-      contactsCountStart: "",
-      contactsCountEnd: "",
+      toggleLimit: null,
+      planStartDate: null,
+      planExpiry: null,
+      contactsLimit: null,
+      totalEmployees: null,
+      employeeSalesCount: null,
+      employeeReminderCount: undefined,
     });
   };
 
@@ -117,50 +53,9 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   useEffect(() => {
     console.log("useEffect", filters);
     if (open) {
-      const resetData = {
-        ...filters,
-        planStartDateStart: filters?.planStartDate?.$gte
-          ? filters.planStartDate?.$gte
-          : null,
-        planStartDateEnd: filters.planStartDate?.$lte
-          ? filters.planStartDate?.$lte
-          : null,
-        planExpiryStart: filters.planExpiry?.$gte
-          ? filters.planExpiry?.$gte
-          : null,
-        planExpiryEnd: filters.planExpiry?.$lte
-          ? filters.planExpiry?.$lte
-          : null,
-        contactsLimitStart: filters.contactsLimit?.$gte
-          ? filters.contactsLimit?.$gte
-          : null,
-        contactsLimitEnd: filters.contactsLimit?.$lte
-          ? filters.contactsLimit?.$lte
-          : null,
-        totalEmployeesStart: filters.totalEmployees?.$gte
-          ? filters.totalEmployees?.$gte
-          : null,
-        totalEmployeesEnd: filters.totalEmployees?.$lte
-          ? filters.totalEmployees?.$lte
-          : null,
-        employeeSalesCountStart: filters.employeeSalesCount?.$gte
-          ? filters.employeeSalesCount?.$gte
-          : null,
-        employeeSalesCountEnd: filters.employeeSalesCount?.$lte
-          ? filters.employeeSalesCount?.$lte
-          : null,
-        employeeReminderCountStart: filters.employeeReminderCount?.$gte
-          ? filters.employeeReminderCount?.$gte
-          : null,
-        employeeReminderCountEnd: filters.employeeReminderCount?.$lte
-          ? filters.employeeReminderCount?.$lte
-          : null,
-        isActive: filters.isActive || false,
-        toggleLimit: filters.toggleLimit || 0,
-      };
-      reset(resetData);
+      reset(filters);
     }
-  }, [open, reset]);
+  }, [open]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -205,12 +100,13 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
               <Controller
                 name="isActive"
                 control={control}
+                defaultValue={false} // Ensure it's always controlled
                 render={({ field }) => (
                   <FormControlLabel
                     control={
                       <Checkbox
                         {...field}
-                        checked={field.value} // Use the field value for checked state
+                        checked={field.value || false} // Prevent undefined issues
                       />
                     }
                     label="Is Active"
@@ -222,49 +118,49 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
             {/* Number Ranges */}
             <div className="grid grid-cols-2 gap-4">
               <FormInput
-                name="contactsLimitStart"
+                name="contactsLimit.$gte"
                 label="Contacts Limit (Min)"
                 control={control}
                 type="number"
               />
               <FormInput
-                name="contactsLimitEnd"
+                name="contactsLimit.$lte"
                 label="Contacts Limit (Max)"
                 control={control}
                 type="number"
               />
               <FormInput
-                name="totalEmployeesStart"
+                name="totalEmployees.$gte"
                 label="Total Employees (Min)"
                 control={control}
                 type="number"
               />
               <FormInput
-                name="totalEmployeesEnd"
+                name="totalEmployees.$lte"
                 label="Total Employees (Max)"
                 control={control}
                 type="number"
               />
               <FormInput
-                name="employeeSalesCountStart"
+                name="employeeSalesCount.$gte"
                 label="Sales Count (Min)"
                 control={control}
                 type="number"
               />
               <FormInput
-                name="employeeSalesCountEnd"
+                name="employeeSalesCount.$lte"
                 label="Sales Count (Max)"
                 control={control}
                 type="number"
               />
               <FormInput
-                name="employeeReminderCountStart"
+                name="employeeReminderCount.$gte"
                 label="Reminder Count (Min)"
                 control={control}
                 type="number"
               />
               <FormInput
-                name="employeeReminderCountEnd"
+                name="employeeReminderCount.$lte"
                 label="Reminder Count (Max)"
                 control={control}
                 type="number"
@@ -300,7 +196,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
             <div className="grid grid-cols-2 gap-4">
               <div className="grid grid-cols-1">
                 <Controller
-                  name="planStartDateStart"
+                  name="planStartDate.$gte"
                   control={control}
                   render={({ field }) => (
                     <DatePicker
@@ -314,7 +210,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
               </div>
               <div className="grid grid-cols-1">
                 <Controller
-                  name="planStartDateEnd"
+                  name="planStartDate.$lte"
                   control={control}
                   render={({ field }) => (
                     <DatePicker
@@ -329,7 +225,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
 
               <div className="grid grid-cols-1">
                 <Controller
-                  name="planExpiryStart"
+                  name="planExpiry.$gte"
                   control={control}
                   render={({ field }) => (
                     <DatePicker
@@ -344,7 +240,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
 
               <div className="grid grid-cols-1">
                 <Controller
-                  name="planExpiryEnd"
+                  name="planExpiry.$lte"
                   control={control}
                   render={({ field }) => (
                     <DatePicker
@@ -364,10 +260,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
             <Button
               variant="contained"
               color="primary"
-              onClick={() => {
-                console.log("resetting form");
-                resetForm();
-              }}
+              onClick={resetForm}
             >
               Reset
             </Button>
