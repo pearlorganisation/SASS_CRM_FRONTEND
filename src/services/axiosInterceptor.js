@@ -31,11 +31,11 @@ instance.interceptors.response.use(
       shouldRetryRequest(originalRequest, originalRequest.url)
     ) {
       try {
-        console.log("Refreshing token...");
+        // console.log("Refreshing token...");
         // await delay(1000 * retryTracker.get(originalRequest.url)); // Exponential backoff
-        console.log('sf --- > ')
+        // console.log('sf --- > ')
         await instance.post("/auth/refresh", { userName: loggedInUserName });
-        console.log('< ---- sf --- > ')
+        // console.log('< ---- sf --- > ')
 
         return instance(originalRequest);
       } catch (refreshError) {

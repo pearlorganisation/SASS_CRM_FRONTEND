@@ -12,7 +12,7 @@ import { closeModal } from "../../features/slices/modalSlice";
 import { exportClientExcel } from "../../features/actions/export-excel";
 import { ClipLoader } from "react-spinners";
 
-const ExportClientExcelModal = ({ modalName }) => {
+const ExportClientExcelModal = ({ modalName, filters }) => {
   const defaultColumns = [
     { header: "Email", key: "email", },
     { header: "Company Name", key: "companyName", },
@@ -30,7 +30,7 @@ const ExportClientExcelModal = ({ modalName }) => {
       key: "employeeReminderCount",
 
     },
-    // { header: "Contacts Count", key: "contactsCount", },
+    { header: "Toggle Limit", key: "toggleLimit", },
   ];
   const dispatch = useDispatch();
 
@@ -58,7 +58,7 @@ const ExportClientExcelModal = ({ modalName }) => {
     const columns = selectedColumns.join(",");
     console.log("Limit:", limitValue);
     console.log("Columns:", columns);
-    dispatch(exportClientExcel({ limit: limitValue, columns }));
+    dispatch(exportClientExcel({ limit: limitValue, columns, filters }));
     //
   };
 

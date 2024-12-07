@@ -2,18 +2,22 @@ import React, { useEffect, useState } from "react";
 import { TextField, IconButton, Box } from "@mui/material";
 import { FaRegEdit, FaCheckSquare } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { setPageLimit } from "../features/slices/pageLimits"; 
+import { setPageLimit } from "../features/slices/pageLimits";
 
-const PageLimitEditor = ({ pageId = "defaultPage", initialLimit = 10 }) => {
+const PageLimitEditor = ({ pageId = "defaultPage" }) => {
   const dispatch = useDispatch();
-  const limitFromRedux = useSelector((state) => state.pageLimits[pageId] || initialLimit);
+  const limitFromRedux = useSelector((state) => state.pageLimits[pageId] || 10);
 
   const [isEditing, setIsEditing] = useState(false);
   const [pageLimit, setPageLimitState] = useState(limitFromRedux);
 
   useEffect(() => {
+    console.log('limitFromRedux', limitFromRedux, pageId);
     setPageLimitState(limitFromRedux);
   }, [limitFromRedux]);
+
+  useEffect(() => {
+  }, []);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -25,12 +29,12 @@ const PageLimitEditor = ({ pageId = "defaultPage", initialLimit = 10 }) => {
   };
 
   return (
-    <Box className="border rounded-md px-3 flex items-center gap-3 w-full text-gray-600">
+    <Box className="border rounded-md px-3 flex items-center gap-3 w-fit text-gray-600">
       {isEditing ? (
         <TextField
           type="number"
           value={pageLimit}
-          variant="outlined"
+          variant="standard"
           size="small"
           onClick={(e) => e.target.select()}
           onKeyDown={(e) => {
@@ -46,7 +50,9 @@ const PageLimitEditor = ({ pageId = "defaultPage", initialLimit = 10 }) => {
           inputProps={{ min: 1, max: 100 }}
         />
       ) : (
-        <label className="text-sm font-medium">Page Limit: {limitFromRedux}</label>
+        <label className="text-sm font-medium">
+          Page Limit: {limitFromRedux}
+        </label>
       )}
 
       {isEditing ? (

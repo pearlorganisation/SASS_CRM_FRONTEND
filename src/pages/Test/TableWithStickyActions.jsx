@@ -25,7 +25,7 @@ const tableCellStyles = {
 };
 
 const TableWithStickyActions = ({ page, setPage }) => {
-  const dispatch = useDispatch()  ; 
+  const dispatch = useDispatch();
   const { attendeeData, isLoading, isSuccess, totalPages, tabValue } =
     useSelector((state) => state.attendee);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -78,6 +78,8 @@ const TableWithStickyActions = ({ page, setPage }) => {
         <Table>
           <TableHead className="bg-gray-100">
             <TableRow>
+              <TableCell className="">S.No</TableCell>{" "}
+              {/* Serial Number Column */}
               <TableCell className="">Select</TableCell>
               <TableCell className={thStyles}>Email</TableCell>
               <TableCell className={thStyles}>First Name</TableCell>
@@ -92,13 +94,18 @@ const TableWithStickyActions = ({ page, setPage }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {attendeeData.map((row) => (
+            {attendeeData.map((row, index) => (
               <TableRow
                 key={row?._id}
                 className={`${
                   isRowSelected(row?._id) ? "bg-blue-50" : "bg-white"
                 } hover:bg-gray-50`}
               >
+                {/* Serial Number */}
+                <TableCell sx={tableCellStyles}>
+                  {(page - 1) * 10 + index + 1}{" "}
+                  {/* Calculate S.No dynamically */}
+                </TableCell>
                 <TableCell sx={tableCellStyles}>
                   <Checkbox
                     color="primary"
@@ -129,7 +136,7 @@ const TableWithStickyActions = ({ page, setPage }) => {
                 </TableCell>
                 <TableCell
                   className="sticky right-0 bg-white z-10"
-                  sx={tableCellStyles}
+                  sx={{ ...tableCellStyles, borderLeft: "1px solid #ccc" }}
                 >
                   <div className="flex gap-2 ">
                     <IconButton onClick={() => handleView(row?.id)}>
@@ -148,6 +155,7 @@ const TableWithStickyActions = ({ page, setPage }) => {
           </TableBody>
         </Table>
       </TableContainer>
+
       <div className="flex justify-center mt-5">
         <Pagination
           count={totalPages}
@@ -156,7 +164,7 @@ const TableWithStickyActions = ({ page, setPage }) => {
           onChange={(_, page) => setPage(page)}
         />
       </div>
-      <EmployeeAssignModal modalName={employeeAssignModalName}/>
+      <EmployeeAssignModal modalName={employeeAssignModalName} />
     </div>
   );
 };

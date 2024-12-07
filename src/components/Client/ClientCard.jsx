@@ -14,7 +14,7 @@ import { formatDateAsNumber } from "../../utils/extra";
 import { getRoleNameByID } from "../../utils/roles";
 
 const ClientCard = (props) => {
-  const { item, icons } = props;
+  const { item, actions } = props;
 
   // Helper to filter employees by role
   const getRoleCount = (roleName) => {
@@ -93,7 +93,20 @@ const ClientCard = (props) => {
               color={item?.isActive ? "success" : "error"}
               size="small"
             />
-            {icons}
+            <div className="flex gap-2 ">
+                  {actions?.map((action, index) => (
+                    <div key={index}>
+                      <Tooltip title={action.tooltip} arrow>
+                        <IconButton
+                          className="group"
+                          onClick={() => action.onClick(item)}
+                        >
+                          {action.icon(item)}
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  ))}
+                </div>
           </div>
         </CardContent>
       </Card>

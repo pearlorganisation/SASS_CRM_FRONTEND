@@ -6,6 +6,10 @@ import {
   Button,
   FormControlLabel,
   Checkbox,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import DatePicker from "react-datepicker";
@@ -34,26 +38,28 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
       userName: "",
       phone: "",
       planName: "",
-      isActive: false,
+      isActive: "",
       toggleLimit: null,
       planStartDate: null,
       planExpiry: null,
       contactsLimit: null,
       totalEmployees: null,
       employeeSalesCount: null,
-      employeeReminderCount: undefined,
+      employeeReminderCount: null,
     });
   };
 
   const onClose = () => {
     dispatch(closeModal(modalName));
   };
-  console.log("render");
 
   useEffect(() => {
-    console.log("useEffect", filters);
+    console.log("open", filters);
     if (open) {
-      reset(filters);
+      reset({
+        ...filters,
+        isActive: filters.isActive ,
+      });
     }
   }, [open]);
 
@@ -96,21 +102,27 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 control={control}
                 register={register}
               />
-              {/* Checkbox */}
+              {/* Select dropdown for Active/Inactive */}
               <Controller
                 name="isActive"
                 control={control}
-                defaultValue={false} // Ensure it's always controlled
+                defaultValue="" // Ensure it's always controlled
                 render={({ field }) => (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        {...field}
-                        checked={field.value || false} // Prevent undefined issues
-                      />
-                    }
-                    label="Is Active"
-                  />
+                  <FormControl fullWidth>
+                    <InputLabel id="active-inactive-label">
+                      Is Active
+                    </InputLabel>
+                    <Select
+                      {...field}
+                      labelId="active-inactive-label"
+                      label="Is Active"
+                      value={field.value || ""} // Ensure value is always controlled
+                    >
+                      <MenuItem value="">All</MenuItem>
+                      <MenuItem value="active">Active</MenuItem>
+                      <MenuItem value="inactive">Inactive</MenuItem>
+                    </Select>
+                  </FormControl>
                 )}
               />
             </div>
@@ -257,11 +269,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
 
           {/* Buttons */}
           <div className="flex justify-between">
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={resetForm}
-            >
+            <Button variant="contained" color="primary" onClick={resetForm}>
               Reset
             </Button>
             <div className="flex gap-2">
