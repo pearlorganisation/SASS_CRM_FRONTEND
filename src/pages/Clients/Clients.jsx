@@ -119,6 +119,9 @@ const Clients = () => {
 
       <DataTable
         tableHeader={tableHeader}
+        tableUniqueKey="clientsListingTable"
+        filters={filters}
+        setFilters={setFilters}
         ClientCards={ClientCards}
         tableData={{
           columns: clientTableColumns,
