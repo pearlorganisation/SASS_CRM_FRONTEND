@@ -27,10 +27,14 @@ import { formatDateAsNumber } from "../../utils/extra";
 import { useDispatch, useSelector } from "react-redux";
 import { openModal } from "../../features/slices/modalSlice";
 import RawTable from "./RawTable";
+import FilterPresetModal from "../Filter/FilterPresetModal";
 
 const DataTable = ({
   tableHeader = "Table",
-  ClientCards=null,
+  tableUniqueKey = "id",
+  filters,
+  setFilters,
+  ClientCards = null,
   tableData,
   actions,
   isSelectVisible = false,
@@ -42,7 +46,7 @@ const DataTable = ({
   exportModalName = "ExportExcelModal",
 }) => {
   const dispatch = useDispatch();
-
+  const filterPresetModalName = "FilterPresetModal";
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -55,7 +59,7 @@ const DataTable = ({
     <div className="p-6 bg-gray-50 rounded-lg">
       <div className="flex gap-4 justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-700">{tableHeader}</h2>
-        
+
         <IconButton
           id="demo-positioned-button"
           aria-controls={open ? "demo-positioned-menu" : undefined}
@@ -71,8 +75,8 @@ const DataTable = ({
           anchorEl={anchorEl}
           open={open}
           onClose={handleClose}
-          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          transformOrigin={{ horizontal: "right", vertical: "top" }}
+          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
           <MenuItem
             onClick={() => {
@@ -93,6 +97,9 @@ const DataTable = ({
           component="label"
           color="secondary"
           variant="outlined"
+          onClick={() => {
+            dispatch(openModal(filterPresetModalName));
+          }}
           startIcon={<BookmarkOutlinedIcon />}
         >
           Presets
@@ -107,19 +114,23 @@ const DataTable = ({
           startIcon={<FilterAltIcon />}
         >
           Filters
+          { filters && Object.keys(filters)?.length > 0 && (
+          <span className="ml-3 px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
+            { Object.keys(filters).length }
+          </span>
+        )}
         </Button>
       </div>
       {ClientCards}
-      <div className={`${ClientCards !== null ? "hidden md:block " : ""}`} >
-      <RawTable
-        tableData={tableData}
-        actions={actions}
-        isSelectVisible={isSelectVisible}
-        page={page}
-        limit={limit}
-      />
+      <div className={`${ClientCards !== null ? "hidden md:block " : ""}`}>
+        <RawTable
+          tableData={tableData}
+          actions={actions}
+          isSelectVisible={isSelectVisible}
+          page={page}
+          limit={limit}
+        />
       </div>
-      
 
       <div className="flex gap-4 md:flex-row flex-col items-center justify-between py-4">
         <Pagination
@@ -130,6 +141,13 @@ const DataTable = ({
         />
         <PageLimitEditor pageId={tableHeader} />
       </div>
+
+      <FilterPresetModal
+        tableName={tableUniqueKey}
+        filters={filters}
+        setFilters={setFilters}
+        modalName={filterPresetModalName}
+      />
     </div>
   );
 };
