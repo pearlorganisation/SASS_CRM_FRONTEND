@@ -3,9 +3,9 @@ import { instance } from '../../services/axiosInterceptor';
 
 export const exportClientExcel = createAsyncThunk(
   "client/exportExcel",
-  async ({ limit = 100, columns = "" }, { rejectWithValue }) => {
+  async ({ limit = 100, columns = "", filters={} }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`export-excel/client`, {
+      const response = await instance.post(`export-excel/client`,filters, {
         params: { limit, columns },
         responseType: 'blob', // Ensure you get the file as a binary Blob
       });

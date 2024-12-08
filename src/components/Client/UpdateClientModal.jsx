@@ -15,8 +15,12 @@ import { updateClient } from "../../features/actions/client";
 import { useDispatch, useSelector } from "react-redux";
 import { resetClientState } from "../../features/slices/client";
 import { ClipLoader } from "react-spinners";
+import { closeModal } from "../../features/slices/modalSlice";
 
-const UpdateClientModal = ({ open, onClose, defaultUserInfo }) => {
+const UpdateClientModal = ({ modalName }) => {
+  const { modals, modalData: defaultUserInfo } = useSelector((state) => state.modals);
+  const open = modals[modalName] ? true : false;
+
   const dispatch = useDispatch();
   const { isUpdating, isSuccess } = useSelector((state) => state.client);
   const [activeTab, setActiveTab] = useState(0);
@@ -68,7 +72,7 @@ const UpdateClientModal = ({ open, onClose, defaultUserInfo }) => {
   };
 
   const handleClose = () => {
-    onClose();
+    dispatch(closeModal(modalName));
     setActiveTab(0);
   };
 

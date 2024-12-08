@@ -1,247 +1,352 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Modal,
   Typography,
-  TextField,
   Button,
-  FormControlLabel,
-  Checkbox,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css"; // Required CSS for the date picker
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../features/slices/modalSlice";
+import FormInput from "../FormInput";
+import { filterTruthyValues } from "../../utils/extra";
 
-const FilterModal = ({ modalName, onApply }) => {
+const FilterModal = ({ modalName, setFilters, filters }) => {
   const dispatch = useDispatch();
-  const { modals, modalData } = useSelector((state) => state.modals);
+  const { modals } = useSelector((state) => state.modals);
   const open = modals[modalName] ? true : false;
   const { control, handleSubmit, register, reset } = useForm();
 
   const onSubmit = (data) => {
-    const filterData = {
-      email: data.email || undefined,
-      companyName: data.companyName || undefined,
-      userName: data.userName || undefined,
-      phone: data.phone || undefined,
-      isActive: data.isActive || undefined,
-      planName: data.planName || undefined,
-      planStartDate:
-        data.planStartDateStart || data.planStartDateEnd
-          ? {
-              $gte: data.planStartDateStart || undefined,
-              $lte: data.planStartDateEnd || undefined,
-            }
-          : undefined,
-      planExpiry:
-        data.planExpiryStart || data.planExpiryEnd
-          ? {
-              $gte: data.planExpiryStart || undefined,
-              $lte: data.planExpiryEnd || undefined,
-            }
-          : undefined,
-      contactsLimit:
-        data.contactsLimitStart || data.contactsLimitEnd
-          ? {
-              $gte: data.contactsLimitStart || undefined,
-              $lte: data.contactsLimitEnd || undefined,
-            }
-          : undefined,
-      totalEmployees:
-        data.totalEmployeesStart || data.totalEmployeesEnd
-          ? {
-              $gte: data.totalEmployeesStart || undefined,
-              $lte: data.totalEmployeesEnd || undefined,
-            }
-          : undefined,
-      employeeSalesCount:
-        data.employeeSalesCountStart || data.employeeSalesCountEnd
-          ? {
-              $gte: data.employeeSalesCountStart || undefined,
-              $lte: data.employeeSalesCountEnd || undefined,
-            }
-          : undefined,
-      employeeReminderCount:
-        data.employeeReminderCountStart || data.employeeReminderCountEnd
-          ? {
-              $gte: data.employeeReminderCountStart || undefined,
-              $lte: data.employeeReminderCountEnd || undefined,
-            }
-          : undefined,
-      contactsCount:
-        data.contactsCountStart || data.contactsCountEnd
-          ? {
-              $gte: data.contactsCountStart || undefined,
-              $lte: data.contactsCountEnd || undefined,
-            }
-          : undefined,
-    };
-    onClose();
+    const filterData = filterTruthyValues(data);
+    setFilters(filterData);
+    dispatch(closeModal(modalName));
+  };
+
+  const resetForm = () => {
+    reset({
+      email: "",
+      companyName: "",
+      userName: "",
+      phone: "",
+      planName: "",
+      isActive: "",
+      toggleLimit: null,
+      planStartDate: null,
+      planExpiry: null,
+      contactsLimit: null,
+      totalEmployees: null,
+      employeeSalesCount: null,
+      employeeReminderCount: null,
+    });
   };
 
   const onClose = () => {
     dispatch(closeModal(modalName));
   };
 
+  useEffect(() => {
+    console.log("open", filters);
+    if (open) {
+      reset({
+        ...filters,
+        isActive: filters.isActive,
+      });
+    }
+  }, [open]);
+
   return (
     <Modal open={open} onClose={onClose}>
-      <Box className="bg-white p-6 rounded-md mx-auto mt-20 w-full max-w-2xl max-h-[80dvh] overflow-y-auto">
+      <Box className="bg-white p-6 rounded-md mx-auto mt-20 w-full max-w-2xl ">
         <Typography variant="h6" className="text-center mb-4">
-          Filter Data
+          Client Filters
         </Typography>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Text Fields */}
-          <div className="grid grid-cols-2 gap-4">
-            <TextField {...register("email")} label="Email" fullWidth />
-            <TextField
-              {...register("companyName")}
-              label="Company Name"
-              fullWidth
-            />
-            <TextField {...register("userName")} label="User Name" fullWidth />
-            <TextField {...register("phone")} label="Phone" fullWidth />
-            <TextField {...register("planName")} label="Plan Name" fullWidth />
-          </div>
+          <div className="max-h-[65dvh] overflow-y-auto space-y-4 p-4 border rounded-lg">
+            <div className="grid grid-cols-2 gap-4">
+              <FormInput
+                name="email"
+                label="Email"
+                control={control}
+                validation={{
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "Enter a valid email address",
+                  },
+                }}
+              />
+              <FormInput
+                name="companyName"
+                label="Company Name"
+                control={control}
+              />
+              <FormInput name="userName" label="User Name" control={control} />
+              <FormInput
+                name="phone"
+                label="Phone"
+                control={control}
+                validation={{
+                  pattern: {
+                    value: /^[0-9]{10}$/, // Only 10 numeric characters
+                    message: "Phone number must be 10 digits",
+                  },
+                }}
+              />
+              <FormInput name="planName" label="Plan Name" control={control} />
+              {/* Select dropdown for Active/Inactive */}
+              <Controller
+                name="isActive"
+                control={control}
+                defaultValue="" // Ensure it's always controlled
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel id="active-inactive-label">
+                      Is Active
+                    </InputLabel>
+                    <Select
+                      {...field}
+                      labelId="active-inactive-label"
+                      label="Is Active"
+                      value={field.value || ""} // Ensure value is always controlled
+                    >
+                      <MenuItem value="">All</MenuItem>
+                      <MenuItem value="active">Active</MenuItem>
+                      <MenuItem value="inactive">Inactive</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+              />
+              <FormInput
+                name="contactsLimit.$gte"
+                label="Contacts Limit (Min)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
+              />
+              <FormInput
+                name="contactsLimit.$lte"
+                label="Contacts Limit (Max)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
+              />
+              <FormInput
+                name="totalEmployees.$gte"
+                label="Total Employees (Min)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
+              />
+              <FormInput
+                name="totalEmployees.$lte"
+                label="Total Employees (Max)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
+              />
+              <FormInput
+                name="employeeSalesCount.$gte"
+                label="Sales Count (Min)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
+              />
+              <FormInput
+                name="employeeSalesCount.$lte"
+                label="Sales Count (Max)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
+              />
+              <FormInput
+                name="employeeReminderCount.$gte"
+                label="Reminder Count (Min)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
+              />
+              <FormInput
+                name="employeeReminderCount.$lte"
+                label="Reminder Count (Max)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
+              />
 
-          {/* Checkbox */}
-          <FormControlLabel
-            control={<Checkbox {...register("isActive")} />}
-            label="Is Active"
-          />
+              <FormInput
+                name="toggleLimit.$gte"
+                label="Toggle Limit (Min)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
+              />
+              <FormInput
+                name="toggleLimit.$lte"
+                label="Toggle Limit (Max)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
+              />
+              {/* <FormInput
+                name="contactsCountStart"
+                label="Contacts Count (Min)"
+                control={control}
+                type="number"
+                validation={{
+                min: {
+                  value: 1,
+                  message: "Value must be at least 1",
+                },
+              }}
 
-          {/* Date Pickers */}
-          <div className="grid grid-cols-2 gap-4">
-            <Controller
-              name="planStartDateStart"
-              control={control}
-              render={({ field }) => (
-                <DatePicker
-                  selected={field.value}
-                  onChange={(date) => field.onChange(date)}
-                  className="border p-2 rounded"
-                  placeholderText="Plan Start Date (From)"
-                />
-              )}
-            />
-            <Controller
-              name="planStartDateEnd"
-              control={control}
-              render={({ field }) => (
-                <DatePicker
-                  selected={field.value}
-                  onChange={(date) => field.onChange(date)}
-                  className="border p-2 rounded"
-                  placeholderText="Plan Start Date (To)"
-                />
-              )}
-            />
-            <Controller
-              name="planExpiryStart"
-              control={control}
-              render={({ field }) => (
-                <DatePicker
-                  selected={field.value}
-                  onChange={(date) => field.onChange(date)}
-                  className="border p-2 rounded"
-                  placeholderText="Plan Expiry (From)"
-                />
-              )}
-            />
-            <Controller
-              name="planExpiryEnd"
-              control={control}
-              render={({ field }) => (
-                <DatePicker
-                  selected={field.value}
-                  onChange={(date) => field.onChange(date)}
-                  className="border p-2 rounded"
-                  placeholderText="Plan Expiry (To)"
-                />
-              )}
-            />
-          </div>
+              />
+              <FormInput
+                name="contactsCountEnd"
+                label="Contacts Count (Max)"
+                control={control}
+                type="number"
+                validation={{
+                min: {
+                  value: 1,
+                  message: "Value must be at least 1",
+                },
+              }}
 
-          {/* Number Ranges */}
-          <div className="grid grid-cols-2 gap-4">
-            <TextField
-              {...register("contactsLimitStart")}
-              label="Contacts Limit (Min)"
-              type="number"
-              fullWidth
-            />
-            <TextField
-              {...register("contactsLimitEnd")}
-              label="Contacts Limit (Max)"
-              type="number"
-              fullWidth
-            />
-            <TextField
-              {...register("totalEmployeesStart")}
-              label="Total Employees (Min)"
-              type="number"
-              fullWidth
-            />
-            <TextField
-              {...register("totalEmployeesEnd")}
-              label="Total Employees (Max)"
-              type="number"
-              fullWidth
-            />
-            <TextField
-              {...register("employeeSalesCountStart")}
-              label="Sales Count (Min)"
-              type="number"
-              fullWidth
-            />
-            <TextField
-              {...register("employeeSalesCountEnd")}
-              label="Sales Count (Max)"
-              type="number"
-              fullWidth
-            />
-            <TextField
-              {...register("employeeReminderCountStart")}
-              label="Reminder Count (Min)"
-              type="number"
-              fullWidth
-            />
-            <TextField
-              {...register("employeeReminderCountEnd")}
-              label="Reminder Count (Max)"
-              type="number"
-              fullWidth
-            />
-            <TextField
-              {...register("contactsCountStart")}
-              label="Contacts Count (Min)"
-              type="number"
-              fullWidth
-            />
-            <TextField
-              {...register("contactsCountEnd")}
-              label="Contacts Count (Max)"
-              type="number"
-              fullWidth
-            />
+              /> */}
+            </div>
+
+            {/* Date Pickers */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1">
+                <Controller
+                  name="planStartDate.$gte"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      selected={field.value}
+                      onChange={(date) => field.onChange(date)}
+                      className="border p-4 w-full rounded flex-1"
+                      placeholderText="Plan Start Date (From)"
+                    />
+                  )}
+                />
+              </div>
+              <div className="grid grid-cols-1">
+                <Controller
+                  name="planStartDate.$lte"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      selected={field.value}
+                      onChange={(date) => field.onChange(date)}
+                      className="border p-4 w-full rounded"
+                      placeholderText="Plan Start Date (To)"
+                    />
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1">
+                <Controller
+                  name="planExpiry.$gte"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      selected={field.value}
+                      onChange={(date) => field.onChange(date)}
+                      className="border p-4 w-full rounded"
+                      placeholderText="Plan Expiry (From)"
+                    />
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-1">
+                <Controller
+                  name="planExpiry.$lte"
+                  control={control}
+                  render={({ field }) => (
+                    <DatePicker
+                      selected={field.value}
+                      onChange={(date) => field.onChange(date)}
+                      className="border p-4 w-full rounded"
+                      placeholderText="Plan Expiry (To)"
+                    />
+                  )}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-end space-x-2">
-            <Button
-              onClick={() => {
-                reset();
-                onClose();
-              }}
-              variant="outlined"
-              color="secondary"
-            >
-              Cancel
+          <div className="flex justify-between">
+            <Button variant="contained" color="primary" onClick={resetForm}>
+              Reset
             </Button>
-            <Button type="submit" variant="contained" color="primary">
-              Apply Filters
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={onClose} variant="outlined" color="secondary">
+                Cancel
+              </Button>
+              <Button type="submit" variant="contained" color="primary">
+                Apply Filters
+              </Button>
+            </div>
           </div>
         </form>
       </Box>

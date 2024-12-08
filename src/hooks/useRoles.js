@@ -4,20 +4,53 @@ import { useMemo } from 'react';
 const useRoles = () => {
   const { roles } = useSelector((state) => state.auth);
 
-  // Transform roles array into an object with name as key and _id as value
+  // Ensure roles is an array and handle cases where it is undefined or not an array
   const rolesObject = useMemo(() => {
-    if (!Array.isArray(roles) || roles.length === 0) return {};
+    if (!Array.isArray(roles)) {
+      console.error('Invalid roles data. Expected an array but received:', typeof roles);
+      return {}; // Return empty object to prevent errors in the app
+    }
+
+    if (roles.length === 0) return {};
+
+    // Safely transform roles array into an object with name as key and _id as value
     return roles.reduce((acc, role) => {
-      acc[role.name] = role._id;
+      if (role && role?.name && role?._id) {
+        acc[role.name] = role._id;
+      } else {
+        console.error('Invalid role data encountered', role);
+      }
       return acc;
     }, {});
   }, [roles]);
 
-  // Wrap rolesObject with Proxy to handle undefined fields gracefully
+  // Safely map roleId to role name with fallback
+  const getRoleNameByID = (roleId = "") => {
+    if (typeof roleId !== 'string' || roleId.trim() === "") {
+      console.warn('Invalid roleId provided:', roleId);
+      return 'Unknown Role';
+    }
+
+    const roleEntries = Object.entries(rolesObject);
+    const matchedRole = roleEntries.find(([roleName, id]) => id === roleId);
+
+    return matchedRole ? matchedRole[0].replace("_", " ") : "Unknown Role";
+  };
+
+  // Wrap rolesObject with Proxy to handle method calls and undefined fields gracefully
   const rolesProxy = useMemo(() => {
     return new Proxy(rolesObject, {
       get(target, property) {
-        // Return the actual property if it exists, otherwise return an empty string
+        // Handle method calls like 'getRoleNameById'
+        if (property === 'getRoleNameById') {
+          return getRoleNameByID;
+        }
+
+        // Fallback for undefined properties in rolesObject
+        if (!(property in target)) {
+          console.warn(`Accessing an unknown role property: ${property}`);
+        }
+
         return property in target ? target[property] : 'defaultName';
       },
     });

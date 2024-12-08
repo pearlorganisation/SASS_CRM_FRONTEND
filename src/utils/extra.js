@@ -84,3 +84,38 @@ export const successToast = (message) => {
     draggable: true,
   });
 };
+
+export function filterTruthyValues(obj) {
+  // Base case: if the input is not an object, return it as is.
+  // console.log("obj", typeof obj, obj);
+  if (typeof obj !== "object" || obj === null) {
+    return obj;
+  }
+
+  // Create a new object to store filtered values.
+  const filteredObj = Array.isArray(obj) ? [] : {};
+
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = obj[key];
+
+      // Check if value is a Date object and ensure it's a valid date.
+      if (value instanceof Date) {
+        if (!isNaN(value.getTime())) {
+          filteredObj[key] = value; // Keep valid Date objects
+        }
+      } else if (typeof value === "object" && value !== null) {
+        // Recursively process nested objects or arrays.
+        const nestedFiltered = filterTruthyValues(value);
+        if (Object.keys(nestedFiltered).length > 0 || Array.isArray(value)) {
+          filteredObj[key] = nestedFiltered;
+        }
+      } else if (value) {
+        // Include only truthy values and exclude empty strings.
+        filteredObj[key] = value;
+      }
+    }
+  }
+
+  return filteredObj;
+}

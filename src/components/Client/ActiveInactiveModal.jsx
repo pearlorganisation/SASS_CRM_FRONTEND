@@ -1,14 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { IconButton, Tooltip } from "@mui/material";
+import {
+  Modal,
+  Box,
+  Tooltip,
+  IconButton,
+  CircularProgress,
+  TextField,
+  Button,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { updateClient } from "../../features/actions/client";
 import { useDispatch, useSelector } from "react-redux";
-import { ClipLoader } from "react-spinners";
+import { updateClient } from "../../features/actions/client";
 import { resetClientState } from "../../features/slices/client";
+import { closeModal } from "../../features/slices/modalSlice";
 
-const ActiveInactiveModal = ({ clientData, setModal }) => {
+const ActiveInactiveModal = ({ modalName }) => {
+  const { modals, modalData: clientData } = useSelector((state) => state.modals);
+  const open = modals[modalName] ? true : false;
+
   const dispatch = useDispatch();
-  const { isUpdating , isSuccess} = useSelector((state) => state.client);
+  const { isUpdating, isSuccess } = useSelector((state) => state.client);
   const [inputValue, setInputValue] = useState("");
   const [note, setNote] = useState("");
   const [isInputValid, setIsInputValid] = useState(true);
@@ -39,24 +50,30 @@ const ActiveInactiveModal = ({ clientData, setModal }) => {
 
   useEffect(() => {
     if (isSuccess) {
-      setModal(null);
+      onClose();
     }
     return () => {
-      console.log('retrigngg')
-      dispatch(resetClientState())
-    }
-
+      dispatch(resetClientState());
+    };
   }, [isSuccess]);
 
+  const onClose = () => {
+    dispatch(closeModal(modalName));
+    setInputValue("");
+    setNote("");
+  };
+
   return (
-    <div className="fixed inset-0 p-4 flex justify-center items-center z-[1000] bg-black/50">
-      <div className="w-full max-w-lg bg-white rounded-md shadow-lg p-6 relative">
+    <Modal open={open} onClose={onClose}>
+      <Box
+        className="relative w-full max-w-lg mx-auto mt-20 bg-white rounded-lg shadow-lg p-6"
+      >
         {/* Modal Header */}
         <div className="flex justify-between items-center border-b pb-2 mb-4">
           <h2 className="text-lg font-semibold">Confirm Action</h2>
           <Tooltip title="Close">
             <IconButton
-              onClick={() => setModal(null)}
+              onClick={onClose}
               className="text-gray-600 hover:text-black"
             >
               <CloseIcon />
@@ -70,65 +87,58 @@ const ActiveInactiveModal = ({ clientData, setModal }) => {
             To proceed, copy and paste the email below into the input field:
           </p>
           <p className="text-sm font-medium bg-gray-100 p-2 rounded border mb-6">
-            {clientData.email}
+            {clientData?.email}
           </p>
-          <div className="relative pb-5">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={handleInputChange}
-              placeholder="Enter the email to confirm"
-              className={`w-full p-2 rounded-md border ${
-                isInputValid ? "border-gray-300" : "border-red-500"
-              }`}
-            />
-            {!isInputValid && (
-              <p className="text-red-500 text-sm mt-1">
-                The email entered does not match.
-              </p>
-            )}
-          </div>
+
+          <TextField
+            label="Enter email to confirm"
+            variant="outlined"
+            value={inputValue}
+            onChange={handleInputChange}
+            error={!isInputValid}
+            helperText={!isInputValid && "The email entered does not match."}
+            fullWidth
+          />
 
           {/* Optional Note Section */}
-          <div className="relative">
-            <textarea
-              value={note}
-              onChange={handleNoteChange}
-              placeholder="Add an optional note (e.g., reason for status change)"
-              className="w-full p-2 rounded-md border border-gray-300"
-              rows="4"
-            />
-          </div>
+          <textarea
+            value={note}
+            onChange={handleNoteChange}
+            placeholder="Add an optional note (e.g., reason for status change)"
+            className="w-full mt-4 p-2 rounded-md border border-gray-300"
+            rows="4"
+          />
         </div>
 
         {/* Modal Actions */}
         <div className="flex flex-col space-y-2 mt-6">
-          <button
+          <Button
             onClick={handleConfirmAction}
             disabled={!isInputValid || isUpdating}
-            className={`px-6 py-2 rounded-md text-white font-medium ${
-              isInputValid
-                ? "bg-blue-500 hover:bg-blue-600"
-                : "bg-gray-300 cursor-not-allowed"
+            variant="contained"
+            color="primary"
+            className={`!py-2 !font-medium ${
+              isInputValid ? "!bg-blue-500" : "!bg-gray-300 !cursor-not-allowed"
             }`}
           >
             {isUpdating ? (
-              <ClipLoader color="#fff" size={20} />
-            ) : clientData.isActive ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : clientData?.isActive ? (
               "Set as Inactive"
             ) : (
               "Set as Active"
             )}
-          </button>
-          <button
-            onClick={() => setModal(null)}
-            className="px-6 py-2 rounded-md bg-gray-200 text-black font-medium"
+          </Button>
+          <Button
+            onClick={onClose}
+            variant="outlined"
+            className="!py-2"
           >
             Cancel
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </Box>
+    </Modal>
   );
 };
 
