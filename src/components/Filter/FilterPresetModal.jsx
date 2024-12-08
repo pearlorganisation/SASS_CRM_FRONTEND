@@ -15,24 +15,45 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CheckIcon from "@mui/icons-material/Check";
 import { closeModal } from "../../features/slices/modalSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { creattFilterPreset, deleteFilterPreset, getFilterPreset } from "../../features/actions/filter-preset";
+import {
+  creattFilterPreset,
+  deleteFilterPreset,
+  getFilterPreset,
+} from "../../features/actions/filter-preset";
 import { clearPreset } from "../../features/slices/filter-preset";
+import { errorToast } from "../../utils/extra";
 
-const FilterPresetModal = ({ modalName, tableName="", filters={}, setFilters }) => {
+const FilterPresetModal = ({
+  modalName,
+  tableName = "",
+  filters = {},
+  setFilters,
+}) => {
   const dispatch = useDispatch();
-  const { modals, modalData } = useSelector((state) => state.modals);
+  const { modals } = useSelector((state) => state.modals);
   const open = modals[modalName] ? true : false;
-  const { filterPresets, isSuccess } = useSelector((state) => state.filterPreset);
+  const { filterPresets, isSuccess } = useSelector(
+    (state) => state.filterPreset
+  );
   const [newPresetName, setNewPresetName] = useState("");
 
   const handleSavePreset = () => {
-    const payload = {
-      name: newPresetName,
-      tableName: tableName,
-      filters:filters
-    }
+    if (
+      filters &&
+      !Array.isArray(filters) &&
+      typeof filters === "object" &&
+      Object.keys(filters).length > 0
+    ) {
+      const payload = {
+        name: newPresetName,
+        tableName: tableName,
+        filters: filters,
+      };
 
-    dispatch(creattFilterPreset(payload));
+      dispatch(creattFilterPreset(payload));
+    }else{
+      errorToast("Please select at least one filter");
+    }
   };
 
   const onApplyPreset = (filters) => {
@@ -47,7 +68,7 @@ const FilterPresetModal = ({ modalName, tableName="", filters={}, setFilters }) 
 
   useEffect(() => {
     if (open && tableName !== "") {
-        dispatch(getFilterPreset(tableName));
+      dispatch(getFilterPreset(tableName));
     }
   }, [open]);
 
@@ -90,7 +111,7 @@ const FilterPresetModal = ({ modalName, tableName="", filters={}, setFilters }) 
         </Box>
 
         {/* Presets List */}
-        { Array.isArray(filterPresets) && filterPresets.length > 0 && (
+        {Array.isArray(filterPresets) && filterPresets.length > 0 && (
           <>
             <Typography variant="subtitle1" gutterBottom>
               Saved Presets

@@ -8,8 +8,9 @@ const FormInput = ({
   control,
   defaultValue = "",
   type = "text",
-  required = false,  // Added required prop
-  errorMessage = "This field is required",  // Custom error message
+  required = false,
+  errorMessage = "This field is required",
+  validation = {}, // Additional dynamic validation rules
 }) => {
   return (
     <Controller
@@ -17,7 +18,8 @@ const FormInput = ({
       control={control}
       defaultValue={defaultValue}
       rules={{
-        required: required ? errorMessage : false,  // Only apply the required rule if `required` is true
+        required: required ? errorMessage : false,
+        ...validation, // Spread additional validation rules
       }}
       render={({ field, fieldState }) => (
         <TextField
@@ -25,14 +27,14 @@ const FormInput = ({
           label={label}
           fullWidth
           type={type}
-          value={type === "number" ? field.value ?? "" : field.value} // Ensure empty value is handled correctly
+          value={type === "number" ? field.value ?? "" : field.value}
           onChange={(e) =>
             field.onChange(
               type === "number" ? parseFloat(e.target.value) || "" : e.target.value
             )
           }
-          error={!!fieldState?.error}  // Show error if there's an error
-          helperText={fieldState?.error?.message}  // Display the error message
+          error={!!fieldState?.error}
+          helperText={fieldState?.error?.message}
         />
       )}
     />
