@@ -19,11 +19,11 @@ const NoticeBoardPage = () => {
     dispatch(resetSuccessAndUpdate());
   }, []);
   return (
-    <div className="mt-14 min-h-screen bg-gray-50 md:px-8 lg:px-12 ">
+    <div className="mt-14 min-h-screen bg-gray-50 md:px-8 px-4 lg:px-12  flex flex-col items-center">
       {/* Title */}
 
       {/* Update Button at the top right */}
-      <div className="flex justify-between items-center">
+      <div className="flex w-full max-w-4xl justify-between items-center">
         <div className="text-4xl font-bold">Notice Board</div>
         <ComponentGuard allowedRoles={[roles.ADMIN]}>
           {" "}
@@ -39,7 +39,7 @@ const NoticeBoardPage = () => {
       </div>
 
       {/* Preview content area */}
-      <div className="w-full mt-10">
+      <div className="max-w-4xl w-full  mt-10">
         <Paper className="p-6 bg-white shadow-lg rounded-lg border border-gray-200">
           <div
             className="preview-content text-base leading-relaxed text-gray-700"

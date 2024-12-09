@@ -201,7 +201,7 @@ const UpdateNoticeboard = () => {
     };
   }, [isSuccess]);
   return (
-    <Box className="flex flex-col items-center p-6 bg-gray-100 min-h-screen">
+    <Box className="flex flex-col items-center px-6 pt-14 bg-gray-100 min-h-screen">
       <Paper
         elevation={3}
         className="w-full max-w-4xl p-6 bg-white rounded-lg shadow-md"
@@ -234,17 +234,7 @@ const UpdateNoticeboard = () => {
           </Button>
         </div>
       </Paper>
-      <Box className="w-full max-w-4xl mt-8">
-        <Typography variant="h5" className="mb-4">
-          Preview
-        </Typography>
-        <Paper className="p-4 bg-gray-100">
-          <div
-            className="preview-content"
-            dangerouslySetInnerHTML={{ __html: editorContent }}
-          />
-        </Paper>
-      </Box>
+     
     </Box>
   );
 };
