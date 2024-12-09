@@ -2,7 +2,7 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
-import { addAttendees, getAttendees } from "../actions/attendees";
+import { addAttendees, getAllAttendees, getAttendees } from "../actions/attendees";
 
 const initialState = {
   isLoading: false,
@@ -50,6 +50,18 @@ export const attendeeSlice = createSlice({
         state.totalPages = action.payload?.totalPages || 1;
       })
       .addCase(getAttendees.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getAllAttendees.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getAllAttendees.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.attendeeData = action.payload?.result || [];
+        state.totalPages = action.payload?.totalPages || 1;
+      })
+      .addCase(getAllAttendees.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });
