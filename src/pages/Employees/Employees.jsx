@@ -1,31 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-  Tooltip,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Skeleton,
-  Stack,
   Button,
 } from "@mui/material";
 import { Edit, Visibility, ToggleOn, ToggleOff } from "@mui/icons-material";
-import {
-  changeEmployeeStatus,
-  getAllEmployees,
-  updateEmployeeStatus,
-} from "../../features/actions/employee";
+import { getAllEmployees } from "../../features/actions/employee";
 import ConfirmActionModal from "./modal/ConfirmActionModal";
-import { getRoleNameByID } from "../../utils/roles";
 import { clearSuccess } from "../../features/slices/employee";
 import { openModal } from "../../features/slices/modalSlice";
 import { getUserSubscription } from "../../features/actions/auth";
+import DataTable from "../../components/Table/DataTable";
+import { employeeTableColumns } from "../../utils/columnData";
+import useRoles from "../../hooks/useRoles";
 
 const tableCellStyles = {
   paddingTop: "8px",
@@ -34,12 +21,24 @@ const tableCellStyles = {
 };
 
 const Employees = () => {
+  // ----------------------- ModalNames for Redux -----------------------
   const activeInactiveModalName = "activeInactiveModal";
+  const employeeExportModalName = "EmployeeExportModal";
+  const employeeFilterModalName = "EmployeeFilterModal";
+  const tableHeader = "Employee Table";
 
-  const [statusModalData, setStatusModalData] = useState(null);
+  // ----------------------- Constants -----------------------
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { employeeData, isLoading, isSuccess } = useSelector(
+  const roles = useRoles();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [filters, setFilters] = useState({});
+  const [page, setPage] = useState(searchParams.get("page") || 1);
+
+  const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
+  const { employeeData, isLoading, isSuccess, totalPages } = useSelector(
     (state) => state.employee
   );
   const { userData } = useSelector((state) => state.auth);
@@ -49,13 +48,7 @@ const Employees = () => {
   }, [userData]);
 
   const handleStatusChange = (item) => {
-    setStatusModalData(item);
-    dispatch(
-      openModal({
-        modalName: activeInactiveModalName,
-        data: item,
-      })
-    );
+
   };
 
   const navigateToAdd = () => navigate("/createEmployee");
@@ -68,12 +61,55 @@ const Employees = () => {
     }
   }, [isSuccess]);
 
+  useEffect(() => {
+    setSearchParams({ page: page });
+  }, [page]);
+
+  // ------------------- Action Icons -------------------
+  const actionIcons = [
+    {
+      icon: () => (
+        <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
+      ),
+      tooltip: "View Employee Info",
+      onClick: (item) => {
+        console.log(`Viewing details for row with id: ${item?._id}`);
+      },
+    },
+    {
+      icon: () => (
+        <Edit className="text-blue-500 group-hover:text-blue-600" />
+      ),
+      tooltip: "Edit Employee Data",
+      onClick: (item) => {
+        navigate(`/employee/edit/${item?._id}`)
+      },
+    },
+    {
+      icon: (item) => (
+       <>
+       {item?.isActive ? (
+          <ToggleOff fontSize="large" className="text-red-500 group-hover:text-red-600" /> 
+        ) : (
+          <ToggleOn fontSize="large" className="text-green-500 group-hover:text-green-600" />
+        )}
+       </>
+      ),
+      tooltip: "Toggle Status",
+      onClick: (item) => {
+        dispatch(
+          openModal({
+            modalName: activeInactiveModalName,
+            data: item,
+          })
+        );
+      },
+    },
+  ];
+
   return (
     <>
-      <div className="p-10">
-        <h1 className="text-2xl font-bold text-gray-700">
-          Manage Employee Details
-        </h1>
+      <div className="pt-14 sm:px-5 px-2">
         {/* Add Employee Button */}
         <div className="flex justify-end items-center pb-4">
           <Button variant="contained" onClick={navigateToAdd}>
@@ -81,130 +117,30 @@ const Employees = () => {
           </Button>
         </div>
 
-        {/* Employee Table */}
-        <TableContainer component={Paper} className="shadow-md rounded-lg">
-          <Table stickyHeader>
-            <TableHead className="bg-gray-50">
-              <TableRow>
-                <TableCell className="font-semibold text-gray-700  whitespace-nowrap">
-                  Username / Email
-                </TableCell>
-                <TableCell className="font-semibold text-gray-700  whitespace-nowrap">
-                  Phone Number
-                </TableCell>
-                <TableCell className="font-semibold text-gray-700  whitespace-nowrap">
-                  Role
-                </TableCell>
-                <TableCell className="font-semibold text-gray-700  whitespace-nowrap">
-                  Status
-                </TableCell>
-                <TableCell className="font-semibold text-gray-700  whitespace-nowrap">
-                  Valid Call Time
-                </TableCell>
-                <TableCell className="font-semibold text-gray-700  whitespace-nowrap">
-                  Daily Contact Limit
-                </TableCell>
-                <TableCell className="font-semibold text-gray-700  whitespace-nowrap sticky right-0 z-10">
-                  Actions
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {isLoading ? (
-                <TableRow>
-                  <TableCell colSpan={7}>
-                    <Stack spacing={4}>
-                      <Skeleton variant="rounded" height={30} />
-                      <Skeleton variant="rounded" height={25} />
-                      <Skeleton variant="rounded" height={20} />
-                    </Stack>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                employeeData.map((item, idx) => (
-                  <TableRow key={idx} className="hover:bg-gray-50">
-                    <TableCell sx={tableCellStyles}>
-                      <div>
-                        <div className="font-semibold">{item?.userName}</div>
-                        <div className="text-sm text-gray-500">
-                          {item?.email}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell sx={tableCellStyles}>{item?.phone}</TableCell>
-                    <TableCell sx={tableCellStyles}>
-                      {getRoleNameByID(item?.role)}
-                    </TableCell>
-                    <TableCell sx={tableCellStyles}>
-                      {item?.isActive ? "Active" : "Inactive"}
-                    </TableCell>
-                    <TableCell sx={tableCellStyles}>
-                      {item?.validCallTime || 0} sec
-                    </TableCell>
-                    <TableCell sx={tableCellStyles}>
-                      {item?.dailyContactLimit || 0} Contacts
-                    </TableCell>
-                    <TableCell
-                      sx={tableCellStyles}
-                      className="sticky right-0 bg-white z-10"
-                    >
-                      <div className="flex gap-2">
-                        <Tooltip title="View Details">
-                          <IconButton
-                            // onClick={() =>
-                            //   navigate(`/employees/assignments/${item?._id}`)
-                            // }
-                            sx={{ color: "blue" }} // Material-UI color styling
-                          >
-                            <Visibility className="text-blue-600" />{" "}
-                            {/* Tailwind class */}
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Edit Employee Data">
-                          <IconButton
-                            onClick={() =>
-                              navigate(`/employee/edit/${item?._id}`)
-                            }
-                            sx={{ color: "green" }} // Material-UI color styling
-                          >
-                            <Edit className="text-green-600" />{" "}
-                            {/* Tailwind class */}
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip
-                          title={item?.isActive ? "Deactivate" : "Activate"}
-                        >
-                          <IconButton
-                            onClick={() => handleStatusChange(item)}
-                            sx={{ color: item?.isActive ? "red" : "green" }} // Material-UI dynamic color styling
-                          >
-                            {item?.isActive ? (
-                              <ToggleOff
-                                fontSize="large"
-                                className="text-red-600"
-                              /> // Tailwind class
-                            ) : (
-                              <ToggleOn
-                                fontSize="large"
-                                className="text-green-600"
-                              />
-                            )}
-                          </IconButton>
-                        </Tooltip>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <DataTable
+          tableHeader={tableHeader}
+          tableUniqueKey="employeeListingTable"
+          filters={filters}
+          setFilters={setFilters}
+          tableData={{
+            columns: employeeTableColumns,
+            rows: employeeData.map((item) => ({
+              ...item,
+              role: roles.getRoleNameById(item?.role),
+            })),
+          }}
+          actions={actionIcons}
+          totalPages={totalPages}
+          page={page}
+          setPage={setPage}
+          limit={LIMIT}
+          filterModalName={employeeFilterModalName}
+          exportModalName={employeeExportModalName}
+          isLoading={isLoading}
+        />
       </div>
 
-      <ConfirmActionModal
-        modalName={activeInactiveModalName}
-        
-      />
+      <ConfirmActionModal modalName={activeInactiveModalName} />
     </>
   );
 };

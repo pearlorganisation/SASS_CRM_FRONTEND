@@ -19,6 +19,7 @@ import modalReducer from './slices/modalSlice'
 import attendeeReducer from './slices/attendees'
 import pageLimitReducer from './slices/pageLimits'
 import filterPresetReducer from './slices/filter-preset'
+import tableReducer from './slices/tableSlice'
 
 // Combine your individual reducers here
 const rootReducer = combineReducers({
@@ -37,7 +38,8 @@ const rootReducer = combineReducers({
   export:exportReducer,
   attendee: attendeeReducer,
   pageLimits: pageLimitReducer,
-  filterPreset: filterPresetReducer
+  filterPreset: filterPresetReducer,
+  table: tableReducer,
 });
 
 // Custom root reducer handling a clear action

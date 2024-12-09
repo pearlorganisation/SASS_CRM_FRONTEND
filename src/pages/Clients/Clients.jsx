@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import DataTable from "../../components/Table/DataTable";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { useDispatch, useSelector } from "react-redux";
 import { clientTableColumns } from "../../utils/columnData";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -48,7 +47,7 @@ const Clients = () => {
       icon: (item) => (
         <div className={`${item?.isActive ? "" : "rotate-180"}`}>
           <LogoutIcon
-            className={`${item?.isActive ? "text-green-700" : "text-red-500"}`}
+            className={`${!item?.isActive ? "text-green-700" : "text-red-500"}`}
           />
         </div>
       ),
@@ -76,7 +75,6 @@ const Clients = () => {
     isSuccess,
   } = useSelector((state) => state.client);
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
-  console.log("clientsData", LIMIT);
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState({});
@@ -134,6 +132,7 @@ const Clients = () => {
         limit={LIMIT}
         filterModalName={clientFilterModalName}
         exportModalName={exportExcelModalName}
+        isLoading={isLoading}
       />
 
       <UpdateClientModal modalName={updateClientModalname} />

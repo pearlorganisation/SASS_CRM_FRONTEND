@@ -21,7 +21,7 @@ const initialState = {
   isSuccess: false,
   employeeData: [],
   singleEmployeeData: null,
-  totalPages: null,
+  totalPages: 1,
   errorMessage: "",
   employeeAssignments: [],
   Stats: null,

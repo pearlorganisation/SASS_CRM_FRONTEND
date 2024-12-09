@@ -4,8 +4,6 @@ import {
   Modal,
   Typography,
   Button,
-  FormControlLabel,
-  Checkbox,
   FormControl,
   InputLabel,
   Select,
@@ -58,7 +56,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
     if (open) {
       reset({
         ...filters,
-        isActive: filters.isActive ,
+        isActive: filters.isActive,
       });
     }
   }, [open]);
@@ -76,32 +74,31 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 name="email"
                 label="Email"
                 control={control}
-                defaultValue=""
+                validation={{
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                    message: "Enter a valid email address",
+                  },
+                }}
               />
               <FormInput
                 name="companyName"
                 label="Company Name"
                 control={control}
-                register={register}
               />
-              <FormInput
-                name="userName"
-                label="User Name"
-                control={control}
-                register={register}
-              />
+              <FormInput name="userName" label="User Name" control={control} />
               <FormInput
                 name="phone"
                 label="Phone"
                 control={control}
-                register={register}
+                validation={{
+                  pattern: {
+                    value: /^[0-9]{10}$/, // Only 10 numeric characters
+                    message: "Phone number must be 10 digits",
+                  },
+                }}
               />
-              <FormInput
-                name="planName"
-                label="Plan Name"
-                control={control}
-                register={register}
-              />
+              <FormInput name="planName" label="Plan Name" control={control} />
               {/* Select dropdown for Active/Inactive */}
               <Controller
                 name="isActive"
@@ -125,57 +122,101 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                   </FormControl>
                 )}
               />
-            </div>
-
-            {/* Number Ranges */}
-            <div className="grid grid-cols-2 gap-4">
               <FormInput
                 name="contactsLimit.$gte"
                 label="Contacts Limit (Min)"
                 control={control}
                 type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
               />
               <FormInput
                 name="contactsLimit.$lte"
                 label="Contacts Limit (Max)"
                 control={control}
                 type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
               />
               <FormInput
                 name="totalEmployees.$gte"
                 label="Total Employees (Min)"
                 control={control}
                 type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
               />
               <FormInput
                 name="totalEmployees.$lte"
                 label="Total Employees (Max)"
                 control={control}
                 type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
               />
               <FormInput
                 name="employeeSalesCount.$gte"
                 label="Sales Count (Min)"
                 control={control}
                 type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
               />
               <FormInput
                 name="employeeSalesCount.$lte"
                 label="Sales Count (Max)"
                 control={control}
                 type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
               />
               <FormInput
                 name="employeeReminderCount.$gte"
                 label="Reminder Count (Min)"
                 control={control}
                 type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
               />
               <FormInput
                 name="employeeReminderCount.$lte"
                 label="Reminder Count (Max)"
                 control={control}
                 type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
               />
 
               <FormInput
@@ -183,24 +224,50 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 label="Toggle Limit (Min)"
                 control={control}
                 type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
               />
               <FormInput
                 name="toggleLimit.$lte"
                 label="Toggle Limit (Max)"
                 control={control}
                 type="number"
+                validation={{
+                  min: {
+                    value: 1,
+                    message: "Value must be at least 1",
+                  },
+                }}
               />
               {/* <FormInput
                 name="contactsCountStart"
                 label="Contacts Count (Min)"
                 control={control}
                 type="number"
+                validation={{
+                min: {
+                  value: 1,
+                  message: "Value must be at least 1",
+                },
+              }}
+
               />
               <FormInput
                 name="contactsCountEnd"
                 label="Contacts Count (Max)"
                 control={control}
                 type="number"
+                validation={{
+                min: {
+                  value: 1,
+                  message: "Value must be at least 1",
+                },
+              }}
+
               /> */}
             </div>
 
