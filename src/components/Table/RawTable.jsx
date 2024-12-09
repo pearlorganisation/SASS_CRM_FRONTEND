@@ -15,7 +15,6 @@ import {
   Skeleton, // Import Skeleton
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedRows } from "../../features/slices/tableSlice";
 
 const tableCellStyles = {
   paddingTop: "6px",
@@ -27,12 +26,22 @@ const tableCellStyles = {
 const thStyles = " whitespace-nowrap";
 
 const RawTable = (props) => {
-  const { tableData, actions, isSelectVisible, page, limit, isLoading } = props;
+  const {
+    tableData,
+    actions,
+    isSelectVisible,
+    page,
+    limit,
+    isLoading,
+    selectedRows,
+    setSelectedRows,
+  } = props;
   const dispatch = useDispatch();
-  const {selectedRows} = useSelector((state) => state.table);
 
   const handleCheckboxChange = (id) => {
-    dispatch(setSelectedRows(id));
+    setSelectedRows((prev) =>
+      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+    );
   };
 
   const isRowSelected = (id) => {
@@ -60,26 +69,28 @@ const RawTable = (props) => {
         <TableBody>
           {isLoading
             ? // Display skeletons while loading
-              Array.from({ length: limit <= 10 ? limit : 10  }).map((_, index) => (
-                <TableRow key={index}>
-                  <TableCell sx={tableCellStyles}>
-                    <Skeleton variant="text" width="100%" />
-                  </TableCell>
-                  {isSelectVisible && (
+              Array.from({ length: limit <= 10 ? limit : 10 }).map(
+                (_, index) => (
+                  <TableRow key={index}>
                     <TableCell sx={tableCellStyles}>
-                      <Checkbox color="primary" disabled />
-                    </TableCell>
-                  )}
-                  {tableData?.columns?.map((column, index) => (
-                    <TableCell key={index} sx={tableCellStyles}>
                       <Skeleton variant="text" width="100%" />
                     </TableCell>
-                  ))}
-                  <TableCell sx={tableCellStyles}>
-                    <Skeleton variant="circle" width={30} height={30} />
-                  </TableCell>
-                </TableRow>
-              ))
+                    {isSelectVisible && (
+                      <TableCell sx={tableCellStyles}>
+                        <Checkbox color="primary" disabled />
+                      </TableCell>
+                    )}
+                    {tableData?.columns?.map((column, index) => (
+                      <TableCell key={index} sx={tableCellStyles}>
+                        <Skeleton variant="text" width="100%" />
+                      </TableCell>
+                    ))}
+                    <TableCell sx={tableCellStyles}>
+                      <Skeleton variant="circle" width={30} height={30} />
+                    </TableCell>
+                  </TableRow>
+                )
+              )
             : // Display actual data when not loading
               tableData?.rows?.map((row, index) => (
                 <TableRow

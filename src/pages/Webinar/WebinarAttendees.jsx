@@ -11,6 +11,7 @@ import { Edit, Delete, Visibility, AttachFile } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
+import { setSelectedRows } from "../../features/slices/tableSlice";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -24,7 +25,7 @@ const WebinarAttendees = () => {
 
   const { attendeeData, isLoading, isSuccess, totalPages, tabValue } =
     useSelector((state) => state.attendee);
-  const { selectedRows } = useSelector((state) => state.table);
+  const [selectedRows, setSelectedRows] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
@@ -40,6 +41,7 @@ const WebinarAttendees = () => {
   const handleTabChange = (_, newValue) => {
     dispatch(setTabValue(newValue));
     setPage(1);
+    setSelectedRows([]);  
   };
 
   useEffect(() => {
@@ -138,12 +140,14 @@ const WebinarAttendees = () => {
         totalPages={totalPages}
         page={page}
         setPage={setPage}
+        selectedRows={selectedRows} 
+        setSelectedRows={setSelectedRows}
         limit={LIMIT}
         filterModalName={AttendeesFilterModalName}
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
       />
-      <EmployeeAssignModal modalName={employeeAssignModalName} />
+      <EmployeeAssignModal selectedRows={selectedRows} modalName={employeeAssignModalName} />
       {showModal &&
         createPortal(
           <UpdateCsvXslxModal setModal={setShowModal} csvId={id} />,

@@ -37,6 +37,16 @@ const useRoles = () => {
     return matchedRole ? matchedRole[0].replace("_", " ") : "Unknown Role";
   };
 
+  // Check if roleName is either 'EMPLOYEE_SALES' or 'EMPLOYEE_REMINDER'
+  const isEmployeeId = (roleId) => {
+    if (typeof roleId !== 'string' || roleId.trim() === "") {
+      
+    }
+    const roleName = getRoleNameByID(roleId);
+    const employeeRoles = ['EMPLOYEE SALES', 'EMPLOYEE REMINDER'];
+    return employeeRoles.includes(roleName);
+  };
+
   // Wrap rolesObject with Proxy to handle method calls and undefined fields gracefully
   const rolesProxy = useMemo(() => {
     return new Proxy(rolesObject, {
@@ -44,6 +54,11 @@ const useRoles = () => {
         // Handle method calls like 'getRoleNameById'
         if (property === 'getRoleNameById') {
           return getRoleNameByID;
+        }
+
+        // Handle method calls like 'isEmployeeId'
+        if (property === 'isEmployeeId') {
+          return isEmployeeId;
         }
 
         // Fallback for undefined properties in rolesObject

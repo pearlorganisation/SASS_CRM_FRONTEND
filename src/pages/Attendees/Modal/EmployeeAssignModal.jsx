@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Box,
@@ -10,26 +10,27 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../../features/slices/modalSlice";
+import {getAllEmployees} from '../../../features/actions/employee'
+import useRoles from '../../../hooks/useRoles';
 
-function EmployeeAssignModal({ modalName, onAssign }) {
+function EmployeeAssignModal({ modalName, onAssign, selectedRows }) {
   const dispatch = useDispatch();
+  const roles = useRoles();
   const { modals } = useSelector((state) => state.modals);
+  const { employeeData, isLoading } = useSelector(state => state.employee);
+  const { isSuccess, tabValue } =
+  useSelector((state) => state.attendee);
+
   const open = modals[modalName] ? true : false;
 
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
-  // Dummy employee data
-  const employeeData = [
-    { _id: "1", userName: "Alice Johnson", role: { name: "Manager" } },
-    { _id: "2", userName: "Bob Smith", role: { name: "Developer" } },
-    { _id: "3", userName: "Charlie Brown", role: { name: "Manager" } },
-  ];
+  const selectedType = tabValue === 'preWebinar'? "EMPLOYEE REMINDER" : "EMPLOYEE SALES";
 
-  const selectedType = "Manager"; // Dummy selected type
 
   // Filter employees based on the selected role
-  const options = employeeData
-    .filter((item) => item?.role?.name === selectedType)
+  const options = employeeData.map(item =>  { return { ...item, role: roles.getRoleNameById(item?.role) }})
+    .filter((item) => item?.role === selectedType)
     .map((item) => ({
       value: item?._id,
       label: item?.userName,
@@ -45,6 +46,11 @@ function EmployeeAssignModal({ modalName, onAssign }) {
     dispatch(closeModal(modalName));
     setSelectedEmployee(null);
   };
+
+  
+  useEffect(()=> {
+    dispatch(getAllEmployees());
+  },[])
 
   return (
     <Modal open={open} onClose={onClose}>

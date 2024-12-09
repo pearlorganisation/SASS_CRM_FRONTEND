@@ -5,17 +5,20 @@ import { IoLogOut, IoPeople, IoSettings } from "react-icons/io5";
 import { HiUserGroup } from "react-icons/hi2";
 import { SiGooglemeet } from "react-icons/si";
 import { AiFillProduct } from "react-icons/ai";
-import { MdAssignment } from "react-icons/md";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // for dropdown icon
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../features/slices/auth";
 import { getAllSidebarLinks } from "../../../features/actions/sidebarLink";
 import { addUserActivity } from "../../../features/actions/userActivity";
 import { roles } from "../../../utils/roles";
+import { FaClipboard } from "react-icons/fa";
+import { Badge } from "@mui/material";
+import { resetSuccessAndUpdate } from "../../../features/slices/noticeBoard";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const {isUpdated} = useSelector((state) => state.noticeBoard);
   const { sidebarLinkData } = useSelector((state) => state.sidebarLink);
   const { userData } = useSelector((state) => state.auth);
   const { isSidebarOpen } = useSelector((state) => state.globalData);
@@ -65,11 +68,21 @@ const Sidebar = () => {
     },
     {
       roles: [roles.EMPLOYEE_SALES, roles.EMPLOYEE_REMINDER, roles.ADMIN],
-      items: [        {
-        path: "/products",
-        label: "Products",
-        icon: <AiFillProduct size={30} />,
-      },
+      items: [
+        {
+          path: "/products",
+          label: "Products",
+          icon: <AiFillProduct size={30} />,
+        },
+        {
+          path: "/notice-board",
+          label: "Notice Board",
+          icon: (
+            <Badge color="secondary" variant="dot" invisible={!isUpdated}>
+              <FaClipboard size={25} />
+            </Badge>
+          ),
+        },
       ],
     },
   ];
@@ -90,7 +103,6 @@ const Sidebar = () => {
   };
 
   const handleNavigation = (link) => {
-    navigate(link);
     addUserActivityLog(link, "page");
   };
 
@@ -137,7 +149,7 @@ const Sidebar = () => {
                   <Link
                     to={item.path}
                     onClick={() => handleNavigation(item.path)}
-                    className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+                    className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
                   >
                     {item.icon}
                     <span className="flex-1 ms-3 whitespace-nowrap">

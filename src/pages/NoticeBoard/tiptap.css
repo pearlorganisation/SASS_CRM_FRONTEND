@@ -1,0 +1,158 @@
+/* Preview content styling */
+.preview-content {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+}
+
+.preview-content h1, .preview-content h2, .preview-content h3, .preview-content h4, .preview-content h5, .preview-content h6 {
+    margin-bottom: 1em;
+    font-weight: bold;
+}
+
+.preview-content h1 {
+    font-size: 32px;
+}
+
+.preview-content h2 {
+    font-size: 28px;
+}
+
+.preview-content h3 {
+    font-size: 24px;
+}
+
+.preview-content h4 {
+    font-size: 20px;
+}
+
+.preview-content h5 {
+    font-size: 18px;
+}
+
+.preview-content h6 {
+    font-size: 16px;
+}
+
+.preview-content p {
+    margin-bottom: 1em;
+}
+
+/* Lists */
+.preview-content ul,
+.preview-content ol {
+    margin: 0;
+    padding-left: 1.5em;
+}
+
+.preview-content li {
+    margin-bottom: 0.5em;
+}
+
+.preview-content ul {
+    list-style-type: disc;
+}
+
+.preview-content ol {
+    list-style-type: decimal;
+}
+
+/* Links */
+.preview-content a {
+    color: blue;
+    text-decoration: underline;
+}
+
+.preview-content a:hover {
+    color: darkblue;
+}
+
+/* Styling for bold, italic, underline */
+.preview-content strong, .ProseMirror strong {
+    font-weight: bold;
+}
+
+.preview-content em, .ProseMirror em {
+    font-style: italic;
+}
+
+.preview-content u, .ProseMirror u {
+    text-decoration: underline;
+}
+
+/* ProseMirror (editor content) styling */
+.ProseMirror {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+}
+
+/* Headings for editor (ProseMirror) */
+.ProseMirror h1, .ProseMirror h2, .ProseMirror h3, .ProseMirror h4, .ProseMirror h5, .ProseMirror h6 {
+    margin-bottom: 1em;
+    font-weight: bold;
+}
+
+.ProseMirror h1 {
+    font-size: 32px;
+}
+
+.ProseMirror h2 {
+    font-size: 28px;
+}
+
+.ProseMirror h3 {
+    font-size: 24px;
+}
+
+.ProseMirror h4 {
+    font-size: 20px;
+}
+
+.ProseMirror h5 {
+    font-size: 18px;
+}
+
+.ProseMirror h6 {
+    font-size: 16px;
+}
+
+/* Lists in editor */
+.ProseMirror ul,
+.ProseMirror ol {
+    margin: 0;
+    padding-left: 1.5em;
+}
+
+.ProseMirror li {
+    margin-bottom: 0.5em;
+}
+
+.ProseMirror ul {
+    list-style-type: disc;
+}
+
+.ProseMirror ol {
+    list-style-type: decimal;
+}
+
+/* Links in editor */
+.ProseMirror a {
+    color: blue;
+    text-decoration: underline;
+}
+
+.ProseMirror a:hover {
+    color: darkblue;
+}
+
+/* Bold, Italic, Underline in editor */
+.ProseMirror strong {
+    font-weight: bold;
+}
+
+.ProseMirror em {
+    font-style: italic;
+}
+
+.ProseMirror u {
+    text-decoration: underline;
+}

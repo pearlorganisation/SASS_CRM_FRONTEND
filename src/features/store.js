@@ -20,6 +20,7 @@ import attendeeReducer from './slices/attendees'
 import pageLimitReducer from './slices/pageLimits'
 import filterPresetReducer from './slices/filter-preset'
 import tableReducer from './slices/tableSlice'
+import noticeBoardSlice from "./slices/noticeBoard";
 
 // Combine your individual reducers here
 const rootReducer = combineReducers({
@@ -40,6 +41,7 @@ const rootReducer = combineReducers({
   pageLimits: pageLimitReducer,
   filterPreset: filterPresetReducer,
   table: tableReducer,
+  noticeBoard: noticeBoardSlice,
 });
 
 // Custom root reducer handling a clear action
@@ -57,7 +59,7 @@ const persistConfig = {
   key: "SaasCrmClientPanel",
   version: 1,
   storage,
-  blacklist: ["export", "modals", 'employee', 'attendee'],
+  blacklist: ["export", "modals", 'employee', 'attendee', 'table'],
   transforms: [
     encryptTransform({
       secretKey: `${import.meta.env.VITE_REACT_APP_REDUX_PERSIST_SECRET_KEY}`,
