@@ -45,6 +45,8 @@ const DataTable = ({
   filterModalName = "FilterModal",
   exportModalName = "ExportExcelModal",
   isLoading = false,
+  selectedRows = [],
+  setSelectedRows = () => {},
 }) => {
   const dispatch = useDispatch();
   const filterPresetModalName = "FilterPresetModal";
@@ -115,11 +117,11 @@ const DataTable = ({
           startIcon={<FilterAltIcon />}
         >
           Filters
-          { filters && Object.keys(filters)?.length > 0 && (
-          <span className="ml-3 px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
-            { Object.keys(filters).length }
-          </span>
-        )}
+          {filters && Object.keys(filters)?.length > 0 && (
+            <span className="ml-3 px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
+              {Object.keys(filters).length}
+            </span>
+          )}
         </Button>
       </div>
       {ClientCards}
@@ -131,6 +133,8 @@ const DataTable = ({
           page={page}
           limit={limit}
           isLoading={isLoading}
+          selectedRows={selectedRows}
+          setSelectedRows={setSelectedRows}
         />
       </div>
 
