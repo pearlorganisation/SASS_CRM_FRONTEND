@@ -14,7 +14,7 @@ import {
   getDashboardUsersData,
   getGlobalData,
 } from "../actions/globalData";
-import { errorToast } from "../../utils/extra";
+import { errorToast, successToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
@@ -74,42 +74,39 @@ export const globalDataSlice = createSlice({
 
       .addCase(getCustomOptions.pending, (state, action) => {
         state.isLoading = true;
-        state.errorMessage = "";
       })
       .addCase(getCustomOptions.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = "";
-        state.customOptions = action.payload?.data || [];
+        state.customOptions = action.payload || [];
       })
       .addCase(getCustomOptions.rejected, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = action.payload;
         errorToast(action?.payload);
       })
       .addCase(createCustomOption.pending, (state, action) => {
         state.isLoading = true;
-        state.errorMessage = "";
+        state.isSuccess = false;
       })
       .addCase(createCustomOption.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = "";
+        state.isSuccess = true;
+        successToast("Option Created Successfully"); 
       })
       .addCase(createCustomOption.rejected, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = action.payload;
         errorToast(action?.payload);
       })
       .addCase(deleteCustomOption.pending, (state, action) => {
         state.isLoading = true;
-        state.errorMessage = "";
+        state.isSuccess = false;
       })
       .addCase(deleteCustomOption.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = "";
+        state.isSuccess = true;
+        successToast("Option Deleted Successfully");
       })
       .addCase(deleteCustomOption.rejected, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = action.payload;
         errorToast(action?.payload);
       })
       .addCase(getDashboardCardsData.pending, (state, action) => {

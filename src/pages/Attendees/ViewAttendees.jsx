@@ -3,7 +3,7 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Tab } from "@mui/material";
 import { clearSuccess } from "../../features/slices/attendees";
-import { getAllAttendees } from "../../features/actions/attendees";
+import { getAll, getAllAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
@@ -21,8 +21,9 @@ const WebinarAttendees = () => {
 
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const { attendeeData, isLoading, isSuccess, totalPages, } =
-  useSelector((state) => state.attendee);
+  const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
+    (state) => state.attendee
+  );
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(searchParams.get("page") || 1);
@@ -32,16 +33,14 @@ const WebinarAttendees = () => {
     setSearchParams({ page: page });
   }, [page]);
 
-
   useEffect(() => {
     dispatch(getAllAttendees({ page, limit: LIMIT }));
-  }, [page,  LIMIT]);
+    dispatch(getAll({ filters: { gender: {$exists: false} } }));
+  }, [page, LIMIT]);
 
   useEffect(() => {
     if (isSuccess) {
-      dispatch(
-        getAllAttendees({ page: 1, limit: LIMIT })
-      );
+      dispatch(getAllAttendees({ page: 1, limit: LIMIT }));
       dispatch(clearSuccess());
     }
   }, [isSuccess]);
@@ -80,16 +79,14 @@ const WebinarAttendees = () => {
       {/* Tabs for Sales and Reminder */}
 
       <div className="flex gap-4 justify-end">
-        {
-          selectedRows.length > 0 && (
-            <Button
-              onClick={() => dispatch(openModal(employeeAssignModalName))}
-              variant="contained"
-            >
-              Assign
-            </Button>
-          )
-        }
+        {selectedRows.length > 0 && (
+          <Button
+            onClick={() => dispatch(openModal(employeeAssignModalName))}
+            variant="contained"
+          >
+            Assign
+          </Button>
+        )}
       </div>
 
       <DataTable
@@ -106,14 +103,17 @@ const WebinarAttendees = () => {
         totalPages={totalPages}
         page={page}
         setPage={setPage}
-        selectedRows={selectedRows} 
+        selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
         limit={LIMIT}
         filterModalName={AttendeesFilterModalName}
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
       />
-      <EmployeeAssignModal selectedRows={selectedRows} modalName={employeeAssignModalName} />
+      <EmployeeAssignModal
+        selectedRows={selectedRows}
+        modalName={employeeAssignModalName}
+      />
     </div>
   );
 };

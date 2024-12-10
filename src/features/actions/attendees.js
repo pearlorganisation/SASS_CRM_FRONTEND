@@ -43,3 +43,18 @@ export const getAllAttendees = createAsyncThunk(
     }
   }
 );
+
+//get All Attendees
+export const getAll = createAsyncThunk(
+  "all/fetchData",
+  async ({ page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
+    try {
+      const response = await instance.post(`/attendees/all`, filters, {
+        params: { page, limit },
+      });
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

@@ -10,20 +10,24 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../features/slices/auth";
 import { getAllSidebarLinks } from "../../../features/actions/sidebarLink";
 import { addUserActivity } from "../../../features/actions/userActivity";
-import { roles } from "../../../utils/roles";
 import { FaClipboard } from "react-icons/fa";
-import { Badge } from "@mui/material";
+import { Badge, Chip } from "@mui/material";
 import { resetSuccessAndUpdate } from "../../../features/slices/noticeBoard";
+import { getNoticeBoard } from "../../../features/actions/noticeBoard";
+import useRoles from "../../../hooks/useRoles";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const roles = useRoles();
+  
   const {isUpdated} = useSelector((state) => state.noticeBoard);
   const { sidebarLinkData } = useSelector((state) => state.sidebarLink);
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, isUserLoggedIn } = useSelector((state) => state.auth);
   const { isSidebarOpen } = useSelector((state) => state.globalData);
   const [showImportantLinks, setShowImportantLinks] = useState(false); // toggle state for sub-links
   const role = userData?.role || "";
+  
 
   const navItems = [
     {
@@ -78,9 +82,7 @@ const Sidebar = () => {
           path: "/notice-board",
           label: "Notice Board",
           icon: (
-            <Badge color="secondary" variant="dot" invisible={!isUpdated}>
               <FaClipboard size={25} />
-            </Badge>
           ),
         },
       ],
@@ -119,6 +121,21 @@ const Sidebar = () => {
     dispatch(getAllSidebarLinks());
   }, []);
 
+  useEffect(() => {
+    let interval;
+    if (role && isUserLoggedIn && roles.isEmployeeId(role)) {
+      interval = setInterval(() => {
+        dispatch(getNoticeBoard());
+      }, 10000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [roles, role]);
+
   return (
     <div
       id="logo-sidebar"
@@ -153,7 +170,11 @@ const Sidebar = () => {
                   >
                     {item.icon}
                     <span className="flex-1 ms-3 whitespace-nowrap">
-                      {item.label}
+                      {item.label}{" "}{
+                        item.label === "Notice Board" && isUpdated && (
+                          <Chip color="secondary" label="New" />
+                        )
+                      }
                     </span>
                   </Link>
                 </li>

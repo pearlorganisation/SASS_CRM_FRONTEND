@@ -35,7 +35,7 @@ export const createCustomOption = createAsyncThunk(
   "customOption/create",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.post(`customOptions`, payload);
+      const response = await instance.post(`status-dropdown`, payload);
       return response;
     } catch (e) {
       return rejectWithValue(e);
@@ -47,7 +47,7 @@ export const getCustomOptions = createAsyncThunk(
   "customOption/get",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`customOptions`);
+      const response = await instance.get(`status-dropdown`);
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
@@ -59,7 +59,7 @@ export const deleteCustomOption = createAsyncThunk(
   "customOption/delete",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await instance.delete(`customOptions/${id}`);
+      const response = await instance.delete(`status-dropdown/${id}`);
       return response;
     } catch (e) {
       return rejectWithValue(e);
