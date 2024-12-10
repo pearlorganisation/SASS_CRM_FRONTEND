@@ -19,7 +19,7 @@ const NoticeBoardPage = () => {
     dispatch(resetSuccessAndUpdate());
   }, []);
   return (
-    <div className="mt-14 min-h-screen bg-gray-50 md:px-8 px-4 lg:px-12  flex flex-col items-center">
+    <div className="pt-14  md:px-8 px-4 lg:px-12  flex flex-col items-center">
       {/* Title */}
 
       {/* Update Button at the top right */}

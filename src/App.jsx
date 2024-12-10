@@ -48,8 +48,7 @@ const App = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
 
-  const { isUserLoggedIn } = useSelector((state) => state.auth);
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, isUserLoggedIn } = useSelector((state) => state.auth);
   const role = userData?.role || "";
   if (isUserLoggedIn && !role) {
     dispatch(logout());
@@ -57,10 +56,10 @@ const App = () => {
 
   useEffect(() => {
     function initFunctions() {
-      dispatch(getAllRoles());
       console.log(" isEmployee --->> ", roles.isEmployeeId(role));
       if (isUserLoggedIn && role && !roles.isEmployeeId(role)) {
         dispatch(getUserSubscription());
+        dispatch(getAllRoles());
       }
     }
     initFunctions();
@@ -74,21 +73,6 @@ const App = () => {
       );
     }
   }, []);
-
-  useEffect(() => {
-    let interval;
-    if (role && isUserLoggedIn && roles.isEmployeeId(role)) {
-      interval = setInterval(() => {
-        dispatch(getNoticeBoard());
-      }, 10000);
-    }
-
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [roles, role]);
 
   // dispatch(clearLoadingAndData())
 

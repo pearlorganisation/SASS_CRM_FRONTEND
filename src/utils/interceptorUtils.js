@@ -33,6 +33,6 @@ export const getErrorMessage = (status, defaultMessage) => {
     500: "Internal Server Error",
   };
   return (
-    errorMessages[status] || defaultMessage || "An unknown error occurred."
+    defaultMessage || errorMessages[status] ||  "An unknown error occurred."
   );
 };

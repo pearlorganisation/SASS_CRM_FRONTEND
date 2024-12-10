@@ -1,68 +1,119 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Modal, Box, TextField, Grid, Tabs, Tab } from "@mui/material";
-import TableWithStickyActions from "../Test/TableWithStickyActions"; // Assuming this is your table component
-// import UpdateCsvXslxModal from "./UpdateCsvXslxModal";
-import { clearSuccess, setTabValue } from "../../features/slices/attendees";
-import { getAttendees } from "../../features/actions/attendees";
+import { Button, Tabs, Tab } from "@mui/material";
+import { clearSuccess } from "../../features/slices/attendees";
+import { getAll, getAllAttendees } from "../../features/actions/attendees";
+import { attendeeTableColumns } from "../../utils/columnData";
+import { Edit, Delete, Visibility } from "@mui/icons-material";
+import DataTable from "../../components/Table/DataTable";
+import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
+import { openModal } from "../../features/slices/modalSlice";
 
 const WebinarAttendees = () => {
-  const { id } = useParams();
+  // ----------------------- ModalNames for Redux -----------------------
+  const AttendeesFilterModalName = "ViewAttendeesFilterModal";
+  const employeeAssignModalName = "ViewEmployeeAssignModal";
+  const tableHeader = "Attendees Table";
+  const exportExcelModalName = "ExportViewAttendeesExcel";
+  // ----------------------- etcetra -----------------------
   const dispatch = useDispatch();
 
-  const { tabValue, isSuccess } = useSelector((state) => state.attendee);
-  const [showModal, setShowModal] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
 
-  const LIMIT = 10;
+  const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
+    (state) => state.attendee
+  );
+  const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(searchParams.get("page") || 1);
-  const [selectedRows, setSelectedRows] = useState([]);
+  const [filters, setFilters] = useState({});
 
   useEffect(() => {
     setSearchParams({ page: page });
   }, [page]);
 
   useEffect(() => {
-    dispatch(getAttendees({ page, limit: LIMIT }));
-  }, [page]);
+    dispatch(getAllAttendees({ page, limit: LIMIT }));
+    dispatch(getAll({ filters: { gender: {$exists: false} } }));
+  }, [page, LIMIT]);
 
   useEffect(() => {
     if (isSuccess) {
-      dispatch(
-        getAttendees({ id, isAttended: tabValue, page: 1, limit: LIMIT })
-      );
+      dispatch(getAllAttendees({ page: 1, limit: LIMIT }));
       dispatch(clearSuccess());
     }
   }, [isSuccess]);
 
+  // ----------------------- Action Icons -----------------------
+
+  const actionIcons = [
+    {
+      icon: () => (
+        <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
+      ),
+      tooltip: "View Attendee Info",
+      onClick: (item) => {
+        console.log(`Viewing details for row with id: ${item?._id}`);
+      },
+    },
+    {
+      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
+      tooltip: "Edit Attendee",
+      onClick: (item) => {
+        console.log(`Editing row with id: ${item?._id}`);
+      },
+    },
+    {
+      icon: (item) => (
+        <Delete className="text-red-500 group-hover:text-red-600" />
+      ),
+      tooltip: "Delete Attendee",
+      onClick: (item) => {
+        console.log(`Deleting row with id: ${item?._id}`);
+      },
+    },
+  ];
   return (
-    <div className="px-6 md:px-10 pt-14 space-y-4">
-     
+    <div className="px-6 md:px-10 pt-10 space-y-6">
+      {/* Tabs for Sales and Reminder */}
 
       <div className="flex gap-4 justify-end">
-        {/* <Button
-          onClick={() => setShowModal((prev) => !prev)}
-          variant="outlined"
-        >
-          Import
-        </Button> */}
-        <Button variant="outlined">Filters</Button>
+        {selectedRows.length > 0 && (
+          <Button
+            onClick={() => dispatch(openModal(employeeAssignModalName))}
+            variant="contained"
+          >
+            Assign
+          </Button>
+        )}
       </div>
 
-      {/* Table Component */}
-      <TableWithStickyActions
-        selectedRows={selectedRows}
-        setSelectedRows={setSelectedRows}
+      <DataTable
+        tableHeader={tableHeader}
+        tableUniqueKey="ViewAttendeesTable"
+        isSelectVisible={true}
+        filters={filters}
+        setFilters={setFilters}
+        tableData={{
+          columns: attendeeTableColumns,
+          rows: attendeeData,
+        }}
+        actions={actionIcons}
+        totalPages={totalPages}
         page={page}
         setPage={setPage}
+        selectedRows={selectedRows}
+        setSelectedRows={setSelectedRows}
+        limit={LIMIT}
+        filterModalName={AttendeesFilterModalName}
+        exportModalName={exportExcelModalName}
+        isLoading={isLoading}
       />
-
-      {/* {showModal &&
-        createPortal(
-          <UpdateCsvXslxModal setModal={setShowModal} csvId={id} />,
-          document.body
-        )} */}
+      <EmployeeAssignModal
+        selectedRows={selectedRows}
+        modalName={employeeAssignModalName}
+      />
     </div>
   );
 };
