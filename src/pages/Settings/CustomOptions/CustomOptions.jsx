@@ -7,14 +7,20 @@ import {
   deleteCustomOption,
   getCustomOptions,
 } from "../../../features/actions/globalData";
-import { getRoleNameByID } from "../../../utils/roles";
 import { Button, Modal, TextField, IconButton } from "@mui/material"; // Importing MUI components
+import useRoles from "../../../hooks/useRoles";
 
 const CustomOptions = () => {
   const dispatch = useDispatch();
-  const { customOptions } = useSelector((state) => state.globalData);
+  const roles = useRoles();
+  const { customOptions, isSuccess } = useSelector((state) => state.globalData);
+  console.log("customOptions", customOptions);
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role || "";
+
+  const customOptionsData = customOptions.filter(
+    (option) => roles.SUPER_ADMIN === role || !option?.isDefault
+  );
 
   const [showModal, setShowModal] = useState(false);
 
@@ -28,32 +34,27 @@ const CustomOptions = () => {
   const handleModalToggle = () => setShowModal(!showModal);
 
   const onSubmit = (data) => {
-    data["value"] = data["label"];
-    dispatch(createCustomOption(data)).then(() => {
-      if (res.meta.requestStatus === "fulfilled"){
-        dispatch(getCustomOptions());
-        reset();
-        setShowModal(false);
-      }
-    });
+    dispatch(createCustomOption(data));
   };
 
   useEffect(() => {
     dispatch(getCustomOptions());
-  }, [dispatch]);
+  }, []);
 
-  const handleDelete = (optionId) => {
-    dispatch(deleteCustomOption(optionId)).then((res) => {
-      if (res.meta.requestStatus === "fulfilled") dispatch(getCustomOptions());
-    });
-  };
+  useEffect(() => {
+    if (isSuccess) {
+      setShowModal(false);
+      reset();
+      dispatch(getCustomOptions());
+    }
+  }, [isSuccess]);
 
   return (
     <div className="container mx-auto mt-10 p-4">
       <div className="flex justify-between py-6 items-center">
-        <h1 className="text-2xl font-bold">Custom Options</h1>
+        <h1 className="text-2xl font-bold">{roles.SUPER_ADMIN === role ? "Default" : "Custom"} Options</h1>
         <Button variant="contained" color="primary" onClick={handleModalToggle}>
-          Add Custom Option
+          Add {roles.SUPER_ADMIN === role ? "Default" : "Custom"} Option
         </Button>
       </div>
 
@@ -68,13 +69,13 @@ const CustomOptions = () => {
             </tr>
           </thead>
           <tbody>
-            {customOptions?.map((option, index) => (
+            {customOptionsData?.map((option, index) => (
               <tr key={index} className="border-b">
                 <td className="p-4">{index + 1}</td>
                 <td className="p-4">{option.label}</td>
                 <td className="p-4">
                   <IconButton
-                    onClick={() => handleDelete(option?._id)}
+                    onClick={() => dispatch(deleteCustomOption(option?._id))}
                     className="text-red-500 hover:text-red-700"
                   >
                     <MdDelete />
@@ -93,7 +94,7 @@ const CustomOptions = () => {
         className="flex items-center justify-center"
       >
         <div className="bg-white p-6 rounded shadow-lg w-80">
-          <h2 className="text-xl font-semibold mb-4">Add Custom Option</h2>
+          <h2 className="text-xl font-semibold mb-4">Add {roles.SUPER_ADMIN === role ? "Default" : "Custom"} Option</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-4">
               <TextField

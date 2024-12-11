@@ -15,7 +15,6 @@ import {
   Skeleton, // Import Skeleton
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedRows } from "../../features/slices/tableSlice";
 
 const tableCellStyles = {
   paddingTop: "6px",
@@ -27,12 +26,22 @@ const tableCellStyles = {
 const thStyles = " whitespace-nowrap";
 
 const RawTable = (props) => {
-  const { tableData, actions, isSelectVisible, page, limit, isLoading } = props;
+  const {
+    tableData,
+    actions,
+    isSelectVisible,
+    page,
+    limit,
+    isLoading,
+    selectedRows,
+    setSelectedRows,
+  } = props;
   const dispatch = useDispatch();
-  const {selectedRows} = useSelector((state) => state.table);
 
   const handleCheckboxChange = (id) => {
-    dispatch(setSelectedRows(id));
+    setSelectedRows((prev) =>
+      prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
+    );
   };
 
   const isRowSelected = (id) => {
@@ -58,83 +67,95 @@ const RawTable = (props) => {
         </TableHead>
 
         <TableBody>
-          {isLoading
-            ? // Display skeletons while loading
-              Array.from({ length: limit <= 10 ? limit : 10  }).map((_, index) => (
-                <TableRow key={index}>
+          {isLoading ? (
+            // Display skeletons while loading
+            Array.from({ length: limit <= 10 ? limit : 10 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell sx={tableCellStyles}>
+                  <Skeleton variant="text" width="100%" />
+                </TableCell>
+                {isSelectVisible && (
                   <TableCell sx={tableCellStyles}>
+                    <Checkbox color="primary" disabled />
+                  </TableCell>
+                )}
+                {tableData?.columns?.map((column, index) => (
+                  <TableCell key={index} sx={tableCellStyles}>
                     <Skeleton variant="text" width="100%" />
                   </TableCell>
-                  {isSelectVisible && (
-                    <TableCell sx={tableCellStyles}>
-                      <Checkbox color="primary" disabled />
-                    </TableCell>
-                  )}
-                  {tableData?.columns?.map((column, index) => (
-                    <TableCell key={index} sx={tableCellStyles}>
-                      <Skeleton variant="text" width="100%" />
-                    </TableCell>
-                  ))}
+                ))}
+                <TableCell sx={tableCellStyles}>
+                  <Skeleton variant="circle" width={30} height={30} />
+                </TableCell>
+              </TableRow>
+            ))
+          ) : tableData?.rows?.length > 0 ? (
+            // Display actual data when not loading and rows are available
+            tableData?.rows?.map((row, index) => (
+              <TableRow
+                key={row?._id}
+                className={`${
+                  isRowSelected(row?._id) ? "bg-blue-50" : "bg-white"
+                } hover:bg-gray-50`}
+              >
+                <TableCell sx={tableCellStyles}>
+                  {(page - 1) * limit + index + 1}
+                </TableCell>
+                {isSelectVisible && (
                   <TableCell sx={tableCellStyles}>
-                    <Skeleton variant="circle" width={30} height={30} />
+                    <Checkbox
+                      color="primary"
+                      checked={isRowSelected(row?._id)}
+                      onChange={() => handleCheckboxChange(row?._id)}
+                    />
                   </TableCell>
-                </TableRow>
-              ))
-            : // Display actual data when not loading
-              tableData?.rows?.map((row, index) => (
-                <TableRow
-                  key={row?._id}
-                  className={`${
-                    isRowSelected(row?._id) ? "bg-blue-50" : "bg-white"
-                  } hover:bg-gray-50`}
-                >
-                  {/* Serial Number */}
-                  <TableCell sx={tableCellStyles}>
-                    {(page - 1) * limit + index + 1}
-                  </TableCell>
-                  {isSelectVisible && (
-                    <TableCell sx={tableCellStyles}>
-                      <Checkbox
-                        color="primary"
-                        checked={isRowSelected(row?._id)}
-                        onChange={() => handleCheckboxChange(row?._id)}
+                )}
+                {tableData?.columns?.map((column, index) => (
+                  <TableCell key={index} sx={tableCellStyles}>
+                    {column.type === "status" && (
+                      <Chip
+                        label={row?.[column.key] ? "Active" : "Inactive"}
+                        color={row?.[column.key] ? "success" : "error"}
                       />
-                    </TableCell>
-                  )}
-                  {tableData?.columns?.map((column, index) => (
-                    <TableCell key={index} sx={tableCellStyles}>
-                      {column.type === "status" && (
-                        <Chip
-                          label={row?.[column.key] ? "Active" : "Inactive"}
-                          color={row?.[column.key] ? "success" : "error"}
-                        />
-                      )}
-                      {column.type === "Date" &&
-                        (formatDateAsNumber(row?.[column.key]) ?? "N/A")}
-                      {column.type === "" && (row?.[column.key] ?? "N/A")}
-                    </TableCell>
-                  ))}
-                  <TableCell
-                    className="sticky right-0 bg-white z-10"
-                    sx={{ ...tableCellStyles, borderLeft: "1px solid #ccc" }}
-                  >
-                    <div className="flex gap-2">
-                      {actions?.map((action, index) => (
-                        <div key={index}>
-                          <Tooltip title={action.tooltip} arrow>
-                            <IconButton
-                              className="group"
-                              onClick={() => action.onClick(row)}
-                            >
-                              {action.icon(row)}
-                            </IconButton>
-                          </Tooltip>
-                        </div>
-                      ))}
-                    </div>
+                    )}
+                    {column.type === "Date" &&
+                      (formatDateAsNumber(row?.[column.key]) ?? "N/A")}
+                    {column.type === "" && (row?.[column.key] ?? "N/A")}
                   </TableCell>
-                </TableRow>
-              ))}
+                ))}
+                <TableCell
+                  className="sticky right-0 bg-white z-10"
+                  sx={{ ...tableCellStyles, borderLeft: "1px solid #ccc" }}
+                >
+                  <div className="flex gap-2">
+                    {actions?.map((action, index) => (
+                      <div key={index}>
+                        <Tooltip title={action.tooltip} arrow>
+                          <IconButton
+                            className="group"
+                            onClick={() => action.onClick(row)}
+                          >
+                            {action.icon(row)}
+                          </IconButton>
+                        </Tooltip>
+                      </div>
+                    ))}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            // Display message when no data is available
+            <TableRow>
+              <TableCell
+                colSpan={tableData?.columns?.length + (isSelectVisible ? 2 : 1)}
+                align="center"
+                sx={{ color: "#999", fontStyle: "italic", padding: "20px" }}
+              >
+                No data available
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>

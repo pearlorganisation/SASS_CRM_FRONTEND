@@ -5,12 +5,13 @@ import { Button, Tabs, Tab } from "@mui/material";
 import { createPortal } from "react-dom";
 import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
 import { clearSuccess, setTabValue } from "../../features/slices/attendees";
-import { getAttendees } from "../../features/actions/attendees";
+import { getAll, getAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
 import { Edit, Delete, Visibility, AttachFile } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
+import AttendeesFilterModal from '../../components/Attendees/AttendeesFilterModal'
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -24,7 +25,7 @@ const WebinarAttendees = () => {
 
   const { attendeeData, isLoading, isSuccess, totalPages, tabValue } =
     useSelector((state) => state.attendee);
-  const { selectedRows } = useSelector((state) => state.table);
+  const [selectedRows, setSelectedRows] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
@@ -40,16 +41,17 @@ const WebinarAttendees = () => {
   const handleTabChange = (_, newValue) => {
     dispatch(setTabValue(newValue));
     setPage(1);
+    setSelectedRows([]);  
   };
 
   useEffect(() => {
-    dispatch(getAttendees({ id, isAttended: tabValue, page, limit: LIMIT }));
-  }, [page, tabValue, LIMIT]);
+    dispatch(getAttendees({ id, isAttended: tabValue, page, limit: LIMIT, filters }));
+  }, [page, tabValue, LIMIT, filters]);
 
   useEffect(() => {
     if (isSuccess) {
       dispatch(
-        getAttendees({ id, isAttended: tabValue, page: 1, limit: LIMIT })
+        getAttendees({ id, isAttended: tabValue, page: 1, limit: LIMIT, filters })
       );
       dispatch(clearSuccess());
     }
@@ -138,12 +140,15 @@ const WebinarAttendees = () => {
         totalPages={totalPages}
         page={page}
         setPage={setPage}
+        selectedRows={selectedRows} 
+        setSelectedRows={setSelectedRows}
         limit={LIMIT}
         filterModalName={AttendeesFilterModalName}
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
       />
-      <EmployeeAssignModal modalName={employeeAssignModalName} />
+      <EmployeeAssignModal selectedRows={selectedRows} modalName={employeeAssignModalName} />
+      <AttendeesFilterModal modalName={AttendeesFilterModalName} filters={filters} setFilters={setFilters} />
       {showModal &&
         createPortal(
           <UpdateCsvXslxModal setModal={setShowModal} csvId={id} />,

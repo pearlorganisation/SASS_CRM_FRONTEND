@@ -39,12 +39,16 @@ import {
 import { addUserActivity } from "./features/actions/userActivity";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 import { getAllRoles, getUserSubscription } from "./features/actions/auth";
+import UpdateNoticeBoard from "./pages/NoticeBoard/UpdateNoticeBoard";
+import NoticeBoard from "./pages/NoticeBoard/NoticeBoard";
+import { getNoticeBoard } from "./features/actions/noticeBoard";
+import useRoles from "./hooks/useRoles";
 
 const App = () => {
   const dispatch = useDispatch();
+  const roles = useRoles();
 
-  const { isUserLoggedIn } = useSelector((state) => state.auth);
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, isUserLoggedIn } = useSelector((state) => state.auth);
   const role = userData?.role || "";
   if (isUserLoggedIn && !role) {
     dispatch(logout());
@@ -52,8 +56,11 @@ const App = () => {
 
   useEffect(() => {
     function initFunctions() {
-      dispatch(getAllRoles());
-      dispatch(getUserSubscription());
+      console.log(" isEmployee --->> ", roles.isEmployeeId(role));
+      if (isUserLoggedIn && role && !roles.isEmployeeId(role)) {
+        dispatch(getUserSubscription());
+        dispatch(getAllRoles());
+      }
     }
     initFunctions();
 
@@ -248,6 +255,18 @@ const App = () => {
         {
           path: "/profile",
           element: <Profile />,
+        },
+        {
+          path: "/notice-board/update",
+          element: (
+            <RouteGuard roleNames={["ADMIN", "SUPER_ADMIN"]}>
+              <UpdateNoticeBoard />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/notice-board",
+          element: <NoticeBoard />,
         },
       ],
     },

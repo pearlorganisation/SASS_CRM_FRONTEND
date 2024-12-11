@@ -5,22 +5,29 @@ import { IoLogOut, IoPeople, IoSettings } from "react-icons/io5";
 import { HiUserGroup } from "react-icons/hi2";
 import { SiGooglemeet } from "react-icons/si";
 import { AiFillProduct } from "react-icons/ai";
-import { MdAssignment } from "react-icons/md";
 import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // for dropdown icon
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../features/slices/auth";
 import { getAllSidebarLinks } from "../../../features/actions/sidebarLink";
 import { addUserActivity } from "../../../features/actions/userActivity";
-import { roles } from "../../../utils/roles";
+import { FaClipboard } from "react-icons/fa";
+import { Badge, Chip } from "@mui/material";
+import { resetSuccessAndUpdate } from "../../../features/slices/noticeBoard";
+import { getNoticeBoard } from "../../../features/actions/noticeBoard";
+import useRoles from "../../../hooks/useRoles";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const roles = useRoles();
+  
+  const {isUpdated} = useSelector((state) => state.noticeBoard);
   const { sidebarLinkData } = useSelector((state) => state.sidebarLink);
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, isUserLoggedIn } = useSelector((state) => state.auth);
   const { isSidebarOpen } = useSelector((state) => state.globalData);
   const [showImportantLinks, setShowImportantLinks] = useState(false); // toggle state for sub-links
   const role = userData?.role || "";
+  
 
   const navItems = [
     {
@@ -65,11 +72,19 @@ const Sidebar = () => {
     },
     {
       roles: [roles.EMPLOYEE_SALES, roles.EMPLOYEE_REMINDER, roles.ADMIN],
-      items: [        {
-        path: "/products",
-        label: "Products",
-        icon: <AiFillProduct size={30} />,
-      },
+      items: [
+        {
+          path: "/products",
+          label: "Products",
+          icon: <AiFillProduct size={30} />,
+        },
+        {
+          path: "/notice-board",
+          label: "Notice Board",
+          icon: (
+              <FaClipboard size={25} />
+          ),
+        },
       ],
     },
   ];
@@ -90,7 +105,6 @@ const Sidebar = () => {
   };
 
   const handleNavigation = (link) => {
-    navigate(link);
     addUserActivityLog(link, "page");
   };
 
@@ -107,6 +121,21 @@ const Sidebar = () => {
     dispatch(getAllSidebarLinks());
   }, []);
 
+  useEffect(() => {
+    let interval;
+    if (role && isUserLoggedIn && roles.isEmployeeId(role)) {
+      interval = setInterval(() => {
+        dispatch(getNoticeBoard());
+      }, 10000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [roles, role]);
+
   return (
     <div
       id="logo-sidebar"
@@ -121,7 +150,7 @@ const Sidebar = () => {
           <li>
             <Link
               to="/"
-              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+              className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
             >
               <TbLayoutDashboardFilled size={30} />
               <span className="ms-3">Dashboard</span>
@@ -137,11 +166,15 @@ const Sidebar = () => {
                   <Link
                     to={item.path}
                     onClick={() => handleNavigation(item.path)}
-                    className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+                    className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
                   >
                     {item.icon}
                     <span className="flex-1 ms-3 whitespace-nowrap">
-                      {item.label}
+                      {item.label}{" "}{
+                        item.label === "Notice Board" && isUpdated && (
+                          <Chip color="secondary" label="New" />
+                        )
+                      }
                     </span>
                   </Link>
                 </li>
@@ -152,7 +185,7 @@ const Sidebar = () => {
           <li>
             <div
               onClick={toggleImportantLinks}
-              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group cursor-pointer"
+              className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group cursor-pointer"
             >
               <AiFillProduct size={30} />
               <span className="flex-1 ms-3 whitespace-nowrap">
@@ -190,7 +223,7 @@ const Sidebar = () => {
           <li>
             <Link
               to="/settings"
-              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+              className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
             >
               <IoSettings size={30} />
               <span className="flex-1 ms-3 whitespace-nowrap">Settings</span>
@@ -201,7 +234,7 @@ const Sidebar = () => {
           <li>
             <button
               onClick={handleLogout}
-              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-red-600 hover:text-[17px] hover:bg-gray-100 group"
+              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-red-600  hover:bg-gray-100 group"
             >
               <IoLogOut size={30} />
               <span className="flex-1 ms-3 whitespace-nowrap">Sign Out</span>

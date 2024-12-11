@@ -42,9 +42,9 @@ const ViewPlans = () => {
         </div>
         {planData &&
           Array.isArray(planData) &&
-          planData?.map((item) => {
+          planData?.map((item, idx) => {
             return (
-              <div className="">
+              <div key={idx} className="">
                 <PlanCard plan={item} isMenuVisible={true} key={item?._id} />
               </div>
             );
