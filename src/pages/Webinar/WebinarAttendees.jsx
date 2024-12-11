@@ -11,11 +11,12 @@ import { Edit, Delete, Visibility, AttachFile } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
-import AttendeesFilterModal from '../../components/Attendees/AttendeesFilterModal'
+import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
+import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
-  const exportExcelModalName = "ExportAttendeesExcel";
+  const exportExcelModalName = "ExportWebinarAttendeesExcel";
   const AttendeesFilterModalName = "AttendeesFilterModal";
   const employeeAssignModalName = "employeeAssignModal";
   const tableHeader = "Attendees Table";
@@ -41,17 +42,25 @@ const WebinarAttendees = () => {
   const handleTabChange = (_, newValue) => {
     dispatch(setTabValue(newValue));
     setPage(1);
-    setSelectedRows([]);  
+    setSelectedRows([]);
   };
 
   useEffect(() => {
-    dispatch(getAttendees({ id, isAttended: tabValue, page, limit: LIMIT, filters }));
+    dispatch(
+      getAttendees({ id, isAttended: tabValue, page, limit: LIMIT, filters })
+    );
   }, [page, tabValue, LIMIT, filters]);
 
   useEffect(() => {
     if (isSuccess) {
       dispatch(
-        getAttendees({ id, isAttended: tabValue, page: 1, limit: LIMIT, filters })
+        getAttendees({
+          id,
+          isAttended: tabValue,
+          page: 1,
+          limit: LIMIT,
+          filters,
+        })
       );
       dispatch(clearSuccess());
     }
@@ -107,16 +116,14 @@ const WebinarAttendees = () => {
       </Tabs>
 
       <div className="flex gap-4 justify-end">
-        {
-          selectedRows.length > 0 && (
-            <Button
-              onClick={() => dispatch(openModal(employeeAssignModalName))}
-              variant="contained"
-            >
-              Assign
-            </Button>
-          )
-        }
+        {selectedRows.length > 0 && (
+          <Button
+            onClick={() => dispatch(openModal(employeeAssignModalName))}
+            variant="contained"
+          >
+            Assign
+          </Button>
+        )}
         <Button
           onClick={() => setShowModal((prev) => !prev)}
           variant="contained"
@@ -140,15 +147,28 @@ const WebinarAttendees = () => {
         totalPages={totalPages}
         page={page}
         setPage={setPage}
-        selectedRows={selectedRows} 
+        selectedRows={selectedRows}
         setSelectedRows={setSelectedRows}
         limit={LIMIT}
         filterModalName={AttendeesFilterModalName}
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
       />
-      <EmployeeAssignModal selectedRows={selectedRows} modalName={employeeAssignModalName} />
-      <AttendeesFilterModal modalName={AttendeesFilterModalName} filters={filters} setFilters={setFilters} />
+      <EmployeeAssignModal
+        selectedRows={selectedRows}
+        modalName={employeeAssignModalName}
+      />
+      <AttendeesFilterModal
+        modalName={AttendeesFilterModalName}
+        filters={filters}
+        setFilters={setFilters}
+      />
+      <ExportWebinarAttendeesModal
+        modalName={exportExcelModalName}
+        filters={filters}
+        webinarId={id}
+        isAttended={tabValue === "postWebinar" ? true : false}
+      />
       {showModal &&
         createPortal(
           <UpdateCsvXslxModal setModal={setShowModal} csvId={id} />,
