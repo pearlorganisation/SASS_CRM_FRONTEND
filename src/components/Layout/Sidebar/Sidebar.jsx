@@ -150,7 +150,7 @@ const Sidebar = () => {
           <li>
             <Link
               to="/"
-              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+              className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
             >
               <TbLayoutDashboardFilled size={30} />
               <span className="ms-3">Dashboard</span>
@@ -185,7 +185,7 @@ const Sidebar = () => {
           <li>
             <div
               onClick={toggleImportantLinks}
-              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group cursor-pointer"
+              className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group cursor-pointer"
             >
               <AiFillProduct size={30} />
               <span className="flex-1 ms-3 whitespace-nowrap">
@@ -223,7 +223,7 @@ const Sidebar = () => {
           <li>
             <Link
               to="/settings"
-              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-[17px] hover:bg-gray-100 group"
+              className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
             >
               <IoSettings size={30} />
               <span className="flex-1 ms-3 whitespace-nowrap">Settings</span>
@@ -234,7 +234,7 @@ const Sidebar = () => {
           <li>
             <button
               onClick={handleLogout}
-              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-red-600 hover:text-[17px] hover:bg-gray-100 group"
+              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-red-600  hover:bg-gray-100 group"
             >
               <IoLogOut size={30} />
               <span className="flex-1 ms-3 whitespace-nowrap">Sign Out</span>

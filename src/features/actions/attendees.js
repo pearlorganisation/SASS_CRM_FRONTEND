@@ -17,9 +17,9 @@ export const addAttendees = createAsyncThunk(
 //get Attendees
 export const getAttendees = createAsyncThunk(
   "attendees/fetchData",
-  async ({ id, isAttended, page = 1, limit = 10 }, { rejectWithValue }) => {
+  async ({ id, isAttended, page = 1, limit = 10, filters={} }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/attendees/${id}`, {
+      const response = await instance.post(`/attendees/${id}`, filters, {
         params: { isAttended, page, limit },
       });
       return response?.data;

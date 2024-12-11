@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addPricePlans,
@@ -16,8 +16,103 @@ import {
   Checkbox,
   Typography,
   Box,
+  Collapse,
+  IconButton,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  Paper,
+  TableBody,
 } from "@mui/material";
 import FormInput from "../../../components/FormInput";
+import { filterTruthyValues } from "../../../utils/extra";
+import { ExpandLess, ExpandMore } from "@mui/icons-material";
+
+const attendeeFields = [
+  { key: "email", displayName: "Email" },
+  { key: "firstName", displayName: "First Name" },
+  { key: "lastName", displayName: "Last Name" },
+  { key: "timeInSession", displayName: "Time in Session" },
+  { key: "gender", displayName: "Gender" },
+  { key: "phone", displayName: "Phone" },
+  { key: "location", displayName: "Location" },
+];
+const tableCellStyles = {
+  paddingTop: "6px",
+  paddingBottom: "6px",
+};
+function AttendeeTable({ control, setValue }) {
+  return (
+    <Box mt={6}>
+      <TableContainer component={Paper} elevation={3}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Field Name</TableCell>
+              <TableCell align="center">Filterable</TableCell>
+              <TableCell align="center">Downloadable</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {attendeeFields.map(({ key, displayName }) => (
+              <TableRow key={key}>
+                <TableCell sx={tableCellStyles}>{displayName}</TableCell>
+                <TableCell align="center" sx={tableCellStyles}>
+                  <Controller
+                    name={`attendeeTableConfig.${key}.filterable`}
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <Checkbox
+                        onChange={(e) => {
+                          const isChecked = e.target.checked;
+                          // Update "Downloadable" checkbox
+                          onChange(isChecked);
+                          // Automatically check "Filterable" if "Downloadable" is checked
+                          if (!isChecked) {
+                            setValue(
+                              `attendeeTableConfig.${key}.downloadable`,
+                              false
+                            );
+                          }
+                        }}
+                        checked={value || false}
+                      />
+                    )}
+                  />
+                </TableCell>
+                <TableCell align="center" sx={tableCellStyles}>
+                  <Controller
+                    name={`attendeeTableConfig.${key}.downloadable`}
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <Checkbox
+                        onChange={(e) => {
+                          const isChecked = e.target.checked;
+                          // Update "Downloadable" checkbox
+                          onChange(isChecked);
+                          // Automatically check "Filterable" if "Downloadable" is checked
+                          if (isChecked) {
+                            setValue(
+                              `attendeeTableConfig.${key}.filterable`,
+                              true
+                            );
+                          }
+                        }}
+                        checked={value || false}
+                      />
+                    )}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
+  );
+}
 
 export default function AddPlan() {
   const { id } = useParams();
@@ -30,19 +125,23 @@ export default function AddPlan() {
     setValue,
     formState: { errors },
   } = useForm();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { isLoading, planData, isSuccess, singlePlanData } = useSelector(
     (state) => state.pricePlans
   );
+  const [isTableOpen, setIsTableOpen] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
-    if (isEditMode) {
-      data["_id"] = id;
+    const payload = filterTruthyValues(data);
+    if (!("attendeeTableConfig" in payload)) {
+      payload["attendeeTableConfig"] = {};
     }
-    dispatch(isEditMode ? updatePricePlans(data) : addPricePlans(data));
+    if (isEditMode) {
+      payload["_id"] = id;
+    }
+    dispatch(isEditMode ? updatePricePlans(payload) : addPricePlans(payload));
   };
 
   useEffect(() => {
@@ -59,7 +158,7 @@ export default function AddPlan() {
 
   useEffect(() => {
     if (isEditMode && singlePlanData) {
-
+      console.log(singlePlanData);
       reset({
         name: singlePlanData.name || "",
         amount: singlePlanData.amount || 0,
@@ -67,12 +166,13 @@ export default function AddPlan() {
         employeeCount: singlePlanData.employeeCount || 0,
         contactLimit: singlePlanData.contactLimit || 0,
         toggleLimit: singlePlanData.toggleLimit || 0,
-      })
+        attendeeTableConfig: singlePlanData.attendeeTableConfig || {},
+      });
     }
   }, [singlePlanData, isEditMode]);
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100 px-2">
+    <div className="min-h-screen pt-14 flex justify-center items-center bg-gray-100 px-2">
       <Box className="max-w-4xl w-full bg-white shadow-md rounded-lg">
         <Box className="px-6 py-4 bg-gray-50 border-b border-gray-200">
           <Typography variant="h6" className="font-semibold text-gray-800">
@@ -130,6 +230,27 @@ export default function AddPlan() {
               errorMessage="Toggle limit is required"
             />
           </div>
+
+          <Box className="mt-6">
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              className="cursor-pointer"
+              onClick={() => setIsTableOpen(!isTableOpen)}
+            >
+              <Typography variant="h6" className="mb-2 font-semibold">
+                Attendees
+              </Typography>
+              <IconButton>
+                {isTableOpen ? <ExpandLess /> : <ExpandMore />}
+              </IconButton>
+            </Box>
+            <Collapse in={isTableOpen} timeout="auto" unmountOnExit>
+              <AttendeeTable control={control} setValue={setValue} />
+            </Collapse>
+          </Box>
+
           <Box className="mt-6">
             <Button
               type="submit"
