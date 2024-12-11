@@ -29,9 +29,12 @@ const FormInput = ({
           type={type}
           value={type === "number" ? field.value ?? "" : field.value}
           onChange={(e) =>
-            field.onChange(
+          {
+            console.log(e.target.value);
+            return field.onChange( // fix get 0 value - remove ' || "" '
               type === "number" ? parseFloat(e.target.value) || "" : e.target.value
-            )
+            );
+          }
           }
           error={!!fieldState?.error}
           helperText={fieldState?.error?.message}

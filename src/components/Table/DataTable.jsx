@@ -138,15 +138,17 @@ const DataTable = ({
         />
       </div>
 
-      <div className="flex gap-4 md:flex-row flex-col flex-wrap items-center justify-between py-4">
-        <Pagination
-          onChange={(e, page) => setPage(page)}
-          count={totalPages || 1}
-          variant="outlined"
-          shape="rounded"
-        />
-        <PageLimitEditor pageId={tableHeader} />
-      </div>
+      {tableData?.rows?.length > 0 && (
+        <div className="flex gap-4 md:flex-row flex-col flex-wrap items-center justify-between py-4">
+          <Pagination
+            onChange={(e, page) => setPage(page)}
+            count={totalPages || 1}
+            variant="outlined"
+            shape="rounded"
+          />
+          <PageLimitEditor pageId={tableHeader} />
+        </div>
+      )}
 
       <FilterPresetModal
         tableName={tableUniqueKey}

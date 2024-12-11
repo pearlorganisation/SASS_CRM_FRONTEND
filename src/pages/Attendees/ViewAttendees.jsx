@@ -35,7 +35,7 @@ const WebinarAttendees = () => {
 
   useEffect(() => {
     dispatch(getAllAttendees({ page, limit: LIMIT }));
-    dispatch(getAll({ filters: { gender: {$exists: false} } }));
+    dispatch(getAll({ filters: { phone: '9999' } }));
   }, [page, LIMIT]);
 
   useEffect(() => {
@@ -96,7 +96,7 @@ const WebinarAttendees = () => {
         filters={filters}
         setFilters={setFilters}
         tableData={{
-          columns: attendeeTableColumns,
+          columns: [...attendeeTableColumns,   { header: "Webinar", key: "webinarName", width: 20, type: "" },],
           rows: attendeeData,
         }}
         actions={actionIcons}
