@@ -19,7 +19,7 @@ export const getAttendees = createAsyncThunk(
   "attendees/fetchData",
   async ({ id, isAttended, page = 1, limit = 10, filters={} }, { rejectWithValue }) => {
     try {
-      const response = await instance.post(`/attendees/${id}`, filters, {
+      const response = await instance.post(`/attendees/${id}`, {filters, fieldName: 'attendeeTableConfig'}, {
         params: { isAttended, page, limit },
       });
       return response?.data;
