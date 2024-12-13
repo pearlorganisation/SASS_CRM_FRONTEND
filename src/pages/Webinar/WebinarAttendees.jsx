@@ -78,7 +78,7 @@ const WebinarAttendees = () => {
       onClick: (item) => {
         console.log(`Viewing details for row with id: ${item?._id}`);
       },
-      readOnly: true
+      readOnly: true,
     },
     {
       icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
@@ -162,8 +162,16 @@ const WebinarAttendees = () => {
         isLoading={isLoading}
       />
       <EmployeeAssignModal
-        selectedRows={selectedRows}
+        selectedRows={attendeeData
+          .filter((item) => selectedRows.includes(item._id))
+          .map((item) => {
+            return {
+              email: item.email,
+              recordType: tabValue,
+            };
+          })}
         modalName={employeeAssignModalName}
+        webinarId={id}
       />
       <AttendeesFilterModal
         modalName={AttendeesFilterModalName}

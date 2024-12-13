@@ -4,9 +4,9 @@ import { instance } from "../../services/axiosInterceptor";
 //assign  attendee
 export const addAssign = createAsyncThunk(
   "attendee/assign",
-  async (payload, { rejectWithValue }) => {
+  async ({id, payload}, { rejectWithValue }) => {
     try {
-      const response = await instance.patch(`attendee/assign`, payload);
+      const response = await instance.post(`assignment/${id}`, payload);
       return response;
     } catch (e) {
       return rejectWithValue(e);

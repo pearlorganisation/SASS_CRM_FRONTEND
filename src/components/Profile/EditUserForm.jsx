@@ -4,6 +4,7 @@ import { TextField, Button, IconButton } from "@mui/material";
 import { useSelector } from "react-redux";
 import CloseIcon from "@mui/icons-material/Close";
 import { ClipLoader } from "react-spinners";
+import FormInput from "../FormInput";
 
 const EditUserForm = ({ onSubmit, onClose }) => {
   const { userData, isLoading } = useSelector((state) => state.auth);
@@ -11,6 +12,7 @@ const EditUserForm = ({ onSubmit, onClose }) => {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm();
 
@@ -34,63 +36,56 @@ const EditUserForm = ({ onSubmit, onClose }) => {
         </IconButton>
       </div>
       {/* Name Field */}
-      <TextField
-        {...register("userName", {
+      <FormInput
+        name="userName"
+        label="Name"
+        control={control}
+        validation={{
           required: "Name is required.",
           minLength: {
             value: 3,
             message: "Name must be at least 3 characters long.",
           },
-        })}
-        label="Name"
-        fullWidth
-        error={!!errors.userName}
-        helperText={errors.userName?.message}
+        }}
       />
 
-      {/* Email Field */}
-      <TextField
-        {...register("email", {
+      <FormInput
+        name="email"
+        label="Email"
+        control={control}
+        validation={{
           required: "Email is required.",
           pattern: {
             value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
             message: "Please enter a valid email address.",
           },
-        })}
-        label="Email"
-        fullWidth
-        error={!!errors.email}
-        helperText={errors.email?.message}
+        }}
       />
 
-      {/* Phone Field */}
-      <TextField
-        {...register("phone", {
+      <FormInput
+        name="phone"
+        label="Phone"
+        control={control}
+        validation={{
           required: "Phone number is required.",
           pattern: {
             value: /^[0-9]{10,15}$/,
             message: "Please enter a valid phone number (10-15 digits).",
           },
-        })}
-        label="Phone"
-        fullWidth
-        error={!!errors.phone}
-        helperText={errors.phone?.message}
+        }}
       />
 
-      {/* Company Name Field */}
-      <TextField
-        {...register("companyName", {
+      <FormInput
+        name="companyName"
+        label="Company Name"
+        control={control}
+        validation={{
           required: "Company name is required.",
           minLength: {
             value: 2,
             message: "Company name must be at least 2 characters long.",
           },
-        })}
-        label="Company Name"
-        fullWidth
-        error={!!errors.companyName}
-        helperText={errors.companyName?.message}
+        }}
       />
 
       {/* Submit Button */}

@@ -4,7 +4,10 @@ import Select from "react-select";
 import { useDispatch, useSelector } from "react-redux";
 import { addNote } from "../../features/actions/assign";
 import { ClipLoader } from "react-spinners";
-import { createAttendeeProduct, getAllProductsByAdminId } from "../../features/actions/product";
+import {
+  createAttendeeProduct,
+  getAllProductsByAdminId,
+} from "../../features/actions/product";
 
 const AddNoteForm = (props) => {
   const { customOptions } = useSelector((state) => state.globalData);
@@ -69,15 +72,17 @@ const AddNoteForm = (props) => {
       : "00";
 
     const note = data?.note;
-    console.log(data)
+    console.log(data);
 
-    if(data?.product && data?.product !== ""){
-      console.log(data?.product)
+    if (data?.product && data?.product !== "") {
+      console.log(data?.product);
       const payload = {
-        email, 
-        productId : productDropdownData.find((item) => item.name === data?.product)?._id,
-      }
-      dispatch(createAttendeeProduct(payload))
+        email,
+        productId: productDropdownData.find(
+          (item) => item.name === data?.product
+        )?._id,
+      };
+      dispatch(createAttendeeProduct(payload));
     }
 
     dispatch(addNote(data)).then(() => {

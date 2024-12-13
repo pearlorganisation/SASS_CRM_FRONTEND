@@ -1,5 +1,6 @@
-import { Button, TextField } from "@mui/material";
-import { useEffect } from "react";
+import { Button, TextField, IconButton, InputAdornment } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { ClipLoader } from "react-spinners";
@@ -16,12 +17,24 @@ function PasswordUpdateForm() {
   const dispatch = useDispatch();
   const { isLoading, isSuccess } = useSelector((state) => state.auth);
 
+  const [showPassword, setShowPassword] = useState({
+    oldPassword: false,
+    password: false,
+    confirmPassword: false,
+  });
+
   const newPassword = watch("password");
+
+  const togglePasswordVisibility = (field) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
 
   const onSubmit = (data) => {
     console.log("Password updated successfully", data);
     dispatch(updatePassword(data));
-    // Your updatePassword function logic
   };
 
   useEffect(() => {
@@ -41,10 +54,25 @@ function PasswordUpdateForm() {
               required: "Current password is required.",
             })}
             label="Current Password"
-            type="password"
+            type={showPassword.oldPassword ? "text" : "password"}
             fullWidth
             error={!!errors.oldPassword}
             helperText={errors.oldPassword?.message}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => togglePasswordVisibility("oldPassword")}
+                  >
+                    {showPassword.oldPassword ? (
+                      <VisibilityOff />
+                    ) : (
+                      <Visibility />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
         </div>
 
@@ -53,18 +81,23 @@ function PasswordUpdateForm() {
           <TextField
             {...register("password", {
               required: "New password is required.",
-              // minLength: {
-              //   value: 8,
-              //   message: "Password must be at least 8 characters long.",
-              // },
-              // validate: (value) =>
-              //   /[A-Z]/.test(value) || "Password must contain at least one uppercase letter.",
             })}
             label="New Password"
-            type="password"
+            type={showPassword.password ? "text" : "password"}
             fullWidth
             error={!!errors.password}
             helperText={errors.password?.message}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => togglePasswordVisibility("password")}
+                  >
+                    {showPassword.password ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
         </div>
 
@@ -77,10 +110,25 @@ function PasswordUpdateForm() {
                 value === newPassword || "Passwords do not match.",
             })}
             label="Confirm Password"
-            type="password"
+            type={showPassword.confirmPassword ? "text" : "password"}
             fullWidth
             error={!!errors.confirmPassword}
             helperText={errors.confirmPassword?.message}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => togglePasswordVisibility("confirmPassword")}
+                  >
+                    {showPassword.confirmPassword ? (
+                      <VisibilityOff />
+                    ) : (
+                      <Visibility />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
         </div>
 

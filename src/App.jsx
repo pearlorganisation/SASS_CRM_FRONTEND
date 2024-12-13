@@ -170,7 +170,11 @@ const App = () => {
         },
         {
           path: "/assignments",
-          element: <Assignments />,
+          element: (
+          <RouteGuard roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER"]}>
+              <Assignments />
+            </RouteGuard>
+          ),
         },
         {
           path: "/products/addProduct",
