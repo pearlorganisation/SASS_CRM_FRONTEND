@@ -1,12 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { toast } from "sonner";
 import { errorToast } from "../../utils/extra";
-import { exportClientExcel } from "../actions/export-excel";
+import { exportClientExcel, exportWebinarAttendeesExcel } from "../actions/export-excel";
 // -------------------------------------------------------------------------------------------
 
 const initialState = {
   isLoading: false,
-  errorMessage: "",
   isSuccess: false,
 };
 
@@ -20,7 +19,6 @@ const exportSlice = createSlice({
       // signUp lifecycle methods
       .addCase(exportClientExcel.pending, (state, action) => {
         state.isLoading = true;
-        state.errorMessage = "";
         state.isSuccess = false;
       })
       .addCase(exportClientExcel.fulfilled, (state, action) => {
@@ -32,7 +30,21 @@ const exportSlice = createSlice({
       })
       .addCase(exportClientExcel.rejected, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = action.payload;
+        errorToast(action.payload);
+      })
+      .addCase(exportWebinarAttendeesExcel.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(exportWebinarAttendeesExcel.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        toast.success(`Data Exported Successfully`, {
+          position: "top-center",
+        });
+      })
+      .addCase(exportWebinarAttendeesExcel.rejected, (state, action) => {
+        state.isLoading = false;
         errorToast(action.payload);
       });
   },
