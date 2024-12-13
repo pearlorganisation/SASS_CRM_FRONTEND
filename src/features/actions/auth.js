@@ -88,3 +88,15 @@ export const getUserSubscription = createAsyncThunk(
     }
   }
 );
+
+export const getCurrentUser = createAsyncThunk(
+  "currentUser/fetchData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`auth/current-user`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

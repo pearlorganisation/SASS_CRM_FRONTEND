@@ -33,6 +33,7 @@ export const attendeeTableColumns = [
   { header: "Gender", key: "gender", width: 20, type: "" },
   { header: "Location", key: "location", width: 20, type: "" },
   { header: "Phone", key: "phone", width: 20, type: "" },
+  { header: "Status", key: "status", width: 20, type: "" },
 ];
 
 export const employeeTableColumns = [

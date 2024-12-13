@@ -23,7 +23,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
 
   const { subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
-//   console.log(subscription?.plan)
+  //console.log(subscription?.plan);
 
   const onSubmit = (data) => {
     const filterData = filterTruthyValues(data);
@@ -152,6 +152,31 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
               )}
               {tableConfig?.location?.filterable && (
                 <FormInput name="location" label="Location" control={control} />
+              )}
+
+              {tableConfig?.status?.filterable && (
+                <Controller
+                  name="status"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <FormControl fullWidth>
+                      <InputLabel id="status-label">Status</InputLabel>
+                      <Select
+                        {...field}
+                        labelId="status-label"
+                        label="Status"
+                        value={field.value || ""}
+                      >
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value="male">will join webinar</MenuItem>
+                        <MenuItem value="female"> no answer</MenuItem>
+                        <MenuItem value="other">no network</MenuItem>
+                        <MenuItem value="other">asked to call later</MenuItem>
+                      </Select>
+                    </FormControl>
+                  )}
+                />
               )}
             </div>
           </div>

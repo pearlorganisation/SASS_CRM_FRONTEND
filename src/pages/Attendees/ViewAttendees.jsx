@@ -35,7 +35,6 @@ const WebinarAttendees = () => {
 
   useEffect(() => {
     dispatch(getAllAttendees({ page, limit: LIMIT }));
-    dispatch(getAll({ filters: { phone: '9999' } }));
   }, [page, LIMIT]);
 
   useEffect(() => {

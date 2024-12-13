@@ -38,7 +38,7 @@ import {
 } from "./pages";
 import { addUserActivity } from "./features/actions/userActivity";
 import RouteGuard from "./components/AccessControl/RouteGuard";
-import { getAllRoles, getUserSubscription } from "./features/actions/auth";
+import { getAllRoles, getCurrentUser, getUserSubscription } from "./features/actions/auth";
 import UpdateNoticeBoard from "./pages/NoticeBoard/UpdateNoticeBoard";
 import NoticeBoard from "./pages/NoticeBoard/NoticeBoard";
 import { getNoticeBoard } from "./features/actions/noticeBoard";
@@ -56,6 +56,7 @@ const App = () => {
 
   useEffect(() => {
     function initFunctions() {
+      dispatch(getCurrentUser());
       console.log(" isEmployee --->> ", roles.isEmployeeId(role));
       if (isUserLoggedIn && role && !roles.isEmployeeId(role)) {
         dispatch(getUserSubscription());

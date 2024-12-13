@@ -7,14 +7,20 @@ import {
   deleteCustomOption,
   getCustomOptions,
 } from "../../../features/actions/globalData";
-import { Button, Modal, TextField, IconButton } from "@mui/material"; // Importing MUI components
+import {
+  Button,
+  Modal,
+  TextField,
+  IconButton,
+  Typography,
+} from "@mui/material"; // Importing MUI components
 import useRoles from "../../../hooks/useRoles";
+import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
 
 const CustomOptions = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
   const { customOptions, isSuccess } = useSelector((state) => state.globalData);
-  console.log("customOptions", customOptions);
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role || "";
 
@@ -23,6 +29,8 @@ const CustomOptions = () => {
   );
 
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteOptionId, setDeleteOptionId] = useState(null);
 
   const {
     register,
@@ -32,9 +40,18 @@ const CustomOptions = () => {
   } = useForm();
 
   const handleModalToggle = () => setShowModal(!showModal);
+  const handleDeleteModalToggle = () => setShowDeleteModal(!showDeleteModal);
 
   const onSubmit = (data) => {
     dispatch(createCustomOption(data));
+  };
+
+  const confirmDelete = () => {
+    if (deleteOptionId) {
+      dispatch(deleteCustomOption(deleteOptionId));
+      setDeleteOptionId(null);
+    }
+    setShowDeleteModal(false);
   };
 
   useEffect(() => {
@@ -52,10 +69,18 @@ const CustomOptions = () => {
   return (
     <div className="container mx-auto mt-10 p-4">
       <div className="flex justify-between py-6 items-center">
-        <h1 className="text-2xl font-bold">{roles.SUPER_ADMIN === role ? "Default" : "Custom"} Options</h1>
-        <Button variant="contained" color="primary" onClick={handleModalToggle}>
-          Add {roles.SUPER_ADMIN === role ? "Default" : "Custom"} Option
-        </Button>
+        <h1 className="text-2xl font-bold">
+          {roles.SUPER_ADMIN === role ? "Default" : "Custom"} Options
+        </h1>
+        <ComponentGuard conditions={[userData?.isActive]}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleModalToggle}
+          >
+            Add {roles.SUPER_ADMIN === role ? "Default" : "Custom"} Option
+          </Button>
+        </ComponentGuard>
       </div>
 
       {/* Display Table */}
@@ -75,7 +100,10 @@ const CustomOptions = () => {
                 <td className="p-4">{option.label}</td>
                 <td className="p-4">
                   <IconButton
-                    onClick={() => dispatch(deleteCustomOption(option?._id))}
+                    onClick={() => {
+                      setDeleteOptionId(option?._id);
+                      setShowDeleteModal(true);
+                    }}
                     className="text-red-500 hover:text-red-700"
                   >
                     <MdDelete />
@@ -94,7 +122,9 @@ const CustomOptions = () => {
         className="flex items-center justify-center"
       >
         <div className="bg-white p-6 rounded shadow-lg w-80">
-          <h2 className="text-xl font-semibold mb-4">Add {roles.SUPER_ADMIN === role ? "Default" : "Custom"} Option</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Add {roles.SUPER_ADMIN === role ? "Default" : "Custom"} Option
+          </h2>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-4">
               <TextField
@@ -126,6 +156,40 @@ const CustomOptions = () => {
               </Button>
             </div>
           </form>
+        </div>
+      </Modal>
+
+      {/* Delete Warning Modal */}
+      <Modal
+        open={showDeleteModal}
+        onClose={handleDeleteModalToggle}
+        className="flex items-center justify-center"
+      >
+        <div className="bg-white p-6 rounded shadow-lg w-96">
+          <Typography className="text-lg font-medium mb-4">
+            Are you sure you want to delete this option?
+          </Typography>
+          <Typography sx={{ my: 2 }} className="text-sm text-gray-600">
+            If you delete this option, you will no longer be able to use it as a
+            filter. This action is irreversible.
+          </Typography>
+          <div className="flex justify-end space-x-4">
+            <Button
+              variant="outlined"
+              onClick={handleDeleteModalToggle}
+              className="px-4 py-2"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              onClick={confirmDelete}
+              className="px-4 py-2"
+            >
+              Delete
+            </Button>
+          </div>
         </div>
       </Modal>
     </div>
