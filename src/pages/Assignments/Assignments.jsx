@@ -9,6 +9,7 @@ import { Edit, Delete, Visibility } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
+import { getAssignments } from "../../features/actions/assign";
 
 const Assignments = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -27,12 +28,14 @@ const Assignments = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
+  const {userData} = useSelector((state) => state.auth);
 
   useEffect(() => {
     setSearchParams({ page: page });
   }, [page]);
 
   useEffect(() => {
+    dispatch(getAssignments(userData?._id))
   }, [page, LIMIT]);
 
   useEffect(() => {

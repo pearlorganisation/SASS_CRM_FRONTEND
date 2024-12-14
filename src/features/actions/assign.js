@@ -14,6 +14,19 @@ export const addAssign = createAsyncThunk(
   }
 );
 
+
+export const getAssignments = createAsyncThunk(
+  "assignments/fetchData",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`assignment/${id}`);
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 export const addNote = createAsyncThunk(
   "note/create",
   async (payload, { rejectWithValue }) => {
