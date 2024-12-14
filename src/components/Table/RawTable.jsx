@@ -131,7 +131,7 @@ const RawTable = (props) => {
                 >
                   <div className="flex gap-2">
                     {actions?.map((action, index) => (
-                      <ComponentGuard conditions={[ action?.readOnly || userData?.isActive]}>
+                      <ComponentGuard key={index} conditions={[ action?.readOnly || userData?.isActive]}>
                       <div key={index}>
                         <Tooltip title={action.tooltip} arrow>
                           <IconButton
