@@ -15,6 +15,7 @@ import {
   Skeleton, // Import Skeleton
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
+import ComponentGuard from "../AccessControl/ComponentGuard";
 
 const tableCellStyles = {
   paddingTop: "6px",
@@ -35,6 +36,7 @@ const RawTable = (props) => {
     isLoading,
     selectedRows,
     setSelectedRows,
+    userData
   } = props;
   const dispatch = useDispatch();
 
@@ -129,6 +131,7 @@ const RawTable = (props) => {
                 >
                   <div className="flex gap-2">
                     {actions?.map((action, index) => (
+                      <ComponentGuard key={index} conditions={[ action?.readOnly || userData?.isActive]}>
                       <div key={index}>
                         <Tooltip title={action.tooltip} arrow>
                           <IconButton
@@ -139,6 +142,7 @@ const RawTable = (props) => {
                           </IconButton>
                         </Tooltip>
                       </div>
+                      </ComponentGuard>
                     ))}
                   </div>
                 </TableCell>

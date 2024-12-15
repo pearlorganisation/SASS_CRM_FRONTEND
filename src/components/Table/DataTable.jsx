@@ -23,11 +23,11 @@ import BookmarkOutlinedIcon from "@mui/icons-material/BookmarkOutlined";
 import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
-import { formatDateAsNumber } from "../../utils/extra";
 import { useDispatch, useSelector } from "react-redux";
 import { openModal } from "../../features/slices/modalSlice";
 import RawTable from "./RawTable";
 import FilterPresetModal from "../Filter/FilterPresetModal";
+import ComponentGuard from "../AccessControl/ComponentGuard";
 
 const DataTable = ({
   tableHeader = "Table",
@@ -51,6 +51,7 @@ const DataTable = ({
   const dispatch = useDispatch();
   const filterPresetModalName = "FilterPresetModal";
   const [anchorEl, setAnchorEl] = useState(null);
+  const { userData } = useSelector((state) => state.auth);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -63,6 +64,7 @@ const DataTable = ({
       <div className="flex gap-4 justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-700">{tableHeader}</h2>
 
+        <ComponentGuard conditions={[userData?.isActive]}>
         <IconButton
           id="demo-positioned-button"
           aria-controls={open ? "demo-positioned-menu" : undefined}
@@ -72,6 +74,8 @@ const DataTable = ({
         >
           <MoreVertOutlinedIcon />
         </IconButton>
+            </ComponentGuard>
+        
         <Menu
           id="demo-positioned-menu"
           aria-labelledby="demo-positioned-button"
@@ -96,6 +100,7 @@ const DataTable = ({
       </div>
 
       <div className="flex gap-4 justify-end items-center py-2">
+      <ComponentGuard conditions={[userData?.isActive]}>
         <Button
           component="label"
           color="secondary"
@@ -123,6 +128,7 @@ const DataTable = ({
             </span>
           )}
         </Button>
+        </ComponentGuard>
       </div>
       {ClientCards}
       <div className={`${ClientCards !== null ? "hidden md:block " : ""}`}>
@@ -135,6 +141,7 @@ const DataTable = ({
           isLoading={isLoading}
           selectedRows={selectedRows}
           setSelectedRows={setSelectedRows}
+          userData={userData}
         />
       </div>
 

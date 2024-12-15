@@ -17,11 +17,12 @@ const modalSlice = createSlice({
       } else {
         const modalName = action.payload?.modalName;
         const data = action.payload?.data;
-        if (modalName) {
-          state.modals[modalName] = true;
-        }
+        
         if (data) {
           state.modalData = data;
+        }
+        if (modalName) {
+          state.modals[modalName] = true;
         }
       }
     },

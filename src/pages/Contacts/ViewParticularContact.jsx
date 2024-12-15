@@ -13,10 +13,41 @@ import { getNotes } from "../../features/actions/assign";
 import EditModal from "./Modal/EditModal";
 import { formatDate } from "../../utils/extra";
 import { getColor, LeadTypeOptions } from "../../utils/LeadType";
-import { resetAttendeeContactDetails } from "../../features/slices/webinarContact";
 import { addUserActivity } from "../../features/actions/userActivity";
 import { getCustomOptions } from "../../features/actions/globalData";
 import NoteItem from "../../components/NoteItem";
+const dummyNotes = [
+  {
+    updatedAt: "2024-12-10T10:30:00Z",
+    callDuration: { hr: 0, min: 15, sec: 30 },
+    status: "Completed",
+    note: "Discussed the project requirements and next steps.",
+  },
+  {
+    updatedAt: "2024-12-11T14:45:00Z",
+    callDuration: { hr: 1, min: 5, sec: 0 },
+    status: "In Progress",
+    note: "Reviewed the initial design draft with the client.",
+  },
+  {
+    updatedAt: "2024-12-12T09:20:00Z",
+    callDuration: { hr: 0, min: 30, sec: 0 },
+    status: "Pending",
+    note: "Scheduled a follow-up meeting to finalize the design.",
+  },
+  {
+    updatedAt: "2024-12-13T16:00:00Z",
+    callDuration: { hr: 0, min: 45, sec: 10 },
+    status: "Completed",
+    note: "Confirmed the delivery timeline and shared the project plan.",
+  },
+  {
+    updatedAt: "2024-12-14T11:15:00Z",
+    callDuration: { hr: 0, min: 20, sec: 0 },
+    status: "Pending",
+    note: "Waiting for client feedback on the updated draft.",
+  },
+];
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -38,9 +69,6 @@ const ViewParticularContact = () => {
   useEffect(() => {
     dispatch(getCustomOptions());
 
-    return () => {
-      dispatch(resetAttendeeContactDetails());
-    };
   }, []);
 
   useEffect(() => {
@@ -157,7 +185,6 @@ const ViewParticularContact = () => {
       dispatch(addUserActivity(data));
   };
 
-  if (!attendeeContactDetails) return null;
 
   return (
     <>
@@ -171,31 +198,20 @@ const ViewParticularContact = () => {
             <span className="text-green-600">5:00 PM</span> by James{" "}
           </p>
         </div>
-        <div className="grid grid-cols-2  gap-10 ">
+        <div className="grid md:grid-cols-2  gap-10 ">
           <div className="flex flex-col h-full relative overflow-hidden">
             <div className="space-y-3 relative top-0 left-0 right-0 z-10">
               <div className="border rounded-lg py-2 px-3 shadow-md">
                 <p>
                   Email :{" "}
                   <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
-                    {attendeeContactDetails?._id}
+                    someemail@glsd.com
                   </span>
                 </p>
               </div>
               <div className="flex justify-between border rounded-lg py-2 px-3 shadow-md">
                 <p>
-                  Name :{" "}
-                  {uniqueNames.map(
-                    (item, index) =>
-                      item && (
-                        <span
-                          key={index}
-                          className="ms-2 bg-slate-100 rounded-md px-3 py-1"
-                        >
-                          {item}
-                        </span>
-                      )
-                  )}
+                  Name : some name
                 </p>
               </div>
 
@@ -203,19 +219,7 @@ const ViewParticularContact = () => {
                 <p className="flex items-center">
                   Phone Number :
                   <span className="ms-2 grid lg:grid-cols-2 gap-3">
-                    {uniquePhones.map(
-                      (item, index) =>
-                        item && (
-                          <span
-                            key={index}
-                            onClick={() => handleCopyClick(item)}
-                            className="flex justify-center items-center gap-1 bg-red-500 ms-2 p-1 text-white cursor-pointer rounded-md px-2 py-1"
-                          >
-                            {item}
-                            <BiSolidCopy color="#050A30" size={12} />
-                          </span>
-                        )
-                    )}
+                     2342342343
                   </span>
                 </p>
               </div>
@@ -227,8 +231,8 @@ const ViewParticularContact = () => {
                     <span className="font-semibold px-3">Notes</span>
                   </div>
                   <div className="overflow-y-auto pb-10 max-h-full scrollbar-thin w-full px-3">
-                    {noteData &&
-                      noteData.map((item, index) => (
+                    {
+                      dummyNotes.map((item, index) => (
                         <NoteItem
                           key={index}
                           index={index}
@@ -286,7 +290,7 @@ const ViewParticularContact = () => {
           </div>
         </div>
         <div className="mt-12 shadow-lg rounded-lg overflow-x-auto">
-          {attendeeContactDetails?.data?.length <= 0 ? (
+          {!attendeeContactDetails?.data ||  attendeeContactDetails?.data?.length <= 0 ? (
             <div className="text-lg p-2 flex justify-center w-full">
               No record found
             </div>

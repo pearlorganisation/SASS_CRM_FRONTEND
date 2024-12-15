@@ -8,6 +8,7 @@ import { errorToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
+  isSuccess: false,
   isFormLoading: false,
   assignData: [],
   noteData: [],
@@ -20,24 +21,23 @@ const initialState = {
 export const assignSlice = createSlice({
   name: "assign",
   initialState,
-  reducers: {},
+  reducers: {
+    resetAssign: (state) => {
+      state.isSuccess = false;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(addAssign.pending, (state, action) => {
         state.isLoading = true;
-        state.errorMessage = "";
+        state.isSuccess = false;
       })
       .addCase(addAssign.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = "";
-        state.assignData = action.payload.data;
-        toast.info(action.payload.data.message, {
-          position: "top-center",
-        });
+        state.isSuccess = true;
       })
       .addCase(addAssign.rejected, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = action.payload;
         errorToast(action?.payload);
       })
       .addCase(addNote.pending, (state, action) => {

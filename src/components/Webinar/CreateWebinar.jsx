@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Dialog,
@@ -8,22 +8,44 @@ import {
 } from "@mui/material";
 import { TextField, Button } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
+import Select from "react-select";
 import { closeModal } from "../../features/slices/modalSlice";
-import { createWebinar, updateWebinar } from "../../features/actions/webinarContact";
+import {
+  createWebinar,
+  updateWebinar,
+} from "../../features/actions/webinarContact";
 import { ClipLoader } from "react-spinners";
+import { getAllEmployees } from "../../features/actions/employee";
+import useRoles from "../../hooks/useRoles";
 
 const CreateWebinar = ({ modalName }) => {
   const dispatch = useDispatch();
+  const roles = useRoles();
   const { isLoading, isSuccess } = useSelector((state) => state.webinarContact);
   const { modals, modalData } = useSelector((state) => state.modals);
   const open = modals[modalName] ? true : false;
+
+  const { employeeData } = useSelector((state) => state.employee);
+  const { userData } = useSelector((state) => state.auth);
 
   const {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm();
+
+  const [selectedEmployees, setSelectedEmployees] = useState([]);
+  const [options, setOptions] = useState([]);
+
+  // Dummy employee data
+  const employeeOptions = [
+    { value: "john_doe", label: "John Doe" },
+    { value: "jane_smith", label: "Jane Smith" },
+    { value: "alice_johnson", label: "Alice Johnson" },
+    { value: "bob_brown", label: "Bob Brown" },
+  ];
 
   useEffect(() => {
     if (isSuccess) {
@@ -32,7 +54,23 @@ const CreateWebinar = ({ modalName }) => {
   }, [isSuccess]);
 
   useEffect(() => {
-    console.log("modalData  ---->", modalData);
+    if (open) {
+      dispatch(getAllEmployees(userData?.id));}
+  }, [open]);
+
+  useEffect(() => {
+    if (employeeData) {
+      setOptions(
+        employeeData.map((employee) => ({
+          value: employee._id,
+          label: `${employee.userName} - ${roles.getRoleNameById(employee.role)}`,
+        }))
+      );
+    }
+  }, [employeeData]);
+
+  useEffect(() => {
+    if(!open) return;
     if (modalData) {
       reset({
         webinarName: modalData?.webinarName,
@@ -40,20 +78,24 @@ const CreateWebinar = ({ modalName }) => {
           ? modalData.webinarDate.split("T")[0]
           : modalData.webinarDate,
       });
+      setSelectedEmployees(options.filter((option) => modalData?.assignedEmployees && modalData?.assignedEmployees?.includes(option.value) ) || []);
     } else {
       reset({
         webinarName: "",
         webinarDate: "",
       });
+      setSelectedEmployees([]);
     }
-  }, [modalData]);
+  }, [modalData, open]);  
 
   const submitForm = (data) => {
-    if(modalData) {
-      dispatch(updateWebinar({id: modalData?._id, data}));
+    const payload = { ...data, assignedEmployees: selectedEmployees.map((e) => e.value) };
+
+    if (modalData) {
+      dispatch(updateWebinar({ id: modalData?._id, data: payload }));
       return;
     }
-    dispatch(createWebinar(data));
+    dispatch(createWebinar(payload));
   };
 
   const handleClose = () => {
@@ -62,6 +104,7 @@ const CreateWebinar = ({ modalName }) => {
       webinarName: "",
       webinarDate: "",
     });
+    setSelectedEmployees([]);
   };
 
   return (
@@ -75,6 +118,7 @@ const CreateWebinar = ({ modalName }) => {
               label="Webinar Name"
               fullWidth
               variant="outlined"
+              control={control}
               {...register("webinarName", {
                 required: "Webinar Name is required",
               })}
@@ -97,6 +141,25 @@ const CreateWebinar = ({ modalName }) => {
               error={!!errors.webinarDate}
               helperText={errors.webinarDate?.message}
             />
+
+            {/* Employee Selection */}
+            <div>
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Assign Employees
+              </label>
+              <Select
+                isMulti
+                options={options}
+                value={selectedEmployees}
+                onChange={setSelectedEmployees}
+                placeholder="Select employees"
+                menuPortalTarget={document.body}
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                }}
+                aria-label="Assign Employees"
+              />
+            </div>
           </div>
         </DialogContent>
         <DialogActions>

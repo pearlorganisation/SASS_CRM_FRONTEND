@@ -66,7 +66,6 @@ const ExportWebinarAttendeesModal = ({
   }, [isSuccess]);
 
   useEffect(() => {
-    console.log("tableConfig", tableConfig, typeof tableConfig);
     const filteredColumns = attendeeTableColumns.filter(
       (col) => col.key in tableConfig && tableConfig[col.key].downloadable
     );

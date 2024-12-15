@@ -29,21 +29,15 @@ import {
 import FormInput from "../../../components/FormInput";
 import { filterTruthyValues } from "../../../utils/extra";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
-
-const attendeeFields = [
-  { key: "email", displayName: "Email" },
-  { key: "firstName", displayName: "First Name" },
-  { key: "lastName", displayName: "Last Name" },
-  { key: "timeInSession", displayName: "Time in Session" },
-  { key: "gender", displayName: "Gender" },
-  { key: "phone", displayName: "Phone" },
-  { key: "location", displayName: "Location" },
-];
+import { getCustomOptions } from "../../../features/actions/globalData";
+import { attendeeTableColumns } from "../../../utils/columnData";
 const tableCellStyles = {
   paddingTop: "6px",
   paddingBottom: "6px",
 };
-function AttendeeTable({ control, setValue }) {
+function AttendeeTable({ control, setValue, watch }) {
+  const { customOptions } = useSelector((state) => state.globalData);
+  console.log(customOptions);
   return (
     <Box mt={6}>
       <TableContainer component={Paper} elevation={3}>
@@ -56,9 +50,9 @@ function AttendeeTable({ control, setValue }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {attendeeFields.map(({ key, displayName }) => (
+            {attendeeTableColumns.map(({ key, header }) => (
               <TableRow key={key}>
-                <TableCell sx={tableCellStyles}>{displayName}</TableCell>
+                <TableCell sx={tableCellStyles}>{header}</TableCell>
                 <TableCell align="center" sx={tableCellStyles}>
                   <Controller
                     name={`attendeeTableConfig.${key}.filterable`}
@@ -75,6 +69,13 @@ function AttendeeTable({ control, setValue }) {
                               `attendeeTableConfig.${key}.downloadable`,
                               false
                             );
+
+                            if(key === 'status'){
+                                customOptions.forEach((option) =>
+                                  setValue(`attendeeTableConfig.defaultOptions.${option?.label}`, false)
+                                );
+                                setValue(`attendeeTableConfig.customOptions.filterable`, false);
+                            }
                           }
                         }}
                         checked={value || false}
@@ -107,6 +108,66 @@ function AttendeeTable({ control, setValue }) {
                 </TableCell>
               </TableRow>
             ))}
+
+            <TableRow>
+              <TableCell></TableCell>
+              <TableCell
+                sx={{
+                  paddingTop: "12px",
+                  paddingBottom: "12px",
+                  fontWeight: "bold",
+                }}
+              >
+                Default Options
+              </TableCell>
+
+              <TableCell sx={tableCellStyles}></TableCell>
+            </TableRow>
+
+            {customOptions.map((option) => (
+              <TableRow key={option?._id}>
+                <TableCell />
+                <TableCell>{option?.label}</TableCell>
+                <TableCell align="center" sx={tableCellStyles}>
+                  <Controller
+                    name={`attendeeTableConfig.defaultOptions.${option?.label}`}
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <Checkbox
+                        onChange={(e) => {
+                          const isChecked = e.target.checked;
+                          // Update "Downloadable" checkbox
+                          onChange(isChecked);
+                        }}
+                        checked={value || false}
+                        disabled={!watch(`attendeeTableConfig.status.filterable`)}
+                      />
+                    )}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+
+            <TableRow>
+              <TableCell sx={tableCellStyles}>Custom Options</TableCell>
+              <TableCell align="center" sx={tableCellStyles}>
+                <Controller
+                  name={`attendeeTableConfig.customOptions.filterable`}
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                    <Checkbox
+                      onChange={(e) => {
+                        const isChecked = e.target.checked;
+                        // Update "Downloadable" checkbox
+                        onChange(isChecked);
+                      }}
+                      checked={value || false}
+                      disabled={!watch(`attendeeTableConfig.status.filterable`)}
+                      />
+                  )}
+                />
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
@@ -121,6 +182,7 @@ export default function AddPlan() {
     register,
     handleSubmit,
     control,
+    watch,
     reset,
     setValue,
     formState: { errors },
@@ -153,6 +215,7 @@ export default function AddPlan() {
   useEffect(() => {
     if (isEditMode) {
       dispatch(getPricePlan(id));
+      dispatch(getCustomOptions());
     }
   }, [id, isEditMode]);
 
@@ -247,7 +310,7 @@ export default function AddPlan() {
               </IconButton>
             </Box>
             <Collapse in={isTableOpen} timeout="auto" unmountOnExit>
-              <AttendeeTable control={control} setValue={setValue} />
+              <AttendeeTable watch={watch} control={control} setValue={setValue} />
             </Collapse>
           </Box>
 
