@@ -21,21 +21,21 @@ const Assignments = () => {
 
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
-    (state) => state.attendee
+  const { assignData, isLoading, isSuccess, totalPages } = useSelector(
+    (state) => state.assign
   );
+  console.log('asssinedata', assignData)
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
-  const {userData} = useSelector((state) => state.auth);
 
   useEffect(() => {
     setSearchParams({ page: page });
   }, [page]);
 
   useEffect(() => {
-    dispatch(getAssignments(userData?._id))
+    dispatch(getAssignments( { page, limit: LIMIT }));
   }, [page, LIMIT]);
 
   useEffect(() => {
@@ -91,19 +91,19 @@ const Assignments = () => {
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="viewAssignmentsTable"
-        isSelectVisible={true}
+        // isSelectVisible={true}
         filters={filters}
         setFilters={setFilters}
         tableData={{
-          columns: [...attendeeTableColumns,   { header: "Webinar", key: "webinarName", width: 20, type: "" },],
-          rows: [],
+          columns: [...attendeeTableColumns, ],//  { header: "Webinar", key: "webinarName", width: 20, type: "" },
+          rows: Array.isArray(assignData) && assignData.map((assignment) => assignment.attendee) || [],
         }}
         actions={actionIcons}
         totalPages={totalPages}
         page={page}
         setPage={setPage}
-        selectedRows={selectedRows}
-        setSelectedRows={setSelectedRows}
+        // selectedRows={selectedRows}
+        // setSelectedRows={setSelectedRows}
         limit={LIMIT}
         filterModalName={filterModalName}
         exportModalName={exportExcelModalName}

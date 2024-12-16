@@ -4,6 +4,7 @@ const initialState = {
   selectedRows: [],
   filters: {},
   page: 1,
+  isTablesMasked: false,
 };
 
 const tableSlice = createSlice({
@@ -23,8 +24,15 @@ const tableSlice = createSlice({
     setPage: (state, action) => {
       state.page = action.payload;
     },
+    setTableMasked: (state, action) => {
+      state.isTablesMasked = action.payload;
+    }
+    // addMaskedTable: (state, action) => {
+    //   const { tableId, tableData } = action.payload;
+    //   state.maskedTables.set(tableId, tableData);
+    // },
   },
 });
 
-export const { setSelectedRows, setFilters, setPage } = tableSlice.actions;
+export const { setSelectedRows, setFilters, setPage, setTableMasked } = tableSlice.actions;
 export default tableSlice.reducer;

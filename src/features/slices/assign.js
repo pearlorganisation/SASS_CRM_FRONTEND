@@ -3,7 +3,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { addAssign, addNote, getNotes } from "../actions/assign";
+import { addAssign, addNote, getAssignments, getNotes } from "../actions/assign";
 import { errorToast } from "../../utils/extra";
 
 const initialState = {
@@ -12,7 +12,7 @@ const initialState = {
   isFormLoading: false,
   assignData: [],
   noteData: [],
-  totalPages: null,
+  totalPages: 1,
   errorMessage: "",
 };
 
@@ -68,6 +68,18 @@ export const assignSlice = createSlice({
       .addCase(getNotes.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
+        errorToast(action?.payload);
+      })
+      .addCase(getAssignments.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getAssignments.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.assignData = action.payload?.result || [];
+        state.totalPages = action.payload?.totalPages || 1;
+      })
+      .addCase(getAssignments.rejected, (state, action) => {
+        state.isLoading = false;
         errorToast(action?.payload);
       });
   },

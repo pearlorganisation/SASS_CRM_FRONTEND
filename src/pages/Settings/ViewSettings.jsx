@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { roles } from "../../utils/roles";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import { RiMoneyRupeeCircleLine } from "react-icons/ri";
@@ -8,11 +8,20 @@ import { PiLetterCirclePBold } from "react-icons/pi";
 import { MdArrowDropDownCircle } from "react-icons/md";
 import { PiLinkSimpleBold } from "react-icons/pi";
 import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Checkbox, FormControlLabel } from "@mui/material";
+import { setTableMasked } from "../../features/slices/tableSlice";
 
 const ViewSettings = () => {
+  const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role || "";
+
+  const {isTablesMasked} = useSelector((state) => state.table);
+  
+
+  const handleMaskedTablesChange = (event) => {
+    dispatch(setTableMasked(event.target.checked));
+  };
 
   return (
     <Box className="mt-10 text-center">
@@ -45,6 +54,20 @@ const ViewSettings = () => {
             <Typography>Custom Status</Typography>
           </Link>
         </ComponentGuard>
+
+        {/* Masked Tables Option */}
+        <div className="flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer   text-green-700 shadow-lg">
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isTablesMasked}
+                onChange={handleMaskedTablesChange}
+                color="primary"
+              />
+            }
+            label={<Typography>Masked Tables</Typography>}
+          />
+        </div>
 
         {/* For SUPER_ADMIN only */}
         <ComponentGuard allowedRoles={[roles.SUPER_ADMIN]}>

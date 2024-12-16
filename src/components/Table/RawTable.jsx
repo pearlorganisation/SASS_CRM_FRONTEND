@@ -36,9 +36,10 @@ const RawTable = (props) => {
     isLoading,
     selectedRows,
     setSelectedRows,
-    userData
+    userData,
   } = props;
   const dispatch = useDispatch();
+    const {isTablesMasked} = useSelector((state) => state.table);
 
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
@@ -122,7 +123,14 @@ const RawTable = (props) => {
                     )}
                     {column.type === "Date" &&
                       (formatDateAsNumber(row?.[column.key]) ?? "N/A")}
-                    {column.type === "" && (row?.[column.key] ?? "N/A")}
+
+                    {column.type === "" &&
+                      (row?.[column.key] !== undefined && row?.[column.key] !== null
+                        ? isTablesMasked &&
+                          ["userName", "email", "phone", 'firstName', 'lastName'].includes(column.key)
+                          ? `${row[column.key].slice(0, 3)}***`
+                          : row[column.key] ?? "N/A"
+                        : "N/A")}
                   </TableCell>
                 ))}
                 <TableCell
@@ -131,17 +139,20 @@ const RawTable = (props) => {
                 >
                   <div className="flex gap-2">
                     {actions?.map((action, index) => (
-                      <ComponentGuard key={index} conditions={[ action?.readOnly || userData?.isActive]}>
-                      <div key={index}>
-                        <Tooltip title={action.tooltip} arrow>
-                          <IconButton
-                            className="group"
-                            onClick={() => action.onClick(row)}
-                          >
-                            {action.icon(row)}
-                          </IconButton>
-                        </Tooltip>
-                      </div>
+                      <ComponentGuard
+                        key={index}
+                        conditions={[action?.readOnly || userData?.isActive]}
+                      >
+                        <div key={index}>
+                          <Tooltip title={action.tooltip} arrow>
+                            <IconButton
+                              className="group"
+                              onClick={() => action.onClick(row)}
+                            >
+                              {action.icon(row)}
+                            </IconButton>
+                          </Tooltip>
+                        </div>
                       </ComponentGuard>
                     ))}
                   </div>

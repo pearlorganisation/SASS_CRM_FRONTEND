@@ -17,10 +17,12 @@ export const addAssign = createAsyncThunk(
 
 export const getAssignments = createAsyncThunk(
   "assignments/fetchData",
-  async (id, { rejectWithValue }) => {
+  async ({page=1, limit=10}, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`assignment/${id}`);
-      return response;
+      const response = await instance.get(`assignment`,{
+        params: {page, limit}
+      });
+      return response?.data || [];
     } catch (e) {
       return rejectWithValue(e);
     }
