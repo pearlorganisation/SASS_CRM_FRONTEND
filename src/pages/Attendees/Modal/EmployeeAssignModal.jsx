@@ -13,14 +13,17 @@ import { closeModal } from "../../../features/slices/modalSlice";
 import { getAllEmployees } from "../../../features/actions/employee";
 import useRoles from "../../../hooks/useRoles";
 import { addAssign } from "../../../features/actions/assign";
+import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
 function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
   const dispatch = useDispatch();
   const roles = useRoles();
+  const logUserActivity = useAddUserActivity();
+
   const { modals } = useSelector((state) => state.modals);
   const { employeeData, isLoading } = useSelector((state) => state.employee);
   const { tabValue } = useSelector((state) => state.attendee);
-  const {isSuccess} = useSelector((state) => state.assign);
+  const { isSuccess } = useSelector((state) => state.assign);
 
   const open = modals[modalName] ? true : false;
 
@@ -57,6 +60,12 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
           },
         })
       );
+      logUserActivity({
+        action: "assign",
+        details: `User manually assigned Attendees to : ${
+          tabValue === "preWebinar" ? "REMINDER EMPLOYEE" : "SALES EMPLOYEE"
+        }`,
+      });
     }
   };
 
@@ -70,11 +79,10 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
   }, []);
 
   useEffect(() => {
-    if(isSuccess){
+    if (isSuccess) {
       onClose();
     }
-
-  },[isSuccess]);
+  }, [isSuccess]);
 
   return (
     <Modal open={open} onClose={onClose}>

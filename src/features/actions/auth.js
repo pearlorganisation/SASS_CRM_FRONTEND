@@ -43,7 +43,12 @@ export const updateUser = createAsyncThunk(
   "user/Update",
   async (payload, { rejectWithValue }) => {
     try {
-      const { data } = await instance.patch("/users", payload);
+      console.log("payload", payload);
+      const { data } = await instance.patch("/users", payload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return data;
     } catch (error) {
       return rejectWithValue(error);
@@ -63,7 +68,6 @@ export const updatePassword = createAsyncThunk(
     }
   }
 );
-
 
 export const getAllRoles = createAsyncThunk(
   "roles/fetchData",
@@ -97,6 +101,18 @@ export const getCurrentUser = createAsyncThunk(
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
+    }
+  }
+);
+
+export const deleteUserDocumet = createAsyncThunk(
+  "userDocuments/Delete",
+  async (filename, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.delete(`/users/document/${filename}`);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error);
     }
   }
 );

@@ -8,13 +8,15 @@ import { addAttendees } from "../../../features/actions/attendees";
 import { useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { clearSuccess } from "../../../features/slices/attendees";
+import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
 const UploadCsvModal = ({ setModal, update }) => {
+  const logUserActivity = useAddUserActivity();
+
   const { tabValue, isLoading, isSuccess } = useSelector(
     (state) => state.attendee
   );
   const { id } = useParams();
-
   const [mapUI, setMapUI] = useState(false);
   const [selectedValues, setSelectedValues] = useState({}); // State to store selected values
   const [meetingData, setMeetingData] = useState([]);
@@ -201,6 +203,11 @@ const UploadCsvModal = ({ setModal, update }) => {
     };
 
     dispatch(addAttendees(payloadData));
+    logUserActivity({
+      action: 'import',
+      type: 'CSV Data',
+      detailItem: tabValue
+    })
   };
 
   function handleCloseModal(){

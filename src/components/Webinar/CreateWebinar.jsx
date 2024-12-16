@@ -17,10 +17,12 @@ import {
 import { ClipLoader } from "react-spinners";
 import { getAllEmployees } from "../../features/actions/employee";
 import useRoles from "../../hooks/useRoles";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const CreateWebinar = ({ modalName }) => {
   const dispatch = useDispatch();
   const roles = useRoles();
+  const logUserActivity = useAddUserActivity();
   const { isLoading, isSuccess } = useSelector((state) => state.webinarContact);
   const { modals, modalData } = useSelector((state) => state.modals);
   const open = modals[modalName] ? true : false;
@@ -90,6 +92,12 @@ const CreateWebinar = ({ modalName }) => {
 
   const submitForm = (data) => {
     const payload = { ...data, assignedEmployees: selectedEmployees.map((e) => e.value) };
+
+    logUserActivity({
+      action: modalData ? "edit" : "create",
+      type: 'Webinar',
+      detailItem: payload.webinarName
+    })
 
     if (modalData) {
       dispatch(updateWebinar({ id: modalData?._id, data: payload }));

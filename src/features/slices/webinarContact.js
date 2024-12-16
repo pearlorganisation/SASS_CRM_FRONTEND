@@ -31,17 +31,14 @@ export const webinarContactSlice = createSlice({
     builder
       .addCase(getAllWebinars.pending, (state, action) => {
         state.isLoading = true;
-        state.errorMessage = "";
       })
       .addCase(getAllWebinars.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = "";
         state.webinarData = action.payload.result || [];
         state.totalPages = action.payload.totalPages;
       })
       .addCase(getAllWebinars.rejected, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = action.payload;
         errorToast(action?.payload);
       })
       .addCase(createWebinar.pending, (state, action) => {

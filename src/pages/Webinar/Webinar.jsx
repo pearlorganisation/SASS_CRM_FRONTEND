@@ -1,31 +1,35 @@
-import { Button, Skeleton, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllWebinars } from "../../features/actions/webinarContact";
-import Delete from "../../components/Webinar/delete";
-import Pagination from "@mui/material/Pagination";
-import CreateWebinar from "../../components/Webinar/CreateWebinar";
-import Tooltip from "@mui/material/Tooltip";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { Button } from "@mui/material";
+import { webinarTableColumns } from "../../utils/columnData";
+import { Edit, Delete, Visibility, AttachFile } from "@mui/icons-material";
+import DataTable from "../../components/Table/DataTable";
 import { openModal } from "../../features/slices/modalSlice";
-import { formatDateAsNumber } from "../../utils/extra";
-import { resetWebinarSuccess } from "../../features/slices/webinarContact";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
+import CreateWebinar from "../../components/Webinar/CreateWebinar";
+import DeleteModal from "../../components/Webinar/delete";
+import { getAllWebinars } from "../../features/actions/webinarContact";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { resetWebinarSuccess } from "../../features/slices/webinarContact";
 
-const MeetingDetails = () => {
+const Webinar = () => {
+  // ----------------------- ModalNames for Redux -----------------------
+  const exportModalName = "ExportFilterModal";
+  const filterModalName = "WebinarFilterModal";
+  const tableHeader = "Webinar Table";
+  const createWebinarModalName = "createWebinarModal";
+
+  // ----------------------- etcetra -----------------------
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const logUserActivity = useAddUserActivity();
+
   const { isLoading, isSuccess, webinarData, totalPages } = useSelector(
     (state) => state.webinarContact
   );
   const { userData } = useSelector((state) => state.auth);
 
-  const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
-  const [page, setPage] = useState(searchParams.get("page") || 1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [id, setId] = useState();
   const [webinarName, setWebinarName] = useState(null);
@@ -36,15 +40,26 @@ const MeetingDetails = () => {
     setWebinarName(name);
   };
 
-  const handlePagination = (e, p) => {
-    setPage(p);
-    setSearchParams({ page: p });
-  };
+  const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [page, setPage] = useState(searchParams.get("page") || 1);
+  const [filters, setFilters] = useState({});
 
   useEffect(() => {
-    console.log("soemtsdf");
-    dispatch(getAllWebinars({ page, limit: 10 }));
+    setSearchParams({ page: page });
   }, [page]);
+
+  useEffect(() => {
+    dispatch(getAllWebinars({ page, limit: LIMIT, filters }));
+  }, [page, LIMIT, filters]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      setShowDeleteModal(false);
+      dispatch(getAllWebinars({ page: 1, limit: LIMIT, filters }));
+      dispatch(resetWebinarSuccess());
+    }
+  }, [isSuccess]);
 
   const handleRowClick = (id) => {
     logUserActivity({
@@ -55,143 +70,79 @@ const MeetingDetails = () => {
     navigate(`/webinarDetails/${id}`);
   };
 
-  useEffect(() => {
-    if (isSuccess) {
-      setShowDeleteModal(false);
-      dispatch(getAllWebinars({ page: 1, limit: 10 }));
-      dispatch(resetWebinarSuccess());
-    }
-  }, [isSuccess]);
+  // ----------------------- Action Icons -----------------------
 
-  const createWebinarModalName = "createWebinarModal";
+  const actionIcons = [
+    {
+      icon: () => (
+        <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
+      ),
+      tooltip: "View Webinar Info",
+      onClick: (item) => {
+        handleRowClick(item?._id);
+      },
+      readOnly: true,
+    },
+    {
+      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
+      tooltip: "Edit Attendee",
+      onClick: (item) => {
+        dispatch(
+          openModal({
+            modalName: createWebinarModalName,
+            data: item,
+          })
+        );
+      },
+    },
+    {
+      icon: (item) => (
+        <Delete className="text-red-500 group-hover:text-red-600" />
+      ),
+      tooltip: "Delete Attendee",
+      onClick: (item) => {
+        handleDeleteModal(item?._id, item?.webinarName)
+      },
+    },
+  ];
   return (
-    <>
-      <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-14">
-        <div className="items-start justify-between md:flex">
-          <div className="max-w-lg">
-            <h3 className="text-gray-800 text-xl font-bold sm:text-2xl">
-              Manage Webinar Details
-            </h3>
-            {/* <p className="text-gray-600 text-[15px] font-medium mt-2">
-              This page is for parsing CSV and XLSX file here.
-            </p> */}
-          </div>
-          <div className="mt-3 md:mt-0 space-x-5">
-            <ComponentGuard conditions={[userData?.isActive]}>
-              <Button
-                onClick={() => dispatch(openModal(createWebinarModalName))}
-                variant="contained"
-                color="secondary"
-              >
-                Create Webinar
-              </Button>
-            </ComponentGuard>
-          </div>
-        </div>
-        <div className="mt-5 shadow-lg rounded-lg overflow-x-auto">
-          {isLoading ? (
-            <Stack spacing={4}>
-              <Skeleton variant="rounded" height={35} />
-              <Skeleton variant="rounded" height={25} />
-              <Skeleton variant="rounded" height={25} />
-              <Skeleton variant="rounded" height={25} />
-              <Skeleton variant="rounded" height={25} />
-            </Stack>
-          ) : (
-            <table className="w-full table-auto text-sm text-left">
-              <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
-                <tr>
-                  <th className="py-3 px-6">S No.</th>
-                  <th className="py-3 px-6">Webinar Name</th>
-                  <th className="py-3 px-6">Webinar Date</th>
-                  <th className="py-3 px-6">Total Registrations</th>
-                  <th className="py-3 px-6">Total Attendees</th>
-                  <th className="py-3 px-6">Total Participants</th>
-                  <th className="py-3 px-6">Action</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-600 divide-y">
-                {Array.isArray(webinarData) &&
-                  webinarData.length > 0 &&
-                  webinarData.map((item, idx) => {
-                    const serialNumber = (page - 1) * 8 + idx + 1;
-                    return (
-                      <tr
-                        key={idx}
-                        className="cursor-pointer hover:bg-gray-100"
-                        onClick={() => handleRowClick(item?._id)}
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {serialNumber}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {item?.webinarName}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {formatDateAsNumber(item?.webinarDate)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {item?.totalRegistrations || 0}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {item?.totalAttendees || 0}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {item?.totalRegistrations + item?.totalAttendees}
-                        </td>
-
-                        <td
-                          className="px-3 whitespace-nowrap flex gap-2"
-                          onClick={(e) => e.stopPropagation()} // Prevent row click event propagation
-                        >
-                          {/* Update Details */}
-                          <Tooltip title="Update Details" arrow>
-                            <button
-                              onClick={() =>
-                                dispatch(
-                                  openModal({
-                                    modalName: createWebinarModalName,
-                                    data: item,
-                                  })
-                                )
-                              }
-                              className="p-2 rounded-lg text-[#006A67] hover:text-[#1b3d3c] duration-150 hover:bg-gray-50"
-                            >
-                              <EditIcon />
-                            </button>
-                          </Tooltip>
-
-                          {/* Delete */}
-                          <Tooltip title="Delete" arrow>
-                            <button
-                              onClick={() =>
-                                handleDeleteModal(item?._id, item?.name)
-                              }
-                              className="p-2 rounded-lg text-red-400 hover:text-red-600 duration-150 hover:bg-gray-50"
-                            >
-                              <DeleteIcon />
-                            </button>
-                          </Tooltip>
-                        </td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
-          )}
-        </div>
+    <div className="px-6 md:px-10 pt-14 space-y-6">
+      <div className="flex gap-4 justify-end">
+        <ComponentGuard conditions={[userData?.isActive]}>
+          <Button
+            onClick={() => dispatch(openModal(createWebinarModalName))}
+            variant="contained"
+          >
+            Create Webinar
+          </Button>
+        </ComponentGuard>
       </div>
-      <div className="flex justify-center mt-5">
-        <Pagination
-          count={1}
-          page={Number(page)}
-          color="primary"
-          onChange={handlePagination}
-        />
-      </div>
+
+      <DataTable
+        tableHeader={tableHeader}
+        tableUniqueKey="webinarTable"
+        filters={filters}
+        setFilters={setFilters}
+        tableData={{
+          columns: webinarTableColumns,
+          rows: webinarData.map((item) => ({
+            ...item,
+            totalParticipants:
+              item?.totalAttendees + item?.totalRegistrations || 0,
+          })),
+        }}
+        actions={actionIcons}
+        totalPages={totalPages}
+        page={page}
+        setPage={setPage}
+        limit={LIMIT}
+        filterModalName={filterModalName}
+        exportModalName={exportModalName}
+        isLoading={isLoading}
+      />
 
       {showDeleteModal && (
-        <Delete
+        <DeleteModal
           setModal={setShowDeleteModal}
           webinarName={webinarName}
           id={id}
@@ -199,8 +150,8 @@ const MeetingDetails = () => {
       )}
 
       <CreateWebinar modalName={createWebinarModalName} />
-    </>
+    </div>
   );
 };
 
-export default MeetingDetails;
+export default Webinar;
