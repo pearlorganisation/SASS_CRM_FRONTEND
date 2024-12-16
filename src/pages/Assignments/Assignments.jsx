@@ -24,7 +24,6 @@ const Assignments = () => {
   const { assignData, isLoading, isSuccess, totalPages } = useSelector(
     (state) => state.assign
   );
-  console.log('asssinedata', assignData)
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(searchParams.get("page") || 1);

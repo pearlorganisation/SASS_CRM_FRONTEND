@@ -16,13 +16,17 @@ import {
 } from "@mui/material"; // Importing MUI components
 import useRoles from "../../../hooks/useRoles";
 import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
+import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
 const CustomOptions = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
+  const logUserActivity = useAddUserActivity();
+
   const { customOptions, isSuccess } = useSelector((state) => state.globalData);
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role || "";
+  const pageTitle = roles.SUPER_ADMIN === role ? "Default" : "Custom";
 
   const customOptionsData = customOptions.filter(
     (option) => roles.SUPER_ADMIN === role || !option?.isDefault
@@ -44,12 +48,22 @@ const CustomOptions = () => {
 
   const onSubmit = (data) => {
     dispatch(createCustomOption(data));
+    logUserActivity({
+      action: "create",
+      type: `${pageTitle} Option`,
+      detailItem: data?.label,
+    });
   };
 
   const confirmDelete = () => {
     if (deleteOptionId) {
-      dispatch(deleteCustomOption(deleteOptionId));
+      dispatch(deleteCustomOption(deleteOptionId?._id));
       setDeleteOptionId(null);
+      logUserActivity({
+        action: "delete",
+        type: `${pageTitle} Option`,
+        detailItem: deleteOptionId?.label,
+      });
     }
     setShowDeleteModal(false);
   };
@@ -70,7 +84,7 @@ const CustomOptions = () => {
     <div className="container mx-auto mt-10 p-4">
       <div className="flex justify-between py-6 items-center">
         <h1 className="text-2xl font-bold">
-          {roles.SUPER_ADMIN === role ? "Default" : "Custom"} Options
+          {pageTitle} Options
         </h1>
         <ComponentGuard conditions={[userData?.isActive]}>
           <Button
@@ -78,7 +92,7 @@ const CustomOptions = () => {
             color="primary"
             onClick={handleModalToggle}
           >
-            Add {roles.SUPER_ADMIN === role ? "Default" : "Custom"} Option
+            Add {pageTitle} Option
           </Button>
         </ComponentGuard>
       </div>
@@ -101,7 +115,7 @@ const CustomOptions = () => {
                 <td className="p-4">
                   <IconButton
                     onClick={() => {
-                      setDeleteOptionId(option?._id);
+                      setDeleteOptionId(option);
                       setShowDeleteModal(true);
                     }}
                     className="text-red-500 hover:text-red-700"
@@ -123,7 +137,7 @@ const CustomOptions = () => {
       >
         <div className="bg-white p-6 rounded shadow-lg w-80">
           <h2 className="text-xl font-semibold mb-4">
-            Add {roles.SUPER_ADMIN === role ? "Default" : "Custom"} Option
+            Add {pageTitle} Option
           </h2>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="mb-4">

@@ -9,26 +9,26 @@ import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // for dropdown ico
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../features/slices/auth";
 import { getAllSidebarLinks } from "../../../features/actions/sidebarLink";
-import { addUserActivity } from "../../../features/actions/userActivity";
 import { FaClipboard } from "react-icons/fa";
 import { Badge, Chip } from "@mui/material";
 import { resetSuccessAndUpdate } from "../../../features/slices/noticeBoard";
 import { getNoticeBoard } from "../../../features/actions/noticeBoard";
 import useRoles from "../../../hooks/useRoles";
 import { MdAssignment } from "react-icons/md";
+import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const roles = useRoles();
-  
-  const {isUpdated} = useSelector((state) => state.noticeBoard);
+  const logUserActivity = useAddUserActivity();
+
+  const { isUpdated } = useSelector((state) => state.noticeBoard);
   const { sidebarLinkData } = useSelector((state) => state.sidebarLink);
   const { userData, isUserLoggedIn } = useSelector((state) => state.auth);
   const { isSidebarOpen } = useSelector((state) => state.globalData);
   const [showImportantLinks, setShowImportantLinks] = useState(false); // toggle state for sub-links
   const role = userData?.role || "";
-  
 
   const navItems = [
     {
@@ -82,9 +82,7 @@ const Sidebar = () => {
         {
           path: "/notice-board",
           label: "Notice Board",
-          icon: (
-              <FaClipboard size={25} />
-          ),
+          icon: <FaClipboard size={25} />,
         },
       ],
     },
@@ -92,13 +90,10 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-
-    dispatch(
-      addUserActivity({
-        action: "logout",
-        details: "User logged out successfully",
-      })
-    );
+    logUserActivity({
+      action: "logout",
+      details: "User logged out successfully",
+    });
   };
 
   const toggleImportantLinks = () => {
@@ -110,12 +105,11 @@ const Sidebar = () => {
   };
 
   const addUserActivityLog = (link, type) => {
-    dispatch(
-      addUserActivity({
-        action: "navigate",
-        details: `User navigated to the ${type}: ${link}`,
-      })
-    );
+    logUserActivity({
+      action: "navigate",
+      detailItem: link,
+      navigateType: type,
+    });
   };
 
   useEffect(() => {
@@ -171,11 +165,10 @@ const Sidebar = () => {
                   >
                     {item.icon}
                     <span className="flex-1 ms-3 whitespace-nowrap">
-                      {item.label}{" "}{
-                        item.label === "Notice Board" && isUpdated && (
-                          <Chip color="secondary" label="New" />
-                        )
-                      }
+                      {item.label}{" "}
+                      {item.label === "Notice Board" && isUpdated && (
+                        <Chip color="secondary" label="New" />
+                      )}
                     </span>
                   </Link>
                 </li>

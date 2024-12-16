@@ -1,13 +1,17 @@
-import { useSelector } from 'react-redux';
-import { useMemo } from 'react';
+import { useSelector } from "react-redux";
+import { useMemo } from "react";
 
 const useRoles = () => {
-  const { roles } = useSelector((state) => state.auth);
+  const { roles, userData } = useSelector((state) => state.auth);
+  const role = userData?.role || "";
 
   // Ensure roles is an array and handle cases where it is undefined or not an array
   const rolesObject = useMemo(() => {
     if (!Array.isArray(roles)) {
-      console.error('Invalid roles data. Expected an array but received:', typeof roles);
+      console.error(
+        "Invalid roles data. Expected an array but received:",
+        typeof roles
+      );
       return {}; // Return empty object to prevent errors in the app
     }
 
@@ -18,7 +22,7 @@ const useRoles = () => {
       if (role && role?.name && role?._id) {
         acc[role.name] = role._id;
       } else {
-        console.error('Invalid role data encountered', role);
+        console.error("Invalid role data encountered", role);
       }
       return acc;
     }, {});
@@ -26,9 +30,9 @@ const useRoles = () => {
 
   // Safely map roleId to role name with fallback
   const getRoleNameByID = (roleId = "") => {
-    if (typeof roleId !== 'string' || roleId.trim() === "") {
-      console.warn('Invalid roleId provided:', roleId);
-      return 'Unknown Role';
+    if (typeof roleId !== "string" || roleId.trim() === "") {
+      console.warn("Invalid roleId provided:", roleId);
+      return "Unknown Role";
     }
 
     const roleEntries = Object.entries(rolesObject);
@@ -39,11 +43,11 @@ const useRoles = () => {
 
   // Check if roleName is either 'EMPLOYEE_SALES' or 'EMPLOYEE_REMINDER'
   const isEmployeeId = (roleId) => {
-    if (typeof roleId !== 'string' || roleId.trim() === "") {
-      
-    }
-    const roleName = getRoleNameByID(roleId);
-    const employeeRoles = ['EMPLOYEE SALES', 'EMPLOYEE REMINDER'];
+    let roleName = "";
+    if (typeof roleId !== "string" || roleId.trim() === "") {
+      roleName = getRoleNameByID(role);
+    } else roleName = getRoleNameByID(roleId);
+    const employeeRoles = ["EMPLOYEE SALES", "EMPLOYEE REMINDER"];
     return employeeRoles.includes(roleName);
   };
 
@@ -52,12 +56,12 @@ const useRoles = () => {
     return new Proxy(rolesObject, {
       get(target, property) {
         // Handle method calls like 'getRoleNameById'
-        if (property === 'getRoleNameById') {
+        if (property === "getRoleNameById") {
           return getRoleNameByID;
         }
 
         // Handle method calls like 'isEmployeeId'
-        if (property === 'isEmployeeId') {
+        if (property === "isEmployeeId") {
           return isEmployeeId;
         }
 
@@ -66,7 +70,7 @@ const useRoles = () => {
           console.warn(`Accessing an unknown role property: ${property}`);
         }
 
-        return property in target ? target[property] : 'defaultName';
+        return property in target ? target[property] : "defaultName";
       },
     });
   }, [rolesObject]);

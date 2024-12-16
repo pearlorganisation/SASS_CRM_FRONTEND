@@ -21,13 +21,15 @@ import { clearSuccess } from "../../features/slices/employee";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import { getRoleNameByID } from "../../utils/roles";
 import useRoles from "../../hooks/useRoles";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const CreateEmployee = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
   const roles = useRoles();
-  
+  const logUserActivity = useAddUserActivity();
+
   const {
     register,
     handleSubmit,
@@ -63,6 +65,12 @@ const CreateEmployee = () => {
     } else {
       dispatch(addEmployee(newData));
     }
+
+    logUserActivity({
+      action: id ? "edit" : "create",
+      type: "Employee",
+      detailItem: newData?.userName,
+    });
   };
 
   const [isPasswordHidden, setPasswordHidden] = useState(true);

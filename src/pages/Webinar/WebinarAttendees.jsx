@@ -14,6 +14,7 @@ import { openModal } from "../../features/slices/modalSlice";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
 import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -24,6 +25,8 @@ const WebinarAttendees = () => {
   // ----------------------- etcetra -----------------------
   const { id } = useParams();
   const dispatch = useDispatch();
+  const logUserActivity = useAddUserActivity();
+
   const { attendeeData, isLoading, isSuccess, totalPages, tabValue } =
     useSelector((state) => state.attendee);
   const { userData } = useSelector((state) => state.auth);
@@ -44,6 +47,11 @@ const WebinarAttendees = () => {
     dispatch(setTabValue(newValue));
     setPage(1);
     setSelectedRows([]);
+    logUserActivity({
+      action: 'switch',
+      type: 'tab',
+      detailItem: newValue
+    })
   };
 
   useEffect(() => {

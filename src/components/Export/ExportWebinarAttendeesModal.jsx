@@ -43,7 +43,7 @@ const ExportWebinarAttendeesModal = ({
   };
 
   const handleSubmit = () => {
-    const limitValue = limit || null;
+    const limitValue = limit || undefined;
     console.log("Limit:", limitValue);
     console.log("Columns:", selectedColumns);
     // dispatch(exportClientExcel({ limit: limitValue, columns, filters }));

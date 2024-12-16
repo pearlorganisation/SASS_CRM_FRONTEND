@@ -14,9 +14,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../features/slices/modalSlice";
 import FormInput from "../FormInput";
 import { filterTruthyValues } from "../../utils/extra";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const FilterModal = ({ modalName, setFilters, filters }) => {
   const dispatch = useDispatch();
+  const logUserActivity = useAddUserActivity();
+
   const { modals } = useSelector((state) => state.modals);
   const open = modals[modalName] ? true : false;
   const { control, handleSubmit, reset } = useForm();
@@ -29,6 +32,11 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
     const filterData = filterTruthyValues(data);
     setFilters(filterData);
     dispatch(closeModal(modalName));
+    logUserActivity({
+      action: "filter",
+      type: "to Table",
+      detailItem: 'Attendees',
+    })
   };
 
   const resetForm = () => {
