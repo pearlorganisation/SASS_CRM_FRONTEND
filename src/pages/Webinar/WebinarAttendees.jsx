@@ -13,6 +13,7 @@ import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
 import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
+import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -23,9 +24,9 @@ const WebinarAttendees = () => {
   // ----------------------- etcetra -----------------------
   const { id } = useParams();
   const dispatch = useDispatch();
-
   const { attendeeData, isLoading, isSuccess, totalPages, tabValue } =
     useSelector((state) => state.attendee);
+  const { userData } = useSelector((state) => state.auth);
   const [selectedRows, setSelectedRows] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
@@ -77,6 +78,7 @@ const WebinarAttendees = () => {
       onClick: (item) => {
         console.log(`Viewing details for row with id: ${item?._id}`);
       },
+      readOnly: true,
     },
     {
       icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
@@ -113,6 +115,8 @@ const WebinarAttendees = () => {
           value="enrollments"
           className="text-gray-600"
         />
+
+        <Tab label="UnAttended" value="unattended" className="text-gray-600" />
       </Tabs>
 
       <div className="flex gap-4 justify-end">
@@ -124,13 +128,16 @@ const WebinarAttendees = () => {
             Assign
           </Button>
         )}
-        <Button
-          onClick={() => setShowModal((prev) => !prev)}
-          variant="contained"
-          startIcon={<AttachFile />}
-        >
-          Import
-        </Button>
+
+        <ComponentGuard conditions={[userData?.isActive]}>
+          <Button
+            onClick={() => setShowModal((prev) => !prev)}
+            variant="contained"
+            startIcon={<AttachFile />}
+          >
+            Import
+          </Button>
+        </ComponentGuard>
       </div>
 
       <DataTable
@@ -155,8 +162,16 @@ const WebinarAttendees = () => {
         isLoading={isLoading}
       />
       <EmployeeAssignModal
-        selectedRows={selectedRows}
+        selectedRows={attendeeData
+          .filter((item) => selectedRows.includes(item._id))
+          .map((item) => {
+            return {
+              email: item.email,
+              recordType: tabValue,
+            };
+          })}
         modalName={employeeAssignModalName}
+        webinarId={id}
       />
       <AttendeesFilterModal
         modalName={AttendeesFilterModalName}

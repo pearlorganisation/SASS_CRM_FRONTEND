@@ -10,26 +10,30 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../../features/slices/modalSlice";
-import {getAllEmployees} from '../../../features/actions/employee'
-import useRoles from '../../../hooks/useRoles';
+import { getAllEmployees } from "../../../features/actions/employee";
+import useRoles from "../../../hooks/useRoles";
+import { addAssign } from "../../../features/actions/assign";
 
-function EmployeeAssignModal({ modalName, onAssign, selectedRows }) {
+function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
   const dispatch = useDispatch();
   const roles = useRoles();
   const { modals } = useSelector((state) => state.modals);
-  const { employeeData, isLoading } = useSelector(state => state.employee);
-  const { isSuccess, tabValue } =
-  useSelector((state) => state.attendee);
+  const { employeeData, isLoading } = useSelector((state) => state.employee);
+  const { tabValue } = useSelector((state) => state.attendee);
+  const {isSuccess} = useSelector((state) => state.assign);
 
   const open = modals[modalName] ? true : false;
 
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
-  const selectedType = tabValue === 'preWebinar'? "EMPLOYEE REMINDER" : "EMPLOYEE SALES";
-
+  const selectedType =
+    tabValue === "preWebinar" ? "EMPLOYEE REMINDER" : "EMPLOYEE SALES";
 
   // Filter employees based on the selected role
-  const options = employeeData.map(item =>  { return { ...item, role: roles.getRoleNameById(item?.role) }})
+  const options = employeeData
+    .map((item) => {
+      return { ...item, role: roles.getRoleNameById(item?.role) };
+    })
     .filter((item) => item?.role === selectedType)
     .map((item) => ({
       value: item?._id,
@@ -38,7 +42,21 @@ function EmployeeAssignModal({ modalName, onAssign, selectedRows }) {
 
   const handleAssign = () => {
     if (selectedEmployee) {
-      onAssign(selectedEmployee); // Callback to assign employee
+      console.log(
+        selectedEmployee,
+        "selectedEmployee",
+        webinarId,
+        selectedRows
+      );
+      dispatch(
+        addAssign({
+          id: selectedEmployee,
+          payload: {
+            webinar: webinarId,
+            assignments: selectedRows,
+          },
+        })
+      );
     }
   };
 
@@ -47,10 +65,16 @@ function EmployeeAssignModal({ modalName, onAssign, selectedRows }) {
     setSelectedEmployee(null);
   };
 
-  
-  useEffect(()=> {
+  useEffect(() => {
     dispatch(getAllEmployees());
-  },[])
+  }, []);
+
+  useEffect(() => {
+    if(isSuccess){
+      onClose();
+    }
+
+  },[isSuccess]);
 
   return (
     <Modal open={open} onClose={onClose}>

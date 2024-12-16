@@ -13,6 +13,7 @@ import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { openModal } from "../../features/slices/modalSlice";
 import { formatDateAsNumber } from "../../utils/extra";
 import { resetWebinarSuccess } from "../../features/slices/webinarContact";
+import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 
 const MeetingDetails = () => {
   const dispatch = useDispatch();
@@ -21,6 +22,7 @@ const MeetingDetails = () => {
   const { isLoading, isSuccess, webinarData, totalPages } = useSelector(
     (state) => state.webinarContact
   );
+  const { userData } = useSelector((state) => state.auth);
 
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
   const [page, setPage] = useState(searchParams.get("page") || 1);
@@ -64,7 +66,7 @@ const MeetingDetails = () => {
   const createWebinarModalName = "createWebinarModal";
   return (
     <>
-      <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-10">
+      <div className="max-w-screen-xl mx-auto px-4 md:px-8 py-14">
         <div className="items-start justify-between md:flex">
           <div className="max-w-lg">
             <h3 className="text-gray-800 text-xl font-bold sm:text-2xl">
@@ -75,26 +77,15 @@ const MeetingDetails = () => {
             </p> */}
           </div>
           <div className="mt-3 md:mt-0 space-x-5">
-            <Button
-              onClick={() => dispatch(openModal(createWebinarModalName))}
-              variant="contained"
-              color="primary"
-              className="cursor-pointer inline-block px-4 py-2 duration-150 font-medium rounded-lg md:text-sm"
-              sx={{
-                backgroundColor: "#6366f1", // Tailwind color equivalent for bg-indigo-600
-                textTransform: "none", // Keeps text normal (not uppercase)
-                fontWeight: 500, // Match font weight to Tailwind's 'font-medium'
-                fontSize: { xs: "0.875rem", md: "1rem" }, // Responsive font size
-                "&:hover": {
-                  backgroundColor: "#4f46e5", // Tailwind's hover:bg-indigo-700 color
-                },
-                "&:active": {
-                  backgroundColor: "#4338ca", // Tailwind's active:bg-indigo-700 color
-                },
-              }}
-            >
-              Create Webinar
-            </Button>
+            <ComponentGuard conditions={[userData?.isActive]}>
+              <Button
+                onClick={() => dispatch(openModal(createWebinarModalName))}
+                variant="contained"
+                color="secondary"
+              >
+                Create Webinar
+              </Button>
+            </ComponentGuard>
           </div>
         </div>
         <div className="mt-5 shadow-lg rounded-lg overflow-x-auto">

@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import {
-  Button,
-} from "@mui/material";
+import { Button } from "@mui/material";
 import { Edit, Visibility, ToggleOn, ToggleOff } from "@mui/icons-material";
 import { getAllEmployees } from "../../features/actions/employee";
 import ConfirmActionModal from "./modal/ConfirmActionModal";
@@ -13,6 +11,7 @@ import { getUserSubscription } from "../../features/actions/auth";
 import DataTable from "../../components/Table/DataTable";
 import { employeeTableColumns } from "../../utils/columnData";
 import useRoles from "../../hooks/useRoles";
+import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 
 const tableCellStyles = {
   paddingTop: "8px",
@@ -47,10 +46,6 @@ const Employees = () => {
     dispatch(getAllEmployees(userData?.id));
   }, [userData]);
 
-  const handleStatusChange = (item) => {
-
-  };
-
   const navigateToAdd = () => navigate("/createEmployee");
 
   useEffect(() => {
@@ -75,25 +70,30 @@ const Employees = () => {
       onClick: (item) => {
         console.log(`Viewing details for row with id: ${item?._id}`);
       },
+      readOnly: true,
     },
     {
-      icon: () => (
-        <Edit className="text-blue-500 group-hover:text-blue-600" />
-      ),
+      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
       tooltip: "Edit Employee Data",
       onClick: (item) => {
-        navigate(`/employee/edit/${item?._id}`)
+        navigate(`/employee/edit/${item?._id}`);
       },
     },
     {
       icon: (item) => (
-       <>
-       {item?.isActive ? (
-          <ToggleOff fontSize="large" className="text-red-500 group-hover:text-red-600" /> 
-        ) : (
-          <ToggleOn fontSize="large" className="text-green-500 group-hover:text-green-600" />
-        )}
-       </>
+        <>
+          {item?.isActive ? (
+            <ToggleOff
+              fontSize="large"
+              className="text-red-500 group-hover:text-red-600"
+            />
+          ) : (
+            <ToggleOn
+              fontSize="large"
+              className="text-green-500 group-hover:text-green-600"
+            />
+          )}
+        </>
       ),
       tooltip: "Toggle Status",
       onClick: (item) => {
@@ -112,9 +112,11 @@ const Employees = () => {
       <div className="pt-14 sm:px-5 px-2">
         {/* Add Employee Button */}
         <div className="flex justify-end items-center pb-4">
-          <Button variant="contained" onClick={navigateToAdd}>
-            Add Employee
-          </Button>
+          <ComponentGuard conditions={[userData?.isActive]}>
+            <Button variant="contained" onClick={navigateToAdd}>
+              Add Employee
+            </Button>
+          </ComponentGuard>
         </div>
 
         <DataTable

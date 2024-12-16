@@ -15,6 +15,7 @@ import { Badge, Chip } from "@mui/material";
 import { resetSuccessAndUpdate } from "../../../features/slices/noticeBoard";
 import { getNoticeBoard } from "../../../features/actions/noticeBoard";
 import useRoles from "../../../hooks/useRoles";
+import { MdAssignment } from "react-icons/md";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -63,11 +64,11 @@ const Sidebar = () => {
     {
       roles: [roles.EMPLOYEE_SALES, roles.EMPLOYEE_REMINDER],
       items: [
-        // {
-        //   path: "/assignments",
-        //   label: "Assignments",
-        //   icon: <MdAssignment size={30} />,
-        // },
+        {
+          path: "/assignments",
+          label: "Assignments",
+          icon: <MdAssignment size={30} />,
+        },
       ],
     },
     {
