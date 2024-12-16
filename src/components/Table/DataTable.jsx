@@ -47,6 +47,8 @@ const DataTable = ({
   exportModalName = "ExportExcelModal",
   isLoading = false,
   selectedRows = [],
+  rowClick = (row) => {},
+  isRowClickable = false,
   setSelectedRows = () => {},
 }) => {
   const dispatch = useDispatch();
@@ -145,6 +147,8 @@ const DataTable = ({
           selectedRows={selectedRows}
           setSelectedRows={setSelectedRows}
           userData={userData}
+          rowClick={rowClick}
+          isRowClickable={isRowClickable}
         />
       </div>
 

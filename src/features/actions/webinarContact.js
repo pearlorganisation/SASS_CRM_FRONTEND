@@ -5,9 +5,9 @@ import { instance } from "../../services/axiosInterceptor";
 // get webinar data
 export const getAllWebinars = createAsyncThunk(
   "webinars/fetchData",
-  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/webinar`, {
+      const response = await instance.post(`/webinar/data`,{ filters }, {
         params: { page, limit },
       });
       return response?.data;
