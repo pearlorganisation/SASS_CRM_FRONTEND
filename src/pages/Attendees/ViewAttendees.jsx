@@ -3,12 +3,14 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Tab } from "@mui/material";
 import { clearSuccess } from "../../features/slices/attendees";
-import { getAll, getAllAttendees } from "../../features/actions/attendees";
+import { getAllAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
+import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
+import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -34,12 +36,12 @@ const WebinarAttendees = () => {
   }, [page]);
 
   useEffect(() => {
-    dispatch(getAllAttendees({ page, limit: LIMIT }));
-  }, [page, LIMIT]);
+    dispatch(getAllAttendees({ page, limit: LIMIT, filters }));
+  }, [page, LIMIT, filters]);
 
   useEffect(() => {
     if (isSuccess) {
-      dispatch(getAllAttendees({ page: 1, limit: LIMIT }));
+      dispatch(getAllAttendees({ page: 1, limit: LIMIT, filters }));
       dispatch(clearSuccess());
     }
   }, [isSuccess]);
@@ -95,7 +97,10 @@ const WebinarAttendees = () => {
         filters={filters}
         setFilters={setFilters}
         tableData={{
-          columns: [...attendeeTableColumns,   { header: "Webinar", key: "webinarName", width: 20, type: "" },],
+          columns: [
+            ...attendeeTableColumns,
+            { header: "Webinar", key: "webinarName", width: 20, type: "" },
+          ],
           rows: attendeeData,
         }}
         actions={actionIcons}
@@ -112,6 +117,15 @@ const WebinarAttendees = () => {
       <EmployeeAssignModal
         selectedRows={selectedRows}
         modalName={employeeAssignModalName}
+      />
+      <AttendeesFilterModal
+        modalName={AttendeesFilterModalName}
+        filters={filters}
+        setFilters={setFilters}
+      />
+      <ExportWebinarAttendeesModal
+        modalName={exportExcelModalName}
+        filters={filters}
       />
     </div>
   );

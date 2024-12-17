@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllRoles, getCurrentUser, getUserSubscription, logIn, signUp, updatePassword, updateUser } from "../actions/auth";
+import { deleteUserDocumet, getAllRoles, getCurrentUser, getUserSubscription, logIn, signUp, updatePassword, updateUser } from "../actions/auth";
 import { toast } from "sonner";
-import { errorToast } from "../../utils/extra";
+import { errorToast, successToast } from "../../utils/extra";
 // -------------------------------------------------------------------------------------------
 
 // initialState -- initial state of authentication
@@ -125,6 +125,20 @@ const authSlice = createSlice({
       })
       .addCase(getCurrentUser.fulfilled, (state, action) => {
         state.userData = action.payload?.data;
+      })
+      .addCase(deleteUserDocumet.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(deleteUserDocumet.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.userData = action.payload;
+        state.isSuccess = true;
+        successToast("User Deleted Successfully");
+      })
+      .addCase(deleteUserDocumet.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
       })
 
   },

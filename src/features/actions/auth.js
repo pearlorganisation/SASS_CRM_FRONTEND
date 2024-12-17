@@ -43,7 +43,12 @@ export const updateUser = createAsyncThunk(
   "user/Update",
   async (payload, { rejectWithValue }) => {
     try {
-      const { data } = await instance.patch("/users", payload);
+      console.log("payload", payload);
+      const { data } = await instance.patch("/users", payload, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return data;
     } catch (error) {
       return rejectWithValue(error);
@@ -63,7 +68,6 @@ export const updatePassword = createAsyncThunk(
     }
   }
 );
-
 
 export const getAllRoles = createAsyncThunk(
   "roles/fetchData",
@@ -97,6 +101,45 @@ export const getCurrentUser = createAsyncThunk(
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
+    }
+  }
+);
+
+export const deleteUserDocumet = createAsyncThunk(
+  "userDocuments/Delete",
+  async (filename, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.delete(`/users/document/${filename}`);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const getUserDocuments = createAsyncThunk(
+  "userDocuments/fetchData",
+  async (filename, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`/documents/${filename}`, {
+        responseType: "blob", // Ensures the response is received as binary data
+      });
+
+      const url = window.URL.createObjectURL(response.data);
+
+      const link = document.createElement("a");
+      link.href = url;
+
+      link.download = filename || 'downloaded_file';
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      return response;
+    } catch (e) {
+      return rejectWithValue(e.message || "File download failed");
     }
   }
 );

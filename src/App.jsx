@@ -36,17 +36,22 @@ import {
   Profile,
   WebinarAttendees,
 } from "./pages";
-import { addUserActivity } from "./features/actions/userActivity";
 import RouteGuard from "./components/AccessControl/RouteGuard";
-import { getAllRoles, getCurrentUser, getUserSubscription } from "./features/actions/auth";
+import {
+  getAllRoles,
+  getCurrentUser,
+  getUserSubscription,
+} from "./features/actions/auth";
 import UpdateNoticeBoard from "./pages/NoticeBoard/UpdateNoticeBoard";
 import NoticeBoard from "./pages/NoticeBoard/NoticeBoard";
 import { getNoticeBoard } from "./features/actions/noticeBoard";
 import useRoles from "./hooks/useRoles";
+import useAddUserActivity from "./hooks/useAddUserActivity";
 
 const App = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
+  const logUserActivity = useAddUserActivity();
 
   const { userData, isUserLoggedIn } = useSelector((state) => state.auth);
   const role = userData?.role || "";
@@ -66,12 +71,10 @@ const App = () => {
     initFunctions();
 
     if (isUserLoggedIn && role) {
-      dispatch(
-        addUserActivity({
-          action: "login/refresh",
-          details: "User logged in or refreshed successfully",
-        })
-      );
+      logUserActivity({
+        action: "login/refresh",
+        details: "User logged in or refreshed successfully",
+      });
     }
   }, []);
 
@@ -171,7 +174,7 @@ const App = () => {
         {
           path: "/assignments",
           element: (
-          <RouteGuard roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER"]}>
+            <RouteGuard roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER"]}>
               <Assignments />
             </RouteGuard>
           ),

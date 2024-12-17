@@ -22,6 +22,7 @@ import {
 } from "../../features/actions/filter-preset";
 import { clearPreset } from "../../features/slices/filter-preset";
 import { errorToast } from "../../utils/extra";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const FilterPresetModal = ({
   modalName,
@@ -30,6 +31,7 @@ const FilterPresetModal = ({
   setFilters,
 }) => {
   const dispatch = useDispatch();
+  const logUserActivity = useAddUserActivity();
   const { modals } = useSelector((state) => state.modals);
   const open = modals[modalName] ? true : false;
   const { filterPresets, isSuccess } = useSelector(
@@ -51,14 +53,24 @@ const FilterPresetModal = ({
       };
 
       dispatch(creattFilterPreset(payload));
-    }else{
+      logUserActivity({
+        action: "create",
+        type: `Filter Preset for Table - ${tableName}`,
+        detailItem: newPresetName,
+      });
+    } else {
       errorToast("Please select at least one filter");
     }
   };
 
-  const onApplyPreset = (filters) => {
-    setFilters(filters);
+  const onApplyPreset = (preset) => {
+    setFilters(preset.filters);
     dispatch(closeModal(modalName));
+    logUserActivity({
+      action: "filter",
+      type: `Preset for Table - ${tableName}`,
+      detailItem: preset?.name,
+    });
   };
 
   const onClose = () => {
@@ -127,13 +139,20 @@ const FilterPresetModal = ({
                     <Button
                       size="small"
                       startIcon={<CheckIcon />}
-                      onClick={() => onApplyPreset(preset.filters)}
+                      onClick={() => onApplyPreset(preset)}
                     >
                       Apply
                     </Button>
                     <IconButton
                       edge="end"
-                      onClick={() => dispatch(deleteFilterPreset(preset._id))}
+                      onClick={() => {
+                        dispatch(deleteFilterPreset(preset._id));
+                        logUserActivity({
+                          action: "delete",
+                          type: `Filter Preset for Table - ${tableName}`,
+                          detailItem: preset.name,
+                        });
+                      }}
                     >
                       <DeleteIcon color="error" />
                     </IconButton>

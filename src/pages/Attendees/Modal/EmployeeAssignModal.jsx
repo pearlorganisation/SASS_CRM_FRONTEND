@@ -13,27 +13,27 @@ import { closeModal } from "../../../features/slices/modalSlice";
 import { getAllEmployees } from "../../../features/actions/employee";
 import useRoles from "../../../hooks/useRoles";
 import { addAssign } from "../../../features/actions/assign";
+import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
 function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
   const dispatch = useDispatch();
   const roles = useRoles();
+  const logUserActivity = useAddUserActivity();
+
   const { modals } = useSelector((state) => state.modals);
   const { employeeData, isLoading } = useSelector((state) => state.employee);
   const { tabValue } = useSelector((state) => state.attendee);
-  const {isSuccess} = useSelector((state) => state.assign);
+  const { isSuccess } = useSelector((state) => state.assign);
 
   const open = modals[modalName] ? true : false;
 
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const selectedType =
-    tabValue === "preWebinar" ? "EMPLOYEE REMINDER" : "EMPLOYEE SALES";
+    tabValue === "preWebinar" ? "EMPLOYEE_REMINDER" : "EMPLOYEE_SALES";
 
   // Filter employees based on the selected role
   const options = employeeData
-    .map((item) => {
-      return { ...item, role: roles.getRoleNameById(item?.role) };
-    })
     .filter((item) => item?.role === selectedType)
     .map((item) => ({
       value: item?._id,
@@ -57,6 +57,12 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
           },
         })
       );
+      logUserActivity({
+        action: "assign",
+        details: `User manually assigned Attendees to : ${
+          tabValue === "preWebinar" ? "REMINDER EMPLOYEE" : "SALES EMPLOYEE"
+        }`,
+      });
     }
   };
 
@@ -66,15 +72,16 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
   };
 
   useEffect(() => {
-    dispatch(getAllEmployees());
+    dispatch(
+      getAllEmployees({})
+    );
   }, []);
 
   useEffect(() => {
-    if(isSuccess){
+    if (isSuccess) {
       onClose();
     }
-
-  },[isSuccess]);
+  }, [isSuccess]);
 
   return (
     <Modal open={open} onClose={onClose}>

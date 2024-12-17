@@ -28,6 +28,7 @@ import { openModal } from "../../features/slices/modalSlice";
 import RawTable from "./RawTable";
 import FilterPresetModal from "../Filter/FilterPresetModal";
 import ComponentGuard from "../AccessControl/ComponentGuard";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const DataTable = ({
   tableHeader = "Table",
@@ -46,9 +47,13 @@ const DataTable = ({
   exportModalName = "ExportExcelModal",
   isLoading = false,
   selectedRows = [],
+  rowClick = (row) => {},
+  isRowClickable = false,
   setSelectedRows = () => {},
 }) => {
   const dispatch = useDispatch();
+  const logUserActivity = useAddUserActivity();
+
   const filterPresetModalName = "FilterPresetModal";
   const [anchorEl, setAnchorEl] = useState(null);
   const { userData } = useSelector((state) => state.auth);
@@ -65,17 +70,17 @@ const DataTable = ({
         <h2 className="text-2xl font-bold text-gray-700">{tableHeader}</h2>
 
         <ComponentGuard conditions={[userData?.isActive]}>
-        <IconButton
-          id="demo-positioned-button"
-          aria-controls={open ? "demo-positioned-menu" : undefined}
-          aria-haspopup="true"
-          aria-expanded={open ? "true" : undefined}
-          onClick={handleClick}
-        >
-          <MoreVertOutlinedIcon />
-        </IconButton>
-            </ComponentGuard>
-        
+          <IconButton
+            id="demo-positioned-button"
+            aria-controls={open ? "demo-positioned-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={open ? "true" : undefined}
+            onClick={handleClick}
+          >
+            <MoreVertOutlinedIcon />
+          </IconButton>
+        </ComponentGuard>
+
         <Menu
           id="demo-positioned-menu"
           aria-labelledby="demo-positioned-button"
@@ -100,40 +105,43 @@ const DataTable = ({
       </div>
 
       <div className="flex gap-4 justify-end items-center py-2">
-      <ComponentGuard conditions={[userData?.isActive]}>
-        <Button
-          component="label"
-          color="secondary"
-          variant="outlined"
-          onClick={() => {
-            dispatch(openModal(filterPresetModalName));
-          }}
-          startIcon={<BookmarkOutlinedIcon />}
-        >
-          Presets
-        </Button>
+        <ComponentGuard conditions={[userData?.isActive]}>
+          <Button
+            component="label"
+            color="secondary"
+            variant="outlined"
+            onClick={() => {
+              dispatch(openModal(filterPresetModalName));
+            }}
+            startIcon={<BookmarkOutlinedIcon />}
+          >
+            Presets
+          </Button>
 
-        <Button
-          component="label"
-          variant="outlined"
-          onClick={() => {
-            dispatch(openModal(filterModalName));
-          }}
-          startIcon={<FilterAltIcon />}
-        >
-          Filters
-          {filters && Object.keys(filters)?.length > 0 && (
-            <span className="ml-3 px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
-              {Object.keys(filters).length}
-            </span>
-          )}
-        </Button>
+          <Button
+            component="label"
+            variant="outlined"
+            onClick={() => {
+              dispatch(openModal(filterModalName));
+            }}
+            startIcon={<FilterAltIcon />}
+          >
+            Filters
+            {filters && Object.keys(filters)?.length > 0 && (
+              <span className="ml-3 px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
+                {Object.keys(filters).length}
+              </span>
+            )}
+          </Button>
         </ComponentGuard>
       </div>
       {ClientCards}
       <div className={`${ClientCards !== null ? "hidden md:block " : ""}`}>
         <RawTable
-          tableData={tableData}
+          tableData={ {
+            ...tableData,
+            rows: Array.isArray(tableData.rows) ? tableData.rows : [],
+          }}
           actions={actions}
           isSelectVisible={isSelectVisible}
           page={page}
@@ -142,13 +150,21 @@ const DataTable = ({
           selectedRows={selectedRows}
           setSelectedRows={setSelectedRows}
           userData={userData}
+          rowClick={rowClick}
+          isRowClickable={isRowClickable}
         />
       </div>
 
       {tableData?.rows?.length > 0 && (
         <div className="flex gap-4 md:flex-row flex-col flex-wrap items-center justify-between py-4">
           <Pagination
-            onChange={(e, page) => setPage(page)}
+            onChange={(e, page) => {
+              setPage(page);
+              logUserActivity({
+                action: "Page changed",
+                details: `User changed page For ${tableHeader} to ${page} `,
+              });
+            }}
             count={totalPages || 1}
             variant="outlined"
             shape="rounded"

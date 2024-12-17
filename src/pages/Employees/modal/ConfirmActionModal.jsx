@@ -13,8 +13,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../../features/slices/modalSlice";
 import { updateEmployeeStatus } from "../../../features/actions/employee";
+import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
 export default function ConfirmActionModal({ modalName }) {
+  const logUserActivity = useAddUserActivity();
   const dispatch = useDispatch();
   const { subscription } = useSelector((state) => state.auth);
   const { modals, modalData } = useSelector((state) => state.modals);
@@ -41,6 +43,13 @@ export default function ConfirmActionModal({ modalName }) {
           isActive: !modalData?.isActive,
         })
       );
+
+      logUserActivity({
+        action: !modalData?.isActive ? "activate" : "deactivate",
+        details: `User ${
+          !modalData?.isActive ? "activated" : "deactivated"
+        } the Employee with Email: ${modalData?.email}`,
+      });
     }
   };
 
@@ -72,18 +81,16 @@ export default function ConfirmActionModal({ modalName }) {
             </IconButton>
           </div>
 
-         
-
           {/* Note About Feature Usage */}
           <div className="flex justify-center mb-4">
-          <Typography
-            variant="caption"
-            className="text-gray-600 text-center mb-4"
-          >
-            You can only activate/deactivate an Employee Account {subscription?.toggleLimit || 0} times.
-          </Typography>
+            <Typography
+              variant="caption"
+              className="text-gray-600 text-center mb-4"
+            >
+              You can only activate/deactivate an Employee Account{" "}
+              {subscription?.toggleLimit || 0} times.
+            </Typography>
           </div>
-           
 
           {/* Confirmation Message */}
           <Typography variant="body1" className="text-center mb-6">

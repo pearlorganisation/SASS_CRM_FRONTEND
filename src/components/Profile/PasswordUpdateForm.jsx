@@ -5,8 +5,10 @@ import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { ClipLoader } from "react-spinners";
 import { updatePassword } from "../../features/actions/auth";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 function PasswordUpdateForm() {
+  const logUserActivity = useAddUserActivity();
   const {
     register,
     handleSubmit,
@@ -35,6 +37,10 @@ function PasswordUpdateForm() {
   const onSubmit = (data) => {
     console.log("Password updated successfully", data);
     dispatch(updatePassword(data));
+    logUserActivity({
+      action: "update",
+      details: "User updated the password",
+    });
   };
 
   useEffect(() => {

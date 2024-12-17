@@ -4,7 +4,7 @@ import { instance } from "../../services/axiosInterceptor";
 //assign  attendee
 export const addAssign = createAsyncThunk(
   "attendee/assign",
-  async ({id, payload}, { rejectWithValue }) => {
+  async ({id, payload}, { rejectWithValue, dispatch }) => {
     try {
       const response = await instance.post(`assignment/${id}`, payload);
       return response;
@@ -59,20 +59,6 @@ export const getNotes = createAsyncThunk(
   }
 );
 
-
-// // get employee data
-// export const getAllEmployees = createAsyncThunk(
-//   "getAllEmployees",
-//   async (id, { rejectWithValue }) => {
-//     try {
-//       const {data} = await instance.get(`/employee?adminId=${id}`);
-
-//       return data?.data;
-//     } catch (e) {
-//       return rejectWithValue(e);
-//     }
-//   }
-// );
 
 
 

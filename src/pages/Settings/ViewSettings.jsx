@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { roles } from "../../utils/roles";
@@ -10,17 +10,69 @@ import { PiLinkSimpleBold } from "react-icons/pi";
 import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 import { Box, Typography, Checkbox, FormControlLabel } from "@mui/material";
 import { setTableMasked } from "../../features/slices/tableSlice";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
+
+// Configuration for the links
+const settingsLinks = [
+  {
+    to: "/plans",
+    name: "Plans",
+    icon: <RiMoneyRupeeCircleLine size={40} />,
+    allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
+    color: "green-700",
+    hoverColor: "green-700",
+  },
+  {
+    to: "/pabblyToken",
+    name: "External API Token",
+    icon: <PiLetterCirclePBold size={40} />,
+    allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
+    color: "green-700",
+    hoverColor: "green-700",
+  },
+  {
+    to: "/settings/custom-status",
+    name: "Custom Status",
+    icon: <MdArrowDropDownCircle size={40} />,
+    allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
+    color: "green-700",
+    hoverColor: "green-700",
+  },
+  {
+    to: "/sidebarLinks",
+    name: "Sidebar Links",
+    icon: <PiLinkSimpleBold size={40} />,
+    allowedRoles: [roles.SUPER_ADMIN],
+    color: "blue-600",
+    hoverColor: "blue-600",
+  },
+  {
+    to: "/update-landing-page",
+    name: "Landing Page",
+    icon: <GiPerspectiveDiceSixFacesRandom size={40} />,
+    allowedRoles: [roles.SUPER_ADMIN],
+    color: "blue-600",
+    hoverColor: "blue-600",
+  },
+];
 
 const ViewSettings = () => {
   const dispatch = useDispatch();
+  const logUserActivity = useAddUserActivity();
+  const { isTablesMasked } = useSelector((state) => state.table);
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role || "";
 
-  const {isTablesMasked} = useSelector((state) => state.table);
-  
-
   const handleMaskedTablesChange = (event) => {
     dispatch(setTableMasked(event.target.checked));
+  };
+
+  const addUserActivityLog = (link, type) => {
+    logUserActivity({
+      action: "navigate",
+      detailItem: link,
+      navigateType: type,
+    });
   };
 
   return (
@@ -30,33 +82,22 @@ const ViewSettings = () => {
       </Typography>
       {/* Tailwind Grid Layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 my-10 md:mx-10">
-        {/* For SUPER_ADMIN and ADMIN roles */}
-        <ComponentGuard allowedRoles={[roles.SUPER_ADMIN, roles.ADMIN]}>
-          <Link
-            to="/plans"
-            className="flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-green-700 hover:text-white text-green-700 shadow-lg"
-          >
-            <RiMoneyRupeeCircleLine size={40} />
-            <Typography>Plans</Typography>
-          </Link>
-          <Link
-            to="/pabblyToken"
-            className="flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-green-700 hover:text-white text-green-700 shadow-lg"
-          >
-            <PiLetterCirclePBold size={40} />
-            <Typography>External API Token</Typography>
-          </Link>
-          <Link
-            to="/settings/custom-status"
-            className="flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-green-700 hover:text-white text-green-700 shadow-lg"
-          >
-            <MdArrowDropDownCircle size={40} />
-            <Typography>Custom Status</Typography>
-          </Link>
-        </ComponentGuard>
+        {/* Render links dynamically */}
+        {settingsLinks.map(({ to, name, icon, allowedRoles, color, hoverColor }, index) => (
+          <ComponentGuard key={index} allowedRoles={allowedRoles}>
+            <Link
+              to={to}
+              onClick={() => addUserActivityLog(to, "page")}
+              className={`flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-${hoverColor} hover:text-white text-${color} shadow-lg`}
+            >
+              {icon}
+              <Typography>{name}</Typography>
+            </Link>
+          </ComponentGuard>
+        ))}
 
         {/* Masked Tables Option */}
-        <div className="flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer   text-green-700 shadow-lg">
+        <div className="flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer text-green-700 shadow-lg">
           <FormControlLabel
             control={
               <Checkbox
@@ -68,24 +109,6 @@ const ViewSettings = () => {
             label={<Typography>Masked Tables</Typography>}
           />
         </div>
-
-        {/* For SUPER_ADMIN only */}
-        <ComponentGuard allowedRoles={[roles.SUPER_ADMIN]}>
-          <Link
-            to="/sidebarLinks"
-            className="flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-blue-600 hover:text-white text-blue-600 shadow-lg"
-          >
-            <PiLinkSimpleBold size={40} />
-            <Typography>Sidebar Links</Typography>
-          </Link>
-          <Link
-            to="/update-landing-page"
-            className="flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-blue-600 hover:text-white text-blue-600 shadow-lg"
-          >
-            <GiPerspectiveDiceSixFacesRandom size={40} />
-            <Typography>Landing Page</Typography>
-          </Link>
-        </ComponentGuard>
       </div>
     </Box>
   );

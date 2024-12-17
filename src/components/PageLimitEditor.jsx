@@ -3,8 +3,10 @@ import { TextField, IconButton, Box } from "@mui/material";
 import { FaRegEdit, FaCheckSquare } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { setPageLimit } from "../features/slices/pageLimits";
+import useAddUserActivity from "../hooks/useAddUserActivity";
 
 const PageLimitEditor = ({ pageId = "defaultPage" }) => {
+  const logUserActivity = useAddUserActivity();
   const dispatch = useDispatch();
   const limitFromRedux = useSelector((state) => state.pageLimits[pageId] || 10);
 
@@ -12,7 +14,6 @@ const PageLimitEditor = ({ pageId = "defaultPage" }) => {
   const [pageLimit, setPageLimitState] = useState(limitFromRedux);
 
   useEffect(() => {
-    console.log('limitFromRedux', limitFromRedux, pageId);
     setPageLimitState(limitFromRedux);
   }, [limitFromRedux]);
 
@@ -25,6 +26,10 @@ const PageLimitEditor = ({ pageId = "defaultPage" }) => {
 
   const handleSaveClick = () => {
     dispatch(setPageLimit({ pageId, limit: pageLimit }));
+    logUserActivity({
+      action: "savePageLimit",
+      details: `User Updated Page Limit For ${pageId}: ${pageLimit}`,
+    })
     setIsEditing(false);
   };
 

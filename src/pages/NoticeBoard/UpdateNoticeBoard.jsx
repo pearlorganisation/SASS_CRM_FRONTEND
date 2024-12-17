@@ -27,6 +27,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { resetSuccessAndUpdate } from "../../features/slices/noticeBoard";
 import { useNavigate } from "react-router-dom";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const MenuBar = ({ setEditorContent }) => {
   const { editor } = useCurrentEditor();
@@ -182,6 +183,8 @@ const content = `
 const UpdateNoticeboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const logUserActivity = useAddUserActivity();
+
   const { noticeData, isSuccess } = useSelector((state) => state.noticeBoard);
 
   const [editorContent, setEditorContent] = useState(
@@ -225,9 +228,15 @@ const UpdateNoticeboard = () => {
             color="primary"
             className="px-6 py-2 font-bold"
             onClick={() =>
+             {
               dispatch(
                 updateNoticeBoard({ content: editorContent, type: "sales" })
-              )
+              );
+              logUserActivity({
+                action: 'update',
+                details: 'User updated the noticeboard',
+              })
+             }
             }
           >
             Update Noticeboard

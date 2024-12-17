@@ -13,8 +13,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateClient } from "../../features/actions/client";
 import { resetClientState } from "../../features/slices/client";
 import { closeModal } from "../../features/slices/modalSlice";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const ActiveInactiveModal = ({ modalName }) => {
+  const logUserActivity = useAddUserActivity();
   const { modals, modalData: clientData } = useSelector((state) => state.modals);
   const open = modals[modalName] ? true : false;
 
@@ -45,6 +47,13 @@ const ActiveInactiveModal = ({ modalName }) => {
           id: clientData?._id,
         })
       );
+
+      logUserActivity({
+        action: !clientData?.isActive ? "activate" : "deactivate",
+        details: `User ${
+          !clientData?.isActive ? "activated" : "deactivated"
+        } the Employee with Email: ${clientData?.email} and Note: ${note}`,
+      });
     }
   };
 

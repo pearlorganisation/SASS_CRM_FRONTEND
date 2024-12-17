@@ -8,8 +8,11 @@ import { clearSuccess } from "../../../features/slices/attendees";
 import { useParams } from "react-router-dom";
 import { addAttendees } from "../../../features/actions/attendees";
 import { ClipLoader } from "react-spinners";
+import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
 const UploadXslxModal = ({ setModal, update }) => {
+  const logUserActivity = useAddUserActivity();
+
   const { tabValue, isLoading, isSuccess } = useSelector(
     (state) => state.attendee
   );
@@ -210,6 +213,11 @@ const UploadXslxModal = ({ setModal, update }) => {
     };
 console.log(mergedResult, "mergedResult")
     dispatch(addAttendees(payloadData));
+    logUserActivity({
+      action: 'import',
+      type: 'XSLX Data',
+      detailItem: tabValue
+    })
   };
 
   function handleCloseModal() {

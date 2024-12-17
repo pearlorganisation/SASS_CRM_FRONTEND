@@ -16,8 +16,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { resetClientState } from "../../features/slices/client";
 import { ClipLoader } from "react-spinners";
 import { closeModal } from "../../features/slices/modalSlice";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const UpdateClientModal = ({ modalName }) => {
+  const logUserActivity = useAddUserActivity();
   const { modals, modalData: defaultUserInfo } = useSelector((state) => state.modals);
   const open = modals[modalName] ? true : false;
 
@@ -55,6 +57,11 @@ const UpdateClientModal = ({ modalName }) => {
     }
 
     dispatch(updateClient({ data: payload, id: data?._id }));
+    logUserActivity({
+      action: "update",
+      type: `Client's ${activeTab === 0 ? "information" : "password"} with UserName`,
+      detailItem: data.userName,
+    });
   };
 
   useEffect(() => {

@@ -24,7 +24,6 @@ export const clientTableColumns = [
   { header: "Toggle Limit", key: "toggleLimit", width: 15, type: "" },
 ];
 
-
 export const attendeeTableColumns = [
   { header: "Email", key: "email", width: 50, type: "" },
   { header: "First Name", key: "firstName", width: 20, type: "" },
@@ -43,5 +42,28 @@ export const employeeTableColumns = [
   { header: "Role", key: "role", width: 20, type: "" },
   { header: "Phone", key: "phone", width: 15, type: "" },
   { header: "Valid Call Time(Sec)", key: "validCallTime", width: 20, type: "" },
-  { header: "Daily Contact Limit", key: "dailyContactLimit", width: 20, type: "" },
+  {
+    header: "Daily Contact Limit",
+    key: "dailyContactLimit",
+    width: 20,
+    type: "",
+  },
+];
+
+export const webinarTableColumns = [
+  { header: "Webinar Name", key: "webinarName", width: 50, type: "" },
+  { header: "Webinar Date", key: "webinarDate", width: 20, type: "Date" },
+  {
+    header: "Total Registrations",
+    key: "totalRegistrations",
+    width: 10,
+    type: "",
+  },
+  { header: "Total Attendees", key: "totalAttendees", width: 20, type: "" },
+  {
+    header: "Total Participants",
+    key: "totalParticipants",
+    width: 15,
+    type: "",
+  },
 ];
