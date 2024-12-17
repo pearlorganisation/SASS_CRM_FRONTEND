@@ -57,7 +57,8 @@ const CreateWebinar = ({ modalName }) => {
 
   useEffect(() => {
     if (open) {
-      dispatch(getAllEmployees(userData?.id));}
+      dispatch(getAllEmployees({}));
+    }
   }, [open]);
 
   useEffect(() => {
@@ -65,14 +66,14 @@ const CreateWebinar = ({ modalName }) => {
       setOptions(
         employeeData.map((employee) => ({
           value: employee._id,
-          label: `${employee.userName} - ${roles.getRoleNameById(employee.role)}`,
+          label: `${employee.userName} - ${employee.role}`,
         }))
       );
     }
   }, [employeeData]);
 
   useEffect(() => {
-    if(!open) return;
+    if (!open) return;
     if (modalData) {
       reset({
         webinarName: modalData?.webinarName,
@@ -80,7 +81,13 @@ const CreateWebinar = ({ modalName }) => {
           ? modalData.webinarDate.split("T")[0]
           : modalData.webinarDate,
       });
-      setSelectedEmployees(options.filter((option) => modalData?.assignedEmployees && modalData?.assignedEmployees?.includes(option.value) ) || []);
+      setSelectedEmployees(
+        options.filter(
+          (option) =>
+            modalData?.assignedEmployees &&
+            modalData?.assignedEmployees?.includes(option.value)
+        ) || []
+      );
     } else {
       reset({
         webinarName: "",
@@ -88,16 +95,19 @@ const CreateWebinar = ({ modalName }) => {
       });
       setSelectedEmployees([]);
     }
-  }, [modalData, open]);  
+  }, [modalData, open]);
 
   const submitForm = (data) => {
-    const payload = { ...data, assignedEmployees: selectedEmployees.map((e) => e.value) };
+    const payload = {
+      ...data,
+      assignedEmployees: selectedEmployees.map((e) => e.value),
+    };
 
     logUserActivity({
       action: modalData ? "edit" : "create",
-      type: 'Webinar',
-      detailItem: payload.webinarName
-    })
+      type: "Webinar",
+      detailItem: payload.webinarName,
+    });
 
     if (modalData) {
       dispatch(updateWebinar({ id: modalData?._id, data: payload }));

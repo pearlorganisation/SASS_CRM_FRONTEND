@@ -30,13 +30,10 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const selectedType =
-    tabValue === "preWebinar" ? "EMPLOYEE REMINDER" : "EMPLOYEE SALES";
+    tabValue === "preWebinar" ? "EMPLOYEE_REMINDER" : "EMPLOYEE_SALES";
 
   // Filter employees based on the selected role
   const options = employeeData
-    .map((item) => {
-      return { ...item, role: roles.getRoleNameById(item?.role) };
-    })
     .filter((item) => item?.role === selectedType)
     .map((item) => ({
       value: item?._id,
@@ -75,7 +72,9 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
   };
 
   useEffect(() => {
-    dispatch(getAllEmployees());
+    dispatch(
+      getAllEmployees({})
+    );
   }, []);
 
   useEffect(() => {

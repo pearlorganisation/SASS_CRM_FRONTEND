@@ -44,6 +44,9 @@ const useAddUserActivity = () => {
       case "edit":
         detailLog = `User edited the ${type}: ${detailItem}`;
         break;
+        case "update":
+          detailLog = `User updated the ${type}: ${detailItem}`;
+        break;
       case "create":
         detailLog = `User created the ${type}: ${detailItem}`;
         break;

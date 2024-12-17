@@ -12,6 +12,9 @@ import DataTable from "../../components/Table/DataTable";
 import { employeeTableColumns } from "../../utils/columnData";
 import useRoles from "../../hooks/useRoles";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
+import EmployeeFilterModal from '../../components/Filter/EmployeeFilterModal';
+import ExportModal from "../../components/Export/ExportModal";
+import { exportEmployeesExcel } from "../../features/actions/export-excel";
 
 const tableCellStyles = {
   paddingTop: "8px",
@@ -43,14 +46,22 @@ const Employees = () => {
   const { userData } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    dispatch(getAllEmployees(userData?.id));
-  }, [userData]);
+    dispatch(getAllEmployees({
+      page: page,
+      limit: LIMIT,
+      filters: filters
+    }));
+  }, [page, LIMIT, filters]);
 
   const navigateToAdd = () => navigate("/createEmployee");
 
   useEffect(() => {
     if (isSuccess) {
-      dispatch(getAllEmployees(userData?.id));
+      dispatch(getAllEmployees({
+        page: 1,
+        limit: LIMIT,
+        filters: filters
+      }));
       dispatch(getUserSubscription());
       dispatch(clearSuccess());
     }
@@ -126,10 +137,7 @@ const Employees = () => {
           setFilters={setFilters}
           tableData={{
             columns: employeeTableColumns,
-            rows: employeeData.map((item) => ({
-              ...item,
-              role: roles.getRoleNameById(item?.role),
-            })),
+            rows: employeeData || [],
           }}
           actions={actionIcons}
           totalPages={totalPages}
@@ -143,6 +151,14 @@ const Employees = () => {
       </div>
 
       <ConfirmActionModal modalName={activeInactiveModalName} />
+      <EmployeeFilterModal modalName={employeeFilterModalName} filters={filters} setFilters={setFilters} />
+      <ExportModal
+        modalName={employeeExportModalName}
+        defaultColumns={employeeTableColumns}
+        handleExport={({ limit, columns }) => {
+          dispatch(exportEmployeesExcel({ limit, columns, filters }));
+        }}
+      />
     </>
   );
 };

@@ -8,6 +8,7 @@ import { addUserActivity, getUserActivity } from "../actions/userActivity.js";
 const initialState = {
   isLoading: false,
   userActivities: [],
+  totalPages: 1,
   errorMessage: "",
   isEmployee: false,
 };
@@ -15,7 +16,7 @@ const initialState = {
 // ---------------------------------------------------------------------------------------
 
 export const userActivitySlice = createSlice({
-  name: "webinarContact",
+  name: "userActivity",
   initialState,
   reducers: {
     resetUserActivities: (state) => {
@@ -46,7 +47,8 @@ export const userActivitySlice = createSlice({
       .addCase(getUserActivity.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.userActivities = action.payload;
+        state.userActivities = action.payload?.data || [];
+        state.totalPages = action.payload?.pagination?.totalPages || 1;
       })
       .addCase(getUserActivity.rejected, (state, action) => {
         state.isLoading = false;

@@ -89,7 +89,8 @@ export const employeeSlice = createSlice({
       .addCase(getAllEmployees.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.employeeData = action.payload;
+        state.employeeData = action.payload?.result || [];
+        state.totalPages = action.payload?.totalPages;
       })
       .addCase(getAllEmployees.rejected, (state, action) => {
         state.isLoading = false;

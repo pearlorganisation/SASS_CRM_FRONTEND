@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@mui/material";
 import { webinarTableColumns } from "../../utils/columnData";
-import { Edit, Delete, } from "@mui/icons-material";
+import { Edit, Delete } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import { openModal } from "../../features/slices/modalSlice";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
@@ -12,8 +12,8 @@ import DeleteModal from "../../components/Webinar/delete";
 import { getAllWebinars } from "../../features/actions/webinarContact";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { resetWebinarSuccess } from "../../features/slices/webinarContact";
-import WebinarFilterModal from '../../components/Filter/WebinarFilterModal'
-import ExportWebinarModal from "../../components/Export/ExportWebinarModal";
+import WebinarFilterModal from "../../components/Filter/WebinarFilterModal";
+import ExportModal from "../../components/Export/ExportModal";
 import { exportWebinarExcel } from "../../features/actions/export-excel";
 
 const Webinar = () => {
@@ -118,7 +118,7 @@ const Webinar = () => {
         setFilters={setFilters}
         tableData={{
           columns: webinarTableColumns,
-          rows: webinarData
+          rows: webinarData,
         }}
         actions={actionIcons}
         totalPages={totalPages}
@@ -128,7 +128,9 @@ const Webinar = () => {
         filterModalName={filterModalName}
         exportModalName={exportModalName}
         isLoading={isLoading}
-        rowClick={(row) => { handleRowClick(row?._id) }}
+        rowClick={(row) => {
+          handleRowClick(row?._id);
+        }}
         isRowClickable={true}
       />
 
@@ -142,14 +144,17 @@ const Webinar = () => {
 
       <CreateWebinar modalName={createWebinarModalName} />
       <WebinarFilterModal
-      filters={filters}
-      setFilters={setFilters}
-      modalName={filterModalName} />
+        filters={filters}
+        setFilters={setFilters}
+        modalName={filterModalName}
+      />
 
-      <ExportWebinarModal
-      modalName={exportModalName}
-      defaultColumns={webinarTableColumns}
-      handleExport={ ({limit, columns}) => {dispatch(exportWebinarExcel({limit, columns, filters}))}}
+      <ExportModal
+        modalName={exportModalName}
+        defaultColumns={webinarTableColumns}
+        handleExport={({ limit, columns }) => {
+          dispatch(exportWebinarExcel({ limit, columns, filters }));
+        }}
       />
     </div>
   );

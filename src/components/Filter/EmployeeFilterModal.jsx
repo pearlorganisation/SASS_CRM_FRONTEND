@@ -1,40 +1,51 @@
 import React, { useEffect } from "react";
-import { Box, Modal, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Modal,
+  Typography,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css"; // Required CSS for the date picker
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../features/slices/modalSlice";
 import FormInput from "../FormInput";
 import { filterTruthyValues } from "../../utils/extra";
-import useAddUserActivity from '../../hooks/useAddUserActivity'
+import useRoles from "../../hooks/useRoles";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const FilterModal = ({ modalName, setFilters, filters }) => {
+  const roles = useRoles();
   const dispatch = useDispatch();
-  const logUserActivity = useAddUserActivity();
+    const logUserActivity = useAddUserActivity();
 
   const { modals } = useSelector((state) => state.modals);
   const open = modals[modalName] ? true : false;
-  const { control, handleSubmit, register, reset } = useForm();
+  const { control, handleSubmit, reset } = useForm();
 
   const onSubmit = (data) => {
     const filterData = filterTruthyValues(data);
     setFilters(filterData);
     logUserActivity({
-      action: "filter",
-      type: "to Table",
-      detailItem: 'Webinars',
-    })
+        action: "filter",
+        type: "to Table",
+        detailItem: 'Employees',
+      })
     dispatch(closeModal(modalName));
   };
 
   const resetForm = () => {
     reset({
-      webinarName: "",
-      webinarDate: null,
-      totalRegistrations: null,
-      totalParticipants: null,
-      totalAttendees: null,
+      email: "",
+      userName: "",
+      phone: "",
+      isActive: "",
+      role: "",
+      validCallTime: null,
+      dailyContactLimit: null,
     });
   };
 
@@ -47,6 +58,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
     if (open) {
       reset({
         ...filters,
+        isActive: filters.isActive,
+        role: filters.role,
       });
     }
   }, [open]);
@@ -55,21 +68,65 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
     <Modal open={open} onClose={onClose}>
       <Box className="bg-white p-6 rounded-md mx-auto mt-20 w-full max-w-2xl ">
         <Typography variant="h6" className="text-center mb-4">
-          Webinar Filters
+          Employee Filters
         </Typography>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="max-h-[65dvh] overflow-y-auto space-y-4 p-4 border rounded-lg">
             <div className="grid grid-cols-2 gap-4">
-              <FormInput
-                name="webinarName"
-                label="Webinar Name"
-                control={control}
-              />
+              <FormInput name="email" label="Email" control={control} />
+              <FormInput name="userName" label="User Name" control={control} />
+              <FormInput name="phone" label="Phone" control={control} />
             </div>
             <div className="grid grid-cols-2 gap-4">
+              <Controller
+                name="isActive"
+                control={control}
+                defaultValue="" // Ensure it's always controlled
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel id="active-inactive-label">
+                      Is Active
+                    </InputLabel>
+                    <Select
+                      {...field}
+                      labelId="active-inactive-label"
+                      label="Is Active"
+                      value={field.value || ""} // Ensure value is always controlled
+                    >
+                      <MenuItem value="">All</MenuItem>
+                      <MenuItem value="active">Active</MenuItem>
+                      <MenuItem value="inactive">Inactive</MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+              />
+              <Controller
+                name="role"
+                control={control}
+                defaultValue="" // Ensure it's always controlled
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel id="active-inactive-label">Role</InputLabel>
+                    <Select
+                      {...field}
+                      labelId="active-inactive-label"
+                      label="Role"
+                      value={field.value || ""} // Ensure value is always controlled
+                    >
+                      <MenuItem value="">All</MenuItem>
+                      <MenuItem value={roles.EMPLOYEE_REMINDER}>
+                        EMPLOYEE REMINDER
+                      </MenuItem>
+                      <MenuItem value={roles.EMPLOYEE_SALES}>
+                        EMPLOYEE SALES
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                )}
+              />
               <FormInput
-                name="totalRegistrations.$gte"
-                label="Total Registrations (Min)"
+                name="validCallTime.$gte"
+                label="Valid Call Time (Min)"
                 control={control}
                 type="number"
                 validation={{
@@ -80,8 +137,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 }}
               />
               <FormInput
-                name="totalRegistrations.$lte"
-                label="Total Registrations (Max)"
+                name="validCallTime.$lte"
+                label="Valid Call Time (Max)"
                 control={control}
                 type="number"
                 validation={{
@@ -92,8 +149,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 }}
               />
               <FormInput
-                name="totalParticipants.$gte"
-                label="Total Participants (Min)"
+                name="dailyContactLimit.$gte"
+                label="Daily Contact Limit (Min)"
                 control={control}
                 type="number"
                 validation={{
@@ -104,8 +161,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 }}
               />
               <FormInput
-                name="totalParticipants.$lte"
-                label="Total Participants (Max)"
+                name="dailyContactLimit.$lte"
+                label="Daily Contact Limit (Max)"
                 control={control}
                 type="number"
                 validation={{
@@ -115,62 +172,6 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                   },
                 }}
               />
-              <FormInput
-                name="totalAttendees.$gte"
-                label="Total Attendees (Min)"
-                control={control}
-                type="number"
-                validation={{
-                  min: {
-                    value: 1,
-                    message: "Value must be at least 1",
-                  },
-                }}
-              />
-              <FormInput
-                name="totalAttendees.$lte"
-                label="Total Attendees (Max)"
-                control={control}
-                type="number"
-                validation={{
-                  min: {
-                    value: 1,
-                    message: "Value must be at least 1",
-                  },
-                }}
-              />
-            </div>
-
-            {/* Date Pickers */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid grid-cols-1">
-                <Controller
-                  name="webinarDate.$gte"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      selected={field.value}
-                      onChange={(date) => field.onChange(date)}
-                      className="border p-4 w-full rounded flex-1"
-                      placeholderText="Webinar Date (From)"
-                    />
-                  )}
-                />
-              </div>
-              <div className="grid grid-cols-1">
-                <Controller
-                  name="webinarDate.$lte"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      selected={field.value}
-                      onChange={(date) => field.onChange(date)}
-                      className="border p-4 w-full rounded"
-                      placeholderText="Webinar Date (To)"
-                    />
-                  )}
-                />
-              </div>
             </div>
           </div>
 

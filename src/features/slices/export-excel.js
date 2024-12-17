@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
 import {
   exportClientExcel,
+  exportEmployeesExcel,
   exportWebinarAttendeesExcel,
   exportWebinarExcel,
 } from "../actions/export-excel";
@@ -56,6 +57,19 @@ const exportSlice = createSlice({
         successToast(`Data Exported Successfully`);
       })
       .addCase(exportWebinarExcel.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action.payload);
+      })
+      .addCase(exportEmployeesExcel.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(exportEmployeesExcel.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        successToast(`Data Exported Successfully`);
+      })
+      .addCase(exportEmployeesExcel.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action.payload);
       });

@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../features/slices/modalSlice";
 import { ClipLoader } from "react-spinners";
 
-const ExportWebinarModal = ({ modalName, defaultColumns, handleExport }) => {
+const ExportModal = ({ modalName, defaultColumns, handleExport }) => {
 
   const dispatch = useDispatch();
 
@@ -107,4 +107,4 @@ const ExportWebinarModal = ({ modalName, defaultColumns, handleExport }) => {
   );
 };
 
-export default ExportWebinarModal;
+export default ExportModal;

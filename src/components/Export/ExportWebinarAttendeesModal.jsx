@@ -16,8 +16,8 @@ import { attendeeTableColumns } from "../../utils/columnData";
 const ExportWebinarAttendeesModal = ({
   modalName,
   filters,
-  isAttended,
-  webinarId,
+  isAttended=true,
+  webinarId="",
 }) => {
   const dispatch = useDispatch();
 

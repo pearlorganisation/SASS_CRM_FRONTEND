@@ -5,7 +5,7 @@ import { Button, Tabs, Tab } from "@mui/material";
 import { createPortal } from "react-dom";
 import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
 import { clearSuccess, setTabValue } from "../../features/slices/attendees";
-import { getAll, getAttendees } from "../../features/actions/attendees";
+import { getAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
 import { Edit, Delete, Visibility, AttachFile } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";

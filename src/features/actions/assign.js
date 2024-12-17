@@ -60,19 +60,5 @@ export const getNotes = createAsyncThunk(
 );
 
 
-// // get employee data
-// export const getAllEmployees = createAsyncThunk(
-//   "getAllEmployees",
-//   async (id, { rejectWithValue }) => {
-//     try {
-//       const {data} = await instance.get(`/employee?adminId=${id}`);
-
-//       return data?.data;
-//     } catch (e) {
-//       return rejectWithValue(e);
-//     }
-//   }
-// );
-
 
 

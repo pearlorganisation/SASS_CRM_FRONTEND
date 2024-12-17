@@ -138,7 +138,10 @@ const DataTable = ({
       {ClientCards}
       <div className={`${ClientCards !== null ? "hidden md:block " : ""}`}>
         <RawTable
-          tableData={tableData}
+          tableData={ {
+            ...tableData,
+            rows: Array.isArray(tableData.rows) ? tableData.rows : [],
+          }}
           actions={actions}
           isSelectVisible={isSelectVisible}
           page={page}

@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Tab } from "@mui/material";
-import { clearSuccess } from "../../features/slices/attendees";
-import { getAll, getAllAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
-import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
 import { getAssignments } from "../../features/actions/assign";
 
