@@ -4,9 +4,16 @@ import { instance } from "../../services/axiosInterceptor";
 //assign  attendee
 export const addAssign = createAsyncThunk(
   "attendee/assign",
-  async ({id, payload}, { rejectWithValue, dispatch }) => {
+  async (
+    { webinar = "", employee = "", assignments = [] },
+    { rejectWithValue, dispatch }
+  ) => {
     try {
-      const response = await instance.post(`assignment/${id}`, payload);
+      const response = await instance.post(`assignment`, {
+        webinar,
+        employee,
+        assignments,
+      });
       return response;
     } catch (e) {
       return rejectWithValue(e);
@@ -14,14 +21,22 @@ export const addAssign = createAsyncThunk(
   }
 );
 
-
 export const getAssignments = createAsyncThunk(
   "assignments/fetchData",
-  async ({page=1, limit=10}, { rejectWithValue }) => {
+  async (
+    { id = "", page = 1, limit = 10, filters = {} },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await instance.get(`assignment`,{
-        params: {page, limit}
-      });
+      const response = await instance.post(
+        `assignment/data/${id}`,
+        {
+          filters,
+        },
+        {
+          params: { page, limit },
+        }
+      );
       return response?.data || [];
     } catch (e) {
       return rejectWithValue(e);
@@ -50,7 +65,7 @@ export const getNotes = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await instance.get(`/notes`, {
-        params: payload
+        params: payload,
       });
       return response?.data?.data;
     } catch (e) {
@@ -58,7 +73,3 @@ export const getNotes = createAsyncThunk(
     }
   }
 );
-
-
-
-

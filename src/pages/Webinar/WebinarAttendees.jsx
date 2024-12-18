@@ -48,10 +48,10 @@ const WebinarAttendees = () => {
     setPage(1);
     setSelectedRows([]);
     logUserActivity({
-      action: 'switch',
-      type: 'tab',
-      detailItem: newValue
-    })
+      action: "switch",
+      type: "tab",
+      detailItem: newValue,
+    });
   };
 
   useEffect(() => {
@@ -170,14 +170,10 @@ const WebinarAttendees = () => {
         isLoading={isLoading}
       />
       <EmployeeAssignModal
-        selectedRows={attendeeData
-          .filter((item) => selectedRows.includes(item._id))
-          .map((item) => {
-            return {
-              email: item.email,
-              recordType: tabValue,
-            };
-          })}
+        selectedRows={selectedRows.map((rowId) => ({
+          attendee: rowId,
+          recordType: tabValue,
+        }))}
         modalName={employeeAssignModalName}
         webinarId={id}
       />

@@ -35,8 +35,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
     logUserActivity({
       action: "filter",
       type: "to Table",
-      detailItem: 'Attendees',
-    })
+      detailItem: "Attendees",
+    });
   };
 
   const resetForm = () => {
@@ -116,6 +116,33 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                   )}
                 />
               )}
+
+              {tableConfig?.isAssigned?.filterable &&
+                modalName !== "ViewAssignmentsFilterModal" && (
+                  <Controller
+                    name="isAssigned"
+                    control={control}
+                    defaultValue=""
+                    render={({ field }) => (
+                      <FormControl fullWidth>
+                        <InputLabel id="isAssigned-label">
+                          Is Assigned
+                        </InputLabel>
+                        <Select
+                          {...field}
+                          labelId="isAssigned-label"
+                          label="Is Assigned"
+                          value={field.value || ""}
+                        >
+                          <MenuItem value="">All</MenuItem>
+                          <MenuItem value="true">Assigned</MenuItem>
+                          <MenuItem value="false">Not Assigned</MenuItem>
+                        </Select>
+                      </FormControl>
+                    )}
+                  />
+                )}
+
               {tableConfig?.timeInSession?.filterable && (
                 <>
                   <FormInput

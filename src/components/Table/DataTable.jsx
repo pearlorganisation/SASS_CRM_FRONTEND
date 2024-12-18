@@ -69,7 +69,7 @@ const DataTable = ({
       <div className="flex gap-4 justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-700">{tableHeader}</h2>
 
-        <ComponentGuard conditions={[userData?.isActive]}>
+        <ComponentGuard conditions={[userData?.isActive, tableUniqueKey !== 'viewAssignmentsTable']}>
           <IconButton
             id="demo-positioned-button"
             aria-controls={open ? "demo-positioned-menu" : undefined}

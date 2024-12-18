@@ -79,7 +79,7 @@ const Employees = () => {
       ),
       tooltip: "View Employee Info",
       onClick: (item) => {
-        console.log(`Viewing details for row with id: ${item?._id}`);
+        navigate(`/employee/view/${item?._id}`);
       },
       readOnly: true,
     },
