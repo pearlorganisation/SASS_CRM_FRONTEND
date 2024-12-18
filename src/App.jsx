@@ -47,6 +47,7 @@ import NoticeBoard from "./pages/NoticeBoard/NoticeBoard";
 import { getNoticeBoard } from "./features/actions/noticeBoard";
 import useRoles from "./hooks/useRoles";
 import useAddUserActivity from "./hooks/useAddUserActivity";
+import ViewEmployee from "./pages/Employees/ViewEmployee";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -63,7 +64,7 @@ const App = () => {
     function initFunctions() {
       dispatch(getCurrentUser());
       console.log(" isEmployee --->> ", roles.isEmployeeId(role));
-      if (isUserLoggedIn && role && !roles.isEmployeeId(role)) {
+      if (isUserLoggedIn && role ) { // && !roles.isEmployeeId(role) removed this from the condition
         dispatch(getUserSubscription());
         dispatch(getAllRoles());
       }
@@ -124,6 +125,14 @@ const App = () => {
           element: (
             <RouteGuard roleNames={["ADMIN"]}>
               <Employees />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/employee/view/:id",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <ViewEmployee />
             </RouteGuard>
           ),
         },

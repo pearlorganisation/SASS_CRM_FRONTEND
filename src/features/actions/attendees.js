@@ -39,16 +39,13 @@ export const getAttendees = createAsyncThunk(
 //get All Attendees
 export const getAllAttendees = createAsyncThunk(
   "allAttendees/fetchData",
-  async (
-    { page = 1, limit = 10, filters = {} },
-    { rejectWithValue }
-  ) => {
+  async ({ page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
     try {
       const response = await instance.post(
         `/attendees/webinar`,
         { filters, fieldName: "attendeeTableConfig", webinarId: "" },
         {
-          params: { isAttended : 'postWebinar', page, limit },
+          params: { isAttended: "postWebinar", page, limit },
         }
       );
       return response?.data;
