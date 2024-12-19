@@ -67,8 +67,7 @@ const ViewParticularContact = () => {
   );
   const { noteData, isFormLoading } = useSelector((state) => state.assign);
   useEffect(() => {
-    dispatch(getCustomOptions());
-
+    // dispatch(getCustomOptions());
   }, []);
 
   useEffect(() => {
@@ -113,7 +112,7 @@ const ViewParticularContact = () => {
 
   useEffect(() => {
     if (!isFormLoading) {
-      dispatch(getNotes({ email, recordType }));
+      // dispatch(getNotes({ email, recordType }));
     }
   }, [isFormLoading]);
 
@@ -160,7 +159,6 @@ const ViewParticularContact = () => {
   const onConfirmEdit = (data) => {
     // dispatch(updateAttendeeDetails(data)).then(() => {
     //   setEditModalData(null);
-
     //   addUserActivityLog({
     //     action: "update",
     //     details: `User updated information of Attendee with Email: ${email}`,
@@ -182,66 +180,51 @@ const ViewParticularContact = () => {
   };
 
   const addUserActivityLog = (data) => {
-      dispatch(addUserActivity(data));
+    dispatch(addUserActivity(data));
   };
 
-
   return (
-    <>
-      <div className=" max-w-screen-xl mx-auto px-4 md:px-2 pt-12 space-y-7">
-        <div className="flex justify-between  ">
-          <h3 className="text-gray-800 text-xl font-bold sm:text-2xl">
-            Attendee Contact Details
-          </h3>
-          <p className=" rounded-lg bg-slate-100  text-sm px-2 py-1">
-            Call Timer is scheduled at{" "}
-            <span className="text-green-600">5:00 PM</span> by James{" "}
-          </p>
+    <div className="px-4 pt-14 space-y-6">
+      <div className="p-6 bg-gray-50 rounded-lg ">
+        <div className="flex gap-4 justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-700">Attendee Details</h2>
         </div>
-        <div className="grid md:grid-cols-2  gap-10 ">
-          <div className="flex flex-col h-full relative overflow-hidden">
-            <div className="space-y-3 relative top-0 left-0 right-0 z-10">
-              <div className="border rounded-lg py-2 px-3 shadow-md">
-                <p>
-                  Email :{" "}
-                  <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
-                    someemail@glsd.com
-                  </span>
-                </p>
-              </div>
-              <div className="flex justify-between border rounded-lg py-2 px-3 shadow-md">
-                <p>
-                  Name : some name
-                </p>
-              </div>
-
-              <div className="border rounded-lg py-1 px-3 shadow-md">
-                <p className="flex items-center">
-                  Phone Number :
-                  <span className="ms-2 grid lg:grid-cols-2 gap-3">
-                     2342342343
-                  </span>
-                </p>
-              </div>
+        <div className=" grid lg:grid-cols-2 mb-6 gap-4 w-full">
+          <div className="space-y-2">
+            <div className="border rounded-lg py-2 px-3 shadow-md">
+              <p>
+                Email :{" "}
+                <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
+                  someemail@glsd.com
+                </span>
+              </p>
             </div>
-            <div className="h-full flex-1 relative">
-              <div className="absolute inset-x-0 top-0 bottom-0 overflow-hidden mt-2">
-                <div className="border rounded-lg shadow-md w-full h-full">
-                  <div className="border-b-4 py-2">
-                    <span className="font-semibold px-3">Notes</span>
-                  </div>
-                  <div className="overflow-y-auto pb-10 max-h-full scrollbar-thin w-full px-3">
-                    {
-                      dummyNotes.map((item, index) => (
-                        <NoteItem
-                          key={index}
-                          index={index}
-                          item={item}
-                          setNoteModalData={setNoteModalData}
-                        />
-                      ))}
-                  </div>
-                </div>
+            <div className="flex justify-between border rounded-lg py-2 px-3 shadow-md">
+              <p>Name : some name</p>
+            </div>
+
+            <div className="border rounded-lg py-1 px-3 shadow-md">
+              <p className="flex items-center">
+                Phone Number :
+                <span className="ms-2 grid lg:grid-cols-2 gap-3">
+                  2342342343
+                </span>
+              </p>
+            </div>
+
+            <div className="border rounded-lg shadow-md w-full h-80 pb-3 flex flex-col">
+              <div className="border-b-4 py-2">
+                <span className="font-semibold px-3">Notes</span>
+              </div>
+              <div className="overflow-y-auto space-y-2 pb-10 scrollbar-thin w-full px-3">
+                {dummyNotes.map((item, index) => (
+                  <NoteItem
+                    key={index}
+                    index={index}
+                    item={item}
+                    setNoteModalData={setNoteModalData}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -249,9 +232,6 @@ const ViewParticularContact = () => {
           <div className="space-y-3 flex-col h-full">
             <div className="flex  justify-between gap-10  items-center">
               <div className="flex items-center gap-3">
-                <div>
-                  <span className="font-semibold">Set Alarm :</span>
-                </div>
                 <button
                   onClick={handleTimerModal}
                   className=" font-semibold shadow rounded-md py-2 bg-blue-600 hover:bg-blue-700 text-white min-w-36"
@@ -260,7 +240,6 @@ const ViewParticularContact = () => {
                 </button>
               </div>
               <div className="flex items-center gap-3">
-                <span className="font-semibold">Lead Type :</span>
                 <div className="outline-none">
                   <Select
                     isClearable="true"
@@ -269,7 +248,6 @@ const ViewParticularContact = () => {
                     value={selectedOption}
                     className=" font-semibold shadow  min-w-36"
                     placeholder="Lead Type "
-                    styles={customStyles}
                   />
                 </div>
               </div>
@@ -290,7 +268,8 @@ const ViewParticularContact = () => {
           </div>
         </div>
         <div className="mt-12 shadow-lg rounded-lg overflow-x-auto">
-          {!attendeeContactDetails?.data ||  attendeeContactDetails?.data?.length <= 0 ? (
+          {!attendeeContactDetails?.data ||
+          attendeeContactDetails?.data?.length <= 0 ? (
             <div className="text-lg p-2 flex justify-center w-full">
               No record found
             </div>
@@ -382,7 +361,7 @@ const ViewParticularContact = () => {
           onConfirmEdit={onConfirmEdit}
         />
       )}
-    </>
+    </div>
   );
 };
 

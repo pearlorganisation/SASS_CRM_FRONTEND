@@ -11,6 +11,7 @@ import { errorToast } from "../../utils/extra";
 const initialState = {
   isLoading: false,
   productData: [],
+  isSuccess: false,
   productDropdownData: [],
   totalPages: 1,
   errorMessage: "",
@@ -21,36 +22,39 @@ const initialState = {
 export const productSlice = createSlice({
   name: "product",
   initialState,
-  reducers: {},
+  reducers: {
+    resetProductState: (state) => {
+      state.isLoading = false;
+      state.isSuccess = false;
+      state.errorMessage = "";
+    },
+  },
   extraReducers: (builder) => {
     builder
 
       .addCase(addProduct.pending, (state, action) => {
         state.isLoading = true;
-        state.errorMessage = "";
+        state.isSuccess = false;
+
       })
       .addCase(addProduct.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = "";
-        state.productData = action.payload.data;
+        state.isSuccess = true;
         toast.success("Product Added Successfully", {
           position: "top-center",
         });
       })
       .addCase(addProduct.rejected, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = action.payload;
         errorToast(action?.payload);
       })
       .addCase(getAllProducts.pending, (state, action) => {
         state.isLoading = true;
-        state.errorMessage = "";
       })
       .addCase(getAllProducts.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = "";
-        state.productData = action.payload?.data;
-        state.totalPages = action.payload?.pagination?.totalPages || 1;
+        state.productData = action.payload?.result || [];
+        state.totalPages = action.payload?.totalPages || 1;
       })
       .addCase(getAllProducts.rejected, (state, action) => {
         state.isLoading = false;
@@ -77,7 +81,7 @@ export const productSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {} = productSlice.actions;
+export const {resetProductState} = productSlice.actions;
 export default productSlice.reducer;
 
 // ================================================== THE END ==================================================

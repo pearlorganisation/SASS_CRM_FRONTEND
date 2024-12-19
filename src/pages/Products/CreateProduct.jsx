@@ -12,6 +12,7 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
+import FormInput from "../../components/FormInput";
 
 const CreateProduct = () => {
   const {
@@ -22,24 +23,24 @@ const CreateProduct = () => {
   } = useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { productData } = useSelector((state) => state.product);
+  const { productData, isSuccess, isLoading } = useSelector((state) => state.product);
   const { userData } = useSelector((state) => state.auth);
   const { webinarData } = useSelector((state) => state.webinarContact);
 
   const onSubmit = (data) => {
-    const newData = { ...data, adminId: userData.id };
+    const newData = { ...data };
     console.log(newData);
     dispatch(addProduct(newData));
   };
 
   useEffect(() => {
-    if (productData.status) {
+    if (isSuccess) {
       navigate("/products");
     }
-  }, [productData]);
+  }, [isSuccess]);
 
   useEffect(() => {
-    dispatch(getAllWebinars(1));
+    // dispatch(getAllWebinars(1));
   }, []);
 
   return (
@@ -71,26 +72,19 @@ const CreateProduct = () => {
 
             {/* Price */}
             <div>
-              <Controller
+              <FormInput
                 name="price"
+                label="Price"
                 control={control}
-                rules={{ required: "Price is required" }}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    type="number"
-                    label="Price"
-                    variant="outlined"
-                    error={!!errors.price}
-                    helperText={errors.price?.message}
-                  />
-                )}
+                type="number"
+                validation={{
+                  required: "Price is required",
+                }}
               />
             </div>
 
             {/* Purchase Date */}
-            <div>
+            {/* <div>
               <Controller
                 name="purchaseDate"
                 control={control}
@@ -108,10 +102,10 @@ const CreateProduct = () => {
                   />
                 )}
               />
-            </div>
+            </div> */}
 
             {/* Webinar */}
-            <div>
+            {/* <div>
               <FormControl fullWidth variant="outlined" error={!!errors.webinarName}>
                 <InputLabel>Webinar</InputLabel>
                 <Controller
@@ -136,6 +130,33 @@ const CreateProduct = () => {
                   <p className="text-red-500 mt-1 text-sm">{errors.webinarName.message}</p>
                 )}
               </FormControl>
+            </div> */}
+
+            {/* Product Level */}
+            <div>
+              <FormControl fullWidth variant="outlined" error={!!errors.level}>
+                <InputLabel>Product Level</InputLabel>
+                <Controller
+                  name="level"
+                  control={control}
+                  rules={{ required: "Please select a product level" }}
+                  render={({ field }) => (
+                    <Select {...field} label="Product Level">
+                      <MenuItem value="" disabled>
+                        Select a level
+                      </MenuItem>
+                      <MenuItem value={1}>L1</MenuItem>
+                      <MenuItem value={2}>L2</MenuItem>
+                      <MenuItem value={3}>L3</MenuItem>
+                    </Select>
+                  )}
+                />
+                {errors.level && (
+                  <p className="text-red-500 mt-1 text-sm">
+                    {errors.level.message}
+                  </p>
+                )}
+              </FormControl>
             </div>
 
             {/* Description */}
@@ -155,31 +176,6 @@ const CreateProduct = () => {
                   />
                 )}
               />
-            </div>
-
-            {/* Product Level */}
-            <div>
-              <FormControl fullWidth variant="outlined" error={!!errors.productLevel}>
-                <InputLabel>Product Level</InputLabel>
-                <Controller
-                  name="productLevel"
-                  control={control}
-                  rules={{ required: "Please select a product level" }}
-                  render={({ field }) => (
-                    <Select {...field} label="Product Level">
-                      <MenuItem value="" disabled>
-                        Select a level
-                      </MenuItem>
-                      <MenuItem value="L1">L1</MenuItem>
-                      <MenuItem value="L2">L2</MenuItem>
-                      <MenuItem value="L3">L3</MenuItem>
-                    </Select>
-                  )}
-                />
-                {errors.productLevel && (
-                  <p className="text-red-500 mt-1 text-sm">{errors.productLevel.message}</p>
-                )}
-              </FormControl>
             </div>
           </div>
 
