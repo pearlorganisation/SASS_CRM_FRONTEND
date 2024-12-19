@@ -76,24 +76,13 @@ const WebinarAttendees = () => {
     },
   ];
   return (
-    <div className="px-6 md:px-10 pt-10 space-y-6">
+    <div className="px-6 md:px-10 pt-14 space-y-6">
       {/* Tabs for Sales and Reminder */}
 
-      <div className="flex gap-4 justify-end">
-        {selectedRows.length > 0 && (
-          <Button
-            onClick={() => dispatch(openModal(employeeAssignModalName))}
-            variant="contained"
-          >
-            Assign
-          </Button>
-        )}
-      </div>
 
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="ViewAttendeesTable"
-        isSelectVisible={true}
         filters={filters}
         setFilters={setFilters}
         tableData={{
@@ -107,16 +96,10 @@ const WebinarAttendees = () => {
         totalPages={totalPages}
         page={page}
         setPage={setPage}
-        selectedRows={selectedRows}
-        setSelectedRows={setSelectedRows}
         limit={LIMIT}
         filterModalName={AttendeesFilterModalName}
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
-      />
-      <EmployeeAssignModal
-        selectedRows={selectedRows}
-        modalName={employeeAssignModalName}
       />
       <AttendeesFilterModal
         modalName={AttendeesFilterModalName}

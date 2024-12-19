@@ -93,6 +93,7 @@ const Webinar = () => {
         <Delete className="text-red-500 group-hover:text-red-600" />
       ),
       tooltip: "Delete Attendee",
+      hideCondition: (item) => item?.totalParticipants <= 0,
       onClick: (item) => {
         handleDeleteModal(item?._id, item?.webinarName);
       },
