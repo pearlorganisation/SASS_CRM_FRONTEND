@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Tab } from "@mui/material";
 import { clearSuccess } from "../../features/slices/attendees";
@@ -20,6 +20,7 @@ const WebinarAttendees = () => {
   const exportExcelModalName = "ExportViewAttendeesExcel";
   // ----------------------- etcetra -----------------------
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -55,7 +56,7 @@ const WebinarAttendees = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
-        console.log(`Viewing details for row with id: ${item?._id}`);
+        navigate(`/particularContact?email=${item?.email}` );
       },
     },
     {
@@ -78,7 +79,6 @@ const WebinarAttendees = () => {
   return (
     <div className="px-6 md:px-10 pt-14 space-y-6">
       {/* Tabs for Sales and Reminder */}
-
 
       <DataTable
         tableHeader={tableHeader}

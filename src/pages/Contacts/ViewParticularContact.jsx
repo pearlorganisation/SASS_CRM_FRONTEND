@@ -66,9 +66,6 @@ const ViewParticularContact = () => {
     (state) => state.webinarContact
   );
   const { noteData, isFormLoading } = useSelector((state) => state.assign);
-  useEffect(() => {
-    // dispatch(getCustomOptions());
-  }, []);
 
   useEffect(() => {
     if (

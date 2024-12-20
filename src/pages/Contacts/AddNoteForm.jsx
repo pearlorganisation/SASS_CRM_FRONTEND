@@ -8,6 +8,7 @@ import {
   createAttendeeProduct,
   getAllProductsByAdminId,
 } from "../../features/actions/product";
+import { getCustomOptions } from "../../features/actions/globalData";
 
 const AddNoteForm = (props) => {
   const { customOptions } = useSelector((state) => state.globalData);
@@ -40,6 +41,7 @@ const AddNoteForm = (props) => {
 
   useEffect(() => {
     dispatch(getAllProductsByAdminId());
+    dispatch(getCustomOptions());
   }, []);
 
   useEffect(() => {
@@ -60,9 +62,11 @@ const AddNoteForm = (props) => {
   }, [isFormLoading]);
 
   const onSubmit = (data) => {
-    if (data?.image?.length > 0) {
-      data.image = data?.image[0];
+    console.log(selectedStatus)
+    if(selectedStatus !== "Payment"){
+      data.image = null;
     }
+    
     data.callDuration.hr = data.callDuration.hr ? data.callDuration.hr : "00";
     data.callDuration.min = data.callDuration.min
       ? data.callDuration.min
@@ -74,23 +78,26 @@ const AddNoteForm = (props) => {
     const note = data?.note;
     console.log(data);
 
-    if (data?.product && data?.product !== "") {
-      console.log(data?.product);
-      const payload = {
-        email,
-        productId: productDropdownData.find(
-          (item) => item.name === data?.product
-        )?._id,
-      };
-      dispatch(createAttendeeProduct(payload));
-    }
+    // if (data?.product && data?.product !== "") {
+    //   console.log(data?.product);
+    //   const payload = {
+    //     email,
+    //     productId: productDropdownData.find(
+    //       (item) => item.name === data?.product
+    //     )?._id,
+    //   };
 
-    dispatch(addNote(data)).then(() => {
-      addUserActivityLog({
-        action: "addNote",
-        details: `User added a note for Attendee with Email: ${email} - Note: ${note}`,
-      });
-    });
+    // console.log(payload);
+    // dispatch(addNote(payload));
+    // }
+
+    dispatch(addNote(data));
+    // .then(() => {
+    //   addUserActivityLog({
+    //     action: "addNote",
+    //     details: `User added a note for Attendee with Email: ${email} - Note: ${note}`,
+    //   });
+    // });
   };
 
   const handleFileChange = (e) => {
@@ -100,108 +107,108 @@ const AddNoteForm = (props) => {
   };
 
   const handleInput = (e, maxValue) => {
-    const value = e.target.value;
+    let value = e.target.value;
 
-    // Limit to numeric input and two characters
-    if (/^\d{0,2}$/.test(value)) {
-      const num = Number(value);
+    value = value.replace(/[^0-9]/g, "");
 
-      // Enforce range based on maxValue
-      if (num <= maxValue) {
-        e.target.value = value;
-      } else {
-        e.target.value = maxValue.toString().padStart(2, "0");
-      }
+    if (value.length > 2) {
+      value = value.slice(0, 2);
     }
+
+    const num = Number(value);
+
+    if (num > maxValue) {
+      value = maxValue.toString().padStart(2, "0");
+    }
+
+    e.target.value = value;
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="px-5">
-      <div className="sm:flex space-y-6 sm:space-y-0 justify-between gap-5">
-        {/* Phone Number Input */}
-        <div className="w-[60%]">
-          <label className="font-medium text-sm">Phone Number</label>
-          <Controller
-            name="phone"
-            control={control}
-            rules={{ required: "Phone number is required" }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                options={uniquePhones.map((phone) => ({
-                  value: phone,
-                  label: phone,
-                }))}
-                className="mt-1 text-sm shadow"
-                placeholder="Choose Phone Number"
-                value={
-                  field.value
-                    ? { value: field.value, label: field.value }
-                    : null
-                }
-                onChange={(selected) => {
-                  field.onChange(selected.value);
-                  setSelectedPhone(selected.value);
-                }}
-                styles={{
-                  control: (provided) => ({
-                    ...provided,
-                    border: errors.phone
-                      ? "1px solid #EF4444"
-                      : "1px solid #CBD5E1",
-                    borderRadius: "7px",
-                  }),
-                  placeHolder: (provided) => ({
-                    ...provided,
-                    color: "#9CA3AF",
-                  }),
-                }}
-              />
-            )}
-          />
-          {errors.phone && (
-            <span className="text-red-500">Phone Number is required</span>
-          )}
-        </div>
+      {/* Phone Number Input */}
 
-        {/* Call Duration Input */}
-        <div className="w-[40%]">
-          <label className="font-medium text-sm">
-            Call Duration{" "}
-            <span className="font-normal text-xs">(hr : min : sec)</span>
-          </label>
-          <div className="mt-1 flex items-center">
-            <input
-              {...register("callDuration.hr")}
-              type="text"
-              placeholder={"00"}
-              className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
-              maxLength={2}
-              onInput={(e) => handleInput(e, 23)} // Hours range: 00-12
-              onClick={(e) => e.target.select()}
-            />
-            <span className="font-light px-1">:</span>
-            <input
-              {...register("callDuration.min")}
-              type="text"
-              placeholder={"00"}
-              className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
-              maxLength={2}
-              onInput={(e) => handleInput(e, 59)} // Minutes range: 00-59
-              onClick={(e) => e.target.select()}
-            />
-            <span className="font-light px-1">:</span>
-            <input
-              {...register("callDuration.sec")}
-              type="text"
-              placeholder={"00"}
-              className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
-              maxLength={2}
-              onInput={(e) => handleInput(e, 59)} // Seconds range: 00-59
-              onClick={(e) => e.target.select()}
-            />
-          </div>
+      {/* Call Duration Input */}
+
+      <div className="w-full flex gap-5 items-center">
+        <label className="font-medium text-sm">
+          Call Duration{" "}
+          <span className="font-normal text-xs">(hr : min : sec)</span>
+        </label>
+        <div className="mt-1 flex items-center">
+          <input
+            {...register("callDuration.hr")}
+            type="text"
+            placeholder={"00"}
+            className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
+            maxLength={2}
+            onInput={(e) => handleInput(e, 23)} // Hours range: 00-12
+            onClick={(e) => e.target.select()}
+          />
+          <span className="font-light px-1">:</span>
+          <input
+            {...register("callDuration.min")}
+            type="text"
+            placeholder={"00"}
+            className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
+            maxLength={2}
+            onInput={(e) => handleInput(e, 59)} // Minutes range: 00-59
+            onClick={(e) => e.target.select()}
+          />
+          <span className="font-light px-1">:</span>
+          <input
+            {...register("callDuration.sec")}
+            type="text"
+            placeholder={"00"}
+            className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
+            maxLength={2}
+            onInput={(e) => handleInput(e, 59)} // Seconds range: 00-59
+            onClick={(e) => e.target.select()}
+          />
         </div>
+      </div>
+
+      <div className="w-full">
+        <label className="font-medium text-sm">Phone Number</label>
+        <Controller
+          name="phone"
+          control={control}
+          rules={{ required: "Phone number is required" }}
+          render={({ field }) => (
+            <Select
+              {...field}
+              options={["3232323232", "3232323233"].map((phone) => ({
+                value: phone,
+                label: phone,
+              }))}
+              className="mt-1 text-sm shadow"
+              placeholder="Choose Phone Number"
+              value={
+                field.value ? { value: field.value, label: field.value } : null
+              }
+              onChange={(selected) => {
+                field.onChange(selected.value);
+                setSelectedPhone(selected.value);
+              }}
+              styles={{
+                control: (provided) => ({
+                  ...provided,
+                  border: errors.phone
+                    ? "1px solid #EF4444"
+                    : "1px solid #CBD5E1",
+                  borderRadius: "7px",
+                }),
+                placeHolder: (provided) => ({
+                  ...provided,
+                  color: "#9CA3AF",
+                }),
+              }}
+            />
+          )}
+        />
+        {errors.phone && (
+          <span className="text-red-500">Phone Number is required</span>
+        )}
       </div>
 
       {/* Status Select */}
@@ -214,13 +221,10 @@ const AddNoteForm = (props) => {
           render={({ field }) => (
             <Select
               {...field}
-              options={[
-                { value: "Payment", label: "Payment" },
-                { value: "Discussion", label: "Discussion" },
-                { value: "Product", label: "Product" },
-                { value: "Other", label: "Other" },
-                ...(customOptions || []),
-              ]}
+              options={customOptions.map((option) => ({
+                value: option?.label,
+                label: option?.label,
+              }))}
               className="mt-1 text-sm shadow"
               placeholder="Choose Status"
               value={
