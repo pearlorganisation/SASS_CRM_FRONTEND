@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@mui/material";
 import { webinarTableColumns } from "../../utils/columnData";
-import { Edit, Delete, Visibility, AttachFile } from "@mui/icons-material";
+import { Edit, Delete } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import { openModal } from "../../features/slices/modalSlice";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
@@ -12,6 +12,9 @@ import DeleteModal from "../../components/Webinar/delete";
 import { getAllWebinars } from "../../features/actions/webinarContact";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { resetWebinarSuccess } from "../../features/slices/webinarContact";
+import WebinarFilterModal from "../../components/Filter/WebinarFilterModal";
+import ExportModal from "../../components/Export/ExportModal";
+import { exportWebinarExcel } from "../../features/actions/export-excel";
 
 const Webinar = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -74,16 +77,6 @@ const Webinar = () => {
 
   const actionIcons = [
     {
-      icon: () => (
-        <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
-      ),
-      tooltip: "View Webinar Info",
-      onClick: (item) => {
-        handleRowClick(item?._id);
-      },
-      readOnly: true,
-    },
-    {
       icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
       tooltip: "Edit Attendee",
       onClick: (item) => {
@@ -100,8 +93,9 @@ const Webinar = () => {
         <Delete className="text-red-500 group-hover:text-red-600" />
       ),
       tooltip: "Delete Attendee",
+      hideCondition: (item) => item?.totalParticipants <= 0,
       onClick: (item) => {
-        handleDeleteModal(item?._id, item?.webinarName)
+        handleDeleteModal(item?._id, item?.webinarName);
       },
     },
   ];
@@ -125,11 +119,7 @@ const Webinar = () => {
         setFilters={setFilters}
         tableData={{
           columns: webinarTableColumns,
-          rows: webinarData.map((item) => ({
-            ...item,
-            totalParticipants:
-              item?.totalAttendees + item?.totalRegistrations || 0,
-          })),
+          rows: webinarData,
         }}
         actions={actionIcons}
         totalPages={totalPages}
@@ -139,6 +129,10 @@ const Webinar = () => {
         filterModalName={filterModalName}
         exportModalName={exportModalName}
         isLoading={isLoading}
+        rowClick={(row) => {
+          handleRowClick(row?._id);
+        }}
+        isRowClickable={true}
       />
 
       {showDeleteModal && (
@@ -150,6 +144,19 @@ const Webinar = () => {
       )}
 
       <CreateWebinar modalName={createWebinarModalName} />
+      <WebinarFilterModal
+        filters={filters}
+        setFilters={setFilters}
+        modalName={filterModalName}
+      />
+
+      <ExportModal
+        modalName={exportModalName}
+        defaultColumns={webinarTableColumns}
+        handleExport={({ limit, columns }) => {
+          dispatch(exportWebinarExcel({ limit, columns, filters }));
+        }}
+      />
     </div>
   );
 };

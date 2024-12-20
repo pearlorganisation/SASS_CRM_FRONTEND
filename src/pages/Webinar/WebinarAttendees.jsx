@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Tab } from "@mui/material";
 import { createPortal } from "react-dom";
 import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
 import { clearSuccess, setTabValue } from "../../features/slices/attendees";
-import { getAll, getAttendees } from "../../features/actions/attendees";
+import { getAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
 import { Edit, Delete, Visibility, AttachFile } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
@@ -26,6 +26,7 @@ const WebinarAttendees = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
+  const navigate = useNavigate();
 
   const { attendeeData, isLoading, isSuccess, totalPages, tabValue } =
     useSelector((state) => state.attendee);
@@ -48,10 +49,10 @@ const WebinarAttendees = () => {
     setPage(1);
     setSelectedRows([]);
     logUserActivity({
-      action: 'switch',
-      type: 'tab',
-      detailItem: newValue
-    })
+      action: "switch",
+      type: "tab",
+      detailItem: newValue,
+    });
   };
 
   useEffect(() => {
@@ -84,7 +85,7 @@ const WebinarAttendees = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
-        console.log(`Viewing details for row with id: ${item?._id}`);
+        navigate('/particularContact')
       },
       readOnly: true,
     },
@@ -170,14 +171,10 @@ const WebinarAttendees = () => {
         isLoading={isLoading}
       />
       <EmployeeAssignModal
-        selectedRows={attendeeData
-          .filter((item) => selectedRows.includes(item._id))
-          .map((item) => {
-            return {
-              email: item.email,
-              recordType: tabValue,
-            };
-          })}
+        selectedRows={selectedRows.map((rowId) => ({
+          attendee: rowId,
+          recordType: tabValue,
+        }))}
         modalName={employeeAssignModalName}
         webinarId={id}
       />

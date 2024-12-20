@@ -17,7 +17,7 @@ export const addEmployee = createAsyncThunk(
 //add employee
 export const updateEmployee = createAsyncThunk(
   "employee/update",
-  async ({id,data}, { rejectWithValue }) => {
+  async ({ id, data }, { rejectWithValue }) => {
     try {
       const response = await instance.patch(`users/employee/${id}`, data);
       return response;
@@ -30,9 +30,11 @@ export const updateEmployee = createAsyncThunk(
 //update employee Status
 export const updateEmployeeStatus = createAsyncThunk(
   "employeeStatus/update",
-  async ({id,isActive}, { rejectWithValue }) => {
+  async ({ id, isActive }, { rejectWithValue }) => {
     try {
-      const response = await instance.patch(`users/employee/status/${id}`, {isActive});
+      const response = await instance.patch(`users/employee/status/${id}`, {
+        isActive,
+      });
       return response;
     } catch (e) {
       return rejectWithValue(e);
@@ -43,19 +45,26 @@ export const updateEmployeeStatus = createAsyncThunk(
 // get employee data
 export const getAllEmployees = createAsyncThunk(
   "employees/fetchData",
-  async (_, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
     try {
-      const { data } = await instance.get(`users/employee`);
+      const { data } = await instance.post(
+        `users/employee`,
+        { filters },
+        {
+          params: { page, limit },
+        }
+      );
 
       return data;
     } catch (e) {
+      console.log(e);
       return rejectWithValue(e);
     }
   }
 );
 
 export const getEmployee = createAsyncThunk(
-  "employee/fetchData", 
+  "employee/fetchData",
   async (id, { rejectWithValue }) => {
     try {
       const { data } = await instance.get(`users/employee/${id}`);

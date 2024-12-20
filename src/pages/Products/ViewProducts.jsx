@@ -1,190 +1,106 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Button } from "@mui/material";
+import { productTableColumns } from "../../utils/columnData";
+import { Edit, Delete } from "@mui/icons-material";
+import DataTable from "../../components/Table/DataTable";
+import { openModal } from "../../features/slices/modalSlice";
+import ComponentGuard from "../../components/AccessControl/ComponentGuard";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { resetProductState } from "../../features/slices/product";
+import useRoles from "../../hooks/useRoles";
 import { getAllProducts } from "../../features/actions/product";
-import {
-  Button,
-  IconButton,
-  Pagination,
-  Paper,
-  Skeleton,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
-import { Add, Delete, Edit, Visibility } from "@mui/icons-material";
-import { roles } from "../../utils/roles";
-import ProductDetailsModal from "./Modal/ProductDetailsModal";
-import { addUserActivity } from "../../features/actions/userActivity";
-import { formatDate } from "../../utils/extra";
 
 const ViewProducts = () => {
-  const [modalData, setModalData] = useState(null);
-  const [page, setPage] = useState(1);
-  const navigate = useNavigate();
+  // ----------------------- ModalNames for Redux -----------------------
+  const exportModalName = "ExportProductModalname";
+  const filterModalName = "FilterProductModalname";
+  const tableHeader = "Product Table";
+
+  // ----------------------- etcetra -----------------------
   const dispatch = useDispatch();
-  const { productData, isLoading, totalPages } = useSelector(
+  const navigate = useNavigate();
+  const roles = useRoles();
+  const logUserActivity = useAddUserActivity();
+
+  const { userData } = useSelector((state) => state.auth);
+  const { isLoading, isSuccess, productData, totalPages } = useSelector(
     (state) => state.product
   );
-  const { userData } = useSelector((state) => state.auth);
+
+  const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [page, setPage] = useState(searchParams.get("page") || 1);
+  const [filters, setFilters] = useState({});
 
   useEffect(() => {
-    dispatch(getAllProducts({ page }));
-  }, [dispatch, page]);
+    setSearchParams({ page: page });
+  }, [page]);
 
-  const handleViewDetails = (product) => {
-    setModalData(product);
-    dispatch(
-      addUserActivity({
-        action: "viewDetails",
-        details: `User viewed details of Product Name: ${product?.name}`,
-      })
-    );
-  };
+  useEffect(() => {
+    dispatch(getAllProducts({ page, limit: LIMIT, filters }));
+  }, [page, LIMIT, filters]);
 
-  const handlePagination = (e, p) => {
-    setPage(p);
-  };
-  const tableCellStyles = {
-    paddingTop: "6px",
-    paddingBottom: "6px",
-    textWrap: "nowrap",
-  };
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(getAllProducts({ page: 1, limit: LIMIT, filters }));
+      dispatch(resetProductState());
+    }
+  }, [isSuccess]);
+  // ----------------------- Action Icons -----------------------
 
-  const dummyData = [
+  const actionIcons = [
     {
-      id: 1,
-      name: "Product A",
-      price: 100,
-      purchaseDate: "2024-12-01",
-      webinar: "Webinar A",
-      description: "Description A",
-      level: "L1",
+      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
+      tooltip: "Edit Attendee",
+      onClick: (item) => {},
     },
     {
-      id: 2,
-      name: "Product B",
-      price: 200,
-      purchaseDate: "2024-12-01",
-      webinar: "Webinar B",
-      description: "Description B",
-      level: "L2",
+      icon: (item) => (
+        <Delete className="text-red-500 group-hover:text-red-600" />
+      ),
+      tooltip: "Delete Attendee",
+      onClick: (item) => {},
     },
   ];
-
   return (
-    <div className="px-5 py-14">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-5">
-        <Typography variant="h5" className="font-bold">
-          Product Details
-        </Typography>
-        {roles.SUPER_ADMIN === userData?.role ||
-        roles.ADMIN === userData?.role ? (
+    <div className="px-6 md:px-10 pt-14 space-y-6">
+      <div className="flex gap-4 justify-end">
+        <ComponentGuard
+          allowedRoles={[roles.ADMIN]}
+          conditions={[userData?.isActive]}
+        >
           <Button
-            variant="contained"
-            startIcon={<Add />}
             onClick={() => navigate("/products/addProduct")}
+            variant="contained"
           >
             Add Product
           </Button>
-        ) : null}
+        </ComponentGuard>
       </div>
 
-      {/* Table */}
-      <TableContainer component={Paper}>
-        <Table stickyHeader>
-          <TableHead className="bg-gray-50" >
-            <TableRow>
-              <TableCell className="font-semibold text-gray-700 whitespace-nowrap">Product Name</TableCell>
-              <TableCell className="font-semibold text-gray-700  whitespace-nowrap">Price</TableCell>
-              <TableCell className="font-semibold text-gray-700  whitespace-nowrap">Purchase Date</TableCell>
-              <TableCell className="font-semibold text-gray-700  whitespace-nowrap">Webinar</TableCell>
-              {/* <TableCell className="font-semibold text-gray-700  whitespace-nowrap">Description</TableCell> */}
-              <TableCell className="font-semibold text-gray-700  whitespace-nowrap">Product Level</TableCell>
-              <TableCell className="font-semibold text-gray-700  whitespace-nowrap sticky right-0 z-10">
-                  Actions
-                </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={7}>
-                  <Stack spacing={2}>
-                    <Skeleton variant="rectangular" height={40} />
-                    <Skeleton variant="rectangular" height={40} />
-                    <Skeleton variant="rectangular" height={40} />
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ) : (
-              (productData || dummyData).map((product, index) => (
-                <TableRow key={index}>
-                  <TableCell sx={tableCellStyles}>{product.name}</TableCell>
-                  <TableCell sx={tableCellStyles}>₹ {product.price}</TableCell>
-                  <TableCell sx={tableCellStyles}>
-                    {formatDate(product.purchaseDate)}
-                  </TableCell>
-                  <TableCell sx={tableCellStyles}>{product.webinar}</TableCell>
-                  {/* <TableCell sx={tableCellStyles}>
-                    {product.description}
-                  </TableCell> */}
-                  <TableCell sx={tableCellStyles}>{product.level}</TableCell>
-                  <TableCell
-                    sx={tableCellStyles}
-                    className="sticky right-0 bg-white z-10"
-                  >
-                    <div className="flex gap-2 ">
-                      <IconButton
-                        color="primary"
-                        onClick={() => handleViewDetails(product)}
-                      >
-                        <Visibility />
-                      </IconButton>
-                      <IconButton
-                        color="secondary"
-                        onClick={() => console.log("Edit Product")}
-                      >
-                        <Edit />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        onClick={() => console.log("Delete Product")}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Pagination */}
-      <div className="flex justify-center mt-5">
-        <Pagination
-          count={totalPages || 5}
-          page={page}
-          color="primary"
-          onChange={handlePagination}
-        />
-      </div>
-
-      {/* Product Details Modal */}
-      {modalData && (
-        <ProductDetailsModal
-          setModalData={setModalData}
-          modalData={modalData}
-        />
-      )}
+      <DataTable
+        tableHeader={tableHeader}
+        tableUniqueKey="productTable"
+        filters={filters}
+        setFilters={setFilters}
+        tableData={{
+          columns: productTableColumns,
+          rows: Array.isArray(productData) ? productData.map((item) => ({
+            ...item,
+            level: `L${item.level}`,
+          })) : [],
+        }}
+        actions={actionIcons}
+        totalPages={totalPages}
+        page={page}
+        setPage={setPage}
+        limit={LIMIT}
+        filterModalName={filterModalName}
+        exportModalName={exportModalName}
+        isLoading={isLoading}
+      />
     </div>
   );
 };

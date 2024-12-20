@@ -116,3 +116,30 @@ export const deleteUserDocumet = createAsyncThunk(
     }
   }
 );
+
+export const getUserDocuments = createAsyncThunk(
+  "userDocuments/fetchData",
+  async (filename, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`/documents/${filename}`, {
+        responseType: "blob", // Ensures the response is received as binary data
+      });
+
+      const url = window.URL.createObjectURL(response.data);
+
+      const link = document.createElement("a");
+      link.href = url;
+
+      link.download = filename || 'downloaded_file';
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      return response;
+    } catch (e) {
+      return rejectWithValue(e.message || "File download failed");
+    }
+  }
+);

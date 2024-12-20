@@ -33,6 +33,7 @@ export const attendeeTableColumns = [
   { header: "Location", key: "location", width: 20, type: "" },
   { header: "Phone", key: "phone", width: 20, type: "" },
   { header: "Status", key: "status", width: 20, type: "" },
+  { header: "Assigned To", key: "isAssigned", width: 20, type: "" },
 ];
 
 export const employeeTableColumns = [
@@ -64,6 +65,17 @@ export const webinarTableColumns = [
     header: "Total Participants",
     key: "totalParticipants",
     width: 15,
+    type: "",
+  },
+];
+
+export const productTableColumns = [
+  { header: "Name", key: "name", width: 50, type: "" },
+  { header: "Price", key: "price", width: 20, type: "" },
+  {
+    header: "Level",
+    key: "level",
+    width: 10,
     type: "",
   },
 ];

@@ -17,11 +17,18 @@ export const addAttendees = createAsyncThunk(
 //get Attendees
 export const getAttendees = createAsyncThunk(
   "attendees/fetchData",
-  async ({ id, isAttended, page = 1, limit = 10, filters={} }, { rejectWithValue }) => {
+  async (
+    { id, isAttended, page = 1, limit = 10, filters = {} },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await instance.post(`/attendees/${id}`, {filters, fieldName: 'attendeeTableConfig'}, {
-        params: { isAttended, page, limit },
-      });
+      const response = await instance.post(
+        `/attendees/webinar`,
+        { filters, fieldName: "attendeeTableConfig", webinarId: id },
+        {
+          params: { isAttended, page, limit },
+        }
+      );
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
@@ -32,26 +39,15 @@ export const getAttendees = createAsyncThunk(
 //get All Attendees
 export const getAllAttendees = createAsyncThunk(
   "allAttendees/fetchData",
-  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
-    try {
-      const response = await instance.get(`/attendees`, {
-        params: { page, limit },
-      });
-      return response?.data;
-    } catch (e) {
-      return rejectWithValue(e);
-    }
-  }
-);
-
-//get All Attendees
-export const getAll = createAsyncThunk(
-  "all/fetchData",
   async ({ page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
     try {
-      const response = await instance.post(`/attendees/all`, filters, {
-        params: { page, limit },
-      });
+      const response = await instance.post(
+        `/attendees/webinar`,
+        { filters, fieldName: "attendeeTableConfig", webinarId: "" },
+        {
+          params: { isAttended: "postWebinar", page, limit },
+        }
+      );
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);

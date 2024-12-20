@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Tab } from "@mui/material";
-import { clearSuccess } from "../../features/slices/attendees";
-import { getAll, getAllAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
-import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
 import { getAssignments } from "../../features/actions/assign";
+import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
+import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
 
 const Assignments = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -21,6 +20,7 @@ const Assignments = () => {
 
   const [selectedRows, setSelectedRows] = useState([]);
 
+  const { userData } = useSelector((state) => state.auth);
   const { assignData, isLoading, isSuccess, totalPages } = useSelector(
     (state) => state.assign
   );
@@ -34,12 +34,13 @@ const Assignments = () => {
   }, [page]);
 
   useEffect(() => {
-    dispatch(getAssignments( { page, limit: LIMIT }));
-  }, [page, LIMIT]);
+    dispatch(
+      getAssignments({ id: userData?._id, page, limit: LIMIT, filters })
+    );
+  }, [page, LIMIT, filters]);
 
   useEffect(() => {
     if (isSuccess) {
-     
     }
   }, [isSuccess]);
 
@@ -73,7 +74,7 @@ const Assignments = () => {
     },
   ];
   return (
-    <div className="px-6 md:px-10 pt-10 space-y-6">
+    <div className="px-6 md:px-10 pt-14 space-y-6">
       {/* Tabs for Sales and Reminder */}
 
       <div className="flex gap-4 justify-end">
@@ -94,8 +95,10 @@ const Assignments = () => {
         filters={filters}
         setFilters={setFilters}
         tableData={{
-          columns: [...attendeeTableColumns, ],//  { header: "Webinar", key: "webinarName", width: 20, type: "" },
-          rows: Array.isArray(assignData) && assignData.map((assignment) => assignment.attendee) || [],
+          columns: attendeeTableColumns.filter(
+            (column) => column.header !== "Assigned To"
+          ), //  { header: "Webinar", key: "webinarName", width: 20, type: "" },
+          rows: Array.isArray(assignData) ? assignData : [],
         }}
         actions={actionIcons}
         totalPages={totalPages}
@@ -107,6 +110,12 @@ const Assignments = () => {
         filterModalName={filterModalName}
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
+      />
+
+      <AttendeesFilterModal
+        modalName={filterModalName}
+        filters={filters}
+        setFilters={setFilters}
       />
     </div>
   );

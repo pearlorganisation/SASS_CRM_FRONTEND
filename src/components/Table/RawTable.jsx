@@ -36,6 +36,8 @@ const RawTable = (props) => {
     isLoading,
     selectedRows,
     setSelectedRows,
+    rowClick = (row) => {console.log("Row clicked:", row)},
+    isRowClickable = false,
     userData,
   } = props;
   const dispatch = useDispatch();
@@ -101,7 +103,10 @@ const RawTable = (props) => {
                   isRowSelected(row?._id) ? "bg-blue-50" : "bg-white"
                 } hover:bg-gray-50`}
               >
-                <TableCell sx={tableCellStyles}>
+                <TableCell 
+                className={`${isRowClickable ? "cursor-pointer" : ""}`}
+                onClick={() => rowClick(row)}
+                sx={tableCellStyles}>
                   {(page - 1) * limit + index + 1}
                 </TableCell>
                 {isSelectVisible && (
@@ -114,7 +119,10 @@ const RawTable = (props) => {
                   </TableCell>
                 )}
                 {tableData?.columns?.map((column, index) => (
-                  <TableCell key={index} sx={tableCellStyles}>
+                  <TableCell
+                  className={`${isRowClickable ? "cursor-pointer" : ""}`}
+                  onClick={() => rowClick(row)}
+                  key={index} sx={tableCellStyles}>
                     {column.type === "status" && (
                       <Chip
                         label={row?.[column.key] ? "Active" : "Inactive"}
@@ -141,7 +149,7 @@ const RawTable = (props) => {
                     {actions?.map((action, index) => (
                       <ComponentGuard
                         key={index}
-                        conditions={[action?.readOnly || userData?.isActive]}
+                        conditions={[action?.readOnly || userData?.isActive, action?.hideCondition ? action.hideCondition(row) : true]}
                       >
                         <div key={index}>
                           <Tooltip title={action.tooltip} arrow>

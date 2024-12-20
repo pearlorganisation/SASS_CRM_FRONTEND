@@ -1,7 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { toast } from "sonner";
-import { errorToast } from "../../utils/extra";
-import { exportClientExcel, exportWebinarAttendeesExcel } from "../actions/export-excel";
+import { errorToast, successToast } from "../../utils/extra";
+import {
+  exportClientExcel,
+  exportEmployeesExcel,
+  exportWebinarAttendeesExcel,
+  exportWebinarExcel,
+} from "../actions/export-excel";
 // -------------------------------------------------------------------------------------------
 
 const initialState = {
@@ -24,9 +28,7 @@ const exportSlice = createSlice({
       .addCase(exportClientExcel.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        toast.success(`Data Exported Successfully`, {
-          position: "top-center",
-        });
+        successToast(`Data Exported Successfully`);
       })
       .addCase(exportClientExcel.rejected, (state, action) => {
         state.isLoading = false;
@@ -39,11 +41,35 @@ const exportSlice = createSlice({
       .addCase(exportWebinarAttendeesExcel.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        toast.success(`Data Exported Successfully`, {
-          position: "top-center",
-        });
+        successToast(`Data Exported Successfully`);
       })
       .addCase(exportWebinarAttendeesExcel.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action.payload);
+      })
+      .addCase(exportWebinarExcel.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(exportWebinarExcel.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        successToast(`Data Exported Successfully`);
+      })
+      .addCase(exportWebinarExcel.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action.payload);
+      })
+      .addCase(exportEmployeesExcel.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(exportEmployeesExcel.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        successToast(`Data Exported Successfully`);
+      })
+      .addCase(exportEmployeesExcel.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action.payload);
       });

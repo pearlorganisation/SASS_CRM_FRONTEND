@@ -8,39 +8,46 @@ import {
   Box,
   Paper,
   Avatar,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Tooltip,
 } from "@mui/material";
 import BusinessIcon from "@mui/icons-material/Business";
 import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import PeopleIcon from "@mui/icons-material/People";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { getClientById } from "../../features/actions/client";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { formatDate } from "../../utils/extra";
+import useRoles from "../../hooks/useRoles";
+import UserActivityLogs from "../../components/Client/UserActivityLogs";
+import { Delete, ExpandMore, Visibility } from "@mui/icons-material";
+import { deleteUserDocumet, getUserDocuments } from "../../features/actions/auth";
 
 const ViewClient = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const roles = useRoles();
+
   const { singleClientData } = useSelector((state) => state.client);
 
   const [clientData = null] = singleClientData || [];
-  console.log(clientData, "clientData");
 
   useEffect(() => {
     dispatch(getClientById(id));
   }, []);
 
   return (
-    <Box className="py-10 md:px-10 mt-10">
+    <Box className="py-10 md:px-10 px-4 mt-10">
       {/* Header Section */}
       <Card
         className="p-8 shadow-lg"
         style={{
-          background: "linear-gradient(90deg, #4CAF50, #2E7D32)",
+          background: clientData?.isActive
+            ? "linear-gradient(90deg, #4CAF50, #2E7D32)" // Green gradient
+            : "linear-gradient(90deg, #FF5252, #D32F2F)", // Red gradient
           color: "white",
           borderRadius: "16px",
         }}
@@ -62,8 +69,7 @@ const ViewClient = () => {
               {clientData?.userName}
             </Typography>
             <Typography variant="subtitle1">
-              {true ? "Active Client" : "Inactive Client"}{" "}
-              {/* to be added later */}
+              {clientData?.companyName}
             </Typography>
           </Grid>
         </Grid>
@@ -105,8 +111,9 @@ const ViewClient = () => {
               <Typography>
                 <strong>Sales:</strong>{" "}
                 {
-                  clientData?.employees.map((item) => item.type === "sales")
-                    .length
+                  clientData?.employees.filter(
+                    (item) => item.role === roles.EMPLOYEE_SALES
+                  ).length
                 }
               </Typography>
             </Box>
@@ -115,8 +122,9 @@ const ViewClient = () => {
               <Typography>
                 <strong>Reminder:</strong>{" "}
                 {
-                  clientData?.employees.map((item) => item.type === "reminder")
-                    .length
+                  clientData?.employees.filter(
+                    (item) => item.role === roles.EMPLOYEE_REMINDER
+                  ).length
                 }
               </Typography>
             </Box>
@@ -157,41 +165,67 @@ const ViewClient = () => {
             </Box>
             <Box display="flex" alignItems="center">
               <Typography>
-                <strong>Expiry:</strong> {formatDate(clientData?.currentPlanExpiry)}
+                <strong>Expiry:</strong>{" "}
+                {formatDate(clientData?.currentPlanExpiry)}
               </Typography>
             </Box>
           </Paper>
         </Grid>
 
+        <Grid item xs={12} md={6}>
+          <Paper elevation={3} className="p-4">
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMore />}
+                aria-controls="user-activity-logs-content"
+                id="user-activity-logs-header"
+              >
+                <Typography variant="subtitle1" style={{ fontWeight: "bold" }}>
+                  Client Documents
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                {Array.isArray(clientData?.documents)
+                  ? clientData.documents.map((doc, index) => (
+                      <div
+                        className="flex justify-between items-center mb-2 shadow-md"
+                        key={index}
+                      >
+                        <Typography variant="body1">
+                          {doc?.originalname}
+                        </Typography>
+
+                        <div className="flex gap-4">
+                        <Tooltip title="Open" arrow>
+                          <button
+                            onClick={() => dispatch(getUserDocuments(doc?.filename))}
+                            className="p-2 rounded-lg text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50"
+                          >
+                            <Visibility />
+                          </button>
+                        </Tooltip>
+                        
+                        {/* <Tooltip title="Delete" arrow>
+                          <button
+                            onClick={() => dispatch(deleteUserDocumet(doc?.filename))}
+                            className="p-2 rounded-lg text-red-500 hover:text-red-600 duration-150 hover:bg-gray-50"
+                          >
+                            <Delete />
+                          </button>
+                        </Tooltip> */}
+                        </div>
+
+                      </div>
+                    ))
+                  : null}
+              </AccordionDetails>
+            </Accordion>
+          </Paper>
+        </Grid>
+
         {/* Status */}
         <Grid item xs={12}>
-          <Paper
-            elevation={3}
-            className="p-4"
-            style={{
-              backgroundColor: clientData?.isActive ? "#E8F5E9" : "#FFEBEE",
-            }}
-          >
-            <Typography variant="h6" gutterBottom>
-              Status
-            </Typography>
-            <Divider className="mb-3" />
-            <Chip
-              label={clientData?.isActive ? "Active" : "Inactive"}
-              color={clientData?.isActive ? "success" : "error"}
-              icon={
-                clientData?.isActive ? (
-                  <CheckCircleOutlineIcon />
-                ) : (
-                  <ErrorOutlineIcon />
-                )
-              }
-              className="mb-2"
-            />
-            <Typography>
-              <strong>Last Active:</strong> 2024-11-20 14:35:00
-            </Typography>
-          </Paper>
+          <UserActivityLogs id={id} isActive={clientData?.isActive} />
         </Grid>
       </Grid>
     </Box>

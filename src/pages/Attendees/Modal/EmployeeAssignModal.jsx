@@ -16,6 +16,8 @@ import { addAssign } from "../../../features/actions/assign";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
 function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
+  console.log("selectedRows", selectedRows);
+
   const dispatch = useDispatch();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
@@ -30,13 +32,10 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const selectedType =
-    tabValue === "preWebinar" ? "EMPLOYEE REMINDER" : "EMPLOYEE SALES";
+    tabValue === "preWebinar" ? "EMPLOYEE_REMINDER" : "EMPLOYEE_SALES";
 
   // Filter employees based on the selected role
   const options = employeeData
-    .map((item) => {
-      return { ...item, role: roles.getRoleNameById(item?.role) };
-    })
     .filter((item) => item?.role === selectedType)
     .map((item) => ({
       value: item?._id,
@@ -44,20 +43,17 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
     }));
 
   const handleAssign = () => {
+    if(selectedEmployee === 'auto') {
+        console.log('auto assigned');
+      return ;
+    }
+
     if (selectedEmployee) {
-      console.log(
-        selectedEmployee,
-        "selectedEmployee",
-        webinarId,
-        selectedRows
-      );
       dispatch(
         addAssign({
-          id: selectedEmployee,
-          payload: {
-            webinar: webinarId,
-            assignments: selectedRows,
-          },
+          webinar: webinarId,
+          employee: selectedEmployee,
+          assignments: selectedRows,
         })
       );
       logUserActivity({
@@ -75,7 +71,7 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
   };
 
   useEffect(() => {
-    dispatch(getAllEmployees());
+    dispatch(getAllEmployees({}));
   }, []);
 
   useEffect(() => {
@@ -101,6 +97,13 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
           onChange={(e) => setSelectedEmployee(e.target.value)}
           className="space-y-3"
         >
+          <FormControlLabel
+            key="auto"
+            value="auto"
+            control={<Radio color="primary" />}
+            label={<span className="text-gray-700">Auto Assign</span>}
+            className="flex items-center"
+          />
           {options.map((option) => (
             <FormControlLabel
               key={option.value}

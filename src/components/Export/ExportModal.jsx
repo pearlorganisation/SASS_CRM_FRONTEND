@@ -9,28 +9,20 @@ import {
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../features/slices/modalSlice";
-import { exportWebinarAttendeesExcel } from "../../features/actions/export-excel";
 import { ClipLoader } from "react-spinners";
-import { attendeeTableColumns } from "../../utils/columnData";
 
-const ExportWebinarAttendeesModal = ({
-  modalName,
-  filters,
-  isAttended=true,
-  webinarId="",
-}) => {
+const ExportModal = ({ modalName, defaultColumns, handleExport }) => {
+
   const dispatch = useDispatch();
-
-  const { subscription } = useSelector((state) => state.auth);
-  const tableConfig = subscription?.plan?.attendeeTableConfig || {};
 
   const { isLoading, isSuccess } = useSelector((state) => state.export);
   const modalState = useSelector((state) => state.modals.modals);
   const open = modalState[modalName] ? true : false;
 
   const [limit, setLimit] = useState("");
-  const [selectedColumns, setSelectedColumns] = useState([]);
-  const [columns, setColumns] = useState([]);
+  const [selectedColumns, setSelectedColumns] = useState(
+    defaultColumns.map((col) => col.key)
+  );
 
   const handleCheckboxChange = (key) => {
     setSelectedColumns((prev) =>
@@ -43,20 +35,8 @@ const ExportWebinarAttendeesModal = ({
   };
 
   const handleSubmit = () => {
-    const limitValue = limit || undefined;
-    console.log("Limit:", limitValue);
-    console.log("Columns:", selectedColumns);
-    // dispatch(exportClientExcel({ limit: limitValue, columns, filters }));
-    dispatch(
-      exportWebinarAttendeesExcel({
-        limit: limitValue,
-        columns: selectedColumns,
-        filters,
-        isAttended,
-        webinarId,
-      })
-    );
-    //
+    handleExport({ limit: limit || undefined, columns: selectedColumns });
+
   };
 
   useEffect(() => {
@@ -64,14 +44,6 @@ const ExportWebinarAttendeesModal = ({
       handleClose();
     }
   }, [isSuccess]);
-
-  useEffect(() => {
-    const filteredColumns = attendeeTableColumns.filter(
-      (col) => col.key in tableConfig && tableConfig[col.key].downloadable
-    );
-    setColumns(filteredColumns);
-    setSelectedColumns(filteredColumns.map((col) => col.key));
-  }, [tableConfig]);
 
   return (
     <Modal open={open} onClose={handleClose}>
@@ -106,7 +78,7 @@ const ExportWebinarAttendeesModal = ({
         <div className="mb-4">
           <h3 className="text-lg font-semibold mb-2">Select Columns</h3>
           <div className="grid grid-cols-2 gap-2">
-            {columns.map((column) => (
+            {defaultColumns.map((column) => (
               <FormControlLabel
                 key={column.key}
                 control={
@@ -126,15 +98,8 @@ const ExportWebinarAttendeesModal = ({
           </Button>
           <Button
             disabled={isLoading}
-            variant="contained"
-            color="primary"
-            onClick={handleSubmit}
-          >
-            {isLoading ? (
-              <ClipLoader className="mx-8" color="#fff" size={20} />
-            ) : (
-              "Download"
-            )}
+            variant="contained" color="primary" onClick={handleSubmit}>
+            {isLoading ? <ClipLoader className="mx-8" color="#fff" size={20} /> : "Download"}
           </Button>
         </div>
       </Box>
@@ -142,4 +107,4 @@ const ExportWebinarAttendeesModal = ({
   );
 };
 
-export default ExportWebinarAttendeesModal;
+export default ExportModal;

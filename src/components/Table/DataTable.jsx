@@ -47,6 +47,8 @@ const DataTable = ({
   exportModalName = "ExportExcelModal",
   isLoading = false,
   selectedRows = [],
+  rowClick = (row) => {},
+  isRowClickable = false,
   setSelectedRows = () => {},
 }) => {
   const dispatch = useDispatch();
@@ -67,7 +69,7 @@ const DataTable = ({
       <div className="flex gap-4 justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-700">{tableHeader}</h2>
 
-        <ComponentGuard conditions={[userData?.isActive]}>
+        <ComponentGuard conditions={[userData?.isActive, tableUniqueKey !== 'viewAssignmentsTable']}>
           <IconButton
             id="demo-positioned-button"
             aria-controls={open ? "demo-positioned-menu" : undefined}
@@ -136,7 +138,10 @@ const DataTable = ({
       {ClientCards}
       <div className={`${ClientCards !== null ? "hidden md:block " : ""}`}>
         <RawTable
-          tableData={tableData}
+          tableData={ {
+            ...tableData,
+            rows: Array.isArray(tableData.rows) ? tableData.rows : [],
+          }}
           actions={actions}
           isSelectVisible={isSelectVisible}
           page={page}
@@ -145,6 +150,8 @@ const DataTable = ({
           selectedRows={selectedRows}
           setSelectedRows={setSelectedRows}
           userData={userData}
+          rowClick={rowClick}
+          isRowClickable={isRowClickable}
         />
       </div>
 
