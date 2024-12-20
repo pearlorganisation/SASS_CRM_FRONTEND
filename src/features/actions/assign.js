@@ -67,7 +67,7 @@ export const getNotes = createAsyncThunk(
       const response = await instance.get(`/notes`, {
         params: payload,
       });
-      return response?.data?.data;
+      return response?.data;
     } catch (e) {
       return rejectWithValue(e);
     }

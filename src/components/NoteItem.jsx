@@ -12,11 +12,12 @@ const NoteItem = ({ item, index, setNoteModalData }) => {
         <div className="flex justify-between">
           <div className="text-sm font-bold">Note {index + 1}</div>
           <p className="flex items-center gap-1 text-xs">
-            <span className="text-gray-500">Call Duration:</span>
-            <span className="bg-green-100 text-green-800 px-2 rounded-md">
-              {`${item?.callDuration?.hr}:${item?.callDuration?.min}:${item?.callDuration?.sec}`}
+            <span className="text-gray-500">Date:</span>
+            <span className="bg-blue-100 text-blue-800 px-2 rounded-md">
+              {formatDate(item?.updatedAt)}
             </span>
           </p>
+          
         </div>
         <div className="flex text-xs justify-between">
           <p className=" flex items-center gap-1">
@@ -26,9 +27,21 @@ const NoteItem = ({ item, index, setNoteModalData }) => {
             </span>
           </p>
           <p className="flex items-center gap-1">
-            <span className="text-gray-500">Date:</span>
-            <span className="bg-blue-100 text-blue-800 px-2 rounded-md">
-              {formatDate(item?.updatedAt)}
+            <span className="text-gray-500">Call Duration:</span>
+            <span className="bg-green-100 text-green-800 px-2 rounded-md">
+              {`${
+                item?.callDuration?.hr
+                  ? item?.callDuration?.hr.toString().padStart(2, "0")
+                  : "00"
+              }:${
+                item?.callDuration?.min
+                  ? item?.callDuration?.min.toString().padStart(2, "0")
+                  : "00"
+              }:${
+                item?.callDuration?.sec
+                  ? item?.callDuration?.sec.toString().padStart(2, "0")
+                  : "00"
+              }`}
             </span>
           </p>
         </div>

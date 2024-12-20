@@ -66,6 +66,7 @@ const ViewParticularContact = () => {
     (state) => state.webinarContact
   );
   const { noteData, isFormLoading } = useSelector((state) => state.assign);
+  console.log(noteData);
 
   useEffect(() => {
     if (
@@ -109,7 +110,7 @@ const ViewParticularContact = () => {
 
   useEffect(() => {
     if (!isFormLoading) {
-      // dispatch(getNotes({ email, recordType }));
+      dispatch(getNotes({ email, recordType }));
     }
   }, [isFormLoading]);
 
@@ -182,9 +183,9 @@ const ViewParticularContact = () => {
 
   return (
     <div className="px-4 pt-14 space-y-6">
-      <div className="p-6 bg-gray-50 rounded-lg ">
+      <div className="md:p-6 p-3 bg-gray-50 rounded-lg ">
         <div className="flex gap-4 justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-700">Attendee Details</h2>
+          <h2 className="text-2xl font-bold text-gray-700">Attendee Contact Details</h2>
         </div>
         <div className=" grid lg:grid-cols-2 mb-6 gap-4 w-full">
           <div className="space-y-2">
@@ -214,14 +215,15 @@ const ViewParticularContact = () => {
                 <span className="font-semibold px-3">Notes</span>
               </div>
               <div className="overflow-y-auto space-y-2 pb-10 scrollbar-thin w-full px-3">
-                {dummyNotes.map((item, index) => (
-                  <NoteItem
-                    key={index}
-                    index={index}
-                    item={item}
-                    setNoteModalData={setNoteModalData}
-                  />
-                ))}
+                {Array.isArray(noteData) &&
+                  noteData.map((item, index) => (
+                    <NoteItem
+                      key={index}
+                      index={index}
+                      item={item}
+                      setNoteModalData={setNoteModalData}
+                    />
+                  ))}
               </div>
             </div>
           </div>

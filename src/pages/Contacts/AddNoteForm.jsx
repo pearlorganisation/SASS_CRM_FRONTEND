@@ -62,8 +62,8 @@ const AddNoteForm = (props) => {
   }, [isFormLoading]);
 
   const onSubmit = (data) => {
-    console.log(selectedStatus)
-    if(selectedStatus !== "Payment"){
+    console.log(selectedStatus);
+    if (selectedStatus !== "Payment") {
       data.image = null;
     }
     
