@@ -68,3 +68,14 @@ export const webinarTableColumns = [
     type: "",
   },
 ];
+
+export const productTableColumns = [
+  { header: "Name", key: "name", width: 50, type: "" },
+  { header: "Price", key: "price", width: 20, type: "" },
+  {
+    header: "Level",
+    key: "level",
+    width: 10,
+    type: "",
+  },
+];

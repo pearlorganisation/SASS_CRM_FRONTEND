@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Tab } from "@mui/material";
 import { createPortal } from "react-dom";
@@ -26,6 +26,7 @@ const WebinarAttendees = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
+  const navigate = useNavigate();
 
   const { attendeeData, isLoading, isSuccess, totalPages, tabValue } =
     useSelector((state) => state.attendee);
@@ -84,7 +85,7 @@ const WebinarAttendees = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
-        console.log(`Viewing details for row with id: ${item?._id}`);
+        navigate('/particularContact')
       },
       readOnly: true,
     },

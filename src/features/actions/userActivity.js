@@ -29,3 +29,16 @@ export const getUserActivity = createAsyncThunk(
     }
   }
 );
+
+export const sendInactiveUserEmail = createAsyncThunk(
+  "userActivity/fetch",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.put(`/user-activities/inactive`);
+      console.log(response.data);
+      return response.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

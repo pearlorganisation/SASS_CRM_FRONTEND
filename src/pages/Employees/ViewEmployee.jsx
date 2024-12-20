@@ -12,11 +12,11 @@ import { getAssignments } from "../../features/actions/assign";
 import { Delete, Edit, Visibility } from "@mui/icons-material";
 
 const ViewEmployee = () => {
-    // ----------------------- ModalNames for Redux -----------------------
-    const filterModalName = "ViewAssignmentsFilterModal";
-    const tableHeader = "Employee Assignments Table";
-    const exportExcelModalName = "ExportViewAssignmentsExcel";
-    // ----------------------- etcetra -----------------------
+  // ----------------------- ModalNames for Redux -----------------------
+  const filterModalName = "ViewAssignmentsFilterModal";
+  const tableHeader = "Employee Assignments Table";
+  const exportExcelModalName = "ExportViewAssignmentsExcel";
+  // ----------------------- etcetra -----------------------
   const { id } = useParams();
   const logUserActivity = useAddUserActivity();
   const dispatch = useDispatch();
@@ -26,19 +26,16 @@ const ViewEmployee = () => {
   );
   const [tabValue, setTabValue] = useState("assignments");
   const LIMIT = useSelector((state) => state.pageLimits[tabValue] || 10);
-    const [searchParams, setSearchParams] = useSearchParams();
-    const [page, setPage] = useState(searchParams.get("page") || 1);
-    const [filters, setFilters] = useState({});
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [page, setPage] = useState(searchParams.get("page") || 1);
+  const [filters, setFilters] = useState({});
 
   useEffect(() => {
-    if(tabValue === 'activityLogs')
-    dispatch(getUserActivity({ id, page: page, limit: LIMIT }));
-    
-    else
-    dispatch(
-      getAssignments({ id, page, limit: LIMIT, filters })
-    );
-  }, [page, LIMIT, filters]);
+    console.log("tabValue", tabValue);
+    if (tabValue === "activityLogs")
+      dispatch(getUserActivity({ id, page: page, limit: LIMIT }));
+    else dispatch(getAssignments({ id, page, limit: LIMIT, filters }));
+  }, [page, LIMIT, filters, tabValue]);
 
   const handleTabChange = (_, newValue) => {
     setTabValue(newValue);
@@ -114,7 +111,6 @@ const ViewEmployee = () => {
       {tabValue !== "activityLogs" && (
         <div className="px-6 md:px-10 pt-14 space-y-6">
           {/* Tabs for Sales and Reminder */}
-
 
           <DataTable
             tableHeader={tableHeader}

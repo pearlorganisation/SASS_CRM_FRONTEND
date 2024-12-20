@@ -149,7 +149,7 @@ const RawTable = (props) => {
                     {actions?.map((action, index) => (
                       <ComponentGuard
                         key={index}
-                        conditions={[action?.readOnly || userData?.isActive]}
+                        conditions={[action?.readOnly || userData?.isActive, action?.hideCondition ? action.hideCondition(row) : true]}
                       >
                         <div key={index}>
                           <Tooltip title={action.tooltip} arrow>

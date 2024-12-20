@@ -42,18 +42,14 @@ export const assignSlice = createSlice({
       })
       .addCase(addNote.pending, (state, action) => {
         state.isFormLoading = true;
-        state.errorMessage = "";
       })
       .addCase(addNote.fulfilled, (state, action) => {
         state.isFormLoading = false;
-        state.errorMessage = "";
         toast.success("Note Added Successfully", {
           position: "top-center",
         });
       })
       .addCase(addNote.rejected, (state, action) => {
-        state.isFormLoading = false;
-        state.errorMessage = action.payload;
         errorToast(action?.payload);
       })
       .addCase(getNotes.pending, (state, action) => {
@@ -63,7 +59,7 @@ export const assignSlice = createSlice({
       .addCase(getNotes.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.noteData = action.payload;
+        state.noteData = action.payload?.data || [];
       })
       .addCase(getNotes.rejected, (state, action) => {
         state.isLoading = false;

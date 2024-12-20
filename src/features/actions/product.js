@@ -3,10 +3,10 @@ import { instance } from "../../services/axiosInterceptor";
 
 //add product
 export const addProduct = createAsyncThunk(
-  "addProduct",
+  "products/create",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.post(`/product`, payload);
+      const response = await instance.post(`/products`, payload);
       return response;
     } catch (e) {
       return rejectWithValue(e);
@@ -19,7 +19,7 @@ export const getAllProducts = createAsyncThunk(
   "getAllProducts",
   async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const { data } = await instance.get(`/product`, {
+      const { data } = await instance.get(`/products`, {
         params: { page, limit },
       });
 
