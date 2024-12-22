@@ -23,7 +23,6 @@ const EmployeeAssignments = () => {
     <AssignmentTable
       isLoading={isLoading}
       assignmentData={employeeAssignments}
-      
     />
 
 
