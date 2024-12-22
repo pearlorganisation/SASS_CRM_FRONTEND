@@ -2,11 +2,12 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
-import { addAttendees, getAllAttendees, getAttendees } from "../actions/attendees";
+import { addAttendees, getAllAttendees, getAttendee, getAttendees, updateAttendee } from "../actions/attendees";
 
 const initialState = {
   isLoading: false,
   isSuccess: false,
+  selectedAttendee: [],
   attendeeData: [],
   singleAttendeeData: null,
   totalPages: 1,
@@ -38,6 +39,30 @@ export const attendeeSlice = createSlice({
         successToast("attendees Added Successfully");
       })
       .addCase(addAttendees.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(updateAttendee.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(updateAttendee.fulfilled, (state) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        successToast("attendees Updated Successfully");
+      })
+      .addCase(updateAttendee.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getAttendee.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getAttendee.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.selectedAttendee = action.payload || [];
+      })
+      .addCase(getAttendee.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       })

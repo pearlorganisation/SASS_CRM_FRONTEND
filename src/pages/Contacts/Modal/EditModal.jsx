@@ -2,20 +2,36 @@ import React from "react";
 import { useForm } from "react-hook-form";
 
 const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
-  
+
+
+
+
+
+  function removeBlankAttributes(obj) {
+    const result = {};
+    for (const key in obj) {
+        if ( obj[key] !== null && obj[key] !== undefined && obj[key].length > 0) {
+            result[key] = obj[key];
+        }
+    }
+    return result;
+}
+
+
   const { register, handleSubmit } = useForm({
     defaultValues: {
-        firstName: initialData?.firstName || "",
-        lastName: initialData?.lastName || "",
-        phone: initialData?.phone || "",
-        location: initialData?.location || "",
-        gender: initialData?.gender || "",
+      firstName: initialData?.firstName,
+      lastName: initialData?.lastName,
+      phone: initialData?.phone,
+      location: initialData?.location,
+      gender: initialData?.gender,
     },
   });
 
   const onSubmit = (data) => {
     data['id'] = initialData?._id;
-    onConfirmEdit(data);
+    let finalData = removeBlankAttributes(data)
+    onConfirmEdit(finalData);
   };
 
   return (

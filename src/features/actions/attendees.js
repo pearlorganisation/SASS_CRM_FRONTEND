@@ -14,6 +14,39 @@ export const addAttendees = createAsyncThunk(
   }
 );
 
+//get single Attendee
+export const getAttendee = createAsyncThunk(
+  "attendee",
+  async (
+    { email },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await instance.get(
+        `/attendees/${email}`,
+      );
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+
+//Update Attendee
+export const updateAttendee = createAsyncThunk(
+  "attendee/update",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`/attendees/${payload?.id}`, payload);
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+
 //get Attendees
 export const getAttendees = createAsyncThunk(
   "attendees/fetchData",

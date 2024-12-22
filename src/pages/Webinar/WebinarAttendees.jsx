@@ -85,6 +85,7 @@ const WebinarAttendees = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
+        console.log('item', item)
         navigate('/particularContact')
       },
       readOnly: true,

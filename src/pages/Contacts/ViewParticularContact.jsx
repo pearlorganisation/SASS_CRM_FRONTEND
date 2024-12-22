@@ -1,53 +1,49 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { BiSolidCopy } from "react-icons/bi";
-
 import Select from "react-select";
 import ViewFullDetailsModal from "./Modal/ViewFullDetailModal";
 import ViewTimerModal from "./Modal/ViewTimerModal";
-import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import AddNoteForm from "./AddNoteForm";
 import { FaRegEdit } from "react-icons/fa";
 import { getNotes } from "../../features/actions/assign";
 import EditModal from "./Modal/EditModal";
-import { formatDate } from "../../utils/extra";
 import { getColor, LeadTypeOptions } from "../../utils/LeadType";
 import { addUserActivity } from "../../features/actions/userActivity";
-import { getCustomOptions } from "../../features/actions/globalData";
 import NoteItem from "../../components/NoteItem";
-const dummyNotes = [
-  {
-    updatedAt: "2024-12-10T10:30:00Z",
-    callDuration: { hr: 0, min: 15, sec: 30 },
-    status: "Completed",
-    note: "Discussed the project requirements and next steps.",
-  },
-  {
-    updatedAt: "2024-12-11T14:45:00Z",
-    callDuration: { hr: 1, min: 5, sec: 0 },
-    status: "In Progress",
-    note: "Reviewed the initial design draft with the client.",
-  },
-  {
-    updatedAt: "2024-12-12T09:20:00Z",
-    callDuration: { hr: 0, min: 30, sec: 0 },
-    status: "Pending",
-    note: "Scheduled a follow-up meeting to finalize the design.",
-  },
-  {
-    updatedAt: "2024-12-13T16:00:00Z",
-    callDuration: { hr: 0, min: 45, sec: 10 },
-    status: "Completed",
-    note: "Confirmed the delivery timeline and shared the project plan.",
-  },
-  {
-    updatedAt: "2024-12-14T11:15:00Z",
-    callDuration: { hr: 0, min: 20, sec: 0 },
-    status: "Pending",
-    note: "Waiting for client feedback on the updated draft.",
-  },
-];
+import { getAttendee, updateAttendee } from "../../features/actions/attendees";
+// const dummyNotes = [
+//   {
+//     updatedAt: "2024-12-10T10:30:00Z",
+//     callDuration: { hr: 0, min: 15, sec: 30 },
+//     status: "Completed",
+//     note: "Discussed the project requirements and next steps.",
+//   },
+//   {
+//     updatedAt: "2024-12-11T14:45:00Z",
+//     callDuration: { hr: 1, min: 5, sec: 0 },
+//     status: "In Progress",
+//     note: "Reviewed the initial design draft with the client.",
+//   },
+//   {
+//     updatedAt: "2024-12-12T09:20:00Z",
+//     callDuration: { hr: 0, min: 30, sec: 0 },
+//     status: "Pending",
+//     note: "Scheduled a follow-up meeting to finalize the design.",
+//   },
+//   {
+//     updatedAt: "2024-12-13T16:00:00Z",
+//     callDuration: { hr: 0, min: 45, sec: 10 },
+//     status: "Completed",
+//     note: "Confirmed the delivery timeline and shared the project plan.",
+//   },
+//   {
+//     updatedAt: "2024-12-14T11:15:00Z",
+//     callDuration: { hr: 0, min: 20, sec: 0 },
+//     status: "Pending",
+//     note: "Waiting for client feedback on the updated draft.",
+//   },
+// ];
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -65,6 +61,9 @@ const ViewParticularContact = () => {
   const { attendeeContactDetails } = useSelector(
     (state) => state.webinarContact
   );
+
+  const { selectedAttendee } = useSelector((state) => state.attendee);
+
   const { noteData, isFormLoading } = useSelector((state) => state.assign);
   console.log(noteData);
 
@@ -114,6 +113,10 @@ const ViewParticularContact = () => {
     }
   }, [isFormLoading]);
 
+  useEffect(() => {
+    dispatch(getAttendee({ email }))
+  }, [email])
+
   const handleTimerModal = () => {
     setShowTimerModal(true);
   };
@@ -155,14 +158,14 @@ const ViewParticularContact = () => {
   };
 
   const onConfirmEdit = (data) => {
-    // dispatch(updateAttendeeDetails(data)).then(() => {
-    //   setEditModalData(null);
-    //   addUserActivityLog({
-    //     action: "update",
-    //     details: `User updated information of Attendee with Email: ${email}`,
-    //   });
-    //   dispatch(getAttendeeContactDetails({ email, recordType }));
-    // });
+    dispatch(updateAttendee(data)).then(() => {
+      setEditModalData(null);
+      addUserActivityLog({
+        action: "update",
+        details: `User updated information of Attendee with Email: ${email}`,
+      });
+      dispatch(getAttendee({ email }));
+    });
   };
 
   const handleLeadChange = (option) => {
@@ -181,6 +184,10 @@ const ViewParticularContact = () => {
     dispatch(addUserActivity(data));
   };
 
+  const removeDuplicates = (arr) => {
+    return [...new Set(arr)]
+  }
+
   return (
     <div className="px-4 pt-14 space-y-6">
       <div className="md:p-6 p-3 bg-gray-50 rounded-lg ">
@@ -193,20 +200,41 @@ const ViewParticularContact = () => {
               <p>
                 Email :{" "}
                 <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
-                  someemail@glsd.com
+                  {console.log("selectedAttendee=======", selectedAttendee)}
+                  {selectedAttendee && selectedAttendee[0]?._id}
                 </span>
               </p>
             </div>
-            <div className="flex justify-between border rounded-lg py-2 px-3 shadow-md">
-              <p>Name : some name</p>
+
+            <div className="border rounded-lg py-2 px-3 shadow-md">
+              <p>
+                Name :{" "}
+                {selectedAttendee && selectedAttendee.length > 0 && selectedAttendee[0]?.data?.map((item) =>
+                (
+                  item?.firstName && (
+                    <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
+                      {`${item.firstName} ${item.lastName}`}
+                    </span>
+                  )
+                ))}
+              </p>
             </div>
 
             <div className="border rounded-lg py-1 px-3 shadow-md">
               <p className="flex items-center">
                 Phone Number :
-                <span className="ms-2 grid lg:grid-cols-2 gap-3">
-                  2342342343
-                </span>
+                {
+                  selectedAttendee && selectedAttendee.length > 0 && selectedAttendee[0]?.data?.length > 0 &&
+                  selectedAttendee[0].data
+                    .map((item) => item?.phone) // Extract phone numbers
+                    .filter((phone, index, self) => phone && self.indexOf(phone) === index) // Filter out duplicates
+                    .map((phone, index) => (
+                      <span key={index} className="ms-2 grid lg:grid-cols-2 gap-3">
+                        {phone}
+                      </span>
+                    ))
+                }
+
               </p>
             </div>
 
@@ -267,8 +295,8 @@ const ViewParticularContact = () => {
           </div>
         </div>
         <div className="mt-12 shadow-lg rounded-lg overflow-x-auto">
-          {!attendeeContactDetails?.data ||
-          attendeeContactDetails?.data?.length <= 0 ? (
+          {!selectedAttendee && selectedAttendee.length <= 0 &&
+            selectedAttendee[0]?.data?.length <= 0 ? (
             <div className="text-lg p-2 flex justify-center w-full">
               No record found
             </div>
@@ -300,11 +328,9 @@ const ViewParticularContact = () => {
                     </td>
                   </tr>
                 ) : (
-                  Array.isArray(attendeeContactDetails?.data) &&
-                  attendeeContactDetails?.data?.length > 0 &&
-                  attendeeContactDetails?.data?.map((item, idx) => {
-                    // const serialNumber = (page - 1) * 25 + idx + 1;
 
+                  selectedAttendee[0]?.data?.map((item, idx) => {
+                    console.log(item)
                     return (
                       <tr key={idx}>
                         <td className={`px-3 py-4 whitespace-nowrap `}>
@@ -312,23 +338,23 @@ const ViewParticularContact = () => {
                         </td>
 
                         <td className="px-2 py-4 whitespace-nowrap ">
-                          {item?.csvName}
+                          {item?.webinar[0].webinarName}
                         </td>
 
                         <td className="px-2 py-4 whitespace-nowrap ">
-                          {item?.firstName || "N/A"}
+                          {item?.firstName || "-"}
                         </td>
                         <td className="px-2 py-4 whitespace-nowrap">
                           {item?.lastName?.match(/:-\)/)
                             ? "--"
-                            : item?.lastName || "N/A"}
+                            : item?.lastName || "-"}
                         </td>
 
                         <td className=" py-4 text-center whitespace-nowrap">
                           {item?.timeInSession}
                         </td>
                         <td className="px-3 py-4 whitespace-nowrap">
-                          {item?.date}
+                          {new Date(item?.webinar[0].webinarDate).toDateString()}
                         </td>
 
                         <td className="px-3 py-4 h-full">

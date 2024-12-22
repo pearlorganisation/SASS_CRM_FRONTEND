@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Tab } from "@mui/material";
 import { attendeeTableColumns } from "../../utils/columnData";
@@ -7,10 +7,13 @@ import { Edit, Delete, Visibility } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import { openModal } from "../../features/slices/modalSlice";
 import { getAssignments } from "../../features/actions/assign";
-import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
 
 const Assignments = () => {
+
+  const navigate = useNavigate();
+
+
   // ----------------------- ModalNames for Redux -----------------------
   const filterModalName = "ViewAssignmentsFilterModal";
   const tableHeader = "Assignments Table";
@@ -44,6 +47,27 @@ const Assignments = () => {
     }
   }, [isSuccess]);
 
+
+  const handleViewFullDetails = (item) => {
+
+    const recordType = item?.isAttended ? 'postWebinar' : 'preWebinar'
+    navigate(
+      `/particularContact?email=${encodeURIComponent(
+        item?.email
+      )}`
+    );
+    if (isEmployee) {
+      dispatch(addUserActivity({
+        action: "viewDetails",
+        details: `User viewed details of Attendee with Email: ${item?._id} and Record Type: ${recordType}`
+      }))
+    }
+
+  };
+
+
+
+
   // ----------------------- Action Icons -----------------------
 
   const actionIcons = [
@@ -53,7 +77,8 @@ const Assignments = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
-        console.log(`Viewing details for row with id: ${item?._id}`);
+        console.log(item)
+        handleViewFullDetails(item)
       },
     },
     {
