@@ -36,12 +36,14 @@ const RawTable = (props) => {
     isLoading,
     selectedRows,
     setSelectedRows,
-    rowClick = (row) => {console.log("Row clicked:", row)},
+    rowClick = (row) => {
+      console.log("Row clicked:", row);
+    },
     isRowClickable = false,
     userData,
   } = props;
   const dispatch = useDispatch();
-    const {isTablesMasked} = useSelector((state) => state.table);
+  const { isTablesMasked } = useSelector((state) => state.table);
 
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
@@ -103,10 +105,11 @@ const RawTable = (props) => {
                   isRowSelected(row?._id) ? "bg-blue-50" : "bg-white"
                 } hover:bg-gray-50`}
               >
-                <TableCell 
-                className={`${isRowClickable ? "cursor-pointer" : ""}`}
-                onClick={() => rowClick(row)}
-                sx={tableCellStyles}>
+                <TableCell
+                  className={`${isRowClickable ? "cursor-pointer" : ""}`}
+                  onClick={() => rowClick(row)}
+                  sx={tableCellStyles}
+                >
                   {(page - 1) * limit + index + 1}
                 </TableCell>
                 {isSelectVisible && (
@@ -120,9 +123,11 @@ const RawTable = (props) => {
                 )}
                 {tableData?.columns?.map((column, index) => (
                   <TableCell
-                  className={`${isRowClickable ? "cursor-pointer" : ""}`}
-                  onClick={() => rowClick(row)}
-                  key={index} sx={tableCellStyles}>
+                    className={`${isRowClickable ? "cursor-pointer" : ""}`}
+                    onClick={() => rowClick(row)}
+                    key={index}
+                    sx={tableCellStyles}
+                  >
                     {column.type === "status" && (
                       <Chip
                         label={row?.[column.key] ? "Active" : "Inactive"}
@@ -133,9 +138,16 @@ const RawTable = (props) => {
                       (formatDateAsNumber(row?.[column.key]) ?? "N/A")}
 
                     {column.type === "" &&
-                      (row?.[column.key] !== undefined && row?.[column.key] !== null
+                      (row?.[column.key] !== undefined &&
+                      row?.[column.key] !== null
                         ? isTablesMasked &&
-                          ["userName", "email", "phone", 'firstName', 'lastName'].includes(column.key)
+                          [
+                            "userName",
+                            "email",
+                            "phone",
+                            "firstName",
+                            "lastName",
+                          ].includes(column.key)
                           ? `${row[column.key].slice(0, 3)}***`
                           : row[column.key] ?? "N/A"
                         : "N/A")}
@@ -149,7 +161,12 @@ const RawTable = (props) => {
                     {actions?.map((action, index) => (
                       <ComponentGuard
                         key={index}
-                        conditions={[action?.readOnly || userData?.isActive, action?.hideCondition ? action.hideCondition(row) : true]}
+                        conditions={[
+                          action?.readOnly || userData?.isActive,
+                          action?.hideCondition
+                            ? action.hideCondition(row)
+                            : true,
+                        ]}
                       >
                         <div key={index}>
                           <Tooltip title={action.tooltip} arrow>

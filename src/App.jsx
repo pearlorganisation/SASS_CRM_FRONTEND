@@ -48,6 +48,7 @@ import { getNoticeBoard } from "./features/actions/noticeBoard";
 import useRoles from "./hooks/useRoles";
 import useAddUserActivity from "./hooks/useAddUserActivity";
 import ViewEmployee from "./pages/Employees/ViewEmployee";
+import LeadTypes from "./pages/ManageLeadTypes";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -115,6 +116,10 @@ const App = () => {
         {
           path: "/particularContact",
           element: <ViewParticularContact />,
+        },
+        {
+          path: '/lead-type',
+          element: <LeadTypes />
         },
         {
           path: "/*",

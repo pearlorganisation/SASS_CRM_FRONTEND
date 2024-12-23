@@ -57,9 +57,9 @@ export const getAttendees = createAsyncThunk(
     try {
       const response = await instance.post(
         `/attendees/webinar`,
-        { filters, fieldName: "attendeeTableConfig", webinarId: id },
+        { filters, fieldName: "attendeeTableConfig", webinarId: id, isAttended },
         {
-          params: { isAttended, page, limit },
+          params: {  page, limit },
         }
       );
       return response?.data;
@@ -76,9 +76,9 @@ export const getAllAttendees = createAsyncThunk(
     try {
       const response = await instance.post(
         `/attendees/webinar`,
-        { filters, fieldName: "attendeeTableConfig", webinarId: "" },
+        { filters, fieldName: "attendeeTableConfig", webinarId: "", isAttended: false },
         {
-          params: { isAttended: "postWebinar", page, limit },
+          params: {  page, limit },
         }
       );
       return response?.data;

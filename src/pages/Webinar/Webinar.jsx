@@ -79,6 +79,7 @@ const Webinar = () => {
     {
       icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
       tooltip: "Edit Attendee",
+      hideCondition: null,
       onClick: (item) => {
         dispatch(
           openModal({

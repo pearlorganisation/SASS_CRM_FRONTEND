@@ -57,7 +57,7 @@ const WebinarAttendees = () => {
 
   useEffect(() => {
     dispatch(
-      getAttendees({ id, isAttended: tabValue, page, limit: LIMIT, filters })
+      getAttendees({ id, isAttended: tabValue === 'postWebinar', page, limit: LIMIT, filters })
     );
   }, [page, tabValue, LIMIT, filters]);
 
@@ -66,7 +66,7 @@ const WebinarAttendees = () => {
       dispatch(
         getAttendees({
           id,
-          isAttended: tabValue,
+          isAttended: tabValue === 'postWebinar',
           page: 1,
           limit: LIMIT,
           filters,
@@ -86,7 +86,7 @@ const WebinarAttendees = () => {
       tooltip: "View Attendee Info",
       onClick: (item) => {
         console.log('item', item)
-        navigate('/particularContact')
+        navigate(`/particularContact?email=${item?.email}` );
       },
       readOnly: true,
     },
