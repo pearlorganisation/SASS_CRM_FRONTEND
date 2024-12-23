@@ -15,13 +15,14 @@ import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModa
 import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { getPullbacks } from "../../features/actions/assign";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
   const exportExcelModalName = "ExportWebinarAttendeesExcel";
   const AttendeesFilterModalName = "AttendeesFilterModal";
   const employeeAssignModalName = "employeeAssignModal";
-  const tableHeader = "Attendees Table";
+  const [tableHeader, setTableHeader] = useState("Attendees Table");
   // ----------------------- etcetra -----------------------
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -56,17 +57,65 @@ const WebinarAttendees = () => {
   };
 
   useEffect(() => {
-    dispatch(
-      getAttendees({ id, isAttended: tabValue === 'postWebinar', page, limit: LIMIT, filters })
-    );
+    console.log("1");
+    switch (tabValue) {
+      case "pullbacks":
+        setTableHeader("Pullbacks");
+        dispatch(getPullbacks({ id, page, limit: LIMIT, filters }));
+
+        break;
+
+      case "postWebinar":
+        setTableHeader("Post Webinar Attendees");
+        dispatch(
+          getAttendees({
+            id,
+            isAttended: tabValue === "postWebinar",
+            page,
+            limit: LIMIT,
+            filters,
+          })
+        );
+        break;
+
+      case "preWebinar":
+        setTableHeader("Pre Webinar Attendees");
+        dispatch(
+          getAttendees({
+            id,
+            isAttended: tabValue === "preWebinar",
+            page,
+            limit: LIMIT,
+            filters,
+          })
+        );
+        break;
+
+      default:
+        setTableHeader("Attendee Table");
+        dispatch(
+          getAttendees({
+            id,
+            isAttended: tabValue === "postWebinar",
+            page,
+            limit: LIMIT,
+            filters,
+          })
+        );
+        break;
+    }
   }, [page, tabValue, LIMIT, filters]);
+
+  useEffect(() => {
+    console.log(attendeeData);
+  }, [attendeeData]);
 
   useEffect(() => {
     if (isSuccess) {
       dispatch(
         getAttendees({
           id,
-          isAttended: tabValue === 'postWebinar',
+          isAttended: tabValue === "postWebinar",
           page: 1,
           limit: LIMIT,
           filters,
@@ -85,8 +134,8 @@ const WebinarAttendees = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
-        console.log('item', item)
-        navigate(`/particularContact?email=${item?.email}` );
+        console.log("item", item);
+        navigate(`/particularContact?email=${item?.email}`);
       },
       readOnly: true,
     },
@@ -127,6 +176,7 @@ const WebinarAttendees = () => {
         />
 
         <Tab label="UnAttended" value="unattended" className="text-gray-600" />
+        <Tab label="Pullbacks" value="pullbacks" className="text-gray-600" />
       </Tabs>
 
       <div className="flex gap-4 justify-end">
