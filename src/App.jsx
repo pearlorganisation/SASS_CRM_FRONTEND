@@ -48,7 +48,7 @@ import { getNoticeBoard } from "./features/actions/noticeBoard";
 import useRoles from "./hooks/useRoles";
 import useAddUserActivity from "./hooks/useAddUserActivity";
 import ViewEmployee from "./pages/Employees/ViewEmployee";
-import LeadTypes from "./pages/ManageLeadTypes";
+import LeadTypes from "./pages/Settings/LeadType/ManageLeadTypes";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -56,28 +56,30 @@ const App = () => {
   const logUserActivity = useAddUserActivity();
 
   const { userData, isUserLoggedIn } = useSelector((state) => state.auth);
-  const role = userData?.role || "";
-  if (isUserLoggedIn && !role) {
+
+  if (isUserLoggedIn && !userData?.role) {
     dispatch(logout());
   }
 
   useEffect(() => {
     function initFunctions() {
-      dispatch(getCurrentUser());
-      console.log(" isEmployee --->> ", roles.isEmployeeId(role));
-      if (isUserLoggedIn && role ) { // && !roles.isEmployeeId(role) removed this from the condition
+      if (isUserLoggedIn && userData?.role ) { // && !roles.isEmployeeId(role) removed this from the condition
         dispatch(getUserSubscription());
         dispatch(getAllRoles());
       }
     }
     initFunctions();
 
-    if (isUserLoggedIn && role) {
+    if (isUserLoggedIn && userData?.role) {
       logUserActivity({
         action: "login/refresh",
         details: "User logged in or refreshed successfully",
       });
     }
+  }, [userData, isUserLoggedIn]);
+
+  useEffect(() => {
+    dispatch(getCurrentUser());
   }, []);
 
   // dispatch(clearLoadingAndData())

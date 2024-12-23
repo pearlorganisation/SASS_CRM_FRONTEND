@@ -14,7 +14,7 @@ const AddNoteForm = (props) => {
   const { customOptions } = useSelector((state) => state.globalData);
   const dispatch = useDispatch();
   const { isFormLoading } = useSelector((state) => state.assign);
-  const { email, recordType, uniquePhones, addUserActivityLog } = props;
+  const { email, uniquePhones, addUserActivityLog } = props;
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -30,7 +30,6 @@ const AddNoteForm = (props) => {
   } = useForm({
     defaultValues: {
       email: email,
-      recordType: recordType,
       phone: "",
       callDuration: { hr: "", min: "", sec: "" },
       status: "",
@@ -48,7 +47,6 @@ const AddNoteForm = (props) => {
     if (!isFormLoading) {
       reset({
         email: email,
-        recordType: recordType,
         phone: "",
         callDuration: { hr: "", min: "", sec: "" },
         status: "",

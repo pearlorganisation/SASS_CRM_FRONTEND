@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Tabs, Tab } from "@mui/material";
+import { Button, Tabs, Tab, IconButton, Tooltip } from "@mui/material";
 import { createPortal } from "react-dom";
 import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
 import { clearSuccess, setTabValue } from "../../features/slices/attendees";
 import { getAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
-import { Edit, Delete, Visibility, AttachFile } from "@mui/icons-material";
+import { Edit, Delete, Visibility, AttachFile, ContentCopy } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
@@ -15,6 +15,7 @@ import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModa
 import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { toast } from "sonner";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -36,11 +37,12 @@ const WebinarAttendees = () => {
 
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
+  const webinarName = searchParams.get("webinarName");
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
 
   useEffect(() => {
-    setSearchParams({ page: page });
+    setSearchParams({ page: page, webinarName: webinarName });
   }, [page]);
 
   // Tabs change handler
@@ -57,7 +59,13 @@ const WebinarAttendees = () => {
 
   useEffect(() => {
     dispatch(
-      getAttendees({ id, isAttended: tabValue === 'postWebinar', page, limit: LIMIT, filters })
+      getAttendees({
+        id,
+        isAttended: tabValue === "postWebinar",
+        page,
+        limit: LIMIT,
+        filters,
+      })
     );
   }, [page, tabValue, LIMIT, filters]);
 
@@ -66,7 +74,7 @@ const WebinarAttendees = () => {
       dispatch(
         getAttendees({
           id,
-          isAttended: tabValue === 'postWebinar',
+          isAttended: tabValue === "postWebinar",
           page: 1,
           limit: LIMIT,
           filters,
@@ -85,8 +93,9 @@ const WebinarAttendees = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
-        console.log('item', item)
-        navigate(`/particularContact?email=${item?.email}` );
+        navigate(
+          `/particularContact?email=${item?.email}&attendeeId=${item?._id}`
+        );
       },
       readOnly: true,
     },
@@ -129,7 +138,19 @@ const WebinarAttendees = () => {
         <Tab label="UnAttended" value="unattended" className="text-gray-600" />
       </Tabs>
 
-      <div className="flex gap-4 justify-end">
+      <div className="flex gap-4 justify-between">
+        <div className="flex gap-4">
+          <h2 className="text-2xl font-bold text-gray-700">{webinarName}</h2>
+          <Tooltip title="Copy Webinar Id" placement="top">
+          <IconButton
+            onClick={() => {
+              navigator.clipboard.writeText(id);
+              toast.success("Copied to clipboard");
+            }}
+          >
+            <ContentCopy className="text-blue-500 group-hover:text-blue-600" />
+          </IconButton></Tooltip>
+        </div>
         {selectedRows.length > 0 && (
           <Button
             onClick={() => dispatch(openModal(employeeAssignModalName))}

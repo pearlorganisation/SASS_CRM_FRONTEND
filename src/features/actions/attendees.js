@@ -87,3 +87,17 @@ export const getAllAttendees = createAsyncThunk(
     }
   }
 );
+
+
+//Update Attendee
+export const updateAttendeeLeadType = createAsyncThunk(
+  "attendee/lead-type/update",
+  async ({id="", leadType=""}, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`/attendees/lead-type/${id}`, {leadType});
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

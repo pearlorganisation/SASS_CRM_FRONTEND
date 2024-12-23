@@ -73,3 +73,66 @@ export const getNotes = createAsyncThunk(
     }
   }
 );
+
+export const addLeadType = createAsyncThunk(
+  "lead-type/create",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.post(`/custom-lead-type `, payload);
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const getLeadType = createAsyncThunk(
+  "lead-type/fetchData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`/custom-lead-type`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const updateLeadType = createAsyncThunk(
+  "lead-type/update",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(
+        `/custom-lead-type/${payload?.id}`,
+        payload
+      );
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const deleteLeadType = createAsyncThunk(
+  "lead-type/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await instance.delete(`/custom-lead-type/${id}`);
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const getDashboardNotes = createAsyncThunk(
+  "dashboar-notes/fetchData",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`/notes/dashboard`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
