@@ -2,6 +2,7 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
+import { getPullbacks } from "../actions/assign";
 import { addAttendees, getAllAttendees, getAttendee, getAttendees, updateAttendee, updateAttendeeLeadType } from "../actions/attendees";
 
 const initialState = {
@@ -74,7 +75,21 @@ export const attendeeSlice = createSlice({
         state.attendeeData = action.payload?.result || [];
         state.totalPages = action.payload?.totalPages || 1;
       })
+      
       .addCase(getAttendees.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getPullbacks.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getPullbacks.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.attendeeData = action.payload || [];
+
+      })
+      
+      .addCase(getPullbacks.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       })

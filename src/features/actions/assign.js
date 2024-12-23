@@ -74,6 +74,28 @@ export const getNotes = createAsyncThunk(
   }
 );
 
+//get Attendees
+export const getPullbacks = createAsyncThunk(
+  "assignment/pullbacks",
+  async (
+    { id, page = 1, limit = 10, filters = {} },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await instance.post(
+        `/assignment/pullback`,
+        { webinar: id, filters },
+        {
+          params: {  page, limit },
+        }
+      );
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 export const addLeadType = createAsyncThunk(
   "lead-type/create",
   async (payload, { rejectWithValue }) => {
