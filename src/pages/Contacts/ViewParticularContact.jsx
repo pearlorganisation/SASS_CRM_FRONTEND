@@ -20,6 +20,9 @@ import {
   updateAttendeeLeadType,
 } from "../../features/actions/attendees";
 import {
+  Badge,
+  Button,
+  Chip,
   FormControl,
   InputLabel,
   ListItemIcon,
@@ -37,6 +40,7 @@ const ViewParticularContact = () => {
   const [showTimerModal, setShowTimerModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [uniquePhones, setUniquePhones] = useState([]);
+  const [uniquePhonesCount, setUniquePhonesCount] = useState([]);
   const [uniqueNames, setUniqueNames] = useState([]);
   const [noteModalData, setNoteModalData] = useState(null);
   const [editModalData, setEditModalData] = useState(null);
@@ -53,15 +57,18 @@ const ViewParticularContact = () => {
   );
 
   useEffect(() => {
+    if (!Array.isArray(selectedAttendee) || selectedAttendee.length === 0)
+      return;
+    const [attendee] = selectedAttendee;
     if (
-      !attendeeContactDetails ||
-      !attendeeContactDetails?.data ||
-      !Array.isArray(attendeeContactDetails?.data) ||
-      !attendeeContactDetails?.data.length
+      !attendee ||
+      !attendee?.data ||
+      !Array.isArray(attendee?.data) ||
+      !attendee?.data.length
     )
       return;
 
-    const tempLead = attendeeContactDetails?.data[0]?.leadType;
+    // const tempLead = attendee?.data[0]?.leadType;
 
     // if (tempLead) {
     //   const leadType = leadTypeOptions.find((item) => item?.value === tempLead);
@@ -71,13 +78,11 @@ const ViewParticularContact = () => {
     // }
 
     const uniquePhonesArr = Array.from(
-      new Set(
-        attendeeContactDetails?.data?.map((item) => item?.phone).filter(Boolean)
-      )
+      new Set(attendee?.data?.map((item) => item?.phone).filter(Boolean))
     );
     setUniquePhones(uniquePhonesArr);
 
-    const namesArr = attendeeContactDetails?.data
+    const namesArr = attendee?.data
       .map((item) => {
         if (item?.firstName) {
           const lastName = item?.lastName?.match(/:-\)/) ? "" : item?.lastName;
@@ -90,7 +95,7 @@ const ViewParticularContact = () => {
     const uniqueNamesArr = Array.from(new Set(namesArr));
 
     setUniqueNames(uniqueNamesArr);
-  }, [attendeeContactDetails]);
+  }, [selectedAttendee]);
 
   useEffect(() => {
     if (!leadTypeData) return;
@@ -104,7 +109,6 @@ const ViewParticularContact = () => {
 
   const handleChange = (event) => {
     setSelectedOption(event.target.value);
-    console.log("selectedOption", selectedOption);
     dispatch(
       updateAttendeeLeadType({ id: attendeeId, leadType: event.target.value })
     );
@@ -139,6 +143,17 @@ const ViewParticularContact = () => {
   const addUserActivityLog = (data) => {
     dispatch(addUserActivity(data));
   };
+
+  useEffect(() => {
+    console.log(noteData);
+
+    const badgeCount = uniquePhones.map((phone) => ({
+      label: phone,
+      count: noteData.filter((note) => note.phone === phone).length,
+    }));
+    console.log(badgeCount);
+    setUniquePhonesCount(badgeCount);
+  }, [noteData, uniquePhones]);
 
   return (
     <div className="px-4 pt-14 space-y-6">
@@ -175,27 +190,15 @@ const ViewParticularContact = () => {
               </p>
             </div>
 
-            <div className="border rounded-lg py-1 px-3 shadow-md">
-              <p className="flex items-center">
-                Phone Number :
-                {selectedAttendee &&
-                  selectedAttendee.length > 0 &&
-                  selectedAttendee[0]?.data?.length > 0 &&
-                  selectedAttendee[0].data
-                    .map((item) => item?.phone) // Extract phone numbers
-                    .filter(
-                      (phone, index, self) =>
-                        phone && self.indexOf(phone) === index
-                    ) // Filter out duplicates
-                    .map((phone, index) => (
-                      <span
-                        key={index}
-                        className="ms-2 grid lg:grid-cols-2 gap-3"
-                      >
-                        {phone}
-                      </span>
-                    ))}
-              </p>
+            <div className="border rounded-lg py-1 px-3 shadow-md flex">
+            <span className=" mr-3">Phone :</span>
+             <div className="flex gap-3">
+             {uniquePhonesCount.map((item, index) => (
+                <Badge key={index} badgeContent={item.count} color="primary">
+                  <Chip label={item.label} variant="outlined" />
+                </Badge>
+              ))}
+             </div>
             </div>
 
             <div className="border rounded-lg shadow-md w-full h-80 pb-3 flex flex-col">
@@ -219,22 +222,30 @@ const ViewParticularContact = () => {
           <div className="space-y-3 flex-col h-full">
             <div className="flex  justify-between gap-10  items-center">
               <div className="flex items-center gap-3">
-                <button
+                <Button
+                  variant="contained"
+                  className="h-10"
                   onClick={handleTimerModal}
-                  className=" font-semibold shadow rounded-md py-2 bg-blue-600 hover:bg-blue-700 text-white min-w-36"
                 >
                   Set Alarm
-                </button>
+                </Button>
               </div>
               <div className="flex items-center w-fit min-w-40 px-2 gap-3">
                 <FormControl fullWidth>
                   <Select
                     labelId="lead-type-select-label"
-                    value={selectedOption}
+                    value={selectedOption || ""}
                     onChange={handleChange}
-                    placeholder="Lead Type"
-                    className="shadow font-semibold"
+                    className="shadow h-10 font-semibold"
+                    displayEmpty
                     renderValue={(selected) => {
+                      if (!selected) {
+                        return (
+                          <span style={{ color: "#888" }}>
+                            Select Lead Type
+                          </span> // Placeholder style
+                        );
+                      }
                       const selectedOption = leadTypeOptions.find(
                         (option) => option.value === selected
                       );
@@ -254,9 +265,7 @@ const ViewParticularContact = () => {
                               backgroundColor: selectedOption?.color || "#000",
                             }}
                           />
-                          <span>
-                            {selectedOption?.label || "Select Lead Type"}
-                          </span>
+                          <span>{selectedOption?.label}</span>
                         </div>
                       );
                     }}
@@ -337,7 +346,6 @@ const ViewParticularContact = () => {
                         </td>
 
                         <td className="px-2 py-4 whitespace-nowrap ">
-                          {console.log("item", item)}
                           {Array.isArray(item?.webinar) &&
                           item.webinar.length > 0
                             ? item?.webinar[0].webinarName
