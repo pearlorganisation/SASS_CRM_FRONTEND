@@ -1,62 +1,46 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import Select from "react-select";
 import ViewFullDetailsModal from "./Modal/ViewFullDetailModal";
 import ViewTimerModal from "./Modal/ViewTimerModal";
 import { useDispatch, useSelector } from "react-redux";
 import AddNoteForm from "./AddNoteForm";
 import { FaRegEdit } from "react-icons/fa";
-import { getNotes } from "../../features/actions/assign";
+import {
+  getLeadType,
+  getNotes,
+  updateLeadType,
+} from "../../features/actions/assign";
 import EditModal from "./Modal/EditModal";
-import { getColor, LeadTypeOptions } from "../../utils/LeadType";
+import { getColor } from "../../utils/LeadType";
 import { addUserActivity } from "../../features/actions/userActivity";
 import NoteItem from "../../components/NoteItem";
-import { getAttendee, updateAttendee } from "../../features/actions/attendees";
-// const dummyNotes = [
-//   {
-//     updatedAt: "2024-12-10T10:30:00Z",
-//     callDuration: { hr: 0, min: 15, sec: 30 },
-//     status: "Completed",
-//     note: "Discussed the project requirements and next steps.",
-//   },
-//   {
-//     updatedAt: "2024-12-11T14:45:00Z",
-//     callDuration: { hr: 1, min: 5, sec: 0 },
-//     status: "In Progress",
-//     note: "Reviewed the initial design draft with the client.",
-//   },
-//   {
-//     updatedAt: "2024-12-12T09:20:00Z",
-//     callDuration: { hr: 0, min: 30, sec: 0 },
-//     status: "Pending",
-//     note: "Scheduled a follow-up meeting to finalize the design.",
-//   },
-//   {
-//     updatedAt: "2024-12-13T16:00:00Z",
-//     callDuration: { hr: 0, min: 45, sec: 10 },
-//     status: "Completed",
-//     note: "Confirmed the delivery timeline and shared the project plan.",
-//   },
-//   {
-//     updatedAt: "2024-12-14T11:15:00Z",
-//     callDuration: { hr: 0, min: 20, sec: 0 },
-//     status: "Pending",
-//     note: "Waiting for client feedback on the updated draft.",
-//   },
-// ];
+import {
+  getAttendee,
+  updateAttendee,
+  updateAttendeeLeadType,
+} from "../../features/actions/attendees";
+import {
+  FormControl,
+  InputLabel,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Select,
+} from "@mui/material";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
   const searchParams = new URLSearchParams(location.search);
   const email = searchParams.get("email");
-  const recordType = searchParams.get("recordType");
+  const attendeeId = searchParams.get("attendeeId");
 
   const [showTimerModal, setShowTimerModal] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState("");
   const [uniquePhones, setUniquePhones] = useState([]);
   const [uniqueNames, setUniqueNames] = useState([]);
   const [noteModalData, setNoteModalData] = useState(null);
   const [editModalData, setEditModalData] = useState(null);
+  const [leadTypeOptions, setLeadTypeOptions] = useState([]);
 
   const { attendeeContactDetails } = useSelector(
     (state) => state.webinarContact
@@ -64,8 +48,9 @@ const ViewParticularContact = () => {
 
   const { selectedAttendee } = useSelector((state) => state.attendee);
 
-  const { noteData, isFormLoading } = useSelector((state) => state.assign);
-  console.log(noteData);
+  const { noteData, isFormLoading, leadTypeData } = useSelector(
+    (state) => state.assign
+  );
 
   useEffect(() => {
     if (
@@ -78,12 +63,12 @@ const ViewParticularContact = () => {
 
     const tempLead = attendeeContactDetails?.data[0]?.leadType;
 
-    if (tempLead) {
-      const leadType = LeadTypeOptions.find((item) => item?.value === tempLead);
-      setSelectedOption(leadType || null);
-    } else {
-      setSelectedOption(null);
-    }
+    // if (tempLead) {
+    //   const leadType = leadTypeOptions.find((item) => item?.value === tempLead);
+    //   setSelectedOption(leadType || null);
+    // } else {
+    //   setSelectedOption(null);
+    // }
 
     const uniquePhonesArr = Array.from(
       new Set(
@@ -108,53 +93,36 @@ const ViewParticularContact = () => {
   }, [attendeeContactDetails]);
 
   useEffect(() => {
+    if (!leadTypeData) return;
+    const options = leadTypeData.map((item) => ({
+      value: item._id,
+      label: item.label,
+      color: item.color,
+    }));
+    setLeadTypeOptions(options);
+  }, [leadTypeData]);
+
+  const handleChange = (event) => {
+    setSelectedOption(event.target.value);
+    console.log("selectedOption", selectedOption);
+    dispatch(
+      updateAttendeeLeadType({ id: attendeeId, leadType: event.target.value })
+    );
+  };
+
+  useEffect(() => {
     if (!isFormLoading) {
-      dispatch(getNotes({ email, recordType }));
+      dispatch(getNotes({ email }));
     }
   }, [isFormLoading]);
 
   useEffect(() => {
-    dispatch(getAttendee({ email }))
-  }, [email])
+    dispatch(getAttendee({ email }));
+    dispatch(getLeadType());
+  }, [email]);
 
   const handleTimerModal = () => {
     setShowTimerModal(true);
-  };
-
-  const handleCopyClick = (textToCopy) => {
-    navigator.clipboard
-      .writeText(textToCopy)
-      .then(() => {
-        toast("Text copied to clipboard!", { position: "top-center" });
-      })
-      .catch((err) => {
-        console.error("Failed to copy text: ", err);
-      });
-  };
-
-  const customStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      border: "1px solid #CBD5E1", // Custom border style
-      borderRadius: "7px",
-      backgroundColor: getColor(selectedOption?.value),
-      boxShadow: "none", // Remove the default box shadow
-      "&:hover": {
-        borderColor: "none", // Keep the border color consistent on hover
-      },
-      "&:focus": {
-        outline: "none", // Remove the focus outline
-        borderColor: "#CBD5E1", // Ensure the border color remains the same
-      }, // Change background color based on the selected option
-    }),
-    placeholder: (provided) => ({
-      ...provided,
-      color: "#9CA3AF", // Custom placeholder color
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: "#FFFFFF", // Default text color for the selected option
-    }),
   };
 
   const onConfirmEdit = (data) => {
@@ -168,31 +136,17 @@ const ViewParticularContact = () => {
     });
   };
 
-  const handleLeadChange = (option) => {
-    setSelectedOption(option);
-    dispatch(
-      updateAttendeeLeadType({ email, recordType, leadType: option?.value })
-    ).then(() => {
-      addUserActivityLog({
-        action: "update",
-        details: `User updated the Lead Type to '${option?.label}' for the Attendee with Email: ${email}`,
-      });
-    });
-  };
-
   const addUserActivityLog = (data) => {
     dispatch(addUserActivity(data));
   };
-
-  const removeDuplicates = (arr) => {
-    return [...new Set(arr)]
-  }
 
   return (
     <div className="px-4 pt-14 space-y-6">
       <div className="md:p-6 p-3 bg-gray-50 rounded-lg ">
         <div className="flex gap-4 justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-700">Attendee Contact Details</h2>
+          <h2 className="text-2xl font-bold text-gray-700">
+            Attendee Contact Details
+          </h2>
         </div>
         <div className=" grid lg:grid-cols-2 mb-6 gap-4 w-full">
           <div className="space-y-2">
@@ -200,7 +154,6 @@ const ViewParticularContact = () => {
               <p>
                 Email :{" "}
                 <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
-                  {console.log("selectedAttendee=======", selectedAttendee)}
                   {selectedAttendee && selectedAttendee[0]?._id}
                 </span>
               </p>
@@ -209,32 +162,39 @@ const ViewParticularContact = () => {
             <div className="border rounded-lg py-2 px-3 shadow-md">
               <p>
                 Name :{" "}
-                {selectedAttendee && selectedAttendee.length > 0 && selectedAttendee[0]?.data?.map((item) =>
-                (
-                  item?.firstName && (
-                    <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
-                      {`${item.firstName} ${item.lastName}`}
-                    </span>
-                  )
-                ))}
+                {selectedAttendee &&
+                  selectedAttendee.length > 0 &&
+                  selectedAttendee[0]?.data?.map(
+                    (item) =>
+                      item?.firstName && (
+                        <span className="ms-2 bg-slate-100 rounded-md px-3 py-1">
+                          {`${item.firstName} ${item.lastName}`}
+                        </span>
+                      )
+                  )}
               </p>
             </div>
 
             <div className="border rounded-lg py-1 px-3 shadow-md">
               <p className="flex items-center">
                 Phone Number :
-                {
-                  selectedAttendee && selectedAttendee.length > 0 && selectedAttendee[0]?.data?.length > 0 &&
+                {selectedAttendee &&
+                  selectedAttendee.length > 0 &&
+                  selectedAttendee[0]?.data?.length > 0 &&
                   selectedAttendee[0].data
                     .map((item) => item?.phone) // Extract phone numbers
-                    .filter((phone, index, self) => phone && self.indexOf(phone) === index) // Filter out duplicates
+                    .filter(
+                      (phone, index, self) =>
+                        phone && self.indexOf(phone) === index
+                    ) // Filter out duplicates
                     .map((phone, index) => (
-                      <span key={index} className="ms-2 grid lg:grid-cols-2 gap-3">
+                      <span
+                        key={index}
+                        className="ms-2 grid lg:grid-cols-2 gap-3"
+                      >
                         {phone}
                       </span>
-                    ))
-                }
-
+                    ))}
               </p>
             </div>
 
@@ -266,17 +226,58 @@ const ViewParticularContact = () => {
                   Set Alarm
                 </button>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="outline-none">
+              <div className="flex items-center w-fit min-w-40 px-2 gap-3">
+                <FormControl fullWidth>
                   <Select
-                    isClearable="true"
-                    options={LeadTypeOptions}
-                    onChange={handleLeadChange}
+                    labelId="lead-type-select-label"
                     value={selectedOption}
-                    className=" font-semibold shadow  min-w-36"
-                    placeholder="Lead Type "
-                  />
-                </div>
+                    onChange={handleChange}
+                    placeholder="Lead Type"
+                    className="shadow font-semibold"
+                    renderValue={(selected) => {
+                      const selectedOption = leadTypeOptions.find(
+                        (option) => option.value === selected
+                      );
+                      return (
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: "16px",
+                              height: "16px",
+                              borderRadius: "50%",
+                              backgroundColor: selectedOption?.color || "#000",
+                            }}
+                          />
+                          <span>
+                            {selectedOption?.label || "Select Lead Type"}
+                          </span>
+                        </div>
+                      );
+                    }}
+                  >
+                    {leadTypeOptions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        <ListItemIcon>
+                          <div
+                            style={{
+                              width: "16px",
+                              height: "16px",
+                              borderRadius: "50%",
+                              backgroundColor: option.color,
+                            }}
+                          />
+                        </ListItemIcon>
+                        <ListItemText primary={option.label} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </div>
             </div>
 
@@ -287,7 +288,6 @@ const ViewParticularContact = () => {
               <AddNoteForm
                 uniquePhones={uniquePhones}
                 email={email}
-                recordType={recordType}
                 addUserActivityLog={addUserActivityLog}
               />
               <div></div>
@@ -295,8 +295,9 @@ const ViewParticularContact = () => {
           </div>
         </div>
         <div className="mt-12 shadow-lg rounded-lg overflow-x-auto">
-          {!selectedAttendee && selectedAttendee.length <= 0 &&
-            selectedAttendee[0]?.data?.length <= 0 ? (
+          {!selectedAttendee &&
+          selectedAttendee.length <= 0 &&
+          selectedAttendee[0]?.data?.length <= 0 ? (
             <div className="text-lg p-2 flex justify-center w-full">
               No record found
             </div>
@@ -328,9 +329,7 @@ const ViewParticularContact = () => {
                     </td>
                   </tr>
                 ) : (
-
                   selectedAttendee[0]?.data?.map((item, idx) => {
-                    console.log(item)
                     return (
                       <tr key={idx}>
                         <td className={`px-3 py-4 whitespace-nowrap `}>
@@ -338,7 +337,11 @@ const ViewParticularContact = () => {
                         </td>
 
                         <td className="px-2 py-4 whitespace-nowrap ">
-                          {item?.webinar[0].webinarName}
+                          {console.log("item", item)}
+                          {Array.isArray(item?.webinar) &&
+                          item.webinar.length > 0
+                            ? item?.webinar[0].webinarName
+                            : "-"}
                         </td>
 
                         <td className="px-2 py-4 whitespace-nowrap ">
@@ -354,7 +357,12 @@ const ViewParticularContact = () => {
                           {item?.timeInSession}
                         </td>
                         <td className="px-3 py-4 whitespace-nowrap">
-                          {new Date(item?.webinar[0].webinarDate).toDateString()}
+                          {Array.isArray(item?.webinar) &&
+                          item.webinar.length > 0
+                            ? new Date(
+                                item?.webinar[0].webinarDate
+                              ).toDateString()
+                            : "-"}
                         </td>
 
                         <td className="px-3 py-4 h-full">

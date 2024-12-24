@@ -2,8 +2,8 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
-import { addAttendees, getAllAttendees, getAttendee, getAttendees, updateAttendee } from "../actions/attendees";
 import { getPullbacks } from "../actions/assign";
+import { addAttendees, getAllAttendees, getAttendee, getAttendees, updateAttendee, updateAttendeeLeadType } from "../actions/attendees";
 
 const initialState = {
   isLoading: false,
@@ -102,6 +102,19 @@ export const attendeeSlice = createSlice({
         state.totalPages = action.payload?.totalPages || 1;
       })
       .addCase(getAllAttendees.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(updateAttendeeLeadType.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(updateAttendeeLeadType.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        successToast("Lead Type Updated Successfully");
+      })
+      .addCase(updateAttendeeLeadType.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });

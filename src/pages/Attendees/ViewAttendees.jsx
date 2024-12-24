@@ -56,7 +56,7 @@ const WebinarAttendees = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
-        navigate(`/particularContact?email=${item?.email}` );
+        navigate(`/particularContact?email=${item?.email}&attendeeId=${item?._id}` );
       },
     },
     {

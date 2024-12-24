@@ -51,11 +51,7 @@ const Assignments = () => {
   const handleViewFullDetails = (item) => {
 
     const recordType = item?.isAttended ? 'postWebinar' : 'preWebinar'
-    navigate(
-      `/particularContact?email=${encodeURIComponent(
-        item?.email
-      )}`
-    );
+    navigate(`/particularContact?email=${item?.email}&attendeeId=${item?._id}` );
     if (isEmployee) {
       dispatch(addUserActivity({
         action: "viewDetails",
