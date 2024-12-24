@@ -3,7 +3,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
 import { getPullbacks } from "../actions/assign";
-import { addAttendees, getAllAttendees, getAttendee, getAttendees, updateAttendee, updateAttendeeLeadType } from "../actions/attendees";
+import { addAttendees, getAllAttendees, getAttendee, getAttendeeLeadTypeByEmail, getAttendees, updateAttendee, updateAttendeeLeadType } from "../actions/attendees";
 
 const initialState = {
   isLoading: false,
@@ -14,6 +14,7 @@ const initialState = {
   totalPages: 1,
   errorMessage: "",
   tabValue: "preWebinar",
+  attendeeLeadType: '',
 };
 // ---------------------------------------------------------------------------------------
 
@@ -27,6 +28,9 @@ export const attendeeSlice = createSlice({
     setTabValue(state, action) {
       state.tabValue = action.payload;
     },
+    clearLeadType(state) {
+      console.log('clearLeadType');
+      state.attendeeLeadType = '';  }
   },
   extraReducers: (builder) => {
     builder
@@ -117,6 +121,18 @@ export const attendeeSlice = createSlice({
       .addCase(updateAttendeeLeadType.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
+      })
+      .addCase(getAttendeeLeadTypeByEmail.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getAttendeeLeadTypeByEmail.fulfilled, (state, action) => {
+        state.isLoading = false;
+        console.log('action.payload?.leadType', action.payload?.leadType);
+        state.attendeeLeadType = action.payload?.leadType || '';
+      })
+      .addCase(getAttendeeLeadTypeByEmail.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
       });
   },
 });
@@ -124,7 +140,7 @@ export const attendeeSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { clearSuccess, setTabValue } = attendeeSlice.actions;
+export const { clearSuccess, setTabValue, clearLeadType } = attendeeSlice.actions;
 export default attendeeSlice.reducer;
 
 // ================================================== THE END ==================================================

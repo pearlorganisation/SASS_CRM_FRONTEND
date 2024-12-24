@@ -15,7 +15,7 @@ import useRoles from "../../../hooks/useRoles";
 import { addAssign } from "../../../features/actions/assign";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
-function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
+function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
   console.log("selectedRows", selectedRows);
 
   const dispatch = useDispatch();
@@ -24,7 +24,6 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
 
   const { modals } = useSelector((state) => state.modals);
   const { employeeData, isLoading } = useSelector((state) => state.employee);
-  const { tabValue } = useSelector((state) => state.attendee);
   const { isSuccess } = useSelector((state) => state.assign);
 
   const open = modals[modalName] ? true : false;
