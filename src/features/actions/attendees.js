@@ -17,14 +17,9 @@ export const addAttendees = createAsyncThunk(
 //get single Attendee
 export const getAttendee = createAsyncThunk(
   "attendee",
-  async (
-    { email },
-    { rejectWithValue }
-  ) => {
+  async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(
-        `/attendees/${email}`,
-      );
+      const response = await instance.get(`/attendees/${email}`);
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
@@ -32,20 +27,21 @@ export const getAttendee = createAsyncThunk(
   }
 );
 
-
 //Update Attendee
 export const updateAttendee = createAsyncThunk(
   "attendee/update",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.patch(`/attendees/${payload?.id}`, payload);
+      const response = await instance.patch(
+        `/attendees/${payload?.id}`,
+        payload
+      );
       return response;
     } catch (e) {
       return rejectWithValue(e);
     }
   }
 );
-
 
 //get Attendees
 export const getAttendees = createAsyncThunk(
@@ -57,9 +53,14 @@ export const getAttendees = createAsyncThunk(
     try {
       const response = await instance.post(
         `/attendees/webinar`,
-        { filters, fieldName: "attendeeTableConfig", webinarId: id, isAttended },
         {
-          params: {  page, limit },
+          filters,
+          fieldName: "attendeeTableConfig",
+          webinarId: id,
+          isAttended,
+        },
+        {
+          params: { page, limit },
         }
       );
       return response?.data;
@@ -76,9 +77,14 @@ export const getAllAttendees = createAsyncThunk(
     try {
       const response = await instance.post(
         `/attendees/webinar`,
-        { filters, fieldName: "attendeeTableConfig", webinarId: "", isAttended: false },
         {
-          params: {  page, limit },
+          filters,
+          fieldName: "attendeeTableConfig",
+          webinarId: "",
+          isAttended: false,
+        },
+        {
+          params: { page, limit },
         }
       );
       return response?.data;
@@ -88,14 +94,29 @@ export const getAllAttendees = createAsyncThunk(
   }
 );
 
-
 //Update Attendee
 export const updateAttendeeLeadType = createAsyncThunk(
   "attendee/lead-type/update",
-  async ({id="", leadType=""}, { rejectWithValue }) => {
+  async ({ email = "", leadType = "" }, { rejectWithValue }) => {
     try {
-      const response = await instance.patch(`/attendees/lead-type/${id}`, {leadType});
+      const response = await instance.post(`/attendee-association`, {
+        email,
+        leadType,
+      });
       return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const getAttendeeLeadTypeByEmail = createAsyncThunk(
+  "attendee/lead-type/fetchData",
+  async (email, { rejectWithValue }) => {
+    try {
+      console.log( 'email ---->',email);
+      const response = await instance.get(`/attendee-association/${email}`);
+      return response?.data;
     } catch (e) {
       return rejectWithValue(e);
     }

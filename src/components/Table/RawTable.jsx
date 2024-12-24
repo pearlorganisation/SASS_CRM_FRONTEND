@@ -20,6 +20,7 @@ import ComponentGuard from "../AccessControl/ComponentGuard";
 const tableCellStyles = {
   paddingTop: "6px",
   paddingBottom: "6px",
+  height: "30px",
   textWrap: "nowrap",
   color: "#555A68",
 };
@@ -40,9 +41,9 @@ const RawTable = (props) => {
       console.log("Row clicked:", row);
     },
     isRowClickable = false,
+    isLeadType = true,
     userData,
   } = props;
-
   const dispatch = useDispatch();
   const { isTablesMasked } = useSelector((state) => state.table);
 
@@ -131,9 +132,28 @@ const RawTable = (props) => {
                 <TableCell
                   className={`${isRowClickable ? "cursor-pointer" : ""}`}
                   onClick={() => rowClick(row)}
-                  sx={tableCellStyles}
+                  sx={{
+                    paddingTop: "0px",
+                    paddingBottom: "0px",
+                    height: "30px",
+                    textWrap: "nowrap",
+                    color: "#555A68",
+                  }}
                 >
-                  {(page - 1) * limit + index + 1}
+                  <div className="flex h-full items-center justify-between">
+                    {true && (
+                      <div
+                        className="w-2 h-full"
+                        style={{
+                          backgroundColor:
+                            row?.leadType?.color || "transparent",
+                          borderRadius: "5%",
+                        }}
+                      ></div>
+                    )}
+
+                    {(page - 1) * limit + index + 1}
+                  </div>
                 </TableCell>
                 {isSelectVisible && (
                   <TableCell sx={tableCellStyles}>
