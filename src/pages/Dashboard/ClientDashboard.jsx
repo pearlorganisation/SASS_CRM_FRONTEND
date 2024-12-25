@@ -14,9 +14,7 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getAdminDashboardData
-} from "../../features/actions/globalData";
+import { getAdminDashboardData } from "../../features/actions/globalData";
 import { MetricCard } from "../../components/Dashboard";
 import { errorToast } from "../../utils/extra";
 
@@ -71,24 +69,24 @@ const ClientDashboard = () => {
   //   "Contacts",
   // ]);
 
-useEffect(() => {
-  const rows = dashBoardCardsData.map((item) => {
-    return {
-      label: item.email,
-      value: item.notes.map((e) => {
+  useEffect(() => {
+    if (Array.isArray(dashBoardCardsData) && dashBoardCardsData.length > 0) {
+      const rows = dashBoardCardsData.map((item) => {
         return {
-          label: e.status,
-          value: e.count,
-          color: "primary",
-        }
-      }),
-    };
-  })
+          label: item.email,
+          value: item.notes.map((e) => {
+            return {
+              label: e.status,
+              value: e.count,
+              color: "primary",
+            };
+          }),
+        };
+      });
 
-  setRows(rows);
-
-  
-}, [dashBoardCardsData])
+      setRows(rows);
+    }
+  }, [dashBoardCardsData]);
 
   useEffect(() => {
     if (startDate && endDate) {
@@ -170,33 +168,40 @@ useEffect(() => {
       </Box>
       {/* Metrics Cards */}
       <Grid container spacing={4} className="pt-3">
-        {rows && rows.length > 0 && rows.map((row, rowIndex) => (
-          <Grid item xs={12} md={12} lg={12} key={rowIndex}>
-            {/* Parent Card */}
-            <Card className="p-4 w-full">
-              <Typography variant="h6" gutterBottom>
-                {row.label}
-              </Typography>
-              <Divider />
-              <Box className="mt-4 flex gap-2 justify-start">
-                {/* Nested Cards */}
-                {row.value.map((nested, nestedIndex) => (
-                  <Box
-                    key={nestedIndex}
-                    className="p-2 my-2"
-                    style={{
-                      border: "1px solid #e0e0e0",
-                      borderRadius: "8px",
-                      backgroundColor: nested.color === "primary" ? "#f1f5fc" : "#fff",
-                    }}
-                  >
-                    <Typography variant="body1">{nested.label}: <strong>{nested.value}</strong></Typography>
-                  </Box>
-                ))}
-              </Box>
-            </Card>
-          </Grid>
-        ))}
+        {rows &&
+          rows.length > 0 &&
+          rows.map((row, rowIndex) => (
+            <Grid item xs={12} md={12} lg={12} key={rowIndex}>
+              {/* Parent Card */}
+              <Card className="p-4 w-full">
+                <Typography variant="h6" gutterBottom>
+                  {row.label}
+                </Typography>
+                <Divider />
+                <Box className="mt-4 flex gap-2 justify-start">
+                  {/* Nested Cards */}
+                  {Array.isArray(row.value) && row?.value?.length > 0 ? row.value.map((nested, nestedIndex) => (
+                    <Box
+                      key={nestedIndex}
+                      className="p-2 my-2"
+                      style={{
+                        border: "1px solid #e0e0e0",
+                        borderRadius: "8px",
+                        backgroundColor:
+                          nested.color === "primary" ? "#f1f5fc" : "#fff",
+                      }}
+                    >
+                      <Typography variant="body1">
+                        {nested.label}: <strong>{nested.value}</strong>
+                      </Typography>
+                    </Box>
+                  )) : (
+                    <div>No Data Found</div>
+                  )}
+                </Box>
+              </Card>
+            </Grid>
+          ))}
       </Grid>
 
       {/* Modal for Card Selection */}

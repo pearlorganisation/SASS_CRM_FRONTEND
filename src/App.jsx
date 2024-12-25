@@ -63,7 +63,8 @@ const App = () => {
 
   useEffect(() => {
     function initFunctions() {
-      if (isUserLoggedIn && userData?.role ) { // && !roles.isEmployeeId(role) removed this from the condition
+      if (isUserLoggedIn && userData?.role) {
+        // && !roles.isEmployeeId(role) removed this from the condition
         dispatch(getUserSubscription());
         dispatch(getAllRoles());
       }
@@ -120,8 +121,8 @@ const App = () => {
           element: <ViewParticularContact />,
         },
         {
-          path: '/lead-type',
-          element: <LeadTypes />
+          path: "/lead-type",
+          element: <LeadTypes />,
         },
         {
           path: "/*",
@@ -303,7 +304,7 @@ const App = () => {
   return (
     <div className="">
       <Toaster position="top-center" richColors />
-      <RouterProvider router={router} />;
+      <RouterProvider router={router} />
     </div>
   );
 };
