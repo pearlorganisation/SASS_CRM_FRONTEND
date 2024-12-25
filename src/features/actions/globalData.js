@@ -79,6 +79,20 @@ export const getDashboardCardsData = createAsyncThunk(
   }
 );
 
+
+export const getAdminDashboardData = createAsyncThunk(
+  "Dashboard/fetchAdminData",
+  async (params, { rejectWithValue }) => {
+    try {
+
+      const response = await instance.get(`notes/dashboard`, { params });
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 export const getDashboardPlansData = createAsyncThunk(
   "DashboardPlans/fetchData",
   async (params, { rejectWithValue }) => {

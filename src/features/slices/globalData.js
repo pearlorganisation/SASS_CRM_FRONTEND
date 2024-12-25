@@ -7,6 +7,7 @@ import {
   createCustomOption,
   createGlobalData,
   deleteCustomOption, 
+  getAdminDashboardData, 
   getCustomOptions,
   getDashboardCardsData,
   getDashboardPlansData,
@@ -122,6 +123,20 @@ export const globalDataSlice = createSlice({
             : {};
       })
       .addCase(getDashboardCardsData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+      })
+
+      .addCase(getAdminDashboardData.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getAdminDashboardData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.dashBoardCardsData = action.payload
+      })
+      .addCase(getAdminDashboardData.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
       })

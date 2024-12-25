@@ -76,7 +76,6 @@ const WebinarAttendees = () => {
       case "pullbacks":
         setTableHeader("Pullbacks");
         dispatch(getPullbacks({ id, page, limit: LIMIT, filters }));
-
         break;
 
       case "postWebinar":

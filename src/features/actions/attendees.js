@@ -70,6 +70,9 @@ export const getAttendees = createAsyncThunk(
   }
 );
 
+
+
+
 //get All Attendees
 export const getAllAttendees = createAsyncThunk(
   "allAttendees/fetchData",
