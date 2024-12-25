@@ -157,7 +157,7 @@ export const getDashboardNotes = createAsyncThunk(
 );
 
 export const getAssignmentsActivity = createAsyncThunk(
-  "assignments/fetchData",
+  "assignments/activity/fetchData",
   async ({ empId = "" }, { rejectWithValue }) => {
     try {
       const response = await instance.get(`assignment/activityInactivity`, {

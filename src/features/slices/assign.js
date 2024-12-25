@@ -9,6 +9,7 @@ import {
   addNote,
   deleteLeadType,
   getAssignments,
+  getAssignmentsActivity,
   getDashboardNotes,
   getLeadType,
   getNotes,
@@ -26,6 +27,7 @@ const initialState = {
   noteData: [],
   totalPages: 1,
   errorMessage: "",
+  activityAssignMents: [],
 };
 
 // ---------------------------------------------------------------------------------------
@@ -149,6 +151,17 @@ export const assignSlice = createSlice({
         state.dashboardNotes = action.payload || [];
       })
       .addCase(getDashboardNotes.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getAssignmentsActivity.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getAssignmentsActivity.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.activityAssignMents = action.payload || [];
+      })
+      .addCase(getAssignmentsActivity.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });
