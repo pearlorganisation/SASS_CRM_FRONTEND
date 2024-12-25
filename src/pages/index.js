@@ -19,9 +19,7 @@ import ViewSidebarLinks from "./Settings/SidebarLinks/ViewSidebarLinks";
 import CreateSidebarLink from "./Settings/SidebarLinks/CreateSidebarLink";
 import Assignments from "./Assignments/Assignments";
 import Clients from "./Clients/Clients";
-import EmployeeAssignments from "./Employees/EmployeeAssignments";
 import LandingPageForm from "./Settings/LandingPage/LandingPageForm";
-import EmployeeActivity from "./Employees/EmployeeActivity";
 import PabblyToken from "./Settings/PabblyToken/PabblyToken";
 import CustomOptions from "./Settings/CustomOptions/CustomOptions";
 import CreateClient from "./Clients/CreateClient";
@@ -50,9 +48,7 @@ export {
   CreateSidebarLink,
   Assignments,
   Clients,
-  EmployeeAssignments,
   LandingPageForm,
-  EmployeeActivity,
   PabblyToken,
   CustomOptions,
   CreateClient,

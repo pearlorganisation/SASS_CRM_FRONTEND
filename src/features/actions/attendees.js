@@ -81,7 +81,7 @@ export const getAllAttendees = createAsyncThunk(
           filters,
           fieldName: "attendeeTableConfig",
           webinarId: "",
-          isAttended: false,
+          isAttended: true,
         },
         {
           params: { page, limit },

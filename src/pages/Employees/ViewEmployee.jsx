@@ -8,7 +8,7 @@ import UserActivityTable from "../../components/Table/UserActivityTable";
 import DataTable from "../../components/Table/DataTable";
 import { attendeeTableColumns } from "../../utils/columnData";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
-import { getAssignments } from "../../features/actions/assign";
+import { getAssignments, getAssignmentsActivity } from "../../features/actions/assign";
 import { Delete, Edit, Visibility } from "@mui/icons-material";
 
 const ViewEmployee = () => {
@@ -34,7 +34,10 @@ const ViewEmployee = () => {
     console.log("tabValue", tabValue);
     if (tabValue === "activityLogs")
       dispatch(getUserActivity({ id, page: page, limit: LIMIT }));
-    else dispatch(getAssignments({ id, page, limit: LIMIT, filters }));
+    else if(tabValue === "activity")
+      dispatch(getAssignmentsActivity({empId:id}));
+    else
+      dispatch(getAssignments({ id, page, limit: LIMIT, filters }));
   }, [page, LIMIT, filters, tabValue]);
 
   const handleTabChange = (_, newValue) => {
@@ -96,6 +99,11 @@ const ViewEmployee = () => {
           value="activityLogs"
           className="text-gray-600"
         />
+         <Tab
+          label="Activity"
+          value="activity"
+          className="text-gray-600"
+        />
       </Tabs>
 
       {tabValue === "activityLogs" && (
@@ -108,7 +116,7 @@ const ViewEmployee = () => {
           <UserActivityTable page={page} setPage={setPage} />
         </div>
       )}
-      {tabValue !== "activityLogs" && (
+      {(tabValue === "history" || tabValue === "assignments")  && (
         <div className="px-6 md:px-10 pt-14 space-y-6">
           {/* Tabs for Sales and Reminder */}
 

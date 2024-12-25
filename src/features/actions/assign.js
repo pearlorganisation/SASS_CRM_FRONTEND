@@ -24,7 +24,7 @@ export const addAssign = createAsyncThunk(
 export const getAssignments = createAsyncThunk(
   "assignments/fetchData",
   async (
-    { id = "", page = 1, limit = 10, filters = {} },
+    { id = "", page = 1, limit = 10, filters = {}, webinarId = "" },
     { rejectWithValue }
   ) => {
     try {
@@ -34,7 +34,7 @@ export const getAssignments = createAsyncThunk(
           filters,
         },
         {
-          params: { page, limit },
+          params: { page, limit, webinarId },
         }
       );
       return response?.data || [];
@@ -77,16 +77,13 @@ export const getNotes = createAsyncThunk(
 //get Attendees
 export const getPullbacks = createAsyncThunk(
   "assignment/pullbacks",
-  async (
-    { id, page = 1, limit = 10, filters = {} },
-    { rejectWithValue }
-  ) => {
+  async ({ id, page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
     try {
       const response = await instance.post(
         `/assignment/pullback`,
         { webinar: id, filters },
         {
-          params: {  page, limit },
+          params: { page, limit },
         }
       );
       return response?.data;
@@ -153,6 +150,20 @@ export const getDashboardNotes = createAsyncThunk(
     try {
       const response = await instance.get(`/notes/dashboard`);
       return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const getAssignmentsActivity = createAsyncThunk(
+  "assignments/fetchData",
+  async ({ empId = "" }, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`assignment/activityInactivity`, {
+        params: { empId },
+      });
+      return response?.data || [];
     } catch (e) {
       return rejectWithValue(e);
     }

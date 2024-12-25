@@ -84,7 +84,7 @@ const WebinarAttendees = () => {
         dispatch(
           getAttendees({
             id,
-            isAttended: tabValue === "postWebinar",
+            isAttended: true,
             page,
             limit: LIMIT,
             filters,
@@ -97,7 +97,7 @@ const WebinarAttendees = () => {
         dispatch(
           getAttendees({
             id,
-            isAttended: tabValue === "preWebinar",
+            isAttended: false,
             page,
             limit: LIMIT,
             filters,

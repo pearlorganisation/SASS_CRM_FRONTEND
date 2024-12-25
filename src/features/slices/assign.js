@@ -37,6 +37,9 @@ export const assignSlice = createSlice({
     resetAssign: (state) => {
       state.isSuccess = false;
     },
+    resetAssignedData: (state) => {
+      state.assignData = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -47,6 +50,7 @@ export const assignSlice = createSlice({
       .addCase(addAssign.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        
       })
       .addCase(addAssign.rejected, (state, action) => {
         state.isLoading = false;
@@ -157,7 +161,7 @@ export const assignSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {} = assignSlice.actions;
+export const {resetAssignedData, } = assignSlice.actions;
 export default assignSlice.reducer;
 
 // ================================================== THE END ==================================================

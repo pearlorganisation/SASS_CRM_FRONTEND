@@ -50,7 +50,10 @@ function AttendeeTable({ control, setValue, watch }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {attendeeTableColumns.map(({ key, header }) => (
+            {[
+              ...attendeeTableColumns,
+              { header: "Lead Type", key: "leadType", width: 20, type: "" },
+            ].map(({ key, header }) => (
               <TableRow key={key}>
                 <TableCell sx={tableCellStyles}>{header}</TableCell>
                 <TableCell align="center" sx={tableCellStyles}>
@@ -70,11 +73,17 @@ function AttendeeTable({ control, setValue, watch }) {
                               false
                             );
 
-                            if(key === 'status'){
-                                customOptions.forEach((option) =>
-                                  setValue(`attendeeTableConfig.defaultOptions.${option?.label}`, false)
-                                );
-                                setValue(`attendeeTableConfig.customOptions.filterable`, false);
+                            if (key === "status") {
+                              customOptions.forEach((option) =>
+                                setValue(
+                                  `attendeeTableConfig.defaultOptions.${option?.label}`,
+                                  false
+                                )
+                              );
+                              setValue(
+                                `attendeeTableConfig.customOptions.filterable`,
+                                false
+                              );
                             }
                           }
                         }}
@@ -140,7 +149,9 @@ function AttendeeTable({ control, setValue, watch }) {
                           onChange(isChecked);
                         }}
                         checked={value || false}
-                        disabled={!watch(`attendeeTableConfig.status.filterable`)}
+                        disabled={
+                          !watch(`attendeeTableConfig.status.filterable`)
+                        }
                       />
                     )}
                   />
@@ -163,7 +174,7 @@ function AttendeeTable({ control, setValue, watch }) {
                       }}
                       checked={value || false}
                       disabled={!watch(`attendeeTableConfig.status.filterable`)}
-                      />
+                    />
                   )}
                 />
               </TableCell>
@@ -310,7 +321,11 @@ export default function AddPlan() {
               </IconButton>
             </Box>
             <Collapse in={isTableOpen} timeout="auto" unmountOnExit>
-              <AttendeeTable watch={watch} control={control} setValue={setValue} />
+              <AttendeeTable
+                watch={watch}
+                control={control}
+                setValue={setValue}
+              />
             </Collapse>
           </Box>
 

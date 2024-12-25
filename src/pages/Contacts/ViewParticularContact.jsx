@@ -344,7 +344,7 @@ const ViewParticularContact = () => {
                 <IconButton
                   onClick={() => {
                     {
-                      /*TODO: Navigate to Notes Page*/
+                      /*TODO: Navigate to Attendee History Page*/
                     }
                   }}
                 >
