@@ -6,6 +6,7 @@ import {
   createWebinar,
   updateWebinar,
   deleteWebinar,
+  getEmployeeWebinars
 } from "../actions/webinarContact";
 import { errorToast, successToast } from "../../utils/extra";
 
@@ -82,6 +83,17 @@ export const webinarContactSlice = createSlice({
         state.isSuccess = true;
       })
       .addCase(deleteWebinar.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getEmployeeWebinars.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getEmployeeWebinars.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.webinarData = action.payload || [];
+      })
+      .addCase(getEmployeeWebinars.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });

@@ -9,6 +9,7 @@ import {
   addNote,
   deleteLeadType,
   getAssignments,
+  getAssignmentsActivity,
   getDashboardNotes,
   getLeadType,
   getNotes,
@@ -26,6 +27,7 @@ const initialState = {
   noteData: [],
   totalPages: 1,
   errorMessage: "",
+  activityAssignMents: [],
 };
 
 // ---------------------------------------------------------------------------------------
@@ -37,6 +39,9 @@ export const assignSlice = createSlice({
     resetAssign: (state) => {
       state.isSuccess = false;
     },
+    resetAssignedData: (state) => {
+      state.assignData = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -47,6 +52,7 @@ export const assignSlice = createSlice({
       .addCase(addAssign.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        
       })
       .addCase(addAssign.rejected, (state, action) => {
         state.isLoading = false;
@@ -147,6 +153,17 @@ export const assignSlice = createSlice({
       .addCase(getDashboardNotes.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
+      })
+      .addCase(getAssignmentsActivity.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getAssignmentsActivity.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.activityAssignMents = action.payload || [];
+      })
+      .addCase(getAssignmentsActivity.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
       });
     // .addDefaultCase((state, action) => {
     //   return state;
@@ -157,7 +174,7 @@ export const assignSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {} = assignSlice.actions;
+export const {resetAssignedData, } = assignSlice.actions;
 export default assignSlice.reducer;
 
 // ================================================== THE END ==================================================

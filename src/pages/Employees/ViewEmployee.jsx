@@ -8,8 +8,12 @@ import UserActivityTable from "../../components/Table/UserActivityTable";
 import DataTable from "../../components/Table/DataTable";
 import { attendeeTableColumns } from "../../utils/columnData";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
-import { getAssignments } from "../../features/actions/assign";
+import {
+  getAssignments,
+  getAssignmentsActivity,
+} from "../../features/actions/assign";
 import { Delete, Edit, Visibility } from "@mui/icons-material";
+import AssignmentActivity from "../../components/Employee/AssignmentActivity";
 
 const ViewEmployee = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -21,9 +25,9 @@ const ViewEmployee = () => {
   const logUserActivity = useAddUserActivity();
   const dispatch = useDispatch();
 
-  const { assignData, isLoading, isSuccess, totalPages } = useSelector(
-    (state) => state.assign
-  );
+  const { assignData, isLoading, isSuccess, totalPages, activityAssignMents } =
+    useSelector((state) => state.assign);
+  console.log("activityAssignMents", activityAssignMents);
   const [tabValue, setTabValue] = useState("assignments");
   const LIMIT = useSelector((state) => state.pageLimits[tabValue] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,6 +38,8 @@ const ViewEmployee = () => {
     console.log("tabValue", tabValue);
     if (tabValue === "activityLogs")
       dispatch(getUserActivity({ id, page: page, limit: LIMIT }));
+    else if (tabValue === "activity")
+      dispatch(getAssignmentsActivity({ empId: id }));
     else dispatch(getAssignments({ id, page, limit: LIMIT, filters }));
   }, [page, LIMIT, filters, tabValue]);
 
@@ -96,6 +102,7 @@ const ViewEmployee = () => {
           value="activityLogs"
           className="text-gray-600"
         />
+        <Tab label="Activity" value="activity" className="text-gray-600" />
       </Tabs>
 
       {tabValue === "activityLogs" && (
@@ -108,7 +115,7 @@ const ViewEmployee = () => {
           <UserActivityTable page={page} setPage={setPage} />
         </div>
       )}
-      {tabValue !== "activityLogs" && (
+      {(tabValue === "history" || tabValue === "assignments") && (
         <div className="px-6 md:px-10 pt-14 space-y-6">
           {/* Tabs for Sales and Reminder */}
 
@@ -140,6 +147,19 @@ const ViewEmployee = () => {
             modalName={filterModalName}
             filters={filters}
             setFilters={setFilters}
+          />
+        </div>
+      )}
+
+      {tabValue === "activity" && (
+        <div className="p-6 bg-gray-50 rounded-lg grid lg:grid-cols-2 gap-4">
+          <AssignmentActivity
+            label="Valid Call Activity"
+            array={activityAssignMents.filter((item) => item.isEligible)}
+          />
+          <AssignmentActivity
+            label="Invalid Call Activity"
+            array={activityAssignMents.filter((item) => !item.isEligible)}
           />
         </div>
       )}

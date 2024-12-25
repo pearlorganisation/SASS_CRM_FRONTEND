@@ -17,6 +17,19 @@ export const getAllWebinars = createAsyncThunk(
   }
 );
 
+// get webinar data
+export const getEmployeeWebinars = createAsyncThunk(
+  "employeeWebinars/fetchData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`/webinar`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 // add webinar
 export const createWebinar = createAsyncThunk(
   "webinars/create",

@@ -20,7 +20,7 @@ import ComponentGuard from "../AccessControl/ComponentGuard";
 const tableCellStyles = {
   paddingTop: "6px",
   paddingBottom: "6px",
-  height: "30px",
+  height: "50px",
   textWrap: "nowrap",
   color: "#555A68",
 };
@@ -141,7 +141,7 @@ const RawTable = (props) => {
                   }}
                 >
                   <div className="flex h-full items-center justify-between">
-                    {true && (
+                    {isLeadType && (
                       <div
                         className="w-2 h-full"
                         style={{

@@ -26,9 +26,7 @@ import {
   CreateSidebarLink,
   Assignments,
   Clients,
-  EmployeeAssignments,
   LandingPageForm,
-  EmployeeActivity,
   PabblyToken,
   CustomOptions,
   CreateClient,
@@ -151,14 +149,6 @@ const App = () => {
               <CreateEmployee />
             </RouteGuard>
           ),
-        },
-        {
-          path: "/employees/assignments/:id",
-          element: <EmployeeAssignments />,
-        },
-        {
-          path: "/employees/Activity/:id/:username/:role",
-          element: <EmployeeActivity />,
         },
         {
           path: "/clients",
