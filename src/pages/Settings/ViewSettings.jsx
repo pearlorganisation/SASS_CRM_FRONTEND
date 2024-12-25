@@ -5,7 +5,7 @@ import { roles } from "../../utils/roles";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import { RiMoneyRupeeCircleLine } from "react-icons/ri";
 import { PiLetterCirclePBold } from "react-icons/pi";
-import { MdArrowDropDownCircle } from "react-icons/md";
+import { MdArrowDropDownCircle, MdLeaderboard } from "react-icons/md";
 import { PiLinkSimpleBold } from "react-icons/pi";
 import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 import { Box, Typography, Checkbox, FormControlLabel } from "@mui/material";
@@ -19,40 +19,36 @@ const settingsLinks = [
     name: "Plans",
     icon: <RiMoneyRupeeCircleLine size={40} />,
     allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
-    color: "green-700",
-    hoverColor: "green-700",
   },
   {
     to: "/pabblyToken",
     name: "External API Token",
-    icon: <PiLetterCirclePBold size={40} />,
+    icon: <PiLetterCirclePBold size={40} />,  
     allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
-    color: "green-700",
-    hoverColor: "green-700",
   },
   {
     to: "/settings/custom-status",
     name: "Custom Status",
     icon: <MdArrowDropDownCircle size={40} />,
     allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
-    color: "green-700",
-    hoverColor: "green-700",
+  },
+  {
+    to: "/lead-type",
+    name: "Lead Types",
+    icon: <MdLeaderboard size={40} />,
+    allowedRoles: [ roles.ADMIN],
   },
   {
     to: "/sidebarLinks",
     name: "Sidebar Links",
     icon: <PiLinkSimpleBold size={40} />,
     allowedRoles: [roles.SUPER_ADMIN],
-    color: "blue-600",
-    hoverColor: "blue-600",
   },
   {
     to: "/update-landing-page",
     name: "Landing Page",
     icon: <GiPerspectiveDiceSixFacesRandom size={40} />,
     allowedRoles: [roles.SUPER_ADMIN],
-    color: "blue-600",
-    hoverColor: "blue-600",
   },
 ];
 
@@ -83,12 +79,12 @@ const ViewSettings = () => {
       {/* Tailwind Grid Layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 my-10 md:mx-10">
         {/* Render links dynamically */}
-        {settingsLinks.map(({ to, name, icon, allowedRoles, color, hoverColor }, index) => (
+        {settingsLinks.map(({ to, name, icon, allowedRoles }, index) => (
           <ComponentGuard key={index} allowedRoles={allowedRoles}>
             <Link
               to={to}
               onClick={() => addUserActivityLog(to, "page")}
-              className={`flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-${hoverColor} hover:text-white text-${color} shadow-lg`}
+              className={`flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-green-600 hover:text-white text-green-600 shadow-lg`}
             >
               {icon}
               <Typography>{name}</Typography>

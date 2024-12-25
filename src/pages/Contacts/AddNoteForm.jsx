@@ -14,7 +14,7 @@ const AddNoteForm = (props) => {
   const { customOptions } = useSelector((state) => state.globalData);
   const dispatch = useDispatch();
   const { isFormLoading } = useSelector((state) => state.assign);
-  const { email, recordType, uniquePhones, addUserActivityLog } = props;
+  const { email, uniquePhones, addUserActivityLog } = props;
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -30,7 +30,6 @@ const AddNoteForm = (props) => {
   } = useForm({
     defaultValues: {
       email: email,
-      recordType: recordType,
       phone: "",
       callDuration: { hr: "", min: "", sec: "" },
       status: "",
@@ -48,7 +47,6 @@ const AddNoteForm = (props) => {
     if (!isFormLoading) {
       reset({
         email: email,
-        recordType: recordType,
         phone: "",
         callDuration: { hr: "", min: "", sec: "" },
         status: "",
@@ -62,11 +60,10 @@ const AddNoteForm = (props) => {
   }, [isFormLoading]);
 
   const onSubmit = (data) => {
-    console.log(selectedStatus);
     if (selectedStatus !== "Payment") {
       data.image = null;
     }
-    
+
     data.callDuration.hr = data.callDuration.hr ? data.callDuration.hr : "00";
     data.callDuration.min = data.callDuration.min
       ? data.callDuration.min
@@ -76,10 +73,8 @@ const AddNoteForm = (props) => {
       : "00";
 
     const note = data?.note;
-    console.log(data);
 
     // if (data?.product && data?.product !== "") {
-    //   console.log(data?.product);
     //   const payload = {
     //     email,
     //     productId: productDropdownData.find(
@@ -87,7 +82,6 @@ const AddNoteForm = (props) => {
     //     )?._id,
     //   };
 
-    // console.log(payload);
     // dispatch(addNote(payload));
     // }
 
@@ -177,7 +171,7 @@ const AddNoteForm = (props) => {
           render={({ field }) => (
             <Select
               {...field}
-              options={["3232323232", "3232323233"].map((phone) => ({
+              options={uniquePhones.map((phone) => ({
                 value: phone,
                 label: phone,
               }))}

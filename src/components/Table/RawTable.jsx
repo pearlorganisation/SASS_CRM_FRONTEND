@@ -12,7 +12,7 @@ import {
   TableHead,
   TableRow,
   Tooltip,
-  Skeleton, // Import Skeleton
+  Skeleton,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import ComponentGuard from "../AccessControl/ComponentGuard";
@@ -42,6 +42,7 @@ const RawTable = (props) => {
     isRowClickable = false,
     userData,
   } = props;
+
   const dispatch = useDispatch();
   const { isTablesMasked } = useSelector((state) => state.table);
 
@@ -55,13 +56,35 @@ const RawTable = (props) => {
     return selectedRows.includes(id);
   };
 
+  const areAllSelected = selectedRows.length === tableData?.rows?.length;
+
+  const handleSelectAllChange = (checked) => {
+    if (checked) {
+      setSelectedRows(tableData?.rows?.map((row) => row._id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
   return (
     <TableContainer component={Paper} className="shadow-md">
       <Table>
         <TableHead className="bg-gray-100">
           <TableRow>
             <TableCell className="">S.No</TableCell>
-            {isSelectVisible && <TableCell className="">Select</TableCell>}
+            {isSelectVisible && (
+              <TableCell className="">
+                <Checkbox
+                  color="primary"
+                  checked={areAllSelected}
+                  indeterminate={
+                    selectedRows.length > 0 &&
+                    selectedRows.length < tableData?.rows?.length
+                  }
+                  onChange={(e) => handleSelectAllChange(e.target.checked)}
+                />
+              </TableCell>
+            )}
             {tableData?.columns?.map((column, index) => (
               <TableCell key={index} className={thStyles}>
                 {column.header}

@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@mui/material";
 import { webinarTableColumns } from "../../utils/columnData";
-import { Edit, Delete } from "@mui/icons-material";
+import { Edit, Delete, ContentCopy } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import { openModal } from "../../features/slices/modalSlice";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
@@ -15,6 +15,7 @@ import { resetWebinarSuccess } from "../../features/slices/webinarContact";
 import WebinarFilterModal from "../../components/Filter/WebinarFilterModal";
 import ExportModal from "../../components/Export/ExportModal";
 import { exportWebinarExcel } from "../../features/actions/export-excel";
+import { toast } from "sonner";
 
 const Webinar = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -64,13 +65,13 @@ const Webinar = () => {
     }
   }, [isSuccess]);
 
-  const handleRowClick = (id) => {
+  const handleRowClick = (id, webinarName) => {
     logUserActivity({
       action: "navigate",
       navigateType: "page",
-      detailItem: `/webinarDetails/${id}`,
+      detailItem: `/webinarDetails/${webinarName}`,
     });
-    navigate(`/webinarDetails/${id}`);
+    navigate(`/webinarDetails/${id}?webinarName=${webinarName}`);
   };
 
   // ----------------------- Action Icons -----------------------
@@ -79,7 +80,7 @@ const Webinar = () => {
     {
       icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
       tooltip: "Edit Attendee",
-      hideCondition: null,
+
       onClick: (item) => {
         dispatch(
           openModal({
@@ -87,6 +88,17 @@ const Webinar = () => {
             data: item,
           })
         );
+      },
+    },
+    {
+      icon: () => (
+        <ContentCopy className="text-blue-500 group-hover:text-blue-600" />
+      ),
+      tooltip: "Copy Webinar Id",
+
+      onClick: (item) => {
+        navigator.clipboard.writeText(item?._id);
+        toast.success("Copied to clipboard");
       },
     },
     {
@@ -131,7 +143,7 @@ const Webinar = () => {
         exportModalName={exportModalName}
         isLoading={isLoading}
         rowClick={(row) => {
-          handleRowClick(row?._id);
+          handleRowClick(row?._id, row.webinarName);
         }}
         isRowClickable={true}
       />
