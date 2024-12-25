@@ -26,7 +26,7 @@ const tableCellStyles = {
 
 const TableWithStickyActions = ({ page, setPage }) => {
   const dispatch = useDispatch();
-  const { attendeeData, isLoading, isSuccess, totalPages, tabValue } =
+  const { attendeeData, isLoading, isSuccess, totalPages } =
     useSelector((state) => state.attendee);
   const [selectedRows, setSelectedRows] = useState([]);
 

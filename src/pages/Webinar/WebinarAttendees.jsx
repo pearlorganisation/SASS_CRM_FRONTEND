@@ -4,10 +4,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Tab, IconButton, Tooltip } from "@mui/material";
 import { createPortal } from "react-dom";
 import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
-import { clearSuccess, setTabValue } from "../../features/slices/attendees";
+import { clearSuccess, setTabValue as setTab } from "../../features/slices/attendees";
 import { getAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
-import { Edit, Delete, Visibility, AttachFile, ContentCopy } from "@mui/icons-material";
+import {
+  Edit,
+  Delete,
+  Visibility,
+  AttachFile,
+  ContentCopy,
+} from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
@@ -15,7 +21,7 @@ import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModa
 import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
-import { getPullbacks } from "../../features/actions/assign";
+import { getLeadType, getPullbacks } from "../../features/actions/assign";
 import { toast } from "sonner";
 
 const WebinarAttendees = () => {
@@ -30,9 +36,10 @@ const WebinarAttendees = () => {
   const logUserActivity = useAddUserActivity();
   const navigate = useNavigate();
 
-  const { attendeeData, isLoading, isSuccess, totalPages, tabValue } =
+  const { attendeeData, isLoading, isSuccess, totalPages } =
     useSelector((state) => state.attendee);
   const { userData } = useSelector((state) => state.auth);
+  const { leadTypeData } = useSelector((state) => state.assign);
   const [selectedRows, setSelectedRows] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
@@ -41,6 +48,7 @@ const WebinarAttendees = () => {
   const webinarName = searchParams.get("webinarName");
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
+  const [tabValue, setTabValue] = useState("preWebinar");
 
   useEffect(() => {
     setSearchParams({ page: page, webinarName: webinarName });
@@ -48,7 +56,8 @@ const WebinarAttendees = () => {
 
   // Tabs change handler
   const handleTabChange = (_, newValue) => {
-    dispatch(setTabValue(newValue));
+    dispatch(setTab(newValue));
+    setTabValue(newValue);
     setPage(1);
     setSelectedRows([]);
     logUserActivity({
@@ -59,7 +68,10 @@ const WebinarAttendees = () => {
   };
 
   useEffect(() => {
-    console.log("1");
+    dispatch(getLeadType());
+  }, []);
+
+  useEffect(() => {
     switch (tabValue) {
       case "pullbacks":
         setTableHeader("Pullbacks");
@@ -107,10 +119,6 @@ const WebinarAttendees = () => {
         break;
     }
   }, [page, tabValue, LIMIT, filters]);
-
-  useEffect(() => {
-    console.log(attendeeData);
-  }, [attendeeData]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -186,14 +194,15 @@ const WebinarAttendees = () => {
         <div className="flex gap-4">
           <h2 className="text-2xl font-bold text-gray-700">{webinarName}</h2>
           <Tooltip title="Copy Webinar Id" placement="top">
-          <IconButton
-            onClick={() => {
-              navigator.clipboard.writeText(id);
-              toast.success("Copied to clipboard");
-            }}
-          >
-            <ContentCopy className="text-blue-500 group-hover:text-blue-600" />
-          </IconButton></Tooltip>
+            <IconButton
+              onClick={() => {
+                navigator.clipboard.writeText(id);
+                toast.success("Copied to clipboard");
+              }}
+            >
+              <ContentCopy className="text-blue-500 group-hover:text-blue-600" />
+            </IconButton>
+          </Tooltip>
         </div>
         {selectedRows.length > 0 && (
           <Button
@@ -214,7 +223,6 @@ const WebinarAttendees = () => {
           </Button>
         </ComponentGuard>
       </div>
-
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="webinarAttendeesTable"
@@ -223,7 +231,10 @@ const WebinarAttendees = () => {
         setFilters={setFilters}
         tableData={{
           columns: attendeeTableColumns,
-          rows: attendeeData,
+          rows: attendeeData.map((row) => ({
+            ...row,
+            leadType: leadTypeData.find((lead) => lead._id === row?.leadType),
+          })),
         }}
         actions={actionIcons}
         totalPages={totalPages}
@@ -237,6 +248,7 @@ const WebinarAttendees = () => {
         isLoading={isLoading}
       />
       <EmployeeAssignModal
+        tabValue={tabValue}
         selectedRows={selectedRows.map((rowId) => ({
           attendee: rowId,
           recordType: tabValue,
