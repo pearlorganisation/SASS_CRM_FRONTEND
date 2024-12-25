@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { useNavigate } from 'react-router-dom';
 
 const tableCellStyles = {
     paddingTop: "6px",
@@ -9,6 +10,7 @@ const tableCellStyles = {
   };
 
 const AssignmentActivity = ({ label, array }) => {
+    const navigate = useNavigate();
   return (
     <Box className="p-4 border rounded-md shadow-md bg-white">
       <Typography variant="h6" className=" text-center text-gray-800 border-b pb-2">
@@ -30,7 +32,13 @@ const AssignmentActivity = ({ label, array }) => {
                 <TableCell sx={tableCellStyles} >{item.email}</TableCell>
                 <TableCell sx={tableCellStyles}>{item.webinar}</TableCell>
                 <TableCell align="center" sx={tableCellStyles}>
-                  <IconButton>
+                  <IconButton
+                  onClick={() => {
+                    navigate(
+                        `/particularContact?email=${item?.email}`
+                      );}
+                  }
+                  >
                     <VisibilityIcon className="text-gray-600" />
                   </IconButton>
                 </TableCell>
