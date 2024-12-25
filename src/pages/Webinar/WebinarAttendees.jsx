@@ -76,7 +76,6 @@ const WebinarAttendees = () => {
       case "pullbacks":
         setTableHeader("Pullbacks");
         dispatch(getPullbacks({ id, page, limit: LIMIT, filters }));
-
         break;
 
       case "postWebinar":
@@ -84,7 +83,7 @@ const WebinarAttendees = () => {
         dispatch(
           getAttendees({
             id,
-            isAttended: tabValue === "postWebinar",
+            isAttended: true,
             page,
             limit: LIMIT,
             filters,
@@ -97,7 +96,7 @@ const WebinarAttendees = () => {
         dispatch(
           getAttendees({
             id,
-            isAttended: tabValue === "preWebinar",
+            isAttended: false,
             page,
             limit: LIMIT,
             filters,
