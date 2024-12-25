@@ -4,93 +4,26 @@ import {
   Typography,
   Grid,
   Box,
-  Button,
   Divider,
-  TextField,
-  Modal,
-  Checkbox,
-  FormControlLabel,
+
 } from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
-import { getAdminDashboardData } from "../../features/actions/globalData";
-import { MetricCard } from "../../components/Dashboard";
+import { getDashboardData } from "../../features/actions/globalData";
 import { errorToast } from "../../utils/extra";
 
 const EmployeeDashboard = () => {
   const dispatch = useDispatch();
   const { dashBoardCardsData } = useSelector((state) => state.globalData);
-  // const cardData = [
-  //   {
-  //     label: "Accounts Created",
-  //     value: dashBoardCardsData?.accountsCreated || 0,
-  //     color: "primary",
-  //   },
-  //   {
-  //     label: "Active Accounts",
-  //     value: dashBoardCardsData?.activeAccounts || 0,
-  //     color: "success",
-  //   },
-  //   {
-  //     label: "Overall Revenue",
-  //     value: `\u20B9 ${dashBoardCardsData?.totalRevenue || 0}`,
-  //     color: "secondary",
-  //   },
-  //   {
-  //     label: "Total Admins",
-  //     value: dashBoardCardsData?.totalAdmins || 0,
-  //     color: "primary",
-  //   },
-  //   {
-  //     label: "Total Employees",
-  //     value: dashBoardCardsData?.totalEmployees || 0,
-  //     color: "success",
-  //   },
-  //   {
-  //     label: "Contacts",
-  //     value: `${dashBoardCardsData?.totalContactsUsed || 0} / ${
-  //       dashBoardCardsData?.totalContactsLimit || 0
-  //     }`,
-  //     color: "textPrimary",
-  //   },
-  // ];
-  const [rows, setRows] = useState([]);
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  // const [modalOpen, setModalOpen] = useState(false);
-  // const [visibleCards, setVisibleCards] = useState([
-  //   "Accounts Created",
-  //   "Active Accounts",
-  //   "Overall Revenue",
-  //   "Total Admins",
-  //   "Total Employees",
-  //   "Contacts",
-  // ]);
 
-  useEffect(() => {
-    if (Array.isArray(dashBoardCardsData) && dashBoardCardsData.length > 0) {
-      const rows = dashBoardCardsData.map((item) => {
-        return {
-          label: item.email,
-          value: item.notes.map((e) => {
-            return {
-              label: e.status,
-              value: e.count,
-              color: "primary",
-            };
-          }),
-        };
-      });
-
-      setRows(rows);
-    }
-  }, [dashBoardCardsData]);
-
+ 
   useEffect(() => {
     if (startDate && endDate) {
-      dispatch(getAdminDashboardData({ startDate, endDate }));
+      dispatch(getDashboardData({ startDate, endDate }));
     }
   }, [startDate, endDate]);
 
@@ -103,16 +36,6 @@ const EmployeeDashboard = () => {
     setEndDate(today);
   }, []);
 
-  // const handleToggleModal = () => setModalOpen(!modalOpen);
-
-  // const handleCardSelection = (label) => {
-  //   setVisibleCards(
-  //     (prev) =>
-  //       prev.includes(label)
-  //         ? prev.filter((item) => item !== label) // Remove if already selected
-  //         : [...prev, label] // Add if not selected
-  //   );
-  // };
 
   const handleStartDateChange = (date) => {
     if (endDate && date > endDate) {
@@ -168,19 +91,17 @@ const EmployeeDashboard = () => {
       </Box>
       {/* Metrics Cards */}
       <Grid container spacing={4} className="pt-3">
-        {rows &&
-          rows.length > 0 &&
-          rows.map((row, rowIndex) => (
-            <Grid item xs={12} md={12} lg={12} key={rowIndex}>
+     
+            <Grid item xs={12} md={12} lg={12}>
               {/* Parent Card */}
               <Card className="p-4 w-full">
                 <Typography variant="h6" gutterBottom>
-                  {row.label}
+                  Your activity on assignments
                 </Typography>
                 <Divider />
-                <Box className="mt-4 flex gap-2 justify-start">
-                  {/* Nested Cards */}
-                  {Array.isArray(row.value) && row?.value?.length > 0 ? row.value.map((nested, nestedIndex) => (
+                 {/* Nested Cards */}
+                 <Box className="flex gap-4 flex-wrap" >
+                 {Array.isArray(dashBoardCardsData) && dashBoardCardsData?.length > 0 ? dashBoardCardsData.map((nested, nestedIndex) => (
                     <Box
                       key={nestedIndex}
                       className="p-2 my-2"
@@ -190,18 +111,19 @@ const EmployeeDashboard = () => {
                         backgroundColor:
                           nested.color === "primary" ? "#f1f5fc" : "#fff",
                       }}
+                   
                     >
                       <Typography variant="body1">
-                        {nested.label}: <strong>{nested.value}</strong>
+                        {nested.status}: <strong>{nested.count}</strong>
                       </Typography>
                     </Box>
                   )) : (
                     <div>No Data Found</div>
                   )}
-                </Box>
+                 </Box>
               </Card>
             </Grid>
-          ))}
+     
       </Grid>
 
       {/* Modal for Card Selection */}

@@ -80,8 +80,8 @@ export const getDashboardCardsData = createAsyncThunk(
 );
 
 
-export const getAdminDashboardData = createAsyncThunk(
-  "Dashboard/fetchAdminData",
+export const getDashboardData = createAsyncThunk(
+  "Dashboard/fetchDashboardData",
   async (params, { rejectWithValue }) => {
     try {
 
