@@ -14,7 +14,7 @@ const AddNoteForm = (props) => {
   const { customOptions } = useSelector((state) => state.globalData);
   const dispatch = useDispatch();
   const { isFormLoading } = useSelector((state) => state.assign);
-  const { email, uniquePhones, addUserActivityLog } = props;
+  const { email, attendeeId, uniquePhones, addUserActivityLog } = props;
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -29,6 +29,7 @@ const AddNoteForm = (props) => {
     formState: { errors },
   } = useForm({
     defaultValues: {
+      attendee: attendeeId,
       email: email,
       phone: "",
       callDuration: { hr: "", min: "", sec: "" },
@@ -46,6 +47,7 @@ const AddNoteForm = (props) => {
   useEffect(() => {
     if (!isFormLoading) {
       reset({
+        attendee: attendeeId,
         email: email,
         phone: "",
         callDuration: { hr: "", min: "", sec: "" },

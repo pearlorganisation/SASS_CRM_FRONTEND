@@ -322,6 +322,7 @@ const ViewParticularContact = () => {
               <AddNoteForm
                 uniquePhones={uniquePhones}
                 email={email}
+                attendeeId={attendeeId}
                 addUserActivityLog={addUserActivityLog}
               />
               <div></div>

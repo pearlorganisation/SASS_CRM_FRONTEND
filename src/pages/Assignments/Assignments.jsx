@@ -93,7 +93,7 @@ const Assignments = () => {
 
   const handleViewFullDetails = (item) => {
     const recordType = item?.isAttended ? "postWebinar" : "preWebinar";
-    navigate(`/particularContact?email=${item?.email}&attendeeId=${item?._id}`);
+    navigate(`/particularContact?email=${item?.email}&attendeeId=${item?.attendeeId}`);
     dispatch(
       addUserActivity({
         action: "viewDetails",

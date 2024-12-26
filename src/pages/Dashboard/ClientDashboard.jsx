@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Typography,
-  Grid,
-  Box,
-  Divider,
+import { Card, Typography, Grid, Box, Divider } from "@mui/material";
 
-} from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,8 +19,8 @@ const ClientDashboard = () => {
     if (Array.isArray(dashBoardCardsData) && dashBoardCardsData.length > 0) {
       const rows = dashBoardCardsData.map((item) => {
         return {
-          label: item.email,
-          value: item.notes.map((e) => {
+          label: item?.email,
+          value: item?.notes?.map((e) => {
             return {
               label: e.status,
               value: e.count,
@@ -54,7 +48,6 @@ const ClientDashboard = () => {
     setStartDate(oneWeekAgo);
     setEndDate(today);
   }, []);
-
 
   const handleStartDateChange = (date) => {
     if (endDate && date > endDate) {
@@ -122,22 +115,24 @@ const ClientDashboard = () => {
                 <Divider />
                 <Box className="mt-4 flex gap-2 justify-start">
                   {/* Nested Cards */}
-                  {Array.isArray(row.value) && row?.value?.length > 0 ? row.value.map((nested, nestedIndex) => (
-                    <Box
-                      key={nestedIndex}
-                      className="p-2 my-2"
-                      style={{
-                        border: "1px solid #e0e0e0",
-                        borderRadius: "8px",
-                        backgroundColor:
-                          nested.color === "primary" ? "#f1f5fc" : "#fff",
-                      }}
-                    >
-                      <Typography variant="body1">
-                        {nested.label}: <strong>{nested.value}</strong>
-                      </Typography>
-                    </Box>
-                  )) : (
+                  {Array.isArray(row.value) && row?.value?.length > 0 ? (
+                    row.value.map((nested, nestedIndex) => (
+                      <Box
+                        key={nestedIndex}
+                        className="p-2 my-2"
+                        style={{
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "8px",
+                          backgroundColor:
+                            nested.color === "primary" ? "#f1f5fc" : "#fff",
+                        }}
+                      >
+                        <Typography variant="body1">
+                          {nested.label}: <strong>{nested.value}</strong>
+                        </Typography>
+                      </Box>
+                    ))
+                  ) : (
                     <div>No Data Found</div>
                   )}
                 </Box>
