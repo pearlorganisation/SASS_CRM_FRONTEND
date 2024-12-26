@@ -4,70 +4,22 @@ import {
   Typography,
   Grid,
   Box,
-  Button,
   Divider,
-  TextField,
-  Modal,
-  Checkbox,
-  FormControlLabel,
+
 } from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
-import { getAdminDashboardData } from "../../features/actions/globalData";
-import { MetricCard } from "../../components/Dashboard";
+import { getDashboardData } from "../../features/actions/globalData";
 import { errorToast } from "../../utils/extra";
 
 const ClientDashboard = () => {
   const dispatch = useDispatch();
   const { dashBoardCardsData } = useSelector((state) => state.globalData);
-  // const cardData = [
-  //   {
-  //     label: "Accounts Created",
-  //     value: dashBoardCardsData?.accountsCreated || 0,
-  //     color: "primary",
-  //   },
-  //   {
-  //     label: "Active Accounts",
-  //     value: dashBoardCardsData?.activeAccounts || 0,
-  //     color: "success",
-  //   },
-  //   {
-  //     label: "Overall Revenue",
-  //     value: `\u20B9 ${dashBoardCardsData?.totalRevenue || 0}`,
-  //     color: "secondary",
-  //   },
-  //   {
-  //     label: "Total Admins",
-  //     value: dashBoardCardsData?.totalAdmins || 0,
-  //     color: "primary",
-  //   },
-  //   {
-  //     label: "Total Employees",
-  //     value: dashBoardCardsData?.totalEmployees || 0,
-  //     color: "success",
-  //   },
-  //   {
-  //     label: "Contacts",
-  //     value: `${dashBoardCardsData?.totalContactsUsed || 0} / ${
-  //       dashBoardCardsData?.totalContactsLimit || 0
-  //     }`,
-  //     color: "textPrimary",
-  //   },
-  // ];
   const [rows, setRows] = useState([]);
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  // const [modalOpen, setModalOpen] = useState(false);
-  // const [visibleCards, setVisibleCards] = useState([
-  //   "Accounts Created",
-  //   "Active Accounts",
-  //   "Overall Revenue",
-  //   "Total Admins",
-  //   "Total Employees",
-  //   "Contacts",
-  // ]);
 
   useEffect(() => {
     if (Array.isArray(dashBoardCardsData) && dashBoardCardsData.length > 0) {
@@ -90,7 +42,7 @@ const ClientDashboard = () => {
 
   useEffect(() => {
     if (startDate && endDate) {
-      dispatch(getAdminDashboardData({ startDate, endDate }));
+      dispatch(getDashboardData({ startDate, endDate }));
     }
   }, [startDate, endDate]);
 
@@ -103,16 +55,6 @@ const ClientDashboard = () => {
     setEndDate(today);
   }, []);
 
-  // const handleToggleModal = () => setModalOpen(!modalOpen);
-
-  // const handleCardSelection = (label) => {
-  //   setVisibleCards(
-  //     (prev) =>
-  //       prev.includes(label)
-  //         ? prev.filter((item) => item !== label) // Remove if already selected
-  //         : [...prev, label] // Add if not selected
-  //   );
-  // };
 
   const handleStartDateChange = (date) => {
     if (endDate && date > endDate) {

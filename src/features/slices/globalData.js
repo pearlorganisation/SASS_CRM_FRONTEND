@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import {
   createCustomOption,
   createGlobalData,
-  deleteCustomOption, 
-  getAdminDashboardData, 
+  deleteCustomOption,
+  getDashboardData, 
   getCustomOptions,
   getDashboardCardsData,
   getDashboardPlansData,
@@ -127,19 +127,21 @@ export const globalDataSlice = createSlice({
         state.errorMessage = action.payload;
       })
 
-      .addCase(getAdminDashboardData.pending, (state, action) => {
+      .addCase(getDashboardData.pending, (state, action) => {
         state.isLoading = true;
         state.errorMessage = "";
       })
-      .addCase(getAdminDashboardData.fulfilled, (state, action) => {
+      .addCase(getDashboardData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
         state.dashBoardCardsData = action.payload
       })
-      .addCase(getAdminDashboardData.rejected, (state, action) => {
+      .addCase(getDashboardData.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
       })
+
+
 
       .addCase(getDashboardPlansData.pending, (state, action) => {
         state.isLoading = true;
