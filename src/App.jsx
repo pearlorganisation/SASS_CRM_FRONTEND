@@ -53,7 +53,9 @@ const App = () => {
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
 
-  const { userData, isUserLoggedIn } = useSelector((state) => state.auth);
+  const { userData, isUserLoggedIn, subscription } = useSelector((state) => state.auth);
+  const tableConfig = subscription?.plan?.attendeeTableConfig || {};
+  const isCustomStatusEnabled = tableConfig?.customOptions?.filterable  || false;
 
   if (isUserLoggedIn && !userData?.role) {
     dispatch(logout());
@@ -209,7 +211,7 @@ const App = () => {
         {
           path: "/settings/custom-status",
           element: (
-            <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
+            <RouteGuard conditions={[isCustomStatusEnabled || roles.isSuperAdmin()]} roleNames={["SUPER_ADMIN", "ADMIN"]}>
               <CustomOptions />
             </RouteGuard>
           ),

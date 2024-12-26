@@ -37,7 +37,6 @@ const tableCellStyles = {
 };
 function AttendeeTable({ control, setValue, watch }) {
   const { customOptions } = useSelector((state) => state.globalData);
-  console.log(customOptions);
   return (
     <Box mt={6}>
       <TableContainer component={Paper} elevation={3}>
@@ -51,8 +50,8 @@ function AttendeeTable({ control, setValue, watch }) {
           </TableHead>
           <TableBody>
             {[
-              ...attendeeTableColumns,
               { header: "Lead Type", key: "leadType", width: 20, type: "" },
+              ...attendeeTableColumns,
             ].map(({ key, header }) => (
               <TableRow key={key}>
                 <TableCell sx={tableCellStyles}>{header}</TableCell>
@@ -232,7 +231,6 @@ export default function AddPlan() {
 
   useEffect(() => {
     if (isEditMode && singlePlanData) {
-      console.log(singlePlanData);
       reset({
         name: singlePlanData.name || "",
         amount: singlePlanData.amount || 0,

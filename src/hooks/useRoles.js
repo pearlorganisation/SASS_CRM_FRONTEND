@@ -51,6 +51,15 @@ const useRoles = () => {
     return employeeRoles.includes(roleName);
   };
 
+  const isSuperAdmin = (roleId) => {
+    let roleName = "";
+    if (typeof roleId !== "string" || roleId.trim() === "") {
+      roleName = getRoleNameByID(role);
+    } else roleName = getRoleNameByID(roleId);
+    const employeeRoles = ["SUPER ADMIN"];
+    return employeeRoles.includes(roleName);
+  };
+
   // Wrap rolesObject with Proxy to handle method calls and undefined fields gracefully
   const rolesProxy = useMemo(() => {
     return new Proxy(rolesObject, {
@@ -63,6 +72,11 @@ const useRoles = () => {
         // Handle method calls like 'isEmployeeId'
         if (property === "isEmployeeId") {
           return isEmployeeId;
+        }
+
+        // Handle method calls like 'isSuperAdmin'
+        if (property === "isSuperAdmin") {
+          return isSuperAdmin;
         }
 
         // Fallback for undefined properties in rolesObject

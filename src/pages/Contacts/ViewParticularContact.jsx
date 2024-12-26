@@ -36,7 +36,6 @@ const ViewParticularContact = () => {
   const dispatch = useDispatch();
   const searchParams = new URLSearchParams(location.search);
   const email = searchParams.get("email");
-  const attendeeId = searchParams.get("attendeeId");
 
   const [showTimerModal, setShowTimerModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
