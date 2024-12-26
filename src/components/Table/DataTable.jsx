@@ -112,7 +112,7 @@ const DataTable = ({
 
       <div
         className={`flex gap-4 ${
-          ButtonGroup ? "justify-between" : "items-center"
+          ButtonGroup ? "justify-between flex-wrap" : "items-center"
         } py-2`}
       >
         {ButtonGroup && <ButtonGroup />}

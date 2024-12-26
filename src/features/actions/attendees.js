@@ -47,10 +47,11 @@ export const updateAttendee = createAsyncThunk(
 export const getAttendees = createAsyncThunk(
   "attendees/fetchData",
   async (
-    { id, isAttended, page = 1, limit = 10, filters = {} },
+    { id, isAttended, page = 1, limit = 10, filters = {}, validCall },
     { rejectWithValue }
   ) => {
     try {
+      console.log(validCall);
       const response = await instance.post(
         `/attendees/webinar`,
         {
@@ -58,6 +59,7 @@ export const getAttendees = createAsyncThunk(
           fieldName: "attendeeTableConfig",
           webinarId: id,
           isAttended,
+          validCall: validCall  
         },
         {
           params: { page, limit },

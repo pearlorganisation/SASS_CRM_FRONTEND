@@ -84,6 +84,7 @@ const WebinarAttendees = () => {
   }, []);
 
   useEffect(() => {
+    console.log(selected);
     switch (tabValue) {
       case "pullbacks":
         setTableHeader("Pullbacks");
@@ -99,6 +100,7 @@ const WebinarAttendees = () => {
             page,
             limit: LIMIT,
             filters,
+            validCall: selected === "All" ? undefined : selected,
           })
         );
         break;
@@ -112,6 +114,7 @@ const WebinarAttendees = () => {
             page,
             limit: LIMIT,
             filters,
+            validCall: selected === "All" ? undefined : selected,
           })
         );
         break;
@@ -125,11 +128,12 @@ const WebinarAttendees = () => {
             page,
             limit: LIMIT,
             filters,
+            validCall: selected === "All" ? undefined : selected,
           })
         );
         break;
     }
-  }, [page, tabValue, LIMIT, filters]);
+  }, [page, tabValue, LIMIT, filters, selected]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -140,6 +144,7 @@ const WebinarAttendees = () => {
           page: 1,
           limit: LIMIT,
           filters,
+          validCall: selected === "All" ? undefined : selected,
         })
       );
       dispatch(clearSuccess());
@@ -161,22 +166,6 @@ const WebinarAttendees = () => {
       },
       readOnly: true,
     },
-    {
-      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
-      tooltip: "Edit Attendee",
-      onClick: (item) => {
-        console.log(`Editing row with id: ${item?._id}`);
-      },
-    },
-    {
-      icon: (item) => (
-        <Delete className="text-red-500 group-hover:text-red-600" />
-      ),
-      tooltip: "Delete Attendee",
-      onClick: (item) => {
-        console.log(`Deleting row with id: ${item?._id}`);
-      },
-    },
   ];
 
   const AttendeeButtonGroup = () => {
@@ -185,7 +174,7 @@ const WebinarAttendees = () => {
       console.log(`${label} button clicked`);
     };
     return (
-      <ButtonGroup    variant="outlined" aria-label="Basic button group">
+      <ButtonGroup variant="outlined" aria-label="Basic button group">
         <Button
           onClick={() => handleClick("All")}
           color={selected === "All" ? "secondary" : "primary"}

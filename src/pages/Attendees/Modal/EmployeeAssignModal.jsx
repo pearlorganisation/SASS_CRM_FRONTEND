@@ -16,7 +16,6 @@ import { addAssign } from "../../../features/actions/assign";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
 function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
-  console.log("selectedRows", selectedRows);
 
   const dispatch = useDispatch();
   const roles = useRoles();
@@ -43,7 +42,6 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
 
   const handleAssign = () => {
     if(selectedEmployee === 'auto') {
-        console.log('auto assigned');
       return ;
     }
 
