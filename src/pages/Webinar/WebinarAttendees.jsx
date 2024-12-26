@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Tabs, Tab, IconButton, Tooltip } from "@mui/material";
+import {
+  Button,
+  Tabs,
+  Tab,
+  IconButton,
+  Tooltip,
+  ButtonGroup,
+} from "@mui/material";
 import { createPortal } from "react-dom";
 import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
-import { clearSuccess, setTabValue as setTab } from "../../features/slices/attendees";
+import {
+  clearSuccess,
+  setTabValue as setTab,
+} from "../../features/slices/attendees";
 import { getAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
 import {
@@ -36,8 +46,9 @@ const WebinarAttendees = () => {
   const logUserActivity = useAddUserActivity();
   const navigate = useNavigate();
 
-  const { attendeeData, isLoading, isSuccess, totalPages } =
-    useSelector((state) => state.attendee);
+  const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
+    (state) => state.attendee
+  );
   const { userData } = useSelector((state) => state.auth);
   const { leadTypeData } = useSelector((state) => state.assign);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -49,6 +60,7 @@ const WebinarAttendees = () => {
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
   const [tabValue, setTabValue] = useState("preWebinar");
+  const [selected, setSelected] = useState("All");
 
   useEffect(() => {
     setSearchParams({ page: page, webinarName: webinarName });
@@ -166,6 +178,35 @@ const WebinarAttendees = () => {
       },
     },
   ];
+
+  const AttendeeButtonGroup = () => {
+    const handleClick = (label) => {
+      setSelected(label); // Update state on button click
+      console.log(`${label} button clicked`);
+    };
+    return (
+      <ButtonGroup    variant="outlined" aria-label="Basic button group">
+        <Button
+          onClick={() => handleClick("All")}
+          color={selected === "All" ? "secondary" : "primary"}
+        >
+          All
+        </Button>
+        <Button
+          onClick={() => handleClick("Valid")}
+          color={selected === "Valid" ? "secondary" : "primary"}
+        >
+          Valid
+        </Button>
+        <Button
+          onClick={() => handleClick("Not Valid")}
+          color={selected === "Not Valid" ? "secondary" : "primary"}
+        >
+          Not Valid
+        </Button>
+      </ButtonGroup>
+    );
+  };
   return (
     <div className="px-6 md:px-10 pt-10 space-y-6">
       {/* Tabs for Sales and Reminder */}
@@ -225,6 +266,7 @@ const WebinarAttendees = () => {
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="webinarAttendeesTable"
+        ButtonGroup={AttendeeButtonGroup}
         isSelectVisible={true}
         filters={filters}
         setFilters={setFilters}

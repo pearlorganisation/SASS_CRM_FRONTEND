@@ -24,7 +24,6 @@ const LeadTypesForm = () => {
   const [editData, setEditData] = useState();
 
   const { leadTypeData, isSuccess } = useSelector((state) => state.assign);
-  console.log("Lead Types:", leadTypeData);
 
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
@@ -46,22 +45,18 @@ const LeadTypesForm = () => {
 
   const onSubmit = (data) => {
     if (editData) {
-      console.log("Updating LeadType:", { id: editData._id, ...data });
       // Call API to update
       dispatch(updateLeadType({ id: editData._id, ...data }));
     } else {
-      console.log("Adding LeadType:", data);
       dispatch(addLeadType(data));
     }
   };
 
   const handleDelete = (id) => {
-    console.log("Deleting LeadType:", id);
     dispatch(deleteLeadType(id));
   };
 
   useEffect(() => {
-    console.log("Fetching Lead Types...");
     dispatch(getLeadType());
   }, []);
 
@@ -99,7 +94,7 @@ const LeadTypesForm = () => {
           </TableHead>
           <TableBody>
             {leadTypeData.map((item) => (
-              <TableRow key={item.id}>
+              <TableRow key={item._id}>
                 <TableCell>{item.label}</TableCell>
                 <TableCell>
                   <div

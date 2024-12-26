@@ -33,6 +33,7 @@ import useAddUserActivity from "../../hooks/useAddUserActivity";
 const DataTable = ({
   tableHeader = "Table",
   tableUniqueKey = "id",
+  ButtonGroup = null,
   filters,
   setFilters,
   ClientCards = null,
@@ -69,7 +70,12 @@ const DataTable = ({
       <div className="flex gap-4 justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-700">{tableHeader}</h2>
 
-        <ComponentGuard conditions={[userData?.isActive, tableUniqueKey !== 'viewAssignmentsTable']}>
+        <ComponentGuard
+          conditions={[
+            userData?.isActive,
+            tableUniqueKey !== "viewAssignmentsTable",
+          ]}
+        >
           <IconButton
             id="demo-positioned-button"
             aria-controls={open ? "demo-positioned-menu" : undefined}
@@ -104,8 +110,14 @@ const DataTable = ({
         </Menu>
       </div>
 
-      <div className="flex gap-4 justify-end items-center py-2">
+      <div
+        className={`flex gap-4 ${
+          ButtonGroup ? "justify-between" : "items-center"
+        } py-2`}
+      >
+        {ButtonGroup && <ButtonGroup />}
         <ComponentGuard conditions={[userData?.isActive]}>
+          <div className="flex gap-4">
           <Button
             component="label"
             color="secondary"
@@ -133,12 +145,13 @@ const DataTable = ({
               </span>
             )}
           </Button>
+          </div>
         </ComponentGuard>
       </div>
       {ClientCards}
       <div className={`${ClientCards !== null ? "hidden md:block " : ""}`}>
         <RawTable
-          tableData={ {
+          tableData={{
             ...tableData,
             rows: Array.isArray(tableData.rows) ? tableData.rows : [],
           }}
