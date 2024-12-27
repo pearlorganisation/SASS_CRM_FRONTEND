@@ -4,10 +4,7 @@ import ViewTimerModal from "./Modal/ViewTimerModal";
 import { useDispatch, useSelector } from "react-redux";
 import AddNoteForm from "./AddNoteForm";
 import { FaRegEdit } from "react-icons/fa";
-import {
-  getLeadType,
-  getNotes,
-} from "../../features/actions/assign";
+import { getLeadType, getNotes } from "../../features/actions/assign";
 import EditModal from "./Modal/EditModal";
 import { addUserActivity } from "../../features/actions/userActivity";
 import NoteItem from "../../components/NoteItem";
@@ -31,9 +28,11 @@ import {
 } from "@mui/material";
 import { OpenInNew } from "@mui/icons-material";
 import { clearLeadType } from "../../features/slices/attendees";
+import { useNavigate } from "react-router-dom";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const email = searchParams.get("email");
   const attendeeId = searchParams.get("attendeeId");
@@ -221,11 +220,9 @@ const ViewParticularContact = () => {
               <div className="border-b-4 items-center px-3   flex justify-between">
                 <span className="font-semibold ">Notes</span>
                 <IconButton
-                  onClick={() => {
-                    {
-                      /*TODO: Navigate to Notes Page*/
-                    }
-                  }}
+                  onClick={() =>
+                    navigate(`/particularContact/notes?email=${email}`)
+                  }
                 >
                   <OpenInNew className="text-neutral-800" />
                 </IconButton>
@@ -246,7 +243,7 @@ const ViewParticularContact = () => {
 
           <div className="space-y-3 flex-col h-full">
             <div className="flex  justify-between gap-10  items-center">
-              <div className="flex items-center gap-3">
+              <div className="flex border border-red-600 items-center gap-3">
                 <Button
                   variant="contained"
                   className="h-10"
@@ -343,11 +340,7 @@ const ViewParticularContact = () => {
                   Attendee History
                 </span>
                 <IconButton
-                  onClick={() => {
-                    {
-                      /*TODO: Navigate to Attendee History Page*/
-                    }
-                  }}
+                  onClick={() => navigate(`/particularContact/attendee-History?email=${email}`)}
                 >
                   <OpenInNew />
                 </IconButton>

@@ -19,9 +19,11 @@ import { getAssignments } from "../../features/actions/assign";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
 import { getEmployeeWebinars } from "../../features/actions/webinarContact";
 import { resetAssignedData } from "../../features/slices/assign";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const Assignments = () => {
   const navigate = useNavigate();
+  const addUserActivity = useAddUserActivity();
 
   // ----------------------- ModalNames for Redux -----------------------
   const filterModalName = "ViewAssignmentsFilterModal";
@@ -178,7 +180,7 @@ const Assignments = () => {
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="viewAssignmentsTable"
-        ButtonGroup={AttendeeButtonGroup}
+        // ButtonGroup={AttendeeButtonGroup}
         // isSelectVisible={true}
         filters={filters}
         setFilters={setFilters}

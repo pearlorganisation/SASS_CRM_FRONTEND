@@ -41,9 +41,6 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
     }));
 
   const handleAssign = () => {
-    if(selectedEmployee === 'auto') {
-      return ;
-    }
 
     if (selectedEmployee) {
       dispatch(
@@ -94,13 +91,6 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
           onChange={(e) => setSelectedEmployee(e.target.value)}
           className="space-y-3"
         >
-          <FormControlLabel
-            key="auto"
-            value="auto"
-            control={<Radio color="primary" />}
-            label={<span className="text-gray-700">Auto Assign</span>}
-            className="flex items-center"
-          />
           {options.map((option) => (
             <FormControlLabel
               key={option.value}

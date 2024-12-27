@@ -213,17 +213,27 @@ const WebinarAttendees = () => {
         <Tab
           label="Enrollments"
           value="enrollments"
-          className="text-gray-600"
+          style={{
+            border: "1px solid red",
+            color: "gray",
+          }}
         />
 
-        <Tab label="UnAttended" value="unattended" className="text-gray-600" />
-        <Tab label="Pullbacks" value="pullbacks" className="text-gray-600" />
+        {/* <Tab label="UnAttended" value="unattended" className="text-gray-600" /> */}
+        <Tab
+          label="Pullbacks"
+          value="pullbacks"
+          style={{
+            border: "1px solid red",
+            color: "gray",
+          }}
+        />
       </Tabs>
 
       <div className="flex gap-4 justify-between">
         <div className="flex gap-4">
           <h2 className="text-2xl font-bold text-gray-700">{webinarName}</h2>
-          <Tooltip title="Copy Webinar Id" placement="top">
+          <Tooltip title={`Copy Webinar Id: ${id}`} placement="top">
             <IconButton
               onClick={() => {
                 navigator.clipboard.writeText(id);
@@ -234,29 +244,31 @@ const WebinarAttendees = () => {
             </IconButton>
           </Tooltip>
         </div>
-        {selectedRows.length > 0 && (
-          <Button
-            onClick={() => dispatch(openModal(employeeAssignModalName))}
-            variant="contained"
-          >
-            Assign
-          </Button>
-        )}
+        <div className="flex gap-4">
+          {selectedRows.length > 0 && (
+            <Button
+              onClick={() => dispatch(openModal(employeeAssignModalName))}
+              variant="contained"
+            >
+              Assign
+            </Button>
+          )}
 
-        <ComponentGuard conditions={[userData?.isActive]}>
-          <Button
-            onClick={() => setShowModal((prev) => !prev)}
-            variant="contained"
-            startIcon={<AttachFile />}
-          >
-            Import
-          </Button>
-        </ComponentGuard>
+          <ComponentGuard conditions={[userData?.isActive]}>
+            <Button
+              onClick={() => setShowModal((prev) => !prev)}
+              variant="contained"
+              startIcon={<AttachFile />}
+            >
+              Import
+            </Button>
+          </ComponentGuard>
+        </div>
       </div>
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="webinarAttendeesTable"
-        ButtonGroup={AttendeeButtonGroup}
+        // ButtonGroup={AttendeeButtonGroup}
         isSelectVisible={true}
         filters={filters}
         setFilters={setFilters}

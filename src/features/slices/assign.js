@@ -52,7 +52,7 @@ export const assignSlice = createSlice({
       .addCase(addAssign.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        successToast("Assignment Created Successfully");
+        successToast("Tempory Toast... will add it later with validation");
         
       })
       .addCase(addAssign.rejected, (state, action) => {

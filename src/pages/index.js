@@ -6,7 +6,6 @@ import ComingSoon from "./NotFound/ComingSoon";
 import NotFound from "./NotFound/NotFound";
 import Employees from "./Employees/Employees";
 import ViewParticularContact from "./Contacts/ViewParticularContact";
-import ViewContacts from "./Contacts/ViewContacts";
 import ViewProducts from "./Products/ViewProducts";
 import CreateProduct from "./Products/CreateProduct";
 import ViewAttendees from "./Attendees/ViewAttendees";
@@ -26,7 +25,11 @@ import CreateClient from "./Clients/CreateClient";
 import ViewClient from "./Clients/ViewClient";
 import Profile from "./Profile/Profile"
 import WebinarAttendees from "./Webinar/WebinarAttendees";
+import NotesPage from "./Contacts/NotesPage";
+import AttendeeHistory from "./Contacts/AttendeeHistory";
+
 export {
+  AttendeeHistory,
   Dashboard,
   Login,
   Webinar,
@@ -35,7 +38,6 @@ export {
   NotFound,
   Employees,
   ViewParticularContact,
-  ViewContacts,
   ViewProducts,
   CreateProduct,
   ViewAttendees,
@@ -54,5 +56,6 @@ export {
   CreateClient,
   ViewClient,
   Profile,
-  WebinarAttendees
+  WebinarAttendees,
+  NotesPage
 };

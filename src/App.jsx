@@ -13,7 +13,6 @@ import {
   NotFound,
   Employees,
   ViewParticularContact,
-  ViewContacts,
   ViewProducts,
   CreateProduct,
   ViewAttendees,
@@ -33,6 +32,8 @@ import {
   ViewClient,
   Profile,
   WebinarAttendees,
+  NotesPage,
+  AttendeeHistory,
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 import {
@@ -55,7 +56,7 @@ const App = () => {
 
   const { userData, isUserLoggedIn, subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
-  const isCustomStatusEnabled = tableConfig?.customOptions?.filterable  || false;
+  const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed  || false;
 
   if (isUserLoggedIn && !userData?.role) {
     dispatch(logout());
@@ -113,8 +114,12 @@ const App = () => {
           ),
         },
         {
-          path: "/contacts/:csvId",
-          element: <ViewContacts />,
+          path: "/particularContact/notes",
+          element: <NotesPage />,
+        },
+        {
+          path: "/particularContact/attendee-history",
+          element: <AttendeeHistory />,
         },
         {
           path: "/particularContact",

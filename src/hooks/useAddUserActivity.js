@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { addUserActivity, sendInactiveUserEmail } from "../features/actions/userActivity";
 import useRoles from "./useRoles";
 
-const INACTIVITY_LIMIT = 10 * 1000; 
+const INACTIVITY_LIMIT = 60 * 10 * 1000; 
 
 // Singleton state variables
 let inactivityTimer = null;
@@ -13,14 +13,11 @@ let initialized = false;
 const resetInactivityTimer = (roles, dispatch) => {
   if (!roles.isEmployeeId("")) return;
 
-  console.log('timer --->', inactivityTimer);
   if (inactivityTimer) {
     clearTimeout(inactivityTimer);
   }
-  console.log("Resetting inactivity timer");
 
   inactivityTimer = setTimeout(() => {
-    console.warn("User is inactive");
     dispatch(sendInactiveUserEmail());
 
     dispatch(
@@ -82,7 +79,6 @@ const useAddUserActivity = () => {
   useEffect(() => {
     if (!initialized) {
       initialized = true;
-      console.log("Initializing singleton inactivity tracker");
       resetInactivityTimer(roles, dispatch);
     }
 

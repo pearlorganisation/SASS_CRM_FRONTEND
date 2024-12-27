@@ -53,14 +53,14 @@ const ViewProducts = () => {
   const actionIcons = [
     {
       icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
-      tooltip: "Edit Attendee",
+      tooltip: "Edit Product",
       onClick: (item) => {},
     },
     {
       icon: (item) => (
         <Delete className="text-red-500 group-hover:text-red-600" />
       ),
-      tooltip: "Delete Attendee",
+      tooltip: "Delete Product",
       onClick: (item) => {},
     },
   ];

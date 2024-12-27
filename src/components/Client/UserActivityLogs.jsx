@@ -28,7 +28,7 @@ import UserActivityTable from "../Table/UserActivityTable";
 const UserActivityLogs = ({ isActive, id }) => {
   const dispatch = useDispatch();
   const { userActivities } = useSelector((state) => state.userActivity);
-  const LIMIT = useSelector((state) => state.pageLimits["userActivity"] || 10);
+  const LIMIT = useSelector((state) => state.pageLimits["activityLogs"] || 10);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
