@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ClipLoader } from "react-spinners";
 
-export default function Delete({ setModal, triggerDelete, isLoading }) {
+export default function ConfirmDeleteModal({ setModal, triggerDelete, isLoading }) {
   const [generatedNumber, setGeneratedNumber] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [isInputValid, setIsInputValid] = useState(true);
@@ -10,7 +10,7 @@ export default function Delete({ setModal, triggerDelete, isLoading }) {
     const randomNumber = Math.floor(100000 + Math.random() * 900000);
     setGeneratedNumber(randomNumber);
   }, []);
-
+ 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
     setIsInputValid(e.target.value === generatedNumber.toString());
@@ -27,7 +27,8 @@ export default function Delete({ setModal, triggerDelete, isLoading }) {
   };
 
   return (
-    <div className="fixed inset-0 p-4 flex flex-wrap justify-center items-center w-full h-full z-[1000] before:fixed before:inset-0 before:w-full before:h-full before:bg-[rgba(0,0,0,0.5)] overflow-auto font-[sans-serif]">
+    
+    <div className="fixed inset-0 p-4 flex flex-wrap justify-center items-center w-full h-full before:fixed before:inset-0 before:w-full before:h-full before:bg-[rgba(0,0,0,0.5)] overflow-auto font-[sans-serif]"  style={{ zIndex: 100 }}>
       <div className="w-full max-w-md bg-white shadow-lg rounded-md p-6 relative">
         <div className="border-b border-b-neutral-500 flex justify-end pb-2">
           <svg

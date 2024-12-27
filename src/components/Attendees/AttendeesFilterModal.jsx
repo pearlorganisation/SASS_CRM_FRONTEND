@@ -214,6 +214,10 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                       <Select
                         {...field}
                         labelId="status-label"
+                        style={{
+                          border: "1px solid red",
+                          color: "gray",
+                        }}
                         label="Status"
                         value={field.value || ""}
                       >
@@ -232,6 +236,10 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                   <Select
                     labelId="lead-type-select-label"
                     value={selectedOption || ""}
+                    style={{
+                      border: "1px solid red",
+                      color: "gray",
+                    }}
                     className="shadow font-semibold"
                     displayEmpty
                     renderValue={(selected) => {

@@ -116,7 +116,6 @@ function AttendeeTable({ control, setValue, watch }) {
                 </TableCell>
               </TableRow>
             ))}
-
             <TableRow>
               <TableCell></TableCell>
               <TableCell
@@ -172,10 +171,17 @@ function AttendeeTable({ control, setValue, watch }) {
                         onChange(isChecked);
                       }}
                       checked={value || false}
-                      disabled={!watch(`attendeeTableConfig.status.filterable`)}
+                      disabled={
+                        !watch(`attendeeTableConfig.status.filterable`) ||
+                        !watch(`attendeeTableConfig.isCustomOptionsAllowed`)
+                      }
                     />
                   )}
                 />
+                {console.log(
+                  !watch(`attendeeTableConfig.status.filterable`) &&
+                    !watch(`attendeeTableConfig.isCustomOptionsAllowed`)
+                )}
               </TableCell>
             </TableRow>
           </TableBody>
@@ -301,6 +307,45 @@ export default function AddPlan() {
               required={true}
               errorMessage="Toggle limit is required"
             />
+
+            <div className="flex ms-2 items-center">
+              <Typography className="font-semibold text-gray-800">
+                {"Custom Options (Create/Dropdown)"}
+              </Typography>
+              <Controller
+                name={`attendeeTableConfig.isCustomOptionsAllowed`}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      // Update "Downloadable" checkbox
+                      onChange(isChecked);
+                      // Automatically check "Filterable" if "Downloadable" is checked
+                      if (!isChecked) {
+                        setValue(
+                          `attendeeTableConfig.customOptions.filterable`,
+                          false
+                        );
+                        // if (key === "status") {
+                        //   customOptions.forEach((option) =>
+                        //     setValue(
+                        //       `attendeeTableConfig.defaultOptions.${option?.label}`,
+                        //       false
+                        //     )
+                        //   );
+                        //   setValue(
+                        //     `attendeeTableConfig.customOptions.filterable`,
+                        //     false
+                        //   );
+                        // }
+                      }
+                    }}
+                    checked={value || false}
+                  />
+                )}
+              />
+            </div>
           </div>
 
           <Box className="mt-6">

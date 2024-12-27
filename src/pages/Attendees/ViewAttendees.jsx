@@ -64,22 +64,6 @@ const WebinarAttendees = () => {
         navigate(`/particularContact?email=${item?.email}&attendeeId=${item?._id}` );
       },
     },
-    {
-      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
-      tooltip: "Edit Attendee",
-      onClick: (item) => {
-        console.log(`Editing row with id: ${item?._id}`);
-      },
-    },
-    {
-      icon: (item) => (
-        <Delete className="text-red-500 group-hover:text-red-600" />
-      ),
-      tooltip: "Delete Attendee",
-      onClick: (item) => {
-        console.log(`Deleting row with id: ${item?._id}`);
-      },
-    },
   ];
   return (
     <div className="px-6 md:px-10 pt-14 space-y-6">

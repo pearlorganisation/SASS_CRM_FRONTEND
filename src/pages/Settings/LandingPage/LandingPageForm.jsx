@@ -16,12 +16,14 @@ import {
   createGlobalData,
   getGlobalData,
 } from "../../../features/actions/globalData";
+import FormInput from "../../../components/FormInput";
 
 const LandingPageForm = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    control,
     reset,
     setValue,
   } = useForm();
@@ -34,8 +36,7 @@ const LandingPageForm = () => {
   const dispatch = useDispatch();
 
   const onSubmit = (data) => {
-    if (data["file"])
-      data["file"] = data["file"][0];
+    if (data["file"]) data["file"] = data["file"][0];
     else data["file"] = null;
     data["videoControls"] = isControlsVisible;
     console.log(data);
@@ -89,21 +90,19 @@ const LandingPageForm = () => {
         {/* Title & Subtitle */}
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
-            <TextField
-              {...register("title", { required: "Heading is required" })}
+            <FormInput
+              name="title"
               label="Heading"
-              fullWidth
-              error={!!errors.title}
-              helperText={errors.title?.message}
+              control={control}
+              validation={{ required: "Heading is required" }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <TextField
-              {...register("subTitle", { required: "Sub Heading is required" })}
+            <FormInput
+              name="subTitle"
               label="Sub Heading"
-              fullWidth
-              error={!!errors.subTitle}
-              helperText={errors.subTitle?.message}
+              control={control}
+              validation={{ required: "Sub Heading is required" }}
             />
           </Grid>
         </Grid>
@@ -169,23 +168,21 @@ const LandingPageForm = () => {
         {/* Button & Link */}
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
-            <TextField
-              {...register("buttonName", {
-                required: "Button name is required",
-              })}
+            <FormInput
+              name="buttonName"
               label="Button Name"
-              fullWidth
-              error={!!errors.buttonName}
-              helperText={errors.buttonName?.message}
+              control={control}
+              validation={{
+                required: "Button name is required",
+              }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <TextField
-              {...register("link", { required: "Link is required" })}
+            <FormInput
+              name="link"
               label="Button Link"
-              fullWidth
-              error={!!errors.link}
-              helperText={errors.link?.message}
+              control={control}
+              validation={{ required: "Link is required" }}
             />
           </Grid>
         </Grid>
@@ -193,23 +190,21 @@ const LandingPageForm = () => {
         {/* Video Dimensions */}
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
-            <TextField
-              {...register("buttonHeight", { required: "Height is required" })}
+            <FormInput
+              name="buttonHeight"
               label="Height (px)"
-              fullWidth
+              control={control}
               type="number"
-              error={!!errors.buttonHeight}
-              helperText={errors.buttonHeight?.message}
+              validation={{ required: "Height is required" }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <TextField
-              {...register("buttonWidth", { required: "Width is required" })}
+          <FormInput
+              name="buttonWidth"
               label="Width (px)"
-              fullWidth
+              control={control}
               type="number"
-              error={!!errors.buttonWidth}
-              helperText={errors.buttonWidth?.message}
+              validation={{ required: "Width is required" }}
             />
           </Grid>
         </Grid>
