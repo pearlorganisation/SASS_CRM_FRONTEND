@@ -17,19 +17,22 @@ import { closeModal } from "../../features/slices/modalSlice";
 import FormInput from "../FormInput";
 import { filterTruthyValues } from "../../utils/extra";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { getCustomOptionsForFilters } from "../../features/actions/globalData";
 
 const FilterModal = ({ modalName, setFilters, filters }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
 
+  const { leadTypeData } = useSelector((state) => state.assign);
+  const { subscription } = useSelector((state) => state.auth);
   const { modals } = useSelector((state) => state.modals);
+  const { customOptionsForFilters } = useSelector((state) => state.globalData);
+  console.log(customOptionsForFilters);
   const open = modals[modalName] ? true : false;
   const { control, handleSubmit, reset } = useForm();
 
   const [selectedOption, setSelectedOption] = useState("");
   const [leadTypeOptions, setLeadTypeOptions] = useState([]);
-  const { leadTypeData } = useSelector((state) => state.assign);
-  const { subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
   //console.log(subscription?.plan);
 
@@ -54,6 +57,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
       gender: "",
       phone: "",
       location: "",
+      status: "",
     });
   };
 
@@ -63,6 +67,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
 
   useEffect(() => {
     if (open) {
+      dispatch(getCustomOptionsForFilters());
       reset({
         ...filters,
       });
@@ -214,18 +219,17 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                       <Select
                         {...field}
                         labelId="status-label"
-                        style={{
-                          border: "1px solid red",
-                          color: "gray",
-                        }}
                         label="Status"
                         value={field.value || ""}
                       >
                         <MenuItem value="">All</MenuItem>
-                        <MenuItem value="male">will join webinar</MenuItem>
-                        <MenuItem value="female"> no answer</MenuItem>
-                        <MenuItem value="other">no network</MenuItem>
-                        <MenuItem value="other">asked to call later</MenuItem>
+                        {
+                          customOptionsForFilters.map((option) => (
+                            <MenuItem key={option.value} value={option.label}>
+                              {option.label}
+                            </MenuItem>
+                          ))
+                        }
                       </Select>
                     </FormControl>
                   )}
