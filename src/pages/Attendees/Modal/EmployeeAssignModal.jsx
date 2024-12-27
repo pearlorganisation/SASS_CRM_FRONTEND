@@ -15,8 +15,7 @@ import useRoles from "../../../hooks/useRoles";
 import { addAssign } from "../../../features/actions/assign";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
-function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
-  console.log("selectedRows", selectedRows);
+function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
 
   const dispatch = useDispatch();
   const roles = useRoles();
@@ -24,7 +23,6 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
 
   const { modals } = useSelector((state) => state.modals);
   const { employeeData, isLoading } = useSelector((state) => state.employee);
-  const { tabValue } = useSelector((state) => state.attendee);
   const { isSuccess } = useSelector((state) => state.assign);
 
   const open = modals[modalName] ? true : false;
@@ -43,10 +41,6 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
     }));
 
   const handleAssign = () => {
-    if(selectedEmployee === 'auto') {
-        console.log('auto assigned');
-      return ;
-    }
 
     if (selectedEmployee) {
       dispatch(
@@ -97,13 +91,6 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId }) {
           onChange={(e) => setSelectedEmployee(e.target.value)}
           className="space-y-3"
         >
-          <FormControlLabel
-            key="auto"
-            value="auto"
-            control={<Radio color="primary" />}
-            label={<span className="text-gray-700">Auto Assign</span>}
-            className="flex items-center"
-          />
           {options.map((option) => (
             <FormControlLabel
               key={option.value}

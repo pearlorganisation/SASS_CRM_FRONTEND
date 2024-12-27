@@ -10,6 +10,8 @@ import {
   Tabs,
   Tab,
   Box,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import { updateClient } from "../../features/actions/client";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,10 +19,13 @@ import { resetClientState } from "../../features/slices/client";
 import { ClipLoader } from "react-spinners";
 import { closeModal } from "../../features/slices/modalSlice";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const UpdateClientModal = ({ modalName }) => {
   const logUserActivity = useAddUserActivity();
-  const { modals, modalData: defaultUserInfo } = useSelector((state) => state.modals);
+  const { modals, modalData: defaultUserInfo } = useSelector(
+    (state) => state.modals
+  );
   const open = modals[modalName] ? true : false;
 
   const dispatch = useDispatch();
@@ -34,6 +39,11 @@ const UpdateClientModal = ({ modalName }) => {
     watch,
     formState: { errors },
   } = useForm();
+
+  const [showPassword, setShowPassword] = useState({
+    newPassword: false,
+    confirmPassword: false,
+  });
 
   useEffect(() => {
     reset({
@@ -59,9 +69,18 @@ const UpdateClientModal = ({ modalName }) => {
     dispatch(updateClient({ data: payload, id: data?._id }));
     logUserActivity({
       action: "update",
-      type: `Client's ${activeTab === 0 ? "information" : "password"} with UserName`,
+      type: `Client's ${
+        activeTab === 0 ? "information" : "password"
+      } with UserName`,
       detailItem: data.userName,
     });
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
   };
 
   useEffect(() => {
@@ -174,28 +193,56 @@ const UpdateClientModal = ({ modalName }) => {
               <TextField
                 {...register("newPassword", {
                   required: "New password is required.",
-                  // minLength: {
-                  //   value: 8,
-                  //   message: "Password must be at least 8 characters long.",
-                  // },
                 })}
                 label="New Password"
-                type="password"
+                type={showPassword.newPassword ? "text" : "password"}
                 fullWidth
                 error={!!errors.newPassword}
                 helperText={errors.newPassword?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => togglePasswordVisibility("newPassword")}
+                      >
+                        {showPassword.newPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
               {/* Confirm Password Field */}
               <TextField
                 {...register("confirmPassword", {
-                  required: "Confirm password is required.",
+                  required: "Please confirm your password.",
                   validate: validatePassword,
                 })}
                 label="Confirm Password"
-                type="password"
+                type={showPassword.confirmPassword ? "text" : "password"}
                 fullWidth
                 error={!!errors.confirmPassword}
                 helperText={errors.confirmPassword?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          togglePasswordVisibility("confirmPassword")
+                        }
+                      >
+                        {showPassword.confirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Box>
           )}

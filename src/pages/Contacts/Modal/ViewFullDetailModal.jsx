@@ -52,6 +52,14 @@ const ViewFullDetailsModal = (props) => {
             </TableRow>
             <TableRow>
               <TableCell className="bg-slate-100 font-medium text-slate-700">
+                Created BY
+              </TableCell>
+              <TableCell className="bg-slate-50 text-slate-500">
+              {modalData?.createdBy?.userName || "-"}
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="bg-slate-100 font-medium text-slate-700">
                 Phone Number
               </TableCell>
               <TableCell className="bg-slate-50 text-slate-500">

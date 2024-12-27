@@ -1,13 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Tabs, Tab } from "@mui/material";
+import {
+  Button,
+  Tabs,
+  Tab,
+  IconButton,
+  Tooltip,
+  ButtonGroup,
+} from "@mui/material";
 import { createPortal } from "react-dom";
 import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
-import { clearSuccess, setTabValue } from "../../features/slices/attendees";
+import {
+  clearSuccess,
+  setTabValue as setTab,
+} from "../../features/slices/attendees";
 import { getAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
-import { Edit, Delete, Visibility, AttachFile } from "@mui/icons-material";
+import {
+  Edit,
+  Delete,
+  Visibility,
+  AttachFile,
+  ContentCopy,
+} from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
@@ -15,37 +31,46 @@ import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModa
 import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { getLeadType, getPullbacks } from "../../features/actions/assign";
+import { toast } from "sonner";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
   const exportExcelModalName = "ExportWebinarAttendeesExcel";
   const AttendeesFilterModalName = "AttendeesFilterModal";
   const employeeAssignModalName = "employeeAssignModal";
-  const tableHeader = "Attendees Table";
+  const [tableHeader, setTableHeader] = useState("Attendees Table");
   // ----------------------- etcetra -----------------------
   const { id } = useParams();
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
   const navigate = useNavigate();
 
-  const { attendeeData, isLoading, isSuccess, totalPages, tabValue } =
-    useSelector((state) => state.attendee);
+  const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
+    (state) => state.attendee
+  );
+  const { isSuccess: assignSuccess } = useSelector((state) => state.assign);
   const { userData } = useSelector((state) => state.auth);
+  const { leadTypeData } = useSelector((state) => state.assign);
   const [selectedRows, setSelectedRows] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
+  const webinarName = searchParams.get("webinarName");
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
+  const [tabValue, setTabValue] = useState("preWebinar");
+  const [selected, setSelected] = useState("All");
 
   useEffect(() => {
-    setSearchParams({ page: page });
+    setSearchParams({ page: page, webinarName: webinarName });
   }, [page]);
 
   // Tabs change handler
   const handleTabChange = (_, newValue) => {
-    dispatch(setTabValue(newValue));
+    dispatch(setTab(newValue));
+    setTabValue(newValue);
     setPage(1);
     setSelectedRows([]);
     logUserActivity({
@@ -56,25 +81,76 @@ const WebinarAttendees = () => {
   };
 
   useEffect(() => {
-    dispatch(
-      getAttendees({ id, isAttended: tabValue, page, limit: LIMIT, filters })
-    );
-  }, [page, tabValue, LIMIT, filters]);
+    dispatch(getLeadType());
+  }, []);
 
   useEffect(() => {
-    if (isSuccess) {
+    console.log(selected);
+    switch (tabValue) {
+      case "pullbacks":
+        setTableHeader("Pullbacks");
+        dispatch(getPullbacks({ id, page, limit: LIMIT, filters }));
+        break;
+
+      case "postWebinar":
+        setTableHeader("Post Webinar Attendees");
+        dispatch(
+          getAttendees({
+            id,
+            isAttended: true,
+            page,
+            limit: LIMIT,
+            filters,
+            validCall: selected === "All" ? undefined : selected,
+          })
+        );
+        break;
+
+      case "preWebinar":
+        setTableHeader("Pre Webinar Attendees");
+        dispatch(
+          getAttendees({
+            id,
+            isAttended: false,
+            page,
+            limit: LIMIT,
+            filters,
+            validCall: selected === "All" ? undefined : selected,
+          })
+        );
+        break;
+
+      default:
+        setTableHeader("Attendee Table");
+        dispatch(
+          getAttendees({
+            id,
+            isAttended: tabValue === "postWebinar",
+            page,
+            limit: LIMIT,
+            filters,
+            validCall: selected === "All" ? undefined : selected,
+          })
+        );
+        break;
+    }
+  }, [page, tabValue, LIMIT, filters, selected]);
+
+  useEffect(() => {
+    if (isSuccess || assignSuccess) {
       dispatch(
         getAttendees({
           id,
-          isAttended: tabValue,
+          isAttended: tabValue === "postWebinar",
           page: 1,
           limit: LIMIT,
           filters,
+          validCall: selected === "All" ? undefined : selected,
         })
       );
       dispatch(clearSuccess());
     }
-  }, [isSuccess]);
+  }, [isSuccess, assignSuccess]);
 
   // ----------------------- Action Icons -----------------------
 
@@ -85,27 +161,42 @@ const WebinarAttendees = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
-        navigate('/particularContact')
+        navigate(
+          `/particularContact?email=${item?.email}&attendeeId=${item?._id}`
+        );
       },
       readOnly: true,
     },
-    {
-      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
-      tooltip: "Edit Attendee",
-      onClick: (item) => {
-        console.log(`Editing row with id: ${item?._id}`);
-      },
-    },
-    {
-      icon: (item) => (
-        <Delete className="text-red-500 group-hover:text-red-600" />
-      ),
-      tooltip: "Delete Attendee",
-      onClick: (item) => {
-        console.log(`Deleting row with id: ${item?._id}`);
-      },
-    },
   ];
+
+  const AttendeeButtonGroup = () => {
+    const handleClick = (label) => {
+      setSelected(label); // Update state on button click
+      console.log(`${label} button clicked`);
+    };
+    return (
+      <ButtonGroup variant="outlined" aria-label="Basic button group">
+        <Button
+          onClick={() => handleClick("All")}
+          color={selected === "All" ? "secondary" : "primary"}
+        >
+          All
+        </Button>
+        <Button
+          onClick={() => handleClick("Valid")}
+          color={selected === "Valid" ? "secondary" : "primary"}
+        >
+          Valid
+        </Button>
+        <Button
+          onClick={() => handleClick("Not Valid")}
+          color={selected === "Not Valid" ? "secondary" : "primary"}
+        >
+          Not Valid
+        </Button>
+      </ButtonGroup>
+    );
+  };
   return (
     <div className="px-6 md:px-10 pt-10 space-y-6">
       {/* Tabs for Sales and Reminder */}
@@ -122,42 +213,71 @@ const WebinarAttendees = () => {
         <Tab
           label="Enrollments"
           value="enrollments"
-          className="text-gray-600"
+          style={{
+            border: "1px solid red",
+            color: "gray",
+          }}
         />
 
-        <Tab label="UnAttended" value="unattended" className="text-gray-600" />
+        {/* <Tab label="UnAttended" value="unattended" className="text-gray-600" /> */}
+        <Tab
+          label="Pullbacks"
+          value="pullbacks"
+          style={{
+            border: "1px solid red",
+            color: "gray",
+          }}
+        />
       </Tabs>
 
-      <div className="flex gap-4 justify-end">
-        {selectedRows.length > 0 && (
-          <Button
-            onClick={() => dispatch(openModal(employeeAssignModalName))}
-            variant="contained"
-          >
-            Assign
-          </Button>
-        )}
+      <div className="flex gap-4 justify-between">
+        <div className="flex gap-4">
+          <h2 className="text-2xl font-bold text-gray-700">{webinarName}</h2>
+          <Tooltip title={`Copy Webinar Id: ${id}`} placement="top">
+            <IconButton
+              onClick={() => {
+                navigator.clipboard.writeText(id);
+                toast.success("Copied to clipboard");
+              }}
+            >
+              <ContentCopy className="text-blue-500 group-hover:text-blue-600" />
+            </IconButton>
+          </Tooltip>
+        </div>
+        <div className="flex gap-4">
+          {selectedRows.length > 0 && (
+            <Button
+              onClick={() => dispatch(openModal(employeeAssignModalName))}
+              variant="contained"
+            >
+              Assign
+            </Button>
+          )}
 
-        <ComponentGuard conditions={[userData?.isActive]}>
-          <Button
-            onClick={() => setShowModal((prev) => !prev)}
-            variant="contained"
-            startIcon={<AttachFile />}
-          >
-            Import
-          </Button>
-        </ComponentGuard>
+          <ComponentGuard conditions={[userData?.isActive]}>
+            <Button
+              onClick={() => setShowModal((prev) => !prev)}
+              variant="contained"
+              startIcon={<AttachFile />}
+            >
+              Import
+            </Button>
+          </ComponentGuard>
+        </div>
       </div>
-
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="webinarAttendeesTable"
+        // ButtonGroup={AttendeeButtonGroup}
         isSelectVisible={true}
         filters={filters}
         setFilters={setFilters}
         tableData={{
           columns: attendeeTableColumns,
-          rows: attendeeData,
+          rows: attendeeData.map((row) => ({
+            ...row,
+            leadType: leadTypeData.find((lead) => lead._id === row?.leadType),
+          })),
         }}
         actions={actionIcons}
         totalPages={totalPages}
@@ -171,6 +291,7 @@ const WebinarAttendees = () => {
         isLoading={isLoading}
       />
       <EmployeeAssignModal
+        tabValue={tabValue}
         selectedRows={selectedRows.map((rowId) => ({
           attendee: rowId,
           recordType: tabValue,

@@ -12,7 +12,7 @@ import {
   TableHead,
   TableRow,
   Tooltip,
-  Skeleton, // Import Skeleton
+  Skeleton,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import ComponentGuard from "../AccessControl/ComponentGuard";
@@ -20,6 +20,7 @@ import ComponentGuard from "../AccessControl/ComponentGuard";
 const tableCellStyles = {
   paddingTop: "6px",
   paddingBottom: "6px",
+  height: "50px",
   textWrap: "nowrap",
   color: "#555A68",
 };
@@ -36,12 +37,15 @@ const RawTable = (props) => {
     isLoading,
     selectedRows,
     setSelectedRows,
-    rowClick = (row) => {console.log("Row clicked:", row)},
+    rowClick = (row) => {
+      console.log("Row clicked:", row);
+    },
     isRowClickable = false,
+    isLeadType = true,
     userData,
   } = props;
   const dispatch = useDispatch();
-    const {isTablesMasked} = useSelector((state) => state.table);
+  const { isTablesMasked } = useSelector((state) => state.table);
 
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
@@ -53,13 +57,35 @@ const RawTable = (props) => {
     return selectedRows.includes(id);
   };
 
+  const areAllSelected = selectedRows.length === tableData?.rows?.length;
+
+  const handleSelectAllChange = (checked) => {
+    if (checked) {
+      setSelectedRows(tableData?.rows?.map((row) => row._id));
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
   return (
     <TableContainer component={Paper} className="shadow-md">
       <Table>
         <TableHead className="bg-gray-100">
           <TableRow>
             <TableCell className="">S.No</TableCell>
-            {isSelectVisible && <TableCell className="">Select</TableCell>}
+            {isSelectVisible && (
+              <TableCell className="">
+                <Checkbox
+                  color="primary"
+                  checked={areAllSelected}
+                  indeterminate={
+                    selectedRows.length > 0 &&
+                    selectedRows.length < tableData?.rows?.length
+                  }
+                  onChange={(e) => handleSelectAllChange(e.target.checked)}
+                />
+              </TableCell>
+            )}
             {tableData?.columns?.map((column, index) => (
               <TableCell key={index} className={thStyles}>
                 {column.header}
@@ -103,11 +129,31 @@ const RawTable = (props) => {
                   isRowSelected(row?._id) ? "bg-blue-50" : "bg-white"
                 } hover:bg-gray-50`}
               >
-                <TableCell 
-                className={`${isRowClickable ? "cursor-pointer" : ""}`}
-                onClick={() => rowClick(row)}
-                sx={tableCellStyles}>
-                  {(page - 1) * limit + index + 1}
+                <TableCell
+                  className={`${isRowClickable ? "cursor-pointer" : ""}`}
+                  onClick={() => rowClick(row)}
+                  sx={{
+                    paddingTop: "0px",
+                    paddingBottom: "0px",
+                    height: "30px",
+                    textWrap: "nowrap",
+                    color: "#555A68",
+                  }}
+                >
+                  <div className="flex h-full items-center justify-between">
+                    {isLeadType && (
+                      <div
+                        className="w-2 h-full"
+                        style={{
+                          backgroundColor:
+                            row?.leadType?.color || "transparent",
+                          borderRadius: "5%",
+                        }}
+                      ></div>
+                    )}
+
+                    {(page - 1) * limit + index + 1}
+                  </div>
                 </TableCell>
                 {isSelectVisible && (
                   <TableCell sx={tableCellStyles}>
@@ -120,9 +166,11 @@ const RawTable = (props) => {
                 )}
                 {tableData?.columns?.map((column, index) => (
                   <TableCell
-                  className={`${isRowClickable ? "cursor-pointer" : ""}`}
-                  onClick={() => rowClick(row)}
-                  key={index} sx={tableCellStyles}>
+                    className={`${isRowClickable ? "cursor-pointer" : ""}`}
+                    onClick={() => rowClick(row)}
+                    key={index}
+                    sx={tableCellStyles}
+                  >
                     {column.type === "status" && (
                       <Chip
                         label={row?.[column.key] ? "Active" : "Inactive"}
@@ -133,9 +181,16 @@ const RawTable = (props) => {
                       (formatDateAsNumber(row?.[column.key]) ?? "N/A")}
 
                     {column.type === "" &&
-                      (row?.[column.key] !== undefined && row?.[column.key] !== null
+                      (row?.[column.key] !== undefined &&
+                      row?.[column.key] !== null
                         ? isTablesMasked &&
-                          ["userName", "email", "phone", 'firstName', 'lastName'].includes(column.key)
+                          [
+                            "userName",
+                            "email",
+                            "phone",
+                            "firstName",
+                            "lastName",
+                          ].includes(column.key)
                           ? `${row[column.key].slice(0, 3)}***`
                           : row[column.key] ?? "N/A"
                         : "N/A")}
@@ -149,7 +204,12 @@ const RawTable = (props) => {
                     {actions?.map((action, index) => (
                       <ComponentGuard
                         key={index}
-                        conditions={[action?.readOnly || userData?.isActive, action?.hideCondition ? action.hideCondition(row) : true]}
+                        conditions={[
+                          action?.readOnly || userData?.isActive,
+                          action?.hideCondition
+                            ? action.hideCondition(row)
+                            : true,
+                        ]}
                       >
                         <div key={index}>
                           <Tooltip title={action.tooltip} arrow>

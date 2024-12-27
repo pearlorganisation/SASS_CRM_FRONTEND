@@ -5,6 +5,7 @@ import { IconButton, Skeleton, Stack, Tooltip } from "@mui/material";
 import { deleteSidebarLink, getAllSidebarLinks } from "../../../features/actions/sidebarLink";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Delete from "../../../components/ConfirmDeleteModal";
 const ViewSidebarLinks = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -14,7 +15,8 @@ const ViewSidebarLinks = () => {
 
   const [selectedLink, setSelectedLink] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const[deletedModal,setdeleteModal]=useState(false)
+const[isId,setId]=useState(null)
   useEffect(() => {
     dispatch(getAllSidebarLinks());
   }, []);
@@ -29,16 +31,18 @@ const ViewSidebarLinks = () => {
     setIsModalOpen(false);
   };
 
-  const handleDelete = (id) => {
-    dispatch(deleteSidebarLink(id)).then((res) => {
+  const handleDelete = () => {
+    dispatch(deleteSidebarLink(isId)).then((res) => {
       if (res?.meta.requestStatus === "fulfilled") {
         dispatch(getAllSidebarLinks());
+        setdeleteModal(false)
       }
 
     });
   };
 
   return (
+    <>
     <div>
       <div className="p-10">
         <div className="flex items-center justify-between flex-col md:flex-row space-y-4 md:space-y-0 pb-8 bg-white">
@@ -100,7 +104,8 @@ const ViewSidebarLinks = () => {
                       <IconButton
                           color="primary"
                           className=" group"
-                          onClick={() => handleDelete(item?._id)}
+                          onClick={() => {setdeleteModal(true)
+                            setId(item?._id)}}
                         >
                             <DeleteIcon />
                           </IconButton>
@@ -142,6 +147,8 @@ const ViewSidebarLinks = () => {
         </div>
       )}
     </div>
+    {deletedModal&&(<Delete setModal={setdeleteModal} triggerDelete={handleDelete} isLoading={isLoading}  />)}
+    </>
   );
 };
 

@@ -18,6 +18,9 @@ const AssignmentTable = (props) => {
   } = props;
 
   const handleViewFullDetails = (item) => {
+
+    console.log('assignment details clicked')
+
     navigate(
       `/particularContact?email=${encodeURIComponent(
         item?._id
@@ -32,7 +35,7 @@ const AssignmentTable = (props) => {
 
   };
 
-  console.log(assignmentData,'daa');
+  
 
   return (
     <div className="mt-7 shadow-lg rounded-lg overflow-x-auto">
@@ -139,11 +142,11 @@ const AssignmentTable = (props) => {
                       >
                         View full details
                       </Link>
-                      {setAssigned && (
+                      {/* {setAssigned && (
                         <button className="py-2 px-3 leading-none font-semibold text-red-500 hover:text-red-600 duration-150 hover:bg-gray-50 rounded-lg">
                           Delete
                         </button>
-                      )}
+                      )} */}
                     </td>
                   </tr>
                 );

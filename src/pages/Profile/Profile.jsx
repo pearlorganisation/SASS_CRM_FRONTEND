@@ -18,6 +18,7 @@ import { ExpandLess, ExpandMore, Delete } from "@mui/icons-material";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import useRoles from "../../hooks/useRoles";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import ConfirmDeleteModal from "../../components/ConfirmDeleteModal";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
@@ -25,21 +26,29 @@ const ProfilePage = () => {
   const logUserActivity = useAddUserActivity();
 
   const [isEditingInfo, setIsEditingInfo] = useState(false);
-  const { userData, isSuccess } = useSelector((state) => state.auth);
+  const { isLoading, userData, isSuccess } = useSelector((state) => state.auth);
   const [isDocumentOpen, setIsDocumentOpen] = useState(false);
-  console.log("userData", userData);
+  const[doc,setDoc]=useState(null)
+  console.log("doc", doc);
+  const[deletemodal,setdeleteModal]=useState(false)
 
   const toggleEdit = () => {
     setIsEditingInfo((prev) => !prev);
   };
 
-  const handleDeleteModal = (document) => {
-    dispatch(deleteUserDocumet(document.filename));
-    logUserActivity({
-      action: "delete",
-      type: "document",
-      detailItem: document.filename,
+  const handleDeleteModal = () => {
+    dispatch(deleteUserDocumet(doc.filename)).then((res)=>{
+      if(res?.meta?.requestStatus==="fulfilled"){
+        logUserActivity({
+          action: "delete",
+          type: "document",
+          detailItem: document.filename,
+        });
+        setdeleteModal(false)
+        
+      }
     });
+    
   };
 
   const saveInfo = (data) => {
@@ -50,6 +59,7 @@ const ProfilePage = () => {
       action: "update",
       details: "User updated the profile information",
     });
+
   };
 
   useEffect(() => {
@@ -58,7 +68,7 @@ const ProfilePage = () => {
     }
   }, [isSuccess]);
 
-  return (
+  return (<>
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8">
       <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* User Info Card */}
@@ -112,7 +122,9 @@ const ProfilePage = () => {
 
                             <Tooltip title="Delete" arrow>
                               <button
-                                onClick={() => handleDeleteModal(doc)}
+                                onClick={() =>{ setDoc(doc)
+                                  setdeleteModal(true)
+                                }}
                                 className="p-2 rounded-lg text-red-400 hover:text-red-600 duration-150 hover:bg-gray-50"
                               >
                                 <Delete />
@@ -134,6 +146,8 @@ const ProfilePage = () => {
         <PasswordUpdateForm />
       </div>
     </div>
+    {deletemodal && (<ConfirmDeleteModal setModal={setdeleteModal} triggerDelete={handleDeleteModal} isLoading={isLoading}/>)}
+</>
   );
 };
 

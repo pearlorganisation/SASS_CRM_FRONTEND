@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import {
   createCustomOption,
   createGlobalData,
-  deleteCustomOption, 
+  deleteCustomOption,
+  getDashboardData, 
   getCustomOptions,
   getDashboardCardsData,
   getDashboardPlansData,
@@ -125,6 +126,22 @@ export const globalDataSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
       })
+
+      .addCase(getDashboardData.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(getDashboardData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        state.dashBoardCardsData = action.payload
+      })
+      .addCase(getDashboardData.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+      })
+
+
 
       .addCase(getDashboardPlansData.pending, (state, action) => {
         state.isLoading = true;

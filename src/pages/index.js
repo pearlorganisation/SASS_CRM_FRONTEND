@@ -6,7 +6,6 @@ import ComingSoon from "./NotFound/ComingSoon";
 import NotFound from "./NotFound/NotFound";
 import Employees from "./Employees/Employees";
 import ViewParticularContact from "./Contacts/ViewParticularContact";
-import ViewContacts from "./Contacts/ViewContacts";
 import ViewProducts from "./Products/ViewProducts";
 import CreateProduct from "./Products/CreateProduct";
 import ViewAttendees from "./Attendees/ViewAttendees";
@@ -19,16 +18,18 @@ import ViewSidebarLinks from "./Settings/SidebarLinks/ViewSidebarLinks";
 import CreateSidebarLink from "./Settings/SidebarLinks/CreateSidebarLink";
 import Assignments from "./Assignments/Assignments";
 import Clients from "./Clients/Clients";
-import EmployeeAssignments from "./Employees/EmployeeAssignments";
 import LandingPageForm from "./Settings/LandingPage/LandingPageForm";
-import EmployeeActivity from "./Employees/EmployeeActivity";
 import PabblyToken from "./Settings/PabblyToken/PabblyToken";
 import CustomOptions from "./Settings/CustomOptions/CustomOptions";
 import CreateClient from "./Clients/CreateClient";
 import ViewClient from "./Clients/ViewClient";
 import Profile from "./Profile/Profile"
 import WebinarAttendees from "./Webinar/WebinarAttendees";
+import NotesPage from "./Contacts/NotesPage";
+import AttendeeHistory from "./Contacts/AttendeeHistory";
+
 export {
+  AttendeeHistory,
   Dashboard,
   Login,
   Webinar,
@@ -37,7 +38,6 @@ export {
   NotFound,
   Employees,
   ViewParticularContact,
-  ViewContacts,
   ViewProducts,
   CreateProduct,
   ViewAttendees,
@@ -50,13 +50,12 @@ export {
   CreateSidebarLink,
   Assignments,
   Clients,
-  EmployeeAssignments,
   LandingPageForm,
-  EmployeeActivity,
   PabblyToken,
   CustomOptions,
   CreateClient,
   ViewClient,
   Profile,
-  WebinarAttendees
+  WebinarAttendees,
+  NotesPage
 };

@@ -3,17 +3,31 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { addAssign, addNote, getAssignments, getNotes } from "../actions/assign";
-import { errorToast } from "../../utils/extra";
+import {
+  addAssign,
+  addLeadType,
+  addNote,
+  deleteLeadType,
+  getAssignments,
+  getAssignmentsActivity,
+  getDashboardNotes,
+  getLeadType,
+  getNotes,
+  updateLeadType,
+} from "../actions/assign";
+import { errorToast, successToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
   isSuccess: false,
   isFormLoading: false,
   assignData: [],
+  leadTypeData: [],
+  dashboardNotes: [],
   noteData: [],
   totalPages: 1,
   errorMessage: "",
+  activityAssignMents: [],
 };
 
 // ---------------------------------------------------------------------------------------
@@ -25,6 +39,9 @@ export const assignSlice = createSlice({
     resetAssign: (state) => {
       state.isSuccess = false;
     },
+    resetAssignedData: (state) => {
+      state.assignData = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -35,6 +52,8 @@ export const assignSlice = createSlice({
       .addCase(addAssign.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        successToast("Tempory Toast... will add it later with validation");
+        
       })
       .addCase(addAssign.rejected, (state, action) => {
         state.isLoading = false;
@@ -77,14 +96,86 @@ export const assignSlice = createSlice({
       .addCase(getAssignments.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
+      })
+      .addCase(addLeadType.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(addLeadType.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+      })
+      .addCase(addLeadType.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getLeadType.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getLeadType.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.leadTypeData = action.payload || [];
+      })
+      .addCase(getLeadType.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(updateLeadType.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(updateLeadType.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+      })
+      .addCase(updateLeadType.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(deleteLeadType.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(deleteLeadType.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+      })
+      .addCase(deleteLeadType.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getDashboardNotes.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getDashboardNotes.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.dashboardNotes = action.payload || [];
+      })
+      .addCase(getDashboardNotes.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getAssignmentsActivity.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getAssignmentsActivity.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.activityAssignMents = action.payload || [];
+      })
+      .addCase(getAssignmentsActivity.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
       });
+    // .addDefaultCase((state, action) => {
+    //   return state;
+    // });
   },
 });
 
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {} = assignSlice.actions;
+export const {resetAssignedData, } = assignSlice.actions;
 export default assignSlice.reducer;
 
 // ================================================== THE END ==================================================

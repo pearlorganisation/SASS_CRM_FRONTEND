@@ -1,16 +1,30 @@
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import React, { useEffect, useState, useLayoutEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Tabs, Tab } from "@mui/material";
+import {
+  Button,
+  Tabs,
+  Tab,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  ButtonGroup,
+} from "@mui/material";
 import { attendeeTableColumns } from "../../utils/columnData";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 import { openModal } from "../../features/slices/modalSlice";
 import { getAssignments } from "../../features/actions/assign";
-import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
+import { getEmployeeWebinars } from "../../features/actions/webinarContact";
+import { resetAssignedData } from "../../features/slices/assign";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const Assignments = () => {
+  const navigate = useNavigate();
+  const addUserActivity = useAddUserActivity();
+
   // ----------------------- ModalNames for Redux -----------------------
   const filterModalName = "ViewAssignmentsFilterModal";
   const tableHeader = "Assignments Table";
@@ -24,25 +38,77 @@ const Assignments = () => {
   const { assignData, isLoading, isSuccess, totalPages } = useSelector(
     (state) => state.assign
   );
+
+  const { webinarData } = useSelector((state) => state.webinarContact);
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
+  const [currentWebinar, setCurrentWebinar] = useState("");
+  const [selected, setSelected] = useState("All");
 
   useEffect(() => {
     setSearchParams({ page: page });
   }, [page]);
 
   useEffect(() => {
-    dispatch(
-      getAssignments({ id: userData?._id, page, limit: LIMIT, filters })
-    );
-  }, [page, LIMIT, filters]);
+    if (currentWebinar)
+      dispatch(
+        getAssignments({
+          id: userData?._id,
+          page,
+          limit: LIMIT,
+          filters,
+          webinarId: currentWebinar,
+          validCall: selected === "All" ? undefined : selected,
+        })
+      );
+  }, [page, LIMIT, filters, selected]);
+
+  useEffect(() => {
+    if (currentWebinar)
+      dispatch(
+        getAssignments({
+          id: userData?._id,
+          page: 1,
+          limit: LIMIT,
+          filters,
+          webinarId: currentWebinar,
+          validCall: selected === "All" ? undefined : selected,
+        })
+      );
+  }, [currentWebinar]);
 
   useEffect(() => {
     if (isSuccess) {
     }
   }, [isSuccess]);
+
+  useLayoutEffect(() => {
+    dispatch(getEmployeeWebinars());
+    return () => {
+      dispatch(resetAssignedData());
+    };
+  }, []);
+
+  useEffect(() => {
+    if (Array.isArray(webinarData) && webinarData.length > 0) {
+      setCurrentWebinar(webinarData[0]._id);
+    }
+  }, [webinarData]);
+
+  const handleViewFullDetails = (item) => {
+    const recordType = item?.isAttended ? "postWebinar" : "preWebinar";
+    navigate(
+      `/particularContact?email=${item?.email}&attendeeId=${item?.attendeeId}`
+    );
+    dispatch(
+      addUserActivity({
+        action: "viewDetails",
+        details: `User viewed details of Attendee with Email: ${item?._id} and Record Type: ${recordType}`,
+      })
+    );
+  };
 
   // ----------------------- Action Icons -----------------------
 
@@ -53,44 +119,68 @@ const Assignments = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
-        console.log(`Viewing details for row with id: ${item?._id}`);
-      },
-    },
-    {
-      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
-      tooltip: "Edit Attendee",
-      onClick: (item) => {
-        console.log(`Editing row with id: ${item?._id}`);
-      },
-    },
-    {
-      icon: (item) => (
-        <Delete className="text-red-500 group-hover:text-red-600" />
-      ),
-      tooltip: "Delete Attendee",
-      onClick: (item) => {
-        console.log(`Deleting row with id: ${item?._id}`);
+        handleViewFullDetails(item);
       },
     },
   ];
+
+  const AttendeeButtonGroup = () => {
+    const handleClick = (label) => {
+      setSelected(label); // Update state on button click
+      console.log(`${label} button clicked`);
+    };
+    return (
+      <ButtonGroup variant="outlined" aria-label="Basic button group">
+        <Button
+          onClick={() => handleClick("All")}
+          color={selected === "All" ? "secondary" : "primary"}
+        >
+          All
+        </Button>
+        <Button
+          onClick={() => handleClick("Valid")}
+          color={selected === "Valid" ? "secondary" : "primary"}
+        >
+          Valid
+        </Button>
+        <Button
+          onClick={() => handleClick("Not Valid")}
+          color={selected === "Not Valid" ? "secondary" : "primary"}
+        >
+          Not Valid
+        </Button>
+      </ButtonGroup>
+    );
+  };
   return (
     <div className="px-6 md:px-10 pt-14 space-y-6">
       {/* Tabs for Sales and Reminder */}
 
       <div className="flex gap-4 justify-end">
-        {selectedRows.length > 0 && (
-          <Button
-            onClick={() => dispatch(openModal(employeeAssignModalName))}
-            variant="contained"
+        <FormControl className="w-60">
+          <InputLabel id="webinar-label">Webinar</InputLabel>
+          <Select
+            labelId="webinar-label"
+            label="Webinar"
+            value={currentWebinar}
+            onChange={(e) => setCurrentWebinar(e.target.value)}
           >
-            Assign
-          </Button>
-        )}
+            <MenuItem value="" disabled>
+              Select Webinar
+            </MenuItem>
+            {webinarData.map((webinar, index) => (
+              <MenuItem key={index} value={webinar._id}>
+                {webinar.webinarName}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </div>
 
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="viewAssignmentsTable"
+        // ButtonGroup={AttendeeButtonGroup}
         // isSelectVisible={true}
         filters={filters}
         setFilters={setFilters}

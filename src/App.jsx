@@ -13,7 +13,6 @@ import {
   NotFound,
   Employees,
   ViewParticularContact,
-  ViewContacts,
   ViewProducts,
   CreateProduct,
   ViewAttendees,
@@ -26,15 +25,15 @@ import {
   CreateSidebarLink,
   Assignments,
   Clients,
-  EmployeeAssignments,
   LandingPageForm,
-  EmployeeActivity,
   PabblyToken,
   CustomOptions,
   CreateClient,
   ViewClient,
   Profile,
   WebinarAttendees,
+  NotesPage,
+  AttendeeHistory,
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 import {
@@ -48,35 +47,41 @@ import { getNoticeBoard } from "./features/actions/noticeBoard";
 import useRoles from "./hooks/useRoles";
 import useAddUserActivity from "./hooks/useAddUserActivity";
 import ViewEmployee from "./pages/Employees/ViewEmployee";
+import LeadTypes from "./pages/Settings/LeadType/ManageLeadTypes";
 
 const App = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
 
-  const { userData, isUserLoggedIn } = useSelector((state) => state.auth);
-  const role = userData?.role || "";
-  if (isUserLoggedIn && !role) {
+  const { userData, isUserLoggedIn, subscription } = useSelector((state) => state.auth);
+  const tableConfig = subscription?.plan?.attendeeTableConfig || {};
+  const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed  || false;
+
+  if (isUserLoggedIn && !userData?.role) {
     dispatch(logout());
   }
 
   useEffect(() => {
     function initFunctions() {
-      dispatch(getCurrentUser());
-      console.log(" isEmployee --->> ", roles.isEmployeeId(role));
-      if (isUserLoggedIn && role ) { // && !roles.isEmployeeId(role) removed this from the condition
+      if (isUserLoggedIn && userData?.role) {
+        // && !roles.isEmployeeId(role) removed this from the condition
         dispatch(getUserSubscription());
         dispatch(getAllRoles());
       }
     }
     initFunctions();
 
-    if (isUserLoggedIn && role) {
+    if (isUserLoggedIn && userData?.role) {
       logUserActivity({
         action: "login/refresh",
         details: "User logged in or refreshed successfully",
       });
     }
+  }, [userData, isUserLoggedIn]);
+
+  useEffect(() => {
+    dispatch(getCurrentUser());
   }, []);
 
   // dispatch(clearLoadingAndData())
@@ -109,12 +114,20 @@ const App = () => {
           ),
         },
         {
-          path: "/contacts/:csvId",
-          element: <ViewContacts />,
+          path: "/particularContact/notes",
+          element: <NotesPage />,
+        },
+        {
+          path: "/particularContact/attendee-history",
+          element: <AttendeeHistory />,
         },
         {
           path: "/particularContact",
           element: <ViewParticularContact />,
+        },
+        {
+          path: "/lead-type",
+          element: <LeadTypes />,
         },
         {
           path: "/*",
@@ -143,14 +156,6 @@ const App = () => {
               <CreateEmployee />
             </RouteGuard>
           ),
-        },
-        {
-          path: "/employees/assignments/:id",
-          element: <EmployeeAssignments />,
-        },
-        {
-          path: "/employees/Activity/:id/:username/:role",
-          element: <EmployeeActivity />,
         },
         {
           path: "/clients",
@@ -211,7 +216,7 @@ const App = () => {
         {
           path: "/settings/custom-status",
           element: (
-            <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
+            <RouteGuard conditions={[isCustomStatusEnabled || roles.isSuperAdmin()]} roleNames={["SUPER_ADMIN", "ADMIN"]}>
               <CustomOptions />
             </RouteGuard>
           ),
@@ -296,7 +301,7 @@ const App = () => {
   return (
     <div className="">
       <Toaster position="top-center" richColors />
-      <RouterProvider router={router} />;
+      <RouterProvider router={router} />
     </div>
   );
 };

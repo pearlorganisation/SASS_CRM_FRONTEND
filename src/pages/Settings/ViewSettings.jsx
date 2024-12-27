@@ -5,63 +5,67 @@ import { roles } from "../../utils/roles";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import { RiMoneyRupeeCircleLine } from "react-icons/ri";
 import { PiLetterCirclePBold } from "react-icons/pi";
-import { MdArrowDropDownCircle } from "react-icons/md";
+import { MdArrowDropDownCircle, MdLeaderboard } from "react-icons/md";
 import { PiLinkSimpleBold } from "react-icons/pi";
 import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 import { Box, Typography, Checkbox, FormControlLabel } from "@mui/material";
 import { setTableMasked } from "../../features/slices/tableSlice";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import useRoles from "../../hooks/useRoles";
 
 // Configuration for the links
-const settingsLinks = [
-  {
-    to: "/plans",
-    name: "Plans",
-    icon: <RiMoneyRupeeCircleLine size={40} />,
-    allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
-    color: "green-700",
-    hoverColor: "green-700",
-  },
-  {
-    to: "/pabblyToken",
-    name: "External API Token",
-    icon: <PiLetterCirclePBold size={40} />,
-    allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
-    color: "green-700",
-    hoverColor: "green-700",
-  },
-  {
-    to: "/settings/custom-status",
-    name: "Custom Status",
-    icon: <MdArrowDropDownCircle size={40} />,
-    allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
-    color: "green-700",
-    hoverColor: "green-700",
-  },
-  {
-    to: "/sidebarLinks",
-    name: "Sidebar Links",
-    icon: <PiLinkSimpleBold size={40} />,
-    allowedRoles: [roles.SUPER_ADMIN],
-    color: "blue-600",
-    hoverColor: "blue-600",
-  },
-  {
-    to: "/update-landing-page",
-    name: "Landing Page",
-    icon: <GiPerspectiveDiceSixFacesRandom size={40} />,
-    allowedRoles: [roles.SUPER_ADMIN],
-    color: "blue-600",
-    hoverColor: "blue-600",
-  },
-];
 
 const ViewSettings = () => {
+  const roles = useRoles();
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
   const { isTablesMasked } = useSelector((state) => state.table);
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role || "";
+
+  const { subscription } = useSelector((state) => state.auth);
+  const tableConfig = subscription?.plan?.attendeeTableConfig || {};
+  const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed  || false;
+
+  const settingsLinks = [
+    {
+      to: "/plans",
+      name: "Plans",
+      icon: <RiMoneyRupeeCircleLine size={40} />,
+      allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
+    },
+    {
+      to: "/pabblyToken",
+      name: "External API Token",
+      icon: <PiLetterCirclePBold size={40} />,  
+      allowedRoles: [roles.ADMIN],
+    },
+    {
+      to: "/settings/custom-status",
+      name: `${roles.isSuperAdmin() ? "Default" : "Custom"} Options`,
+      icon: <MdArrowDropDownCircle size={40} />,
+      conditions:[isCustomStatusEnabled || roles.isSuperAdmin()],
+      allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
+    },
+    {
+      to: "/lead-type",
+      name: "Lead Types",
+      icon: <MdLeaderboard size={40} />,
+      allowedRoles: [ roles.ADMIN],
+    },
+    {
+      to: "/sidebarLinks",
+      name: "Sidebar Links",
+      icon: <PiLinkSimpleBold size={40} />,
+      allowedRoles: [roles.SUPER_ADMIN],
+    },
+    {
+      to: "/update-landing-page",
+      name: "Landing Page",
+      icon: <GiPerspectiveDiceSixFacesRandom size={40} />,
+      allowedRoles: [roles.SUPER_ADMIN],
+    },
+  ];
 
   const handleMaskedTablesChange = (event) => {
     dispatch(setTableMasked(event.target.checked));
@@ -83,12 +87,12 @@ const ViewSettings = () => {
       {/* Tailwind Grid Layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 my-10 md:mx-10">
         {/* Render links dynamically */}
-        {settingsLinks.map(({ to, name, icon, allowedRoles, color, hoverColor }, index) => (
-          <ComponentGuard key={index} allowedRoles={allowedRoles}>
+        {settingsLinks.map(({ to, name, icon, allowedRoles, conditions=[] }, index) => (
+          <ComponentGuard key={index} allowedRoles={allowedRoles} conditions={conditions}>
             <Link
               to={to}
               onClick={() => addUserActivityLog(to, "page")}
-              className={`flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-${hoverColor} hover:text-white text-${color} shadow-lg`}
+              className={`flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-green-600 hover:text-white text-green-600 shadow-lg`}
             >
               {icon}
               <Typography>{name}</Typography>

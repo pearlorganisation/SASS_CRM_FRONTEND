@@ -7,10 +7,10 @@ import { getAllAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
-import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
 import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
+import { getLeadType } from "../../features/actions/assign";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -24,6 +24,7 @@ const WebinarAttendees = () => {
 
   const [selectedRows, setSelectedRows] = useState([]);
 
+  const { leadTypeData } = useSelector((state) => state.assign);
   const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
     (state) => state.attendee
   );
@@ -47,6 +48,10 @@ const WebinarAttendees = () => {
     }
   }, [isSuccess]);
 
+    useEffect(() => {
+      dispatch(getLeadType());
+    }, []);
+
   // ----------------------- Action Icons -----------------------
 
   const actionIcons = [
@@ -56,23 +61,7 @@ const WebinarAttendees = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
-        navigate(`/particularContact?email=${item?.email}` );
-      },
-    },
-    {
-      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
-      tooltip: "Edit Attendee",
-      onClick: (item) => {
-        console.log(`Editing row with id: ${item?._id}`);
-      },
-    },
-    {
-      icon: (item) => (
-        <Delete className="text-red-500 group-hover:text-red-600" />
-      ),
-      tooltip: "Delete Attendee",
-      onClick: (item) => {
-        console.log(`Deleting row with id: ${item?._id}`);
+        navigate(`/particularContact?email=${item?.email}&attendeeId=${item?._id}` );
       },
     },
   ];
@@ -90,7 +79,10 @@ const WebinarAttendees = () => {
             ...attendeeTableColumns,
             { header: "Webinar", key: "webinarName", width: 20, type: "" },
           ],
-          rows: attendeeData,
+          rows: attendeeData.map((row) => ({
+            ...row,
+            leadType: leadTypeData.find((lead) => lead._id === row?.leadType),
+          })),
         }}
         actions={actionIcons}
         totalPages={totalPages}

@@ -2,20 +2,36 @@ import React from "react";
 import { useForm } from "react-hook-form";
 
 const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
-  
+
+
+
+
+
+  function removeBlankAttributes(obj) {
+    const result = {};
+    for (const key in obj) {
+        if ( obj[key] !== null && obj[key] !== undefined && obj[key].length > 0) {
+            result[key] = obj[key];
+        }
+    }
+    return result;
+}
+
+
   const { register, handleSubmit } = useForm({
     defaultValues: {
-        firstName: initialData?.firstName || "",
-        lastName: initialData?.lastName || "",
-        phone: initialData?.phone || "",
-        location: initialData?.location || "",
-        gender: initialData?.gender || "",
+      firstName: initialData?.firstName,
+      lastName: initialData?.lastName,
+      phone: initialData?.phone,
+      location: initialData?.location,
+      gender: initialData?.gender,
     },
   });
 
   const onSubmit = (data) => {
     data['id'] = initialData?._id;
-    onConfirmEdit(data);
+    let finalData = removeBlankAttributes(data)
+    onConfirmEdit(finalData);
   };
 
   return (
@@ -76,9 +92,9 @@ const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
               className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 focus:border-teal-500 focus:outline-none"
             >
               <option value="">Select Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Others">Others</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="others">Others</option>
             </select>
           </div>
 

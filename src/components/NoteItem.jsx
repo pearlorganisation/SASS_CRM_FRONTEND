@@ -30,10 +30,6 @@ const NoteItem = ({ item, index, setNoteModalData }) => {
             <span className="text-gray-500">Call Duration:</span>
             <span className="bg-green-100 text-green-800 px-2 rounded-md">
               {`${
-                item?.callDuration?.hr
-                  ? item?.callDuration?.hr.toString().padStart(2, "0")
-                  : "00"
-              }:${
                 item?.callDuration?.min
                   ? item?.callDuration?.min.toString().padStart(2, "0")
                   : "00"
@@ -49,6 +45,12 @@ const NoteItem = ({ item, index, setNoteModalData }) => {
 
       {/* Note Content */}
       <div className="px-4 py-2">
+      <p className=" flex items-center gap-1 text-xs mb-1">
+            <span className="font-semibold text-gray-600">Created By:</span>
+            <span className="bg-purple-100 text-neutral-800 px-2 rounded-md">
+              {item?.createdBy?.userName || "N/A"}
+            </span>
+          </p>
         <p className="text-sm bg-slate-100 px-3 py-2 rounded-md text-gray-700">
           {item?.note}
         </p>

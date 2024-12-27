@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Modal,
@@ -8,6 +8,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,6 +26,9 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   const open = modals[modalName] ? true : false;
   const { control, handleSubmit, reset } = useForm();
 
+  const [selectedOption, setSelectedOption] = useState("");
+  const [leadTypeOptions, setLeadTypeOptions] = useState([]);
+  const { leadTypeData } = useSelector((state) => state.assign);
   const { subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
   //console.log(subscription?.plan);
@@ -63,6 +68,16 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
       });
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!leadTypeData) return;
+    const options = leadTypeData.map((item) => ({
+      value: item._id,
+      label: item.label,
+      color: item.color,
+    }));
+    setLeadTypeOptions(options);
+  }, [leadTypeData]);
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -188,7 +203,6 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
               {tableConfig?.location?.filterable && (
                 <FormInput name="location" label="Location" control={control} />
               )}
-
               {tableConfig?.status?.filterable && (
                 <Controller
                   name="status"
@@ -200,6 +214,10 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                       <Select
                         {...field}
                         labelId="status-label"
+                        style={{
+                          border: "1px solid red",
+                          color: "gray",
+                        }}
                         label="Status"
                         value={field.value || ""}
                       >
@@ -212,6 +230,67 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                     </FormControl>
                   )}
                 />
+              )}
+              {tableConfig?.leadType?.filterable && (
+                <FormControl fullWidth>
+                  <Select
+                    labelId="lead-type-select-label"
+                    value={selectedOption || ""}
+                    style={{
+                      border: "1px solid red",
+                      color: "gray",
+                    }}
+                    className="shadow font-semibold"
+                    displayEmpty
+                    renderValue={(selected) => {
+                      if (!selected) {
+                        return (
+                          <span style={{ color: "#888" }}>
+                            Select Lead Type
+                          </span> // Placeholder style
+                        );
+                      }
+                      const selectedOption = leadTypeOptions.find(
+                        (option) => option.value === selected
+                      );
+                      return (
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: "16px",
+                              height: "16px",
+                              borderRadius: "50%",
+                              backgroundColor: selectedOption?.color || "#000",
+                            }}
+                          />
+                          <span>{selectedOption?.label}</span>
+                        </div>
+                      );
+                    }}
+                  >
+                    {leadTypeOptions.map((option) => (
+                      <MenuItem key={option.value} value={option.value}>
+                        <ListItemIcon>
+                          <div
+                            style={{
+                              width: "16px",
+                              height: "16px",
+                              borderRadius: "50%",
+                              backgroundColor: option.color,
+                            }}
+                          />
+                        </ListItemIcon>
+                        <ListItemText primary={option.label} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               )}
             </div>
           </div>

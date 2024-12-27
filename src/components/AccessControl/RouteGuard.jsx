@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import useRoles from "../../hooks/useRoles";
 // import { roles } from "../../utils/roles";
-export default function RouteGuard({ children, roleNames = [] }) {
+export default function RouteGuard({ children, roleNames = [], conditions = [] }) {
   const navigate = useNavigate();
   const [loader, setLoader] = useState(true);
   const roles = useRoles();
@@ -13,6 +13,18 @@ export default function RouteGuard({ children, roleNames = [] }) {
   useEffect(() => {
     // console.log("role naimgn useEffecter", roleNames);
     setLoader(true);
+
+    if (conditions.length > 0) {
+      let isAllowed = true;
+      conditions.forEach((condition) => {
+        if (!condition) {
+          isAllowed = false;
+        }
+      });
+      if (!isAllowed) {
+        navigate("/");
+      }
+    }
 
     if (roleNames.length > 0) {
       let isAllowed = false;
