@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Card,
-  Typography,
-  Grid,
-  Box,
-  Divider,
-
-} from "@mui/material";
+import { Card, Typography, Grid, Box, Divider } from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,7 +13,9 @@ const EmployeeDashboard = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
- 
+  const [statusData, setStatusData] = useState([]);
+  const [webinarData, setWebinarData] = useState([]);
+
   useEffect(() => {
     if (startDate && endDate) {
       dispatch(getDashboardData({ startDate, endDate }));
@@ -35,7 +30,6 @@ const EmployeeDashboard = () => {
     setStartDate(oneWeekAgo);
     setEndDate(today);
   }, []);
-
 
   const handleStartDateChange = (date) => {
     if (endDate && date > endDate) {
@@ -52,6 +46,15 @@ const EmployeeDashboard = () => {
     }
     setEndDate(date);
   };
+
+  useEffect(() => {
+    if (Array.isArray(dashBoardCardsData?.metrics)) {
+      setWebinarData(dashBoardCardsData?.metrics[0]?.webinarGroup);
+    }
+    if (Array.isArray(dashBoardCardsData?.metrics)) {
+      setStatusData(dashBoardCardsData?.metrics[0]?.statusGroup);
+    }
+  }, [dashBoardCardsData]);
 
   return (
     <Box className="md:px-10 py-10">
@@ -91,39 +94,56 @@ const EmployeeDashboard = () => {
       </Box>
       {/* Metrics Cards */}
       <Grid container spacing={4} className="pt-3">
-     
-            <Grid item xs={12} md={12} lg={12}>
-              {/* Parent Card */}
-              <Card className="p-4 w-full">
-                <Typography variant="h6" gutterBottom>
-                  Your activity on assignments
-                </Typography>
-                <Divider />
-                 {/* Nested Cards */}
-                 <Box className="flex gap-4 flex-wrap" >
-                 {Array.isArray(dashBoardCardsData) && dashBoardCardsData?.length > 0 ? dashBoardCardsData.map((nested, nestedIndex) => (
-                    <Box
-                      key={nestedIndex}
-                      className="p-2 my-2"
-                      style={{
-                        border: "1px solid #e0e0e0",
-                        borderRadius: "8px",
-                        backgroundColor:
-                          nested.color === "primary" ? "#f1f5fc" : "#fff",
-                      }}
-                   
-                    >
-                      <Typography variant="body1">
-                        {nested.status}: <strong>{nested.count}</strong>
-                      </Typography>
-                    </Box>
-                  )) : (
-                    <div>No Data Found</div>
-                  )}
-                 </Box>
-              </Card>
-            </Grid>
-     
+        <Grid item xs={12} md={12} lg={12}>
+          {/* Parent Card */}
+          <Card className="p-4 w-full">
+            <Typography variant="h6" gutterBottom>
+              Your activity on assignments
+            </Typography>
+            <Box className="mb-2 flex flex-wrap gap-2 justify-start">
+              {Array.isArray(webinarData) &&
+                webinarData?.length > 0 &&
+                webinarData.map((nested, nestedIndex) => (
+                  <Box
+                    key={nestedIndex}
+                    className="p-1 my-1"
+                    style={{
+                      border: "1px solid #e0e0e0",
+                      borderRadius: "8px",
+                      backgroundColor:
+                        nested.color === "primary" ? "#f1f5fc" : "#fff",
+                    }}
+                  >
+                    <Typography variant="body1">{nested._id}</Typography>
+                  </Box>
+                ))}
+            </Box>
+            <Divider />
+            {/* Nested Cards */}
+            <Box className="flex gap-4 flex-wrap">
+              {Array.isArray(statusData) && statusData?.length > 0 ? (
+                statusData?.map((nested, nestedIndex) => (
+                  <Box
+                    key={nestedIndex}
+                    className="p-2 my-2"
+                    style={{
+                      border: "1px solid #e0e0e0",
+                      borderRadius: "8px",
+                      backgroundColor:
+                        nested.color === "primary" ? "#f1f5fc" : "#fff",
+                    }}
+                  >
+                    <Typography variant="body1">
+                      {nested._id}: <strong>{nested.count}</strong>
+                    </Typography>
+                  </Box>
+                ))
+              ) : (
+                <div>No Data Found</div>
+              )}
+            </Box>
+          </Card>
+        </Grid>
       </Grid>
 
       {/* Modal for Card Selection */}
