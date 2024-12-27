@@ -112,8 +112,8 @@ const DataTable = ({
 
       <div
         className={`flex gap-4 ${
-          ButtonGroup ? "justify-between flex-wrap" : "items-center"
-        } py-2`}
+          ButtonGroup ? "justify-between flex-wrap" : "justify-end"
+        } py-2 items-center`}
       >
         {ButtonGroup && <ButtonGroup />}
         <ComponentGuard conditions={[userData?.isActive]}>
