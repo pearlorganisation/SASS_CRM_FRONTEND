@@ -18,7 +18,7 @@ const ClientDashboard = () => {
   useEffect(() => {
     if (Array.isArray(dashBoardCardsData) && dashBoardCardsData.length > 0) {
       const rows = dashBoardCardsData.map((item) => {
-        return {
+        let row = {
           label: item?.email,
           value: item?.notes?.map((e) => {
             return {
@@ -28,6 +28,26 @@ const ClientDashboard = () => {
             };
           }),
         };
+        row.value.unshift({
+          label: "Total pending",
+          value: item?.totalAssignments - item?.totalWorked,
+          color: "primary",
+        });
+        
+
+        row.value.unshift({
+          label: "Total Worked upon",
+          value: item?.totalWorked,
+          color: "primary",
+        });
+
+        row.value.unshift({
+          label: "Total Assignments",
+          value: item?.totalAssignments,
+          color: "primary",
+        });
+
+        return row
       });
 
       setRows(rows);
