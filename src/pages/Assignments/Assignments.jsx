@@ -9,6 +9,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  ButtonGroup,
 } from "@mui/material";
 import { attendeeTableColumns } from "../../utils/columnData";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
@@ -42,6 +43,7 @@ const Assignments = () => {
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
   const [currentWebinar, setCurrentWebinar] = useState("");
+  const [selected, setSelected] = useState("All");
 
   useEffect(() => {
     setSearchParams({ page: page });
@@ -56,9 +58,10 @@ const Assignments = () => {
           limit: LIMIT,
           filters,
           webinarId: currentWebinar,
+          validCall: selected === "All" ? undefined : selected,
         })
       );
-  }, [page, LIMIT, filters]);
+  }, [page, LIMIT, filters, selected]);
 
   useEffect(() => {
     if (currentWebinar)
@@ -69,6 +72,7 @@ const Assignments = () => {
           limit: LIMIT,
           filters,
           webinarId: currentWebinar,
+          validCall: selected === "All" ? undefined : selected,
         })
       );
   }, [currentWebinar]);
@@ -93,7 +97,9 @@ const Assignments = () => {
 
   const handleViewFullDetails = (item) => {
     const recordType = item?.isAttended ? "postWebinar" : "preWebinar";
-    navigate(`/particularContact?email=${item?.email}&attendeeId=${item?.attendeeId}`);
+    navigate(
+      `/particularContact?email=${item?.email}&attendeeId=${item?.attendeeId}`
+    );
     dispatch(
       addUserActivity({
         action: "viewDetails",
@@ -115,6 +121,35 @@ const Assignments = () => {
       },
     },
   ];
+
+  const AttendeeButtonGroup = () => {
+    const handleClick = (label) => {
+      setSelected(label); // Update state on button click
+      console.log(`${label} button clicked`);
+    };
+    return (
+      <ButtonGroup variant="outlined" aria-label="Basic button group">
+        <Button
+          onClick={() => handleClick("All")}
+          color={selected === "All" ? "secondary" : "primary"}
+        >
+          All
+        </Button>
+        <Button
+          onClick={() => handleClick("Valid")}
+          color={selected === "Valid" ? "secondary" : "primary"}
+        >
+          Valid
+        </Button>
+        <Button
+          onClick={() => handleClick("Not Valid")}
+          color={selected === "Not Valid" ? "secondary" : "primary"}
+        >
+          Not Valid
+        </Button>
+      </ButtonGroup>
+    );
+  };
   return (
     <div className="px-6 md:px-10 pt-14 space-y-6">
       {/* Tabs for Sales and Reminder */}
@@ -143,6 +178,7 @@ const Assignments = () => {
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="viewAssignmentsTable"
+        ButtonGroup={AttendeeButtonGroup}
         // isSelectVisible={true}
         filters={filters}
         setFilters={setFilters}

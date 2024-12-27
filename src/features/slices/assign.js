@@ -15,7 +15,7 @@ import {
   getNotes,
   updateLeadType,
 } from "../actions/assign";
-import { errorToast } from "../../utils/extra";
+import { errorToast, successToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
@@ -52,6 +52,7 @@ export const assignSlice = createSlice({
       .addCase(addAssign.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        successToast("Assignment Created Successfully");
         
       })
       .addCase(addAssign.rejected, (state, action) => {

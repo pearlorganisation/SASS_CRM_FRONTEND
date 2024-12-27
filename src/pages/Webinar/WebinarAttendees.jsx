@@ -49,6 +49,7 @@ const WebinarAttendees = () => {
   const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
     (state) => state.attendee
   );
+  const { isSuccess: assignSuccess } = useSelector((state) => state.assign);
   const { userData } = useSelector((state) => state.auth);
   const { leadTypeData } = useSelector((state) => state.assign);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -136,7 +137,7 @@ const WebinarAttendees = () => {
   }, [page, tabValue, LIMIT, filters, selected]);
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess || assignSuccess) {
       dispatch(
         getAttendees({
           id,
@@ -149,7 +150,7 @@ const WebinarAttendees = () => {
       );
       dispatch(clearSuccess());
     }
-  }, [isSuccess]);
+  }, [isSuccess, assignSuccess]);
 
   // ----------------------- Action Icons -----------------------
 

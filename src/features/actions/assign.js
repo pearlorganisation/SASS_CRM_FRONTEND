@@ -24,7 +24,7 @@ export const addAssign = createAsyncThunk(
 export const getAssignments = createAsyncThunk(
   "assignments/fetchData",
   async (
-    { id = "", page = 1, limit = 10, filters = {}, webinarId = "" },
+    { id = "", page = 1, limit = 10, filters = {}, webinarId = "", validCall },
     { rejectWithValue }
   ) => {
     try {
@@ -32,6 +32,7 @@ export const getAssignments = createAsyncThunk(
         `assignment/data/${id}`,
         {
           filters,
+          validCall,
         },
         {
           params: { page, limit, webinarId },
