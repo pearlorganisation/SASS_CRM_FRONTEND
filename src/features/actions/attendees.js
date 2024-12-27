@@ -59,7 +59,7 @@ export const getAttendees = createAsyncThunk(
           fieldName: "attendeeTableConfig",
           webinarId: id,
           isAttended,
-          validCall: validCall  
+          validCall 
         },
         {
           params: { page, limit },

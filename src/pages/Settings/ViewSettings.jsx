@@ -25,7 +25,7 @@ const ViewSettings = () => {
 
   const { subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
-  const isCustomStatusEnabled = tableConfig?.customOptions?.filterable  || false;
+  const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed  || false;
 
   const settingsLinks = [
     {
@@ -38,7 +38,7 @@ const ViewSettings = () => {
       to: "/pabblyToken",
       name: "External API Token",
       icon: <PiLetterCirclePBold size={40} />,  
-      allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
+      allowedRoles: [roles.ADMIN],
     },
     {
       to: "/settings/custom-status",

@@ -96,13 +96,21 @@ const ViewEmployee = () => {
           value="assignments"
           className="text-gray-600"
         />
-        <Tab label="History" value="history" className="text-gray-600" />
+        <Tab
+          label="History"
+          value="history"
+          style={{
+            border: "1px solid red",
+            color: "gray",
+          }}
+          className="text-gray-600"
+        />
         <Tab
           label="Activity Logs"
           value="activityLogs"
           className="text-gray-600"
         />
-        <Tab label="Activity" value="activity" className="text-gray-600" />
+        {/* <Tab label="Activity" value="activity" className="text-gray-600" /> */}
       </Tabs>
 
       {tabValue === "activityLogs" && (

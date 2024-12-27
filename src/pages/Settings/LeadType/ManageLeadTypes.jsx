@@ -17,13 +17,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { addLeadType, getLeadType, updateLeadType , deleteLeadType} from "../../../features/actions/assign";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Delete from "../../../components/ConfirmDeleteModal";
 
 const LeadTypesForm = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState();
 
-  const { leadTypeData, isSuccess } = useSelector((state) => state.assign);
+  const { isLoading,leadTypeData, isSuccess } = useSelector((state) => state.assign);
 
   const { handleSubmit, control, reset } = useForm({
     defaultValues: {
@@ -31,6 +32,8 @@ const LeadTypesForm = () => {
       color: "#000000",
     },
   });
+  const[isId, setisId]=useState()
+  const[deleteModal,setdeleteModal]=useState(false)
 
   const openModal = (data = null) => {
     setEditData(data);
@@ -52,8 +55,9 @@ const LeadTypesForm = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    dispatch(deleteLeadType(id));
+  const handleDelete = () => {
+    dispatch(deleteLeadType(isId));
+ 
   };
 
   useEffect(() => {
@@ -64,10 +68,12 @@ const LeadTypesForm = () => {
     if (isSuccess) {
       closeModal();
       dispatch(getLeadType());
+      setdeleteModal(false)
+
     }
   }, [isSuccess]);
 
-  return (
+  return (<>
     <div className="pt-14 flex flex-col items-center space-y-8">
       {/* Header with Add Button */}
       <div className="w-full px-4 lg:px-8 flex justify-between items-center">
@@ -115,7 +121,9 @@ const LeadTypesForm = () => {
                     <EditIcon />
                   </IconButton>
                   <IconButton
-                    onClick={() => handleDelete(item._id)}
+                    onClick={() => {setisId(item._id)
+                      setdeleteModal(true)}
+                    }
                     color="secondary"
                     aria-label="delete"
                   >
@@ -195,6 +203,8 @@ const LeadTypesForm = () => {
         </Box>
       </Modal>
     </div>
+    {deleteModal && (<Delete setModal={setdeleteModal} triggerDelete={handleDelete} isLoading={isLoading} />)}
+  </>
   );
 };
 
