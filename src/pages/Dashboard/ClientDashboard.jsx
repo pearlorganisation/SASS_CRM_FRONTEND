@@ -20,32 +20,44 @@ const ClientDashboard = () => {
       const rows = dashBoardCardsData.map((item) => {
         let row = {
           label: item?.email,
-          value: item?.notes?.map((e) => {
+          value: item?.metrics[0]?.statusGroup?.map((e) => {
             return {
-              label: e.status,
+              label: e._id,
               value: e.count,
               color: "primary",
             };
           }),
+          webinars: item?.metrics[0]?.webinarGroup?.map((e) => {
+            return {
+              label: e._id
+            }
+          }),
         };
-        row.value.unshift({
-          label: "Total pending",
-          value: item?.totalAssignments - item?.totalWorked,
-          color: "primary",
-        });
-        
 
-        row.value.unshift({
-          label: "Total Worked upon",
-          value: item?.totalWorked,
-          color: "primary",
-        });
 
-        row.value.unshift({
-          label: "Total Assignments",
-          value: item?.totalAssignments,
-          color: "primary",
-        });
+
+        if(row?.value){
+
+          row?.value?.unshift({
+            label: "Total pending",
+            value: item?.totalAssignments - item?.totalWorked,
+            color: "primary",
+          });
+          
+          row.value.unshift({
+            label: "Total Worked upon",
+            value: item?.totalWorked,
+            color: "primary",
+          });
+
+          row.value.unshift({
+            label: "Total Assignments",
+            value: item?.totalAssignments,
+            color: "primary",
+          });
+        }
+
+
 
         return row
       });
@@ -129,9 +141,31 @@ const ClientDashboard = () => {
             <Grid item xs={12} md={12} lg={12} key={rowIndex}>
               {/* Parent Card */}
               <Card className="p-4 w-full">
+                
                 <Typography variant="h6" gutterBottom>
                   {row.label}
                 </Typography>
+                <Box className="mb-2 flex flex-wrap gap-2 justify-start">
+                  {Array.isArray(row.webinars) && row?.webinars?.length > 0 && (
+                    row.webinars.map((nested, nestedIndex) => (
+                      <Box
+                        key={nestedIndex}
+                        className="p-1 my-1"
+                        style={{
+                          border: "1px solid #e0e0e0",
+                          borderRadius: "8px",
+                          backgroundColor:
+                            nested.color === "primary" ? "#f1f5fc" : "#fff",
+                        }}
+                      >
+                        <Typography variant="body1">
+                          {nested.label}
+                        </Typography>
+                      </Box>
+                    ))
+                  )}
+                  
+                 </Box>
                 <Divider />
                 <Box className="mt-4 flex gap-2 justify-start">
                   {/* Nested Cards */}
