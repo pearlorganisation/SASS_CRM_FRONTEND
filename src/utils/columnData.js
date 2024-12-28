@@ -49,6 +49,12 @@ export const employeeTableColumns = [
     width: 20,
     type: "",
   },
+  {
+    header: "Inactivity Time(Min)",
+    key: "inactivityTime",
+    width: 20,
+    type: "",
+  },
 ];
 
 export const webinarTableColumns = [

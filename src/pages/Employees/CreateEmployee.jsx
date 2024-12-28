@@ -22,6 +22,7 @@ import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import { getRoleNameByID } from "../../utils/roles";
 import useRoles from "../../hooks/useRoles";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import FormInput from "../../components/FormInput";
 
 const CreateEmployee = () => {
   const dispatch = useDispatch();
@@ -108,6 +109,7 @@ const CreateEmployee = () => {
         phone: singleEmployeeData?.phone,
         validCallTime: singleEmployeeData?.validCallTime,
         dailyContactLimit: singleEmployeeData?.dailyContactLimit,
+        inactivityTime: singleEmployeeData?.inactivityTime || 10,
       });
     }
   }, [singleEmployeeData]);
@@ -148,34 +150,8 @@ const CreateEmployee = () => {
                   className="mt-2"
                 />
               </div>
-
-              {/* Employee Type */}
-              <div className="w-full">
-                <FormControl fullWidth variant="outlined" error={!!errors.role}>
-                  <InputLabel>Employee Type</InputLabel>
-                  <Controller
-                    control={control}
-                    name="role"
-                    rules={{ required: "Role is required" }}
-                    render={({ field }) => (
-                      <Select {...field} label="Employee Type">
-                        <MenuItem value="" disabled>
-                          Choose Employee Type
-                        </MenuItem>
-                        <MenuItem value="EMPLOYEE_SALES">Sales</MenuItem>
-                        <MenuItem value="EMPLOYEE_REMINDER">Reminder</MenuItem>
-                      </Select>
-                    )}
-                  />
-                  {errors.role && (
-                    <FormHelperText>{errors.role.message}</FormHelperText>
-                  )}
-                </FormControl>
-              </div>
-            </div>
-
-            <div className="sm:grid sm:grid-cols-2 sm:gap-6">
               {/* Email */}
+
               <div className="w-full">
                 <TextField
                   {...register("email", { required: "Email is required" })}
@@ -187,7 +163,47 @@ const CreateEmployee = () => {
                   className="mt-2"
                 />
               </div>
+            </div>
 
+            <div className="sm:grid sm:grid-cols-2 sm:gap-6">
+              {/* Valid Call Time (seconds) */}
+              <div className="w-full">
+                <TextField
+                  {...register("validCallTime", {
+                    required: "Valid Call Time is required",
+                    validate: numericValidation,
+                  })}
+                  label="Valid Call Time (seconds)"
+                  type="number"
+                  variant="outlined"
+                  fullWidth
+                  error={Boolean(errors.validCallTime)}
+                  helperText={errors.validCallTime?.message}
+                  className="mt-2"
+                  inputProps={{ min: 0 }}
+                />
+              </div>
+
+              {/* Daily Contact Limit */}
+              <div className="w-full">
+                <TextField
+                  {...register("dailyContactLimit", {
+                    required: "Daily Contact Limit is required",
+                    validate: numericValidation,
+                  })}
+                  label="Daily Contact Limit"
+                  type="number"
+                  variant="outlined"
+                  fullWidth
+                  error={Boolean(errors.dailyContactLimit)}
+                  helperText={errors.dailyContactLimit?.message}
+                  className="mt-2"
+                  inputProps={{ min: 0 }}
+                />
+              </div>
+            </div>
+
+            <div className="sm:grid sm:grid-cols-2 sm:gap-6">
               {/* Phone Number */}
               <div className="w-full">
                 <TextField
@@ -206,6 +222,54 @@ const CreateEmployee = () => {
                   className="mt-2"
                 />
               </div>
+
+              {id && (
+                <FormInput
+                  name="inactivityTime"
+                  label="Inactivity Time (Minutes)"
+                  control={control}
+                  type="number"
+                  validation={{
+                    required: "Inactivity Time is required",
+                    min: {
+                      value: 1,
+                      message: "Value must be at least 1",
+                    },
+                  }}
+                />
+              )}
+
+              {/* Employee Type */}
+              {!id && (
+                <div className="w-full">
+                  <FormControl
+                    fullWidth
+                    variant="outlined"
+                    error={!!errors.role}
+                  >
+                    <InputLabel>Employee Type</InputLabel>
+                    <Controller
+                      control={control}
+                      name="role"
+                      rules={{ required: "Role is required" }}
+                      render={({ field }) => (
+                        <Select {...field} label="Employee Type">
+                          <MenuItem value="" disabled>
+                            Choose Employee Type
+                          </MenuItem>
+                          <MenuItem value="EMPLOYEE_SALES">Sales</MenuItem>
+                          <MenuItem value="EMPLOYEE_REMINDER">
+                            Reminder
+                          </MenuItem>
+                        </Select>
+                      )}
+                    />
+                    {errors.role && (
+                      <FormHelperText>{errors.role.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                </div>
+              )}
             </div>
 
             {!id ? (
@@ -249,43 +313,24 @@ const CreateEmployee = () => {
             ) : (
               <></>
             )}
-            <div className="sm:grid sm:grid-cols-2 sm:gap-6">
-              {/* Valid Call Time (seconds) */}
-              <div className="w-full">
-                <TextField
-                  {...register("validCallTime", {
-                    required: "Valid Call Time is required",
-                    validate: numericValidation,
-                  })}
-                  label="Valid Call Time (seconds)"
-                  type="number"
-                  variant="outlined"
-                  fullWidth
-                  error={Boolean(errors.validCallTime)}
-                  helperText={errors.validCallTime?.message}
-                  className="mt-2"
-                  inputProps={{ min: 0 }}
-                />
-              </div>
 
-              {/* Daily Contact Limit */}
-              <div className="w-full">
-                <TextField
-                  {...register("dailyContactLimit", {
-                    required: "Daily Contact Limit is required",
-                    validate: numericValidation,
-                  })}
-                  label="Daily Contact Limit"
+            {!id && (
+              <div className="sm:grid sm:grid-cols-2 sm:gap-6">
+                <FormInput
+                  name="inactivityTime"
+                  label="Inactivity Time (Minutes)"
+                  control={control}
                   type="number"
-                  variant="outlined"
-                  fullWidth
-                  error={Boolean(errors.dailyContactLimit)}
-                  helperText={errors.dailyContactLimit?.message}
-                  className="mt-2"
-                  inputProps={{ min: 0 }}
+                  validation={{
+                    required: "Inactivity Time is required",
+                    min: {
+                      value: 1,
+                      message: "Value must be at least 1",
+                    },
+                  }}
                 />
               </div>
-            </div>
+            )}
 
             <div className="mt-6">
               <Button

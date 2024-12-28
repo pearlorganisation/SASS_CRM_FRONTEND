@@ -27,14 +27,12 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   const { subscription } = useSelector((state) => state.auth);
   const { modals } = useSelector((state) => state.modals);
   const { customOptionsForFilters } = useSelector((state) => state.globalData);
-  console.log(customOptionsForFilters);
   const open = modals[modalName] ? true : false;
   const { control, handleSubmit, reset } = useForm();
 
   const [selectedOption, setSelectedOption] = useState("");
   const [leadTypeOptions, setLeadTypeOptions] = useState([]);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
-  //console.log(subscription?.plan);
 
   const onSubmit = (data) => {
     const filterData = filterTruthyValues(data);
