@@ -127,3 +127,24 @@ export const getAttendeeLeadTypeByEmail = createAsyncThunk(
     }
   }
 );
+
+
+
+//get All Attendees
+export const getEnrollments = createAsyncThunk(
+  "enrollments/attendee",
+  async ({ id, page = 1, limit = 10 }, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(
+        `/enrollments/attendee/${id}`,
+        {
+          params: { page, limit },
+        }
+      );
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+

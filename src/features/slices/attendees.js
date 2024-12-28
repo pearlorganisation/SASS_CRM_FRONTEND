@@ -3,13 +3,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
 import { getPullbacks } from "../actions/assign";
-import { addAttendees, getAllAttendees, getAttendee, getAttendeeLeadTypeByEmail, getAttendees, updateAttendee, updateAttendeeLeadType } from "../actions/attendees";
+import { addAttendees, getAllAttendees, getAttendee, getAttendeeLeadTypeByEmail, getAttendees, getEnrollments, updateAttendee, updateAttendeeLeadType } from "../actions/attendees";
 
 const initialState = {
   isLoading: false,
   isSuccess: false,
   selectedAttendee: [],
   attendeeData: [],
+  attendeeEnrollments: [],
   singleAttendeeData: null,
   totalPages: 1,
   errorMessage: "",
@@ -131,6 +132,17 @@ export const attendeeSlice = createSlice({
         state.attendeeLeadType = action.payload?.leadType || '';
       })
       .addCase(getAttendeeLeadTypeByEmail.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getEnrollments.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getEnrollments.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.attendeeEnrollments = action?.payload?.result || [];
+      })
+      .addCase(getEnrollments.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });
