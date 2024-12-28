@@ -55,6 +55,18 @@ export const getCustomOptions = createAsyncThunk(
   }
 );
 
+export const getCustomOptionsForFilters = createAsyncThunk(
+  "customOption/getFilters",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`status-dropdown/filter`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 export const deleteCustomOption = createAsyncThunk(
   "customOption/delete",
   async (id, { rejectWithValue }) => {
