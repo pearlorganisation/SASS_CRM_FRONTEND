@@ -13,13 +13,13 @@ import {
 } from "@mui/material";
 import { attendeeTableColumns } from "../../utils/columnData";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
-import DataTable from "../../components/Table/DataTable";
-import { openModal } from "../../features/slices/modalSlice";
-import { getAssignments } from "../../features/actions/assign";
+import DataTable from "../../components/Table/DataTable"; 
+import { getAssignments, requestReAssignment } from "../../features/actions/assign";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
 import { getEmployeeWebinars } from "../../features/actions/webinarContact";
 import { resetAssignedData } from "../../features/slices/assign";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { AssignmentStatus } from "../../utils/extra";
 
 const Assignments = () => {
   const navigate = useNavigate();
@@ -46,6 +46,7 @@ const Assignments = () => {
   const [filters, setFilters] = useState({});
   const [currentWebinar, setCurrentWebinar] = useState("");
   const [selected, setSelected] = useState("All");
+  const [tabValue, setTabValue] = useState(AssignmentStatus.ACTIVE);
 
   useEffect(() => {
     setSearchParams({ page: page });
@@ -61,9 +62,10 @@ const Assignments = () => {
           filters,
           webinarId: currentWebinar,
           validCall: selected === "All" ? undefined : selected,
+          assignmentStatus: tabValue,
         })
       );
-  }, [page, LIMIT, filters, selected]);
+  }, [page, LIMIT, filters, selected, tabValue]);
 
   useEffect(() => {
     if (currentWebinar)
@@ -75,12 +77,14 @@ const Assignments = () => {
           filters,
           webinarId: currentWebinar,
           validCall: selected === "All" ? undefined : selected,
+          assignmentStatus: tabValue,
         })
       );
   }, [currentWebinar]);
 
   useEffect(() => {
     if (isSuccess) {
+      setSelectedRows([]);
     }
   }, [isSuccess]);
 
@@ -127,7 +131,6 @@ const Assignments = () => {
   const AttendeeButtonGroup = () => {
     const handleClick = (label) => {
       setSelected(label); // Update state on button click
-      console.log(`${label} button clicked`);
     };
     return (
       <ButtonGroup variant="outlined" aria-label="Basic button group">
@@ -138,25 +141,44 @@ const Assignments = () => {
           All
         </Button>
         <Button
-          onClick={() => handleClick("Valid")}
-          color={selected === "Valid" ? "secondary" : "primary"}
+          onClick={() => handleClick("Worked")}
+          color={selected === "Worked" ? "secondary" : "primary"}
         >
-          Valid
+          Worked
         </Button>
         <Button
-          onClick={() => handleClick("Not Valid")}
-          color={selected === "Not Valid" ? "secondary" : "primary"}
+          onClick={() => handleClick("Pending")}
+          color={selected === "Pending" ? "secondary" : "primary"}
         >
-          Not Valid
+          Pending
         </Button>
       </ButtonGroup>
     );
   };
   return (
-    <div className="px-6 md:px-10 pt-14 space-y-6">
-      {/* Tabs for Sales and Reminder */}
+    
 
-      <div className="flex gap-4 justify-end">
+    <div className="px-6 md:px-10 pt-10 space-y-6">
+     <Tabs
+        value={tabValue}
+        onChange={(e, newValue) => setTabValue(newValue)}
+        centered
+        className="border-b border-gray-200"
+        textColor="primary"
+        indicatorColor="primary"
+      >
+        <Tab label="Assignments" value={AssignmentStatus.ACTIVE} className="text-gray-600" />
+        <Tab label="ReAssignments" value={AssignmentStatus.REASSIGN_REQUESTED} className="text-gray-600" />
+      </Tabs>
+
+      <div className={`flex items-center gap-4 ${selectedRows.length > 0 ? "justify-between" : "justify-end"} `}>
+        {
+          selectedRows.length > 0 && (
+            <Button 
+            onClick={ () => dispatch(requestReAssignment(selectedRows)) }
+            className="h-10" variant="contained">Request ReAssignment</Button>)
+        }
+
         <FormControl className="w-60">
           <InputLabel id="webinar-label">Webinar</InputLabel>
           <Select
@@ -180,8 +202,8 @@ const Assignments = () => {
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="viewAssignmentsTable"
-        // ButtonGroup={AttendeeButtonGroup}
-        // isSelectVisible={true}
+        ButtonGroup={AttendeeButtonGroup}
+        isSelectVisible={true}
         filters={filters}
         setFilters={setFilters}
         tableData={{
@@ -194,8 +216,8 @@ const Assignments = () => {
         totalPages={totalPages}
         page={page}
         setPage={setPage}
-        // selectedRows={selectedRows}
-        // setSelectedRows={setSelectedRows}
+        selectedRows={selectedRows}
+        setSelectedRows={setSelectedRows}
         limit={LIMIT}
         filterModalName={filterModalName}
         exportModalName={exportExcelModalName}

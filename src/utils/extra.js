@@ -119,3 +119,11 @@ export function filterTruthyValues(obj) {
 
   return filteredObj;
 }
+
+export const AssignmentStatus = {
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
+  COMPLETED: 'completed',
+  REASSIGN_REQUESTED: 'reassignrequested',
+  REASSIGN_APPROVED: 'reassignapproved'
+};
