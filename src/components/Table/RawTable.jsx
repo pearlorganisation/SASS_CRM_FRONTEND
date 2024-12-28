@@ -41,7 +41,7 @@ const RawTable = (props) => {
       console.log("Row clicked:", row);
     },
     isRowClickable = false,
-    isLeadType = true,
+    isLeadType = false,
     userData,
   } = props;
   const dispatch = useDispatch();
@@ -140,7 +140,7 @@ const RawTable = (props) => {
                     color: "#555A68",
                   }}
                 >
-                  <div className="flex h-full items-center justify-between">
+                  <div className={`flex h-full items-center justify-between ${!isLeadType ? 'px-3' : ''}`}>
                     {isLeadType && (
                       <div
                         className="w-2 h-full"

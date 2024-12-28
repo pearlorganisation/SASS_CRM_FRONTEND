@@ -85,3 +85,8 @@ export const productTableColumns = [
     type: "",
   },
 ];
+
+export const pullbacksTableColumns = [
+  { header: "Email", key: "attendeeEmail", width: 50, type: "" },
+  { header: "Assigned To", key: "assignedTo", width: 20, type: "" },
+];
