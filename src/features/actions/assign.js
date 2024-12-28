@@ -200,18 +200,22 @@ export const requestReAssignment = createAsyncThunk(
 
 export const getRequestedReAssignments = createAsyncThunk(
   "ReAssignments/fetch",
-  async ({page = 1, limit = 10, filters = {}, webinarId }, { rejectWithValue }) => {
+  async (
+    { page = 1, limit = 10, filters = {}, webinarId },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await instance.post(`assignment/fetch-reassignments`, {
-        filters,
-        assignmentStatus: AssignmentStatus.REASSIGN_REQUESTED,
-        webinarId
-      },
-      {
-        params: { page, limit }
-      }
-    
-    );
+      const response = await instance.post(
+        `assignment/fetch-reassignments`,
+        {
+          filters,
+          assignmentStatus: AssignmentStatus.REASSIGN_REQUESTED,
+          webinarId,
+        },
+        {
+          params: { page, limit },
+        }
+      );
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);

@@ -44,13 +44,14 @@ const DataTable = ({
   page = 1,
   setPage,
   limit = 10,
-  filterModalName = "FilterModal",
-  exportModalName = "ExportExcelModal",
+  filterModalName = "",
+  exportModalName = "",
   isLoading = false,
   selectedRows = [],
   rowClick = (row) => {},
   isRowClickable = false,
   setSelectedRows = () => {},
+  isLeadType = false,
 }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
@@ -74,6 +75,7 @@ const DataTable = ({
           conditions={[
             userData?.isActive,
             tableUniqueKey !== "viewAssignmentsTable",
+            exportModalName !== "",
           ]}
         >
           <IconButton
@@ -116,7 +118,7 @@ const DataTable = ({
         } py-2 items-center`}
       >
         {ButtonGroup && <ButtonGroup />}
-        <ComponentGuard conditions={[userData?.isActive]}>
+        <ComponentGuard conditions={[userData?.isActive, filterModalName !== ""]}>
           <div className="flex gap-4">
           <Button
             component="label"
@@ -165,6 +167,7 @@ const DataTable = ({
           userData={userData}
           rowClick={rowClick}
           isRowClickable={isRowClickable}
+          isLeadType={isLeadType}
         />
       </div>
 
@@ -179,6 +182,7 @@ const DataTable = ({
               });
             }}
             count={totalPages || 1}
+            page={page}
             variant="outlined"
             shape="rounded"
           />

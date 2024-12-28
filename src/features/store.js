@@ -21,6 +21,7 @@ import pageLimitReducer from './slices/pageLimits'
 import filterPresetReducer from './slices/filter-preset'
 import tableReducer from './slices/tableSlice'
 import noticeBoardSlice from "./slices/noticeBoard";
+import reAssign from "./slices/reAssign.slice";
 
 // Combine your individual reducers here
 const rootReducer = combineReducers({
@@ -42,6 +43,7 @@ const rootReducer = combineReducers({
   filterPreset: filterPresetReducer,
   table: tableReducer,
   noticeBoard: noticeBoardSlice,
+  reAssign,
 });
 
 // Custom root reducer handling a clear action

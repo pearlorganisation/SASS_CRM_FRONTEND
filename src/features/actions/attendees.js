@@ -51,7 +51,6 @@ export const getAttendees = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      console.log(validCall);
       const response = await instance.post(
         `/attendees/webinar`,
         {
@@ -119,7 +118,6 @@ export const getAttendeeLeadTypeByEmail = createAsyncThunk(
   "attendee/lead-type/fetchData",
   async (email, { rejectWithValue }) => {
     try {
-      console.log( 'email ---->',email);
       const response = await instance.get(`/attendee-association/${email}`);
       return response?.data;
     } catch (e) {
