@@ -14,6 +14,7 @@ import {
   getDashboardRevenueData,
   getDashboardUsersData,
   getGlobalData,
+  getCustomOptionsForFilters,
 } from "../actions/globalData";
 import { errorToast, successToast } from "../../utils/extra";
 
@@ -23,6 +24,7 @@ const initialState = {
   errorMessage: "",
   isSuccess: false,
   customOptions: [],
+  customOptionsForFilters: [],
   isSidebarOpen: false,
   dashBoardCardsData: {},
   plansGraphData: [],
@@ -81,6 +83,17 @@ export const globalDataSlice = createSlice({
         state.customOptions = action.payload || [];
       })
       .addCase(getCustomOptions.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getCustomOptionsForFilters.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getCustomOptionsForFilters.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.customOptionsForFilters = action.payload || [];
+      })
+      .addCase(getCustomOptionsForFilters.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       })

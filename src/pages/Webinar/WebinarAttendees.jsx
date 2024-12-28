@@ -85,7 +85,6 @@ const WebinarAttendees = () => {
   }, []);
 
   useEffect(() => {
-    console.log(selected);
     switch (tabValue) {
       case "pullbacks":
         setTableHeader("Pullbacks");
@@ -112,20 +111,6 @@ const WebinarAttendees = () => {
           getAttendees({
             id,
             isAttended: false,
-            page,
-            limit: LIMIT,
-            filters,
-            validCall: selected === "All" ? undefined : selected,
-          })
-        );
-        break;
-
-      default:
-        setTableHeader("Attendee Table");
-        dispatch(
-          getAttendees({
-            id,
-            isAttended: tabValue === "postWebinar",
             page,
             limit: LIMIT,
             filters,
@@ -172,7 +157,6 @@ const WebinarAttendees = () => {
   const AttendeeButtonGroup = () => {
     const handleClick = (label) => {
       setSelected(label); // Update state on button click
-      console.log(`${label} button clicked`);
     };
     return (
       <ButtonGroup variant="outlined" aria-label="Basic button group">
@@ -183,16 +167,16 @@ const WebinarAttendees = () => {
           All
         </Button>
         <Button
-          onClick={() => handleClick("Valid")}
-          color={selected === "Valid" ? "secondary" : "primary"}
+          onClick={() => handleClick("Worked")}
+          color={selected === "Worked" ? "secondary" : "primary"}
         >
-          Valid
+          Worked
         </Button>
         <Button
-          onClick={() => handleClick("Not Valid")}
-          color={selected === "Not Valid" ? "secondary" : "primary"}
+          onClick={() => handleClick("Pending")}
+          color={selected === "Pending" ? "secondary" : "primary"}
         >
-          Not Valid
+          Pending
         </Button>
       </ButtonGroup>
     );
@@ -230,20 +214,7 @@ const WebinarAttendees = () => {
         />
       </Tabs>
 
-      <div className="flex gap-4 justify-between">
-        <div className="flex gap-4">
-          <h2 className="text-2xl font-bold text-gray-700">{webinarName}</h2>
-          <Tooltip title={`Copy Webinar Id: ${id}`} placement="top">
-            <IconButton
-              onClick={() => {
-                navigator.clipboard.writeText(id);
-                toast.success("Copied to clipboard");
-              }}
-            >
-              <ContentCopy className="text-blue-500 group-hover:text-blue-600" />
-            </IconButton>
-          </Tooltip>
-        </div>
+      <div className="flex gap-4 justify-end">
         <div className="flex gap-4">
           {selectedRows.length > 0 && (
             <Button
@@ -268,7 +239,7 @@ const WebinarAttendees = () => {
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="webinarAttendeesTable"
-        // ButtonGroup={AttendeeButtonGroup}
+        ButtonGroup={AttendeeButtonGroup}
         isSelectVisible={true}
         filters={filters}
         setFilters={setFilters}

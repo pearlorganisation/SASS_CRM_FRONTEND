@@ -11,6 +11,7 @@ import NoteItem from "../../components/NoteItem";
 import {
   getAttendee,
   getAttendeeLeadTypeByEmail,
+  getEnrollments,
   updateAttendee,
   updateAttendeeLeadType,
 } from "../../features/actions/attendees";
@@ -26,9 +27,10 @@ import {
   MenuItem,
   Select,
 } from "@mui/material";
-import { OpenInNew } from "@mui/icons-material";
+import { Add, OpenInNew } from "@mui/icons-material";
 import { clearLeadType } from "../../features/slices/attendees";
 import { useNavigate } from "react-router-dom";
+import AddEnrollmentModal from "./Modal/AddEnrollmentModal";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -44,13 +46,16 @@ const ViewParticularContact = () => {
   const [uniqueNames, setUniqueNames] = useState([]);
   const [noteModalData, setNoteModalData] = useState(null);
   const [editModalData, setEditModalData] = useState(null);
+  
   const [leadTypeOptions, setLeadTypeOptions] = useState([]);
+
+const [showEnrollmentModal, setShowEnrollmentModal] = useState(false)
 
   const { attendeeContactDetails } = useSelector(
     (state) => state.webinarContact
   );
 
-  const { selectedAttendee, attendeeLeadType } = useSelector(
+  const { selectedAttendee, attendeeLeadType, attendeeEnrollments } = useSelector(
     (state) => state.attendee
   );
 
@@ -167,6 +172,16 @@ const ViewParticularContact = () => {
     setUniquePhonesCount(badgeCount);
   }, [noteData, uniquePhones]);
 
+
+  useEffect(() => {
+    dispatch(getEnrollments({ id: attendeeId }));
+  }, [attendeeId])
+
+  useEffect(() => {
+    console.log(attendeeEnrollments)
+  }, [attendeeEnrollments])
+
+
   return (
     <div className="px-4 pt-14 space-y-6">
       <div className="md:p-6 p-3 bg-gray-50 rounded-lg ">
@@ -252,7 +267,7 @@ const ViewParticularContact = () => {
                   Set Alarm
                 </Button>
               </div>
-              <div className="flex items-center w-fit min-w-40 px-2 gap-3">
+              <div className="flex items-center w-fit min-w-40 px-1 gap-3">
                 <FormControl fullWidth>
                   <Select
                     labelId="lead-type-select-label"
@@ -326,101 +341,202 @@ const ViewParticularContact = () => {
             </div>
           </div>
         </div>
-        <div className="mt-12 shadow-lg rounded-lg overflow-x-auto">
-          {!selectedAttendee &&
-          selectedAttendee.length <= 0 &&
-          selectedAttendee[0]?.data?.length <= 0 ? (
-            <div className="text-lg p-2 flex justify-center w-full">
-              No record found
-            </div>
-          ) : (
-            <div className="p-2 bg-neutral-100 rounded-lg shadow-md">
-              <div className=" items-center px-3 text-neutral-800  flex justify-between">
-                <span className="font-semibold text-xl  ">
-                  Attendee History
-                </span>
-                <IconButton
-                  onClick={() => navigate(`/particularContact/attendee-History?email=${email}`)}
-                >
-                  <OpenInNew />
-                </IconButton>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+          <div className="mt-12 shadow-lg rounded-lg overflow-x-auto">
+            {!selectedAttendee &&
+            selectedAttendee.length <= 0 &&
+            selectedAttendee[0]?.data?.length <= 0 ? (
+              <div className="text-lg p-2 flex justify-center w-full">
+                No record found
               </div>
-              <table className="w-full table-auto text-sm text-left ">
-                <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
-                  <tr>
-                    <th className="py-3 px-2">S No.</th>
-                    <th className="py-3 px-2">Webinar</th>
-                    <th className="py-3 px-2">First Name</th>
-                    <th className="py-3 px-2">Last Name</th>
-                    <th className="py-3  text-center">Webinar Minutes</th>
-                    <th className="py-3 px-2">Webinar Date</th>
-                    <th className="py-3 px-2">Action</th>
-                  </tr>
-                </thead>
-
-                <tbody className="text-gray-600 divide-y">
-                  {false ? (
+            ) : (
+              <div className="p-2 bg-neutral-100 rounded-lg shadow-md">
+                <div className=" items-center px-3 text-neutral-800  flex justify-between">
+                  <span className="font-semibold text-xl  ">
+                    Attendee History
+                  </span>
+                  <IconButton
+                    onClick={() =>
+                      navigate(
+                        `/particularContact/attendee-History?email=${email}`
+                      )
+                    }
+                  >
+                    <OpenInNew />
+                  </IconButton>
+                </div>
+                <table className="w-full table-auto text-sm text-left ">
+                  <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
                     <tr>
-                      <td colSpan="8" className="text-center px-6 py-8">
-                        <Stack spacing={4}>
-                          <Skeleton variant="rounded" height={30} />
-                          <Skeleton variant="rounded" height={25} />
-                          <Skeleton variant="rounded" height={20} />
-                          <Skeleton variant="rounded" height={20} />
-                          <Skeleton variant="rounded" height={20} />
-                        </Stack>
-                      </td>
+                      <th className="py-3 px-1">S No.</th>
+                      <th className="py-3 px-1">Webinar</th>
+                      <th className="py-3 px-1">First Name</th>
+                      <th className="py-3 px-1">Last Name</th>
+                      <th className="py-3  text-center">Webinar Minutes</th>
+                      <th className="py-3 px-1">Webinar Date</th>
+                      <th className="py-3 px-1">Action</th>
                     </tr>
-                  ) : (
-                    selectedAttendee[0]?.data?.map((item, idx) => {
-                      return (
-                        <tr key={idx}>
-                          <td className={`px-3 py-4 whitespace-nowrap `}>
-                            {idx + 1}
-                          </td>
+                  </thead>
 
-                          <td className="px-2 py-4 whitespace-nowrap ">
-                            {Array.isArray(item?.webinar) &&
-                            item.webinar.length > 0
-                              ? item?.webinar[0].webinarName
-                              : "-"}
-                          </td>
+                  <tbody className="text-gray-600 divide-y">
+                    {false ? (
+                      <tr>
+                        <td colSpan="8" className="text-center px-6 py-8">
+                          <Stack spacing={4}>
+                            <Skeleton variant="rounded" height={30} />
+                            <Skeleton variant="rounded" height={25} />
+                            <Skeleton variant="rounded" height={20} />
+                            <Skeleton variant="rounded" height={20} />
+                            <Skeleton variant="rounded" height={20} />
+                          </Stack>
+                        </td>
+                      </tr>
+                    ) : (
+                      selectedAttendee[0]?.data?.map((item, idx) => {
+                        return (
+                          <tr key={idx}>
+                            <td className={`px-3 py-4 whitespace-nowrap `}>
+                              {idx + 1}
+                            </td>
 
-                          <td className="px-2 py-4 whitespace-nowrap ">
-                            {item?.firstName || "-"}
-                          </td>
-                          <td className="px-2 py-4 whitespace-nowrap">
-                            {item?.lastName?.match(/:-\)/)
-                              ? "--"
-                              : item?.lastName || "-"}
-                          </td>
+                            <td className="px-2 py-4 whitespace-nowrap ">
+                              {Array.isArray(item?.webinar) &&
+                              item.webinar.length > 0
+                                ? item?.webinar[0].webinarName
+                                : "-"}
+                            </td>
 
-                          <td className=" py-4 text-center whitespace-nowrap">
-                            {item?.timeInSession}
-                          </td>
-                          <td className="px-3 py-4 whitespace-nowrap">
-                            {Array.isArray(item?.webinar) &&
-                            item.webinar.length > 0
-                              ? new Date(
-                                  item?.webinar[0].webinarDate
-                                ).toDateString()
-                              : "-"}
-                          </td>
+                            <td className="px-2 py-4 whitespace-nowrap ">
+                              {item?.firstName || "-"}
+                            </td>
+                            <td className="px-2 py-4 whitespace-nowrap">
+                              {item?.lastName?.match(/:-\)/)
+                                ? "--"
+                                : item?.lastName || "-"}
+                            </td>
 
-                          <td className="px-3 py-4 h-full">
-                            <FaRegEdit
-                              onClick={() => setEditModalData(item)}
-                              className="text-xl cursor-pointer"
-                            />
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
+                            <td className=" py-4 text-center whitespace-nowrap">
+                              {item?.timeInSession}
+                            </td>
+                            <td className="px-3 py-4 whitespace-nowrap">
+                              {Array.isArray(item?.webinar) &&
+                              item.webinar.length > 0
+                                ? new Date(
+                                    item?.webinar[0].webinarDate
+                                  ).toDateString()
+                                : "-"}
+                            </td>
+
+                            <td className="px-3 py-4 h-full">
+                              <FaRegEdit
+                                onClick={() => setEditModalData(item)}
+                                className="text-xl cursor-pointer"
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+          <div className="mt-12 shadow-lg rounded-lg overflow-x-auto">
+            {!attendeeEnrollments &&
+            attendeeEnrollments.length <= 0 ? (
+              <div className="text-lg p-2 flex justify-center w-full">
+                No record found
+              </div>
+            ) : (
+              <div className="p-2 bg-neutral-100 rounded-lg shadow-md">
+                <div className=" items-center px-3 text-neutral-800  flex justify-between">
+                  <span className="font-semibold text-xl  ">
+                    Enrollments History
+                  </span>
+                  <Add
+                    className="cursor-pointer hover:bg-gray-200 transition duration-300"
+                    onClick={() =>
+                      setShowEnrollmentModal(true)
+                    }
+                    fontSize="medium"
+                  >
+                    <OpenInNew />
+                  </Add>
+                </div>
+                <table className="w-full table-auto text-sm text-left ">
+                  <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
+                    <tr>
+                      <th className="py-3 px-1">S No.</th>
+                      <th className="py-3 px-1">Webinar</th>
+                      <th className="py-3 px-1">E-Mail</th>
+                      <th className="py-3 px-1">Product Name</th>
+                      <th className="py-3  text-center">Price</th>
+                      <th className="py-3 px-1">Level</th>
+                      {/* <th className="py-3 px-1">Action</th> */}
+                    </tr>
+                  </thead>
+
+                  <tbody className="text-gray-600 divide-y">
+                    {false ? (
+                      <tr>
+                        <td colSpan="8" className="text-center px-6 py-8">
+                          <Stack spacing={4}>
+                            <Skeleton variant="rounded" height={30} />
+                            <Skeleton variant="rounded" height={25} />
+                            <Skeleton variant="rounded" height={20} />
+                            <Skeleton variant="rounded" height={20} />
+                            <Skeleton variant="rounded" height={20} />
+                          </Stack>
+                        </td>
+                      </tr>
+                    ) : (
+                      attendeeEnrollments?.map((item, idx) => {
+                        return (
+                          <tr key={idx}>
+                            <td className={`px-3 py-4 whitespace-nowrap `}>
+                              {idx + 1}
+                            </td>
+
+                            <td className="px-2 py-4 whitespace-nowrap ">
+                              {item?.webinar 
+                                ? item?.webinar.webinarName
+                                : "-"}
+                            </td>
+
+                            <td className="px-2 py-4 whitespace-nowrap ">
+                              {item?.attendee && item?.attendee.email || "-"}
+                            </td>
+                            
+
+                            <td className=" py-4 text-center whitespace-nowrap">
+                              {item?.product && item?.product?.name}
+                            </td>
+                            <td className="px-3 py-4 whitespace-nowrap">
+                            {item?.product && item?.product?.price}
+
+                            </td>
+
+                            <td className="px-3 py-4 whitespace-nowrap">
+                            {item?.product && item?.product?.level}
+
+                            </td>
+
+                            {/* <td className="px-3 py-4 h-full">
+                              <FaRegEdit
+                                onClick={() => setEditModalData(item)}
+                                className="text-xl cursor-pointer"
+                              />
+                            </td> */}
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       {noteModalData && (
@@ -435,6 +551,12 @@ const ViewParticularContact = () => {
           setModal={setEditModalData}
           initialData={editModalData}
           onConfirmEdit={onConfirmEdit}
+        />
+      )}
+      {showEnrollmentModal && (
+        <AddEnrollmentModal
+          setModal={setShowEnrollmentModal}
+          attendeeId={attendeeId}
         />
       )}
     </div>

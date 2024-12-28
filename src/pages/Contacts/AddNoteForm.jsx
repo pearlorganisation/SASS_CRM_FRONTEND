@@ -102,13 +102,12 @@ const AddNoteForm = (props) => {
     setValue("image", file);
   };
 
-  const handleInput = (e, maxValue) => {
+  const handleInput = (e, maxValue, numAllowed=2) => {
     let value = e.target.value;
 
     value = value.replace(/[^0-9]/g, "");
-
-    if (value.length > 2) {
-      value = value.slice(0, 2);
+    if (value.length > numAllowed) {
+      value = value.slice(0, numAllowed);
     }
 
     const num = Number(value);
@@ -129,10 +128,10 @@ const AddNoteForm = (props) => {
       <div className="w-full flex gap-5 items-center">
         <label className="font-medium text-sm">
           Call Duration{" "}
-          <span className="font-normal text-xs">(hr : min : sec)</span>
+          <span className="font-normal text-xs">(min : sec)</span>
         </label>
         <div className="mt-1 flex items-center">
-          <input
+          {/* <input
             {...register("callDuration.hr")}
             type="text"
             placeholder={"00"}
@@ -141,14 +140,14 @@ const AddNoteForm = (props) => {
             onInput={(e) => handleInput(e, 23)} // Hours range: 00-12
             onClick={(e) => e.target.select()}
           />
-          <span className="font-light px-1">:</span>
+          <span className="font-light px-1">:</span> */}
           <input
             {...register("callDuration.min")}
             type="text"
             placeholder={"00"}
-            className="w-10 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
-            maxLength={2}
-            onInput={(e) => handleInput(e, 59)} // Minutes range: 00-59
+            className="w-12 h-10 rounded-lg border focus:border-teal-500 outline-none text-center text-xl"
+            maxLength={3}
+            onInput={(e) => handleInput(e, 150, 3)} // Minutes range: 00-59
             onClick={(e) => e.target.select()}
           />
           <span className="font-light px-1">:</span>

@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { instance } from "../../services/axiosInterceptor";
+import { AssignmentStatus } from "../../utils/extra";
 
 //assign  attendee
 export const addAssign = createAsyncThunk(
@@ -24,7 +25,15 @@ export const addAssign = createAsyncThunk(
 export const getAssignments = createAsyncThunk(
   "assignments/fetchData",
   async (
-    { id = "", page = 1, limit = 10, filters = {}, webinarId = "", validCall },
+    {
+      id = "",
+      page = 1,
+      limit = 10,
+      filters = {},
+      webinarId = "",
+      validCall,
+      assignmentStatus = "",
+    },
     { rejectWithValue }
   ) => {
     try {
@@ -33,6 +42,7 @@ export const getAssignments = createAsyncThunk(
         {
           filters,
           validCall,
+          assignmentStatus,
         },
         {
           params: { page, limit, webinarId },
@@ -165,6 +175,44 @@ export const getAssignmentsActivity = createAsyncThunk(
         params: { empId },
       });
       return response?.data || [];
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const requestReAssignment = createAsyncThunk(
+  "assignments/requestReAssignment",
+  async (payload = [], { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`assignment/reassign`, {
+        assignments: payload,
+      });
+      return {
+        response: response.data,
+        requestIds: payload,
+      };
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const getRequestedReAssignments = createAsyncThunk(
+  "ReAssignments/fetch",
+  async ({page = 1, limit = 10, filters = {}, webinarId }, { rejectWithValue }) => {
+    try {
+      const response = await instance.post(`assignment/fetch-reassignments`, {
+        filters,
+        assignmentStatus: AssignmentStatus.REASSIGN_REQUESTED,
+        webinarId
+      },
+      {
+        params: { page, limit }
+      }
+    
+    );
+      return response?.data;
     } catch (e) {
       return rejectWithValue(e);
     }

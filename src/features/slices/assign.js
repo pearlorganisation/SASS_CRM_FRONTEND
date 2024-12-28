@@ -13,6 +13,8 @@ import {
   getDashboardNotes,
   getLeadType,
   getNotes,
+  getRequestedReAssignments,
+  requestReAssignment,
   updateLeadType,
 } from "../actions/assign";
 import { errorToast, successToast } from "../../utils/extra";
@@ -53,7 +55,6 @@ export const assignSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         successToast("Tempory Toast... will add it later with validation");
-        
       })
       .addCase(addAssign.rejected, (state, action) => {
         state.isLoading = false;
@@ -165,17 +166,44 @@ export const assignSlice = createSlice({
       .addCase(getAssignmentsActivity.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
+      })
+      .addCase(requestReAssignment.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(requestReAssignment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        console.log(action?.payload);
+        const { requestIds = [] } = action.payload;
+        state.assignData = state.assignData.filter((item) =>
+          !requestIds.includes(item._id)
+        );
+        successToast("Request Sent Successfully");
+      })
+      .addCase(requestReAssignment.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getRequestedReAssignments.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getRequestedReAssignments.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.assignData = action.payload?.result || [];
+        state.totalPages = action.payload?.totalPages || 1;
+      })
+      .addCase(getRequestedReAssignments.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
       });
-    // .addDefaultCase((state, action) => {
-    //   return state;
-    // });
   },
 });
 
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {resetAssignedData, } = assignSlice.actions;
+export const { resetAssignedData } = assignSlice.actions;
 export default assignSlice.reducer;
 
 // ================================================== THE END ==================================================
