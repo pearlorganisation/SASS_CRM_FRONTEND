@@ -1,49 +1,43 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchReAssignments,
   handleReAssigmentRequest,
 } from "../../features/actions/reAssign";
 import { useNavigate, useParams } from "react-router-dom";
-import { pullbacksTableColumns } from "../../utils/columnData";
+import { enrollmentsColumn } from "../../utils/columnData";
 import DataTable from "../../components/Table/DataTable";
 import { Cancel, CheckCircle, Visibility } from "@mui/icons-material";
 import { AssignmentStatus } from "../../utils/extra";
-
+import { getWebinarEnrollments } from "../../features/actions/attendees";
 
 const Enrollments = (props) => {
-  const tableHeader = "Re-Assignments";
+  const tableHeader = "Enrollments";
 
   const { id } = useParams();
-  const { tabValue, subTabValue, page, setPage, selectedRows, setSelectedRows } = props;
+  const { tabValue, page, setPage } = props;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { reAssignData, totalPages, isLoading, isSuccess } = useSelector(
-    (state) => state.reAssign
+  const { webinarEnrollments, isLoading, isSuccess } = useSelector(
+    (state) => state.attendee
   );
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
 
-
   useEffect(() => {
     dispatch(
-      fetchReAssignments({
-        webinarId: id,
-        status: subTabValue,
-        recordType: tabValue,
-        page,
+      getWebinarEnrollments({
+        id: id,
+        page: 1,
         limit: LIMIT,
       })
     );
-  }, [subTabValue, LIMIT, page, tabValue]);
+  }, [LIMIT, page, tabValue]);
 
   useEffect(() => {
     if (isSuccess) {
       dispatch(
-        fetchReAssignments({
-          webinarId: id,
-          status: subTabValue,
-          recordType: tabValue,
+        getWebinarEnrollments({
+          id: id,
           page: 1,
           limit: LIMIT,
         })
@@ -51,37 +45,12 @@ const Enrollments = (props) => {
     }
   }, [isSuccess]);
 
+//   useEffect(() => {
+//     console.log(webinarEnrollments);
+//   }, [webinarEnrollments]);
+
   const actionIcons = [
-    {
-      icon: () => (
-        <CheckCircle className="text-green-500 group-hover:text-green-600" />
-      ),
-      tooltip: "Accept Re-Assignment Request",
-      hideCondition: (row) =>
-        row?.status !== AssignmentStatus.REASSIGN_APPROVED,
-      onClick: (item) => {
-        dispatch(
-          handleReAssigmentRequest({
-            status: "approved",
-            assignments: [item?._id],
-          })
-        );
-      },
-    },
-    {
-      icon: () => <Cancel className="text-red-500 group-hover:text-red-600" />,
-      tooltip: "Reject Re-Assignment Request",
-      hideCondition: (row) =>
-        row?.status !== AssignmentStatus.REASSIGN_APPROVED,
-      onClick: (item) => {
-        dispatch(
-          handleReAssigmentRequest({
-            status: "rejected",
-            assignments: [item?._id],
-          })
-        );
-      },
-    },
+    
     {
       icon: () => (
         <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
@@ -89,40 +58,34 @@ const Enrollments = (props) => {
       tooltip: "View Attendee Info",
       onClick: (item) => {
         navigate(
-          `/particularContact?email=${item?.attendeeEmail}&attendeeId=${item?.attendee}`
+          `/particularContact?email=${item?.attendee}&attendeeId=${item?.attendeeId}`
         );
       },
       readOnly: true,
     },
   ];
+
   return (
     <>
       <DataTable
         tableHeader={tableHeader}
-        tableUniqueKey="webinarReAssignmentsAttendeesTable"
-        isSelectVisible={true}
-        setSelectedRows={setSelectedRows}
-        selectedRows={selectedRows}
+        tableUniqueKey="enrollmentsTable"
+        // isSelectVisible={true}
+        // setSelectedRows={setSelectedRows}
+        // selectedRows={selectedRows}
         tableData={{
-          columns: pullbacksTableColumns.map((column) => {
-            if(column.header === 'Assigned To' && subTabValue === AssignmentStatus.REASSIGN_APPROVED){
-              return {
-                ...column,
-                header: 'Previous Assigned To'
-              }
-            }
-            return column
+          columns: enrollmentsColumn.map((column) => {
+            return column;
           }),
-          rows: reAssignData,
+          rows: webinarEnrollments,
         }}
         actions={actionIcons}
-        totalPages={totalPages}
+        // totalPages={totalPages}
         page={page}
         setPage={setPage}
         limit={LIMIT}
         isLoading={isLoading}
       />
-      
     </>
   );
 };

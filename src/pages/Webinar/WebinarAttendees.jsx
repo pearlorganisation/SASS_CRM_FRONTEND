@@ -233,12 +233,9 @@ const WebinarAttendees = () => {
         conditions={[tabValue === "enrollments"]}
       >
         <Enrollments
-        webinarId={id}
           page={page}
           setPage={setPage}
           tabValue={tabValue}
-          selectedRows={selectedRows}
-          setSelectedRows={setSelectedRows}
         />
       </ComponentGuard>
 

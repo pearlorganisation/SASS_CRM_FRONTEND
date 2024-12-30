@@ -90,3 +90,14 @@ export const pullbacksTableColumns = [
   { header: "Email", key: "attendeeEmail", width: 50, type: "" },
   { header: "Assigned To", key: "assignedTo", width: 20, type: "" },
 ];
+
+
+
+export const enrollmentsColumn = [
+  { header: "E-Mail", key: "attendee", width: 50, type: "" },
+  { header: "Product", key: "product", subKey: "name", width: 20, type: "Product" },
+  { header: "Level", key: "product", subKey: "level", width: 20, type: "Product" },
+  { header: "Price", key: "product", subKey: "price", width: 20, type: "Product" },
+  { header: "Date", key: "createdAt", width: 20, type: "Date" },
+
+];
