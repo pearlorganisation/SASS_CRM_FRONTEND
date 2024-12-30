@@ -5,26 +5,32 @@ import {
   FormControlLabel,
   Radio,
   Button,
+  Checkbox,
   Modal,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../features/slices/modalSlice";
 import { getAssignedEmployees } from "../../features/actions/webinarContact";
 import useRoles from "../../hooks/useRoles";
-import { changeAssignment } from "../../features/actions/reAssign";
+import {
+  changeAssignment,
+  moveAttendeesToPullbacks,
+} from "../../features/actions/reAssign";
 
 const ReAssignmentModal = ({
   modalName,
   tabValue,
   webinarid,
   selectedRows,
+  isPullbackVisible=false,
 }) => {
   const dispatch = useDispatch();
   const roles = useRoles();
   const [assignmentType, setAssignmentType] = useState("temporary");
   const [selectedEmployee, setSelectedEmployee] = useState("");
 
-  const { reAssignData } = useSelector((state) => state.reAssign);
+  const [moveToPullbacks, setMoveToPullbacks] = useState(false);
+  const { reAssignData, isSuccess } = useSelector((state) => state.reAssign);
   const { assignedEmployees, isLoading } = useSelector(
     (state) => state.webinarContact
   );
@@ -43,26 +49,38 @@ const ReAssignmentModal = ({
     }));
 
   const handleSubmit = () => {
-    const payload = {
-      isTemp: assignmentType === "temporary" ? true : false,
-      employeeId: selectedEmployee,
-      recordType: tabValue,
-      webinarId: webinarid,
-      assignments: reAssignData
-        .filter((item) => selectedRows.includes(item?._id))
-        .map((item) => ({
-          assignmentId: item?._id,
-          attendeeId: item?.attendee,
-        })),
-    };
-    console.log(payload);
-    dispatch(changeAssignment(payload));
+    if (moveToPullbacks && isPullbackVisible) {
+      const payload = {
+        recordType: tabValue,
+        webinarId: webinarid,
+        attendees: selectedRows.map((id) => id),
+      };
+      console.log("Pullbacks Payload:", payload);
+      // Dispatch your specific action for "Move to Pullbacks"
+      dispatch(moveAttendeesToPullbacks(payload));
+    } else {
+      const payload = {
+        isTemp: assignmentType === "temporary" ? true : false,
+        employeeId: selectedEmployee,
+        recordType: tabValue,
+        webinarId: webinarid,
+        assignments: reAssignData
+          .filter((item) => selectedRows.includes(item?._id))
+          .map((item) => ({
+            assignmentId: item?._id,
+            attendeeId: item?.attendee,
+          })),
+      };
+      console.log(payload);
+      dispatch(changeAssignment(payload));
+    }
   };
 
   const handleCancel = () => {
     dispatch(closeModal(modalName));
     setAssignmentType("temporary");
     setSelectedEmployee("");
+    setMoveToPullbacks(false);
   };
 
   useEffect(() => {
@@ -70,17 +88,49 @@ const ReAssignmentModal = ({
       dispatch(getAssignedEmployees(webinarid));
     }
   }, [open]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      handleCancel();
+    }
+
+    return () => {
+      if(isSuccess){
+
+      }
+    }
+  },[isSuccess]);
+
   return (
     <Modal open={open} onClose={handleCancel}>
       <Box
         className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto mt-20"
         sx={{ outline: "none" }}
       >
-        <h2 className="text-lg font-semibold mb-4">Assign Task</h2>
+        <h2 className="text-lg font-bold mb-4 border-b">Re-Assign Attendee</h2>
+
+        {/* Move to Pullbacks */}
+        {
+          isPullbackVisible && (
+            <div className="mb-4">
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={moveToPullbacks}
+                onChange={(e) => setMoveToPullbacks(e.target.checked)}
+              />
+            }
+            label="Move to Pullbacks"
+          />
+        </div>
+          )
+        }
 
         {/* Assignment Type */}
         <div className="mb-4">
-          <label className="block font-medium mb-2">Assignment Type</label>
+          <label className="block font-medium mb-2">
+            Select Assignment Type
+          </label>
           <RadioGroup
             value={assignmentType}
             onChange={(e) => setAssignmentType(e.target.value)}
@@ -90,18 +140,20 @@ const ReAssignmentModal = ({
               value="temporary"
               control={<Radio />}
               label="Temporary"
+              disabled={moveToPullbacks}
             />
             <FormControlLabel
               value="permanent"
               control={<Radio />}
               label="Permanent"
+              disabled={moveToPullbacks}
             />
           </RadioGroup>
         </div>
 
         {/* Employees */}
         <div className="mb-4">
-          <label className="block font-medium mb-2">Employee</label>
+          <label className="block font-medium mb-2">Select Employee</label>
           <RadioGroup
             value={selectedEmployee}
             onChange={(e) => setSelectedEmployee(e.target.value)}
@@ -113,6 +165,7 @@ const ReAssignmentModal = ({
                 value={employee?.value}
                 control={<Radio />}
                 label={employee?.label}
+                disabled={moveToPullbacks}
               />
             ))}
           </RadioGroup>
@@ -125,7 +178,7 @@ const ReAssignmentModal = ({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!selectedEmployee}
+            disabled={!selectedEmployee && !moveToPullbacks}
             variant="contained"
           >
             Submit

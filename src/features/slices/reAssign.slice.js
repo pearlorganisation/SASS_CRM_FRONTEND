@@ -7,6 +7,7 @@ import {
   changeAssignment,
   fetchReAssignments,
   handleReAssigmentRequest,
+  moveAttendeesToPullbacks,
 } from "../actions/reAssign";
 
 const initialState = {
@@ -64,6 +65,19 @@ export const reAssignSlice = createSlice({
         successToast("Re-assignment successfully");
       })
       .addCase(changeAssignment.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(moveAttendeesToPullbacks.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(moveAttendeesToPullbacks.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        successToast(" Assignment moved to pullbacks successfully");
+      })
+      .addCase(moveAttendeesToPullbacks.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });

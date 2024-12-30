@@ -14,6 +14,7 @@ import {
 } from "../../features/actions/assign";
 import { Delete, Edit, Visibility } from "@mui/icons-material";
 import AssignmentActivity from "../../components/Employee/AssignmentActivity";
+import { AssignmentStatus } from "../../utils/extra";
 
 const ViewEmployee = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -40,7 +41,7 @@ const ViewEmployee = () => {
       dispatch(getUserActivity({ id, page: page, limit: LIMIT }));
     else if (tabValue === "activity")
       dispatch(getAssignmentsActivity({ empId: id }));
-    else dispatch(getAssignments({ id, page, limit: LIMIT, filters }));
+    else dispatch(getAssignments({ id, page, limit: LIMIT, filters, assignmentStatus: AssignmentStatus.ACTIVE }));
   }, [page, LIMIT, filters, tabValue]);
 
   const handleTabChange = (_, newValue) => {

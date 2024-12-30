@@ -45,7 +45,26 @@ export const changeAssignment = createAsyncThunk(
   "assignments/reassign/change",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.patch(`assignment/reassign/change`, payload);
+      const response = await instance.patch(
+        `assignment/reassign/change`,
+        payload
+      );
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const moveAttendeesToPullbacks = createAsyncThunk(
+  "assignments/reassign/pullback",
+  async ({ attendees = [], webinarId, recordType }, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`assignment/reassign/pullback`, {
+        attendees,
+        webinarId,
+        recordType,
+      });
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);

@@ -47,7 +47,7 @@ export const updateAttendee = createAsyncThunk(
 export const getAttendees = createAsyncThunk(
   "attendees/fetchData",
   async (
-    { id, isAttended, page = 1, limit = 10, filters = {}, validCall },
+    { id, isAttended, page = 1, limit = 10, filters = {}, validCall, assignmentType },
     { rejectWithValue }
   ) => {
     try {
@@ -58,7 +58,8 @@ export const getAttendees = createAsyncThunk(
           fieldName: "attendeeTableConfig",
           webinarId: id,
           isAttended,
-          validCall 
+          validCall ,
+          assignmentType
         },
         {
           params: { page, limit },
