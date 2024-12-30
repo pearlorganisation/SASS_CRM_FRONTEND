@@ -154,6 +154,7 @@ export const attendeeSlice = createSlice({
       .addCase(getWebinarEnrollments.fulfilled, (state, action) => {
         state.isLoading = false;
         state.webinarEnrollments = action?.payload?.result || [];
+        state.totalPages = action?.payload?.totalPages || 1;
       })
       .addCase(getWebinarEnrollments.rejected, (state, action) => {
         state.isLoading = false;

@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  handleReAssigmentRequest,
-} from "../../features/actions/reAssign";
 import { useNavigate, useParams } from "react-router-dom";
 import { enrollmentsColumn } from "../../utils/columnData";
 import DataTable from "../../components/Table/DataTable";
-import { Cancel, CheckCircle, Visibility } from "@mui/icons-material";
-import { AssignmentStatus } from "../../utils/extra";
+import { Visibility } from "@mui/icons-material";
 import { getWebinarEnrollments } from "../../features/actions/attendees";
 
 const Enrollments = (props) => {
@@ -18,7 +14,7 @@ const Enrollments = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { webinarEnrollments, isLoading, isSuccess } = useSelector(
+  const { webinarEnrollments, totalPages, isLoading, isSuccess } = useSelector(
     (state) => state.attendee
   );
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
@@ -45,12 +41,7 @@ const Enrollments = (props) => {
     }
   }, [isSuccess]);
 
-//   useEffect(() => {
-//     console.log(webinarEnrollments);
-//   }, [webinarEnrollments]);
-
   const actionIcons = [
-    
     {
       icon: () => (
         <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
@@ -80,7 +71,7 @@ const Enrollments = (props) => {
           rows: webinarEnrollments,
         }}
         actions={actionIcons}
-        // totalPages={totalPages}
+        totalPages={totalPages}
         page={page}
         setPage={setPage}
         limit={LIMIT}
