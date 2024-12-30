@@ -14,6 +14,7 @@ import { getAllEmployees } from "../../../features/actions/employee";
 import useRoles from "../../../hooks/useRoles";
 import { addAssign } from "../../../features/actions/assign";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
+import { getAssignedEmployees } from "../../../features/actions/webinarContact";
 
 function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
 
@@ -21,20 +22,23 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
 
-  const { modals } = useSelector((state) => state.modals);
-  const { employeeData, isLoading } = useSelector((state) => state.employee);
+  
   const { isSuccess } = useSelector((state) => state.assign);
-
+  const { modals } = useSelector((state) => state.modals);
   const open = modals[modalName] ? true : false;
 
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
+  const { assignedEmployees, isLoading } = useSelector(
+    (state) => state.webinarContact
+  );
+
   const selectedType =
-    tabValue === "preWebinar" ? "EMPLOYEE_REMINDER" : "EMPLOYEE_SALES";
+    tabValue === "preWebinar" ? "EMPLOYEE REMINDER" : "EMPLOYEE SALES";
 
   // Filter employees based on the selected role
-  const options = employeeData
-    .filter((item) => item?.role === selectedType)
+  const options = assignedEmployees
+    .filter((item) => roles.getRoleNameById(item?.role) === selectedType)
     .map((item) => ({
       value: item?._id,
       label: item?.userName,
@@ -64,9 +68,12 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
     setSelectedEmployee(null);
   };
 
-  useEffect(() => {
-    dispatch(getAllEmployees({}));
-  }, []);
+
+    useEffect(() => {
+      if (open) {
+        dispatch(getAssignedEmployees(webinarId));
+      }
+    }, [open]);
 
   useEffect(() => {
     if (isSuccess) {

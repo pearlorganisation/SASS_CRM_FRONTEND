@@ -42,7 +42,7 @@ const Assignments = () => {
   const { webinarData } = useSelector((state) => state.webinarContact);
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
-  const [page, setPage] = useState(searchParams.get("page") || 1);
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [filters, setFilters] = useState({});
   const [currentWebinar, setCurrentWebinar] = useState("");
   const [selected, setSelected] = useState("All");

@@ -70,7 +70,6 @@ const DataTable = ({
     <div className="p-6 bg-gray-50 rounded-lg">
       <div className="flex gap-4 justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-700">{tableHeader}</h2>
-
         <ComponentGuard
           conditions={[
             userData?.isActive,
@@ -170,7 +169,6 @@ const DataTable = ({
           isLeadType={isLeadType}
         />
       </div>
-
       {tableData?.rows?.length > 0 && (
         <div className="flex gap-4 md:flex-row flex-col flex-wrap items-center justify-between py-4">
           <Pagination
@@ -189,7 +187,6 @@ const DataTable = ({
           <PageLimitEditor pageId={tableHeader} />
         </div>
       )}
-
       <FilterPresetModal
         tableName={tableUniqueKey}
         filters={filters}

@@ -174,8 +174,8 @@ const [showEnrollmentModal, setShowEnrollmentModal] = useState(false)
 
 
   useEffect(() => {
-    dispatch(getEnrollments({ id: attendeeId }));
-  }, [attendeeId])
+    dispatch(getEnrollments({ id: email }));
+  }, [email])
 
   useEffect(() => {
     console.log(attendeeEnrollments)

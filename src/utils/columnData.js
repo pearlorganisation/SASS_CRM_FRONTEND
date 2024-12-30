@@ -26,14 +26,14 @@ export const clientTableColumns = [
 
 export const attendeeTableColumns = [
   { header: "Email", key: "email", width: 50, type: "" },
+  { header: "Assigned To", key: "isAssigned", width: 20, type: "" },
   { header: "First Name", key: "firstName", width: 20, type: "" },
   { header: "Last Name", key: "lastName", width: 20, type: "" },
+  { header: "Status", key: "status", width: 20, type: "" },
   { header: "Time in Session", key: "timeInSession", width: 20, type: "" },
   { header: "Gender", key: "gender", width: 20, type: "" },
   { header: "Location", key: "location", width: 20, type: "" },
   { header: "Phone", key: "phone", width: 20, type: "" },
-  { header: "Assigned To", key: "isAssigned", width: 20, type: "" },
-  { header: "Status", key: "status", width: 20, type: "" },
 ];
 
 export const employeeTableColumns = [
@@ -89,4 +89,15 @@ export const productTableColumns = [
 export const pullbacksTableColumns = [
   { header: "Email", key: "attendeeEmail", width: 50, type: "" },
   { header: "Assigned To", key: "assignedTo", width: 20, type: "" },
+];
+
+
+
+export const enrollmentsColumn = [
+  { header: "E-Mail", key: "attendee", width: 50, type: "" },
+  { header: "Product", key: "product", subKey: "name", width: 20, type: "Product" },
+  { header: "Level", key: "product", subKey: "level", width: 20, type: "Product" },
+  { header: "Price", key: "product", subKey: "price", width: 20, type: "Product" },
+  { header: "Date", key: "createdAt", width: 20, type: "Date" },
+
 ];
