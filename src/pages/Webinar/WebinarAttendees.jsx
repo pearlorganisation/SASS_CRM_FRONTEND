@@ -43,6 +43,8 @@ import { AssignmentStatus } from "../../utils/extra";
 import ReAssignmentModal from "../../components/Webinar/ReAssignmentModal";
 import { getAllEmployees } from "../../features/actions/employee";
 import Enrollments from "./Enrollments";
+import { resetReAssignSuccess } from "../../features/slices/reAssign.slice";
+import { resetAssignSuccess } from "../../features/slices/assign";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -245,23 +247,18 @@ const WebinarAttendees = () => {
         />
       </ComponentGuard>
 
-      <ComponentGuard
-        conditions={[tabValue === "enrollments"]}
-      >
-        <Enrollments
-          page={page}
-          setPage={setPage}
-          tabValue={tabValue}
-        />
+      <ComponentGuard conditions={[tabValue === "enrollments"]}>
+        <Enrollments page={page} setPage={setPage} tabValue={tabValue} />
       </ComponentGuard>
-
 
       <ReAssignmentModal
         selectedRows={selectedRows}
         webinarid={id}
         tabValue={tabValue}
         modalName={reAssignmentModalName}
-        isPullbackVisible={tabValue !== 'enrollments' && subTabValue === 'attendees'}
+        isPullbackVisible={
+          tabValue !== "enrollments" && subTabValue === "attendees"
+        }
         isAttendee={true}
       />
 
@@ -297,7 +294,7 @@ const WebinarAttendeesPage = (props) => {
     isSelectVisible,
     setIsSelectVisible,
     setSelectedAssignmentType,
-    selectedAssignmentType
+    selectedAssignmentType,
   } = props;
 
   const tableHeader = "Attendees Table";
@@ -311,8 +308,12 @@ const WebinarAttendeesPage = (props) => {
   const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
     (state) => state.attendee
   );
-  const { isSuccess: assignSuccess } = useSelector((state) => state.assign);
-  const { leadTypeData } = useSelector((state) => state.assign);
+  const { isSuccess: isSuccessReAssign } = useSelector(
+    (state) => state.reAssign
+  );
+  const { leadTypeData, isSuccess: assignSuccess } = useSelector(
+    (state) => state.assign
+  );
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
 
   const [filters, setFilters] = useState({});
@@ -338,7 +339,8 @@ const WebinarAttendeesPage = (props) => {
   }, [page, tabValue, LIMIT, filters, selected, selectedAssignmentType]);
 
   useEffect(() => {
-    if (isSuccess || assignSuccess) {
+    if (isSuccess || assignSuccess || isSuccessReAssign) {
+      console.log("isssucess", isSuccess, assignSuccess, isSuccessReAssign);
       dispatch(
         getAttendees({
           id,
@@ -354,8 +356,10 @@ const WebinarAttendeesPage = (props) => {
         })
       );
       dispatch(clearSuccess());
+      dispatch(resetReAssignSuccess());
+      dispatch(resetAssignSuccess());
     }
-  }, [isSuccess, assignSuccess]);
+  }, [isSuccess, assignSuccess, isSuccessReAssign]);
 
   const actionIcons = [
     {

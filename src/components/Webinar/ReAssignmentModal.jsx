@@ -51,8 +51,8 @@ const ReAssignmentModal = ({
     }));
 
   const handleSubmit = () => {
-    if (isAttendee) {
-      if (moveToPullbacks) {
+    if (isAttendee && isPullbackVisible) {
+      if (moveToPullbacks ) {
         const payload = {
           recordType: tabValue,
           webinarId: webinarid,
@@ -71,6 +71,7 @@ const ReAssignmentModal = ({
           attendees: selectedRows.map((id) => id),
         };
         console.log(payload);
+        dispatch(moveAttendeesToPullbacks(payload));
       }
     } else {
       const payload = {

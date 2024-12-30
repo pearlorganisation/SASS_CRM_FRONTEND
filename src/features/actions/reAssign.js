@@ -58,12 +58,14 @@ export const changeAssignment = createAsyncThunk(
 
 export const moveAttendeesToPullbacks = createAsyncThunk(
   "assignments/reassign/pullback",
-  async ({ attendees = [], webinarId, recordType }, { rejectWithValue }) => {
+  async ({ attendees = [], webinarId, recordType, employeeId, isTemp }, { rejectWithValue }) => {
     try {
       const response = await instance.patch(`assignment/reassign/pullback`, {
         attendees,
         webinarId,
         recordType,
+        employeeId,
+        isTemp,
       });
       return response?.data;
     } catch (e) {

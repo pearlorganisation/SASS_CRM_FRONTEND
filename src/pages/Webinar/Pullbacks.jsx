@@ -10,6 +10,7 @@ import DataTable from "../../components/Table/DataTable";
 import { Cancel, CheckCircle, Visibility } from "@mui/icons-material";
 import { AssignmentStatus } from "../../utils/extra";
 import ReAssignmentModal from "../../components/Webinar/ReAssignmentModal";
+import { resetReAssignSuccess } from "../../features/slices/reAssign.slice";
 
 const Pullbacks = (props) => {
   const tableHeader = "Re-Assignments";
@@ -39,6 +40,8 @@ const Pullbacks = (props) => {
 
   useEffect(() => {
     if (isSuccess) {
+      console.log('isssucess', isSuccess)
+
       dispatch(
         fetchReAssignments({
           webinarId: id,
@@ -48,6 +51,8 @@ const Pullbacks = (props) => {
           limit: LIMIT,
         })
       );
+
+      dispatch(resetReAssignSuccess());
     }
   }, [isSuccess]);
 
