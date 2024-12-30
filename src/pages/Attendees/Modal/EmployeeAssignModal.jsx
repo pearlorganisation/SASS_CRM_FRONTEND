@@ -21,10 +21,10 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
 
-  const { modals } = useSelector((state) => state.modals);
+  
   const { employeeData, isLoading } = useSelector((state) => state.employee);
   const { isSuccess } = useSelector((state) => state.assign);
-
+  const { modals } = useSelector((state) => state.modals);
   const open = modals[modalName] ? true : false;
 
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -64,9 +64,6 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
     setSelectedEmployee(null);
   };
 
-  useEffect(() => {
-    dispatch(getAllEmployees({}));
-  }, []);
 
   useEffect(() => {
     if (isSuccess) {

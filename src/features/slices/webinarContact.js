@@ -6,7 +6,8 @@ import {
   createWebinar,
   updateWebinar,
   deleteWebinar,
-  getEmployeeWebinars
+  getEmployeeWebinars,
+  getAssignedEmployees
 } from "../actions/webinarContact";
 import { errorToast, successToast } from "../../utils/extra";
 
@@ -16,6 +17,7 @@ const initialState = {
   totalPages: null,
   isSuccess: false,
   errorMessage: "",
+  assignedEmployees: [],
 };
 
 // ---------------------------------------------------------------------------------------
@@ -94,6 +96,18 @@ export const webinarContactSlice = createSlice({
         state.webinarData = action.payload || [];
       })
       .addCase(getEmployeeWebinars.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      
+      .addCase(getAssignedEmployees.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getAssignedEmployees.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.assignedEmployees = action.payload || [];
+      })
+      .addCase(getAssignedEmployees.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });

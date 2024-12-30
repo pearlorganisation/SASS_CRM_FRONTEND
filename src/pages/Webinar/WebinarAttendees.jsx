@@ -8,6 +8,7 @@ import {
   IconButton,
   Tooltip,
   ButtonGroup,
+  Modal,
 } from "@mui/material";
 import { createPortal } from "react-dom";
 import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
@@ -35,20 +36,26 @@ import { getLeadType, getPullbacks } from "../../features/actions/assign";
 import { toast } from "sonner";
 import Pullbacks from "./Pullbacks";
 import { AssignmentStatus } from "../../utils/extra";
+import ReAssignmentModal from "../../components/Webinar/ReAssignmentModal";
+import { getAllEmployees } from "../../features/actions/employee";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
 
   const employeeAssignModalName = "employeeAssignModal";
+  const reAssignmentModalName = "ReAssignmentModal";
   // ----------------------- etcetra -----------------------
+  const { id } = useParams();
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
 
   const { userData } = useSelector((state) => state.auth);
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [modalNames, setModalNames] = useState(new Map());
+
   const webinarName = searchParams.get("webinarName");
-  const [page, setPage] = useState(searchParams.get("page") || 1);
+  const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [tabValue, setTabValue] = useState(
     searchParams.get("tabValue") || "preWebinar"
   );
@@ -85,6 +92,7 @@ const WebinarAttendees = () => {
 
   useEffect(() => {
     dispatch(getLeadType());
+    dispatch(getAllEmployees({}));
   }, []);
 
   // Tabs change handler
@@ -102,6 +110,7 @@ const WebinarAttendees = () => {
 
   const handleSubTabChange = (_, newValue) => {
     setSubTabValue(newValue);
+    setSelectedRows([]);
     setPage(1);
     // logUserActivity({
     //   action: "switch",
@@ -141,10 +150,16 @@ const WebinarAttendees = () => {
         <div className="flex gap-4">
           {selectedRows.length > 0 && (
             <Button
-              onClick={() => dispatch(openModal(employeeAssignModalName))}
+              onClick={() => {
+                if (subTabValue === "attendees") {
+                  dispatch(openModal(employeeAssignModalName));
+                } else {
+                  dispatch(openModal(reAssignmentModalName));
+                }
+              }}
               variant="contained"
             >
-              Assign
+              {subTabValue === "attendees" ? "Assign" : "Re-Assign"}
             </Button>
           )}
 
@@ -198,7 +213,6 @@ const WebinarAttendees = () => {
           subTabValue={subTabValue}
           selectedRows={selectedRows}
           setSelectedRows={setSelectedRows}
-          employeeAssignModalName={employeeAssignModalName}
         />
       )}
 
@@ -210,8 +224,27 @@ const WebinarAttendees = () => {
           page={page}
           setPage={setPage}
           tabValue={tabValue}
+          selectedRows={selectedRows}
+          setSelectedRows={setSelectedRows}
         />
       </ComponentGuard>
+
+      <ReAssignmentModal
+      selectedRows={selectedRows}
+        webinarid={id}
+        tabValue={tabValue}
+        modalName={reAssignmentModalName}
+      />
+
+      <EmployeeAssignModal
+        tabValue={tabValue}
+        selectedRows={selectedRows.map((rowId) => ({
+          attendee: rowId,
+          recordType: tabValue,
+        }))}
+        modalName={employeeAssignModalName}
+        webinarId={id}
+      />
     </div>
   );
 };
@@ -226,7 +259,6 @@ const WebinarAttendeesPage = (props) => {
     subTabValue,
     selectedRows,
     setSelectedRows,
-    employeeAssignModalName,
   } = props;
 
   const tableHeader = "Attendees Table";
@@ -349,15 +381,6 @@ const WebinarAttendeesPage = (props) => {
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
         isLeadType={true}
-      />
-      <EmployeeAssignModal
-        tabValue={tabValue}
-        selectedRows={selectedRows.map((rowId) => ({
-          attendee: rowId,
-          recordType: tabValue,
-        }))}
-        modalName={employeeAssignModalName}
-        webinarId={id}
       />
       <AttendeesFilterModal
         modalName={AttendeesFilterModalName}
