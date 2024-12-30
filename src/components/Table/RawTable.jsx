@@ -140,7 +140,11 @@ const RawTable = (props) => {
                     color: "#555A68",
                   }}
                 >
-                  <div className={`flex h-full items-center justify-between ${!isLeadType ? 'px-3' : ''}`}>
+                  <div
+                    className={`flex h-full items-center justify-between ${
+                      !isLeadType ? "px-3" : ""
+                    }`}
+                  >
                     {isLeadType && (
                       <div
                         className="w-2 h-full"
@@ -179,6 +183,9 @@ const RawTable = (props) => {
                     )}
                     {column.type === "Date" &&
                       (formatDateAsNumber(row?.[column.key]) ?? "N/A")}
+
+                    {column.type === "Product" &&
+                      (row?.[column.key][column?.subKey] ?? "N/A")}
 
                     {column.type === "" &&
                       (row?.[column.key] !== undefined &&

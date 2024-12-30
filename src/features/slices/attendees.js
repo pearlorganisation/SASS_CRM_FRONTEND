@@ -3,7 +3,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
 import { getPullbacks } from "../actions/assign";
-import { addAttendees, getAllAttendees, getAttendee, getAttendeeLeadTypeByEmail, getAttendees, getEnrollments, updateAttendee, updateAttendeeLeadType } from "../actions/attendees";
+import { addAttendees, addEnrollment, getAllAttendees, getAttendee, getAttendeeLeadTypeByEmail, getAttendees, getEnrollments, getWebinarEnrollments, updateAttendee, updateAttendeeLeadType } from "../actions/attendees";
 
 const initialState = {
   isLoading: false,
@@ -11,6 +11,7 @@ const initialState = {
   selectedAttendee: [],
   attendeeData: [],
   attendeeEnrollments: [],
+  webinarEnrollments: [],
   singleAttendeeData: null,
   totalPages: 1,
   errorMessage: "",
@@ -143,6 +144,30 @@ export const attendeeSlice = createSlice({
         state.attendeeEnrollments = action?.payload?.result || [];
       })
       .addCase(getEnrollments.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+
+      .addCase(getWebinarEnrollments.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getWebinarEnrollments.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.webinarEnrollments = action?.payload?.result || [];
+      })
+      .addCase(getWebinarEnrollments.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+
+      .addCase(addEnrollment.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(addEnrollment.fulfilled, (state, action) => {
+        state.isLoading = false;
+        successToast("Enrollment Added Successfully");
+      })
+      .addCase(addEnrollment.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });

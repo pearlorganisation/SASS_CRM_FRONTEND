@@ -42,6 +42,7 @@ import Pullbacks from "./Pullbacks";
 import { AssignmentStatus } from "../../utils/extra";
 import ReAssignmentModal from "../../components/Webinar/ReAssignmentModal";
 import { getAllEmployees } from "../../features/actions/employee";
+import Enrollments from "./Enrollments";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -177,7 +178,6 @@ const WebinarAttendees = () => {
           <ComponentGuard
             conditions={[
               userData?.isActive,
-              subTabValue === "attendees",
               tabValue !== "enrollments",
               selectedRows.length === 0,
             ]}
@@ -244,6 +244,17 @@ const WebinarAttendees = () => {
           setSelectedRows={setSelectedRows}
         />
       </ComponentGuard>
+
+      <ComponentGuard
+        conditions={[tabValue === "enrollments"]}
+      >
+        <Enrollments
+          page={page}
+          setPage={setPage}
+          tabValue={tabValue}
+        />
+      </ComponentGuard>
+
 
       <ReAssignmentModal
         selectedRows={selectedRows}

@@ -7,8 +7,8 @@ import {
   updateWebinar,
   deleteWebinar,
   getEmployeeWebinars,
-  getAssignedEmployees
-} from "../actions/webinarContact";
+  getAssignedEmployees,
+  } from "../actions/webinarContact";
 import { errorToast, successToast } from "../../utils/extra";
 
 const initialState = {
@@ -111,6 +111,7 @@ export const webinarContactSlice = createSlice({
         state.isLoading = false;
         errorToast(action?.payload);
       });
+
   },
 });
 
