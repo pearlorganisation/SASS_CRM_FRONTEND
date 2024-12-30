@@ -2,40 +2,45 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProducts } from "../../../features/actions/product";
+import { addEnrollment, getEnrollments } from "../../../features/actions/attendees";
 
-const AddEnrollmentModal = ({ setModal, initialData, onConfirmEdit }) => {
+const AddEnrollmentModal = ({ setModal, onConfirmEdit }) => {
   const { productData } = useSelector((state) => state.product);
 
   const dispatch = useDispatch();
+
+  const { selectedAttendee } = useSelector((state) => state.attendee);
+
   useEffect(() => {
     dispatch(getAllProducts({}));
   }, []);
 
-  useEffect(() => {
-    console.log(productData);
-  }, [productData]);
+  // function removeBlankAttributes(obj) {
+  //   const result = {};
+  //   for (const key in obj) {
+  //     if (obj[key] !== null && obj[key] !== undefined && obj[key].length > 0) {
+  //       result[key] = obj[key];
+  //     }
+  //   }
+  //   return result;
+  // }
 
-  function removeBlankAttributes(obj) {
-    const result = {};
-    for (const key in obj) {
-      if (obj[key] !== null && obj[key] !== undefined && obj[key].length > 0) {
-        result[key] = obj[key];
-      }
-    }
-    return result;
-  }
-
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, formState: { errors },
+} = useForm({
     defaultValues: {
-      product: initialData?.product || "",
-      Webinar: initialData?.webinar || "",
+      attendee: "",
+      product: "",
+      webinar: "",
     },
   });
 
   const onSubmit = (data) => {
-    data["attendee"] = initialData?.attendee;
-    let finalData = removeBlankAttributes(data);
-    onConfirmEdit(finalData);
+    const attendeeEmail = selectedAttendee && selectedAttendee[0]?._id;
+    data["attendee"] = attendeeEmail;
+    console.log(data)
+    dispatch(addEnrollment(data)).then(res => {
+      dispatch(getEnrollments({id: attendeeEmail}));
+    })
   };
 
   return (
@@ -46,27 +51,41 @@ const AddEnrollmentModal = ({ setModal, initialData, onConfirmEdit }) => {
           <div>
             <label className="block text-sm font-medium">Product</label>
             <select
-              {...register("product")}
+              {...register("product",{ required: "Product is required" }) }
               className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 focus:border-teal-500 focus:outline-none"
             >
               <option value="">Select Product</option>
-              {productData && productData.map((product) => (
-                  <option value={product._id}>{product?.name} | Level: {product?.level} | Price: {product?.price}</option>
-              ))}
+              {productData &&
+                productData.map((product) => (
+                  <option value={product._id} key={product._id}>
+                    {product?.name} | Level: {product?.level} | Price:{" "}
+                    {product?.price}
+                  </option>
+                ))}
             </select>
+            {errors.product && (
+              <p className="text-red-500 text-sm mt-1">{errors.product.message}</p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium">Webinar</label>
             <select
-              {...register("webinar")}
-              className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 focus:border-teal-500 focus:outline-none"
+              {...register("webinar",{ required: "Webinar is required" })}
+              className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 focus:border-red-500 focus:outline-none"
             >
               <option value="">Select Webinar</option>
-              {productData && productData.map((product) => (
-                  <option value={product._id}>{product?.name} | Level: {product?.level} | Price: {product?.price}</option>
-              ))}
+              {selectedAttendee &&
+                  selectedAttendee.length > 0 &&
+                  selectedAttendee[0]?.data?.map((item, index) => (
+                  <option value={item?.webinar[0]?._id} key={index}>
+                    {item?.webinar[0]?.webinarName} | {new Date(item?.webinar[0]?.webinarDate).toDateString()}
+                  </option>
+                ))}
             </select>
+            {errors.webinar && (
+              <p className="text-red-500 text-sm mt-1">{errors.webinar.message}</p>
+            )}
           </div>
 
           <button
