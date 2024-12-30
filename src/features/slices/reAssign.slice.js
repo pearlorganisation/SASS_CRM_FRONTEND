@@ -24,7 +24,7 @@ export const reAssignSlice = createSlice({
   name: "assign",
   initialState,
   reducers: {
-    resetAssign: (state) => {
+    resetReAssignSuccess: (state) => {
       state.isSuccess = false;
     },
     resetAssignedData: (state) => {
@@ -87,7 +87,7 @@ export const reAssignSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { resetReAssignData } = reAssignSlice.actions;
+export const { resetReAssignData, resetReAssignSuccess } = reAssignSlice.actions;
 export default reAssignSlice.reducer;
 
 // ================================================== THE END ==================================================

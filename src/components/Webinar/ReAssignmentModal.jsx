@@ -16,13 +16,15 @@ import {
   changeAssignment,
   moveAttendeesToPullbacks,
 } from "../../features/actions/reAssign";
+import { resetReAssignSuccess } from "../../features/slices/reAssign.slice";
 
 const ReAssignmentModal = ({
   modalName,
   tabValue,
   webinarid,
   selectedRows,
-  isPullbackVisible=false,
+  isPullbackVisible = false,
+  isAttendee = false,
 }) => {
   const dispatch = useDispatch();
   const roles = useRoles();
@@ -31,11 +33,11 @@ const ReAssignmentModal = ({
 
   const [moveToPullbacks, setMoveToPullbacks] = useState(false);
   const { reAssignData, isSuccess } = useSelector((state) => state.reAssign);
+  const { modals } = useSelector((state) => state.modals);
+  const open = modals[modalName] ? true : false;
   const { assignedEmployees, isLoading } = useSelector(
     (state) => state.webinarContact
   );
-  const { modals } = useSelector((state) => state.modals);
-  const open = modals[modalName] ? true : false;
 
   const selectedType =
     tabValue === "preWebinar" ? "EMPLOYEE REMINDER" : "EMPLOYEE SALES";
@@ -49,15 +51,27 @@ const ReAssignmentModal = ({
     }));
 
   const handleSubmit = () => {
-    if (moveToPullbacks && isPullbackVisible) {
-      const payload = {
-        recordType: tabValue,
-        webinarId: webinarid,
-        attendees: selectedRows.map((id) => id),
-      };
-      console.log("Pullbacks Payload:", payload);
-      // Dispatch your specific action for "Move to Pullbacks"
-      dispatch(moveAttendeesToPullbacks(payload));
+    if (isAttendee) {
+      if (moveToPullbacks) {
+        const payload = {
+          recordType: tabValue,
+          webinarId: webinarid,
+          attendees: selectedRows.map((id) => id),
+        };
+        console.log("Pullbacks Payload:", payload);
+        // Dispatch your specific action for "Move to Pullbacks"
+        dispatch(moveAttendeesToPullbacks(payload));
+      }
+      else{
+        const payload = {
+          isTemp: assignmentType === "temporary" ? true : false,
+          employeeId: selectedEmployee,
+          webinarId: webinarid,
+          recordType: tabValue,
+          attendees: selectedRows.map((id) => id),
+        };
+        console.log(payload);
+      }
     } else {
       const payload = {
         isTemp: assignmentType === "temporary" ? true : false,
@@ -95,11 +109,11 @@ const ReAssignmentModal = ({
     }
 
     return () => {
-      if(isSuccess){
-
+      if (isSuccess) {
+        dispatch(resetReAssignSuccess());
       }
-    }
-  },[isSuccess]);
+    };
+  }, [isSuccess]);
 
   return (
     <Modal open={open} onClose={handleCancel}>
@@ -110,21 +124,19 @@ const ReAssignmentModal = ({
         <h2 className="text-lg font-bold mb-4 border-b">Re-Assign Attendee</h2>
 
         {/* Move to Pullbacks */}
-        {
-          isPullbackVisible && (
-            <div className="mb-4">
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={moveToPullbacks}
-                onChange={(e) => setMoveToPullbacks(e.target.checked)}
-              />
-            }
-            label="Move to Pullbacks"
-          />
-        </div>
-          )
-        }
+        {isPullbackVisible && (
+          <div className="mb-4">
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={moveToPullbacks}
+                  onChange={(e) => setMoveToPullbacks(e.target.checked)}
+                />
+              }
+              label="Move to Pullbacks"
+            />
+          </div>
+        )}
 
         {/* Assignment Type */}
         <div className="mb-4">

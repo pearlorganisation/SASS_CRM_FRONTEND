@@ -262,6 +262,7 @@ const WebinarAttendees = () => {
         tabValue={tabValue}
         modalName={reAssignmentModalName}
         isPullbackVisible={tabValue !== 'enrollments' && subTabValue === 'attendees'}
+        isAttendee={true}
       />
 
       <EmployeeAssignModal
