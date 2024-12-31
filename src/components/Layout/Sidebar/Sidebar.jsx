@@ -161,9 +161,7 @@ const Sidebar = () => {
                   <Link
                     to={item.path}
                     onClick={() => handleNavigation(item.path)}
-                    className={`flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group ${
-                      item.label === "Products" ? " border border-red-500" : ""
-                    }`}
+                    className={`flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group`}
                   >
                     {item.icon}
                     <span className="flex-1 ms-3 whitespace-nowrap">
