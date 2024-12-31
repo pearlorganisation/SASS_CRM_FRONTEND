@@ -3,7 +3,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { addProduct, getAllProducts, getAllProductsByAdminId } from "../actions/product";
+import { addProduct, getAllProducts, getAllProductsByAdminId, updateProduct } from "../actions/product";
 import { errorToast } from "../../utils/extra";
 
 
@@ -48,6 +48,24 @@ export const productSlice = createSlice({
         state.isLoading = false;
         errorToast(action?.payload);
       })
+
+      .addCase(updateProduct.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        toast.success("Product updated Successfully", {
+          position: "top-center",
+        });
+      })
+      .addCase(updateProduct.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+
       .addCase(getAllProducts.pending, (state, action) => {
         state.isLoading = true;
       })

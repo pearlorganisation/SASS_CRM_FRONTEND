@@ -147,7 +147,7 @@ const WebinarAttendees = () => {
           label="Enrollments"
           value="enrollments"
           style={{
-            border: "1px solid red",
+            // border: "1px solid red",
             color: "gray",
           }}
         />
