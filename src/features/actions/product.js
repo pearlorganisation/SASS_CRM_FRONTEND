@@ -14,6 +14,19 @@ export const addProduct = createAsyncThunk(
   }
 );
 
+//add product
+export const updateProduct = createAsyncThunk(
+  "products/update",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`/products/${payload.id}`, payload);
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 // get product data
 export const getAllProducts = createAsyncThunk(
   "getAllProducts",

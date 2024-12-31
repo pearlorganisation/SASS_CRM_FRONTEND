@@ -1,26 +1,18 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllProducts } from "../../../features/actions/product";
 import {
-  addEnrollment,
-  getEnrollments,
-} from "../../../features/actions/attendees";
+  getAllProducts,
+  updateProduct,
+} from "../../../features/actions/product";
 
-const EditProductModal = ({ setModal, product }) => {
+const EditProductModal = ({ setModal, product, page, LIMIT }) => {
   const dispatch = useDispatch();
 
-  const { selectedAttendee } = useSelector((state) => state.attendee);
+  const { selectedAttendee, isLoading } = useSelector(
+    (state) => state.attendee
+  );
 
-  // function removeBlankAttributes(obj) {
-  //   const result = {};
-  //   for (const key in obj) {
-  //     if (obj[key] !== null && obj[key] !== undefined && obj[key].length > 0) {
-  //       result[key] = obj[key];
-  //     }
-  //   }
-  //   return result;
-  // }
 
   const {
     register,
@@ -29,18 +21,18 @@ const EditProductModal = ({ setModal, product }) => {
   } = useForm({
     defaultValues: {
       name: product?.name || "",
-      level: product?.level || "",
+      level: product?.level ? Number(product?.level?.split("")[1]) : "",
       price: product?.price || "",
       description: product?.description || "",
     },
   });
 
   const onSubmit = (data) => {
-    const attendeeEmail = selectedAttendee && selectedAttendee[0]?._id;
-    data["attendee"] = attendeeEmail;
+    data["id"] = product._id;
+    data["level"] = Number(data.level);
     console.log(data);
-    dispatch(addEnrollment(data)).then((res) => {
-      dispatch(getEnrollments({ id: attendeeEmail }));
+    dispatch(updateProduct(data)).then((res) => {
+      dispatch(getAllProducts({ page, limit: LIMIT }));
     });
   };
 
@@ -74,13 +66,13 @@ const EditProductModal = ({ setModal, product }) => {
           <div>
             <label className="block text-sm font-medium">Description</label>
 
-            <input
+            <textarea
               {...register("description", {
                 required: "description is required",
               })}
               type="number"
-              className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 focus:border-teal-500 focus:outline-none"
-              placeholder="description"
+              className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 py-1 focus:border-teal-500 focus:outline-none min-h-[50px] max-h-[100px]"
+              placeholder="Description"
             />
           </div>
 
@@ -94,11 +86,11 @@ const EditProductModal = ({ setModal, product }) => {
                 Select Level
               </option>
 
-              <option value="L1">L1</option>
+              <option value={1}>L1</option>
 
-              <option value="L1">L2</option>
+              <option value={2}>L2</option>
 
-              <option value="L1">L3</option>
+              <option value={3}>L3</option>
             </select>
             {errors.product && (
               <p className="text-red-500 text-sm mt-1">

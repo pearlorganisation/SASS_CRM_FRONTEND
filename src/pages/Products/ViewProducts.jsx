@@ -114,6 +114,8 @@ const ViewProducts = () => {
         <EditProductModal
           product={product}
           setModal={setOpenModal}
+          page={page}
+          LIMIT={LIMIT}
         />
       )}
     </div>
