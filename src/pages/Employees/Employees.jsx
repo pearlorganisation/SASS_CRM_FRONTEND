@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@mui/material";
-import { Edit, Visibility, ToggleOn, ToggleOff } from "@mui/icons-material";
+import { Edit, Visibility, ToggleOn, ToggleOff, Dashboard } from "@mui/icons-material";
 import { getAllEmployees } from "../../features/actions/employee";
 import ConfirmActionModal from "./modal/ConfirmActionModal";
-import { clearSuccess } from "../../features/slices/employee";
+import { clearSuccess, setEmployeeModeId } from "../../features/slices/employee";
 import { openModal } from "../../features/slices/modalSlice";
 import { getUserSubscription } from "../../features/actions/auth";
 import DataTable from "../../components/Table/DataTable";
@@ -82,6 +82,15 @@ const Employees = () => {
         navigate(`/employee/view/${item?._id}`);
       },
       readOnly: true,
+    },
+    ,
+    {
+      icon: () => <Dashboard className="text-neutral-500 group-hover:text-neutral-600" />,
+      tooltip: "Visit Dashboard",
+      onClick: (item) => {
+        dispatch(setEmployeeModeId(item._id));
+        navigate('/');
+      },
     },
     {
       icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,

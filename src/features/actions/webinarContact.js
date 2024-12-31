@@ -37,9 +37,11 @@ export const getAssignedEmployees = createAsyncThunk(
 // get webinar data
 export const getEmployeeWebinars = createAsyncThunk(
   "employeeWebinars/fetchData",
-  async (_, { rejectWithValue }) => {
+  async ({ employeeId }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/webinar`);
+      const response = await instance.get(`/webinar`,{
+        params: { employeeId },
+      });
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);

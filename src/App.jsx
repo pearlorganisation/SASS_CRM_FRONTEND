@@ -48,6 +48,7 @@ import useRoles from "./hooks/useRoles";
 import useAddUserActivity from "./hooks/useAddUserActivity";
 import ViewEmployee from "./pages/Employees/ViewEmployee";
 import LeadTypes from "./pages/Settings/LeadType/ManageLeadTypes";
+import EmployeeDashboard from "./pages/Dashboard/EmployeeDashboard";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -282,6 +283,30 @@ const App = () => {
           path: "/notice-board/update",
           element: (
             <RouteGuard roleNames={["ADMIN", "SUPER_ADMIN"]}>
+              <UpdateNoticeBoard />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "employee/dashboard/:id",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <EmployeeDashboard />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "employee/assignments/:id",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <Assignments />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "employee/products/:id",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
               <UpdateNoticeBoard />
             </RouteGuard>
           ),
