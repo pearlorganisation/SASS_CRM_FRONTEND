@@ -30,7 +30,6 @@ const FormInput = ({
           value={type === "number" ? field.value ?? "" : field.value}
           onChange={(e) =>
           {
-            console.log(e.target.value);
             return field.onChange( // fix get 0 value - remove ' || "" '
               type === "number" ? parseFloat(e.target.value) || "" : e.target.value
             );
