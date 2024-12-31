@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useLayoutEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Button,
@@ -13,8 +13,11 @@ import {
 } from "@mui/material";
 import { attendeeTableColumns } from "../../utils/columnData";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
-import DataTable from "../../components/Table/DataTable"; 
-import { getAssignments, requestReAssignment } from "../../features/actions/assign";
+import DataTable from "../../components/Table/DataTable";
+import {
+  getAssignments,
+  requestReAssignment,
+} from "../../features/actions/assign";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
 import { getEmployeeWebinars } from "../../features/actions/webinarContact";
 import { resetAssignedData } from "../../features/slices/assign";
@@ -22,6 +25,7 @@ import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { AssignmentStatus } from "../../utils/extra";
 
 const Assignments = () => {
+  const employeeId = useParams()?.id;
   const navigate = useNavigate();
   const addUserActivity = useAddUserActivity();
 
@@ -56,7 +60,7 @@ const Assignments = () => {
     if (currentWebinar)
       dispatch(
         getAssignments({
-          id: userData?._id,
+          id: employeeId || userData?._id,
           page,
           limit: LIMIT,
           filters,
@@ -71,7 +75,7 @@ const Assignments = () => {
     if (currentWebinar)
       dispatch(
         getAssignments({
-          id: userData?._id,
+          id: employeeId || userData?._id,
           page: 1,
           limit: LIMIT,
           filters,
@@ -89,7 +93,7 @@ const Assignments = () => {
   }, [isSuccess]);
 
   useLayoutEffect(() => {
-    dispatch(getEmployeeWebinars());
+    dispatch(getEmployeeWebinars({ employeeId }));
     return () => {
       dispatch(resetAssignedData());
     };
@@ -128,38 +132,33 @@ const Assignments = () => {
     },
   ];
 
-  const AttendeeButtonGroup = () => {
-    const handleClick = (label) => {
-      setSelected(label); // Update state on button click
+  const AttendeeDropdown = () => {
+    const handleChange = (event) => {
+      const label = event.target.value;
+      setSelected(label);
+      setPage(1);
     };
+
     return (
-      <ButtonGroup variant="outlined" aria-label="Basic button group">
-        <Button
-          onClick={() => handleClick("All")}
-          color={selected === "All" ? "secondary" : "primary"}
+      <FormControl className="w-40 " variant="outlined">
+        <InputLabel id="attendee-label">Activity</InputLabel>
+        <Select
+          labelId="attendee-label"
+          className="h-10"
+          value={selected}
+          onChange={handleChange}
+          label="Activity"
         >
-          All
-        </Button>
-        <Button
-          onClick={() => handleClick("Worked")}
-          color={selected === "Worked" ? "secondary" : "primary"}
-        >
-          Worked
-        </Button>
-        <Button
-          onClick={() => handleClick("Pending")}
-          color={selected === "Pending" ? "secondary" : "primary"}
-        >
-          Pending
-        </Button>
-      </ButtonGroup>
+          <MenuItem value="All">All</MenuItem>
+          <MenuItem value="Worked">Worked</MenuItem>
+          <MenuItem value="Pending">Pending</MenuItem>
+        </Select>
+      </FormControl>
     );
   };
   return (
-    
-
     <div className="px-6 md:px-10 pt-10 space-y-6">
-     <Tabs
+      <Tabs
         value={tabValue}
         onChange={(e, newValue) => setTabValue(newValue)}
         centered
@@ -167,17 +166,32 @@ const Assignments = () => {
         textColor="primary"
         indicatorColor="primary"
       >
-        <Tab label="Assignments" value={AssignmentStatus.ACTIVE} className="text-gray-600" />
-        <Tab label="ReAssignments" value={AssignmentStatus.REASSIGN_REQUESTED} className="text-gray-600" />
+        <Tab
+          label="Assignments"
+          value={AssignmentStatus.ACTIVE}
+          className="text-gray-600"
+        />
+        <Tab
+          label="ReAssignments"
+          value={AssignmentStatus.REASSIGN_REQUESTED}
+          className="text-gray-600"
+        />
       </Tabs>
 
-      <div className={`flex items-center gap-4 ${selectedRows.length > 0 ? "justify-between" : "justify-end"} `}>
-        {
-          selectedRows.length > 0 && (
-            <Button 
-            onClick={ () => dispatch(requestReAssignment(selectedRows)) }
-            className="h-10" variant="contained">Request ReAssignment</Button>)
-        }
+      <div
+        className={`flex items-center gap-4 ${
+          selectedRows.length > 0 ? "justify-between" : "justify-end"
+        } `}
+      >
+        {selectedRows.length > 0 && (
+          <Button
+            onClick={() => dispatch(requestReAssignment(selectedRows))}
+            className="h-10"
+            variant="contained"
+          >
+            Request ReAssignment
+          </Button>
+        )}
 
         <FormControl className="w-60">
           <InputLabel id="webinar-label">Webinar</InputLabel>
@@ -202,7 +216,7 @@ const Assignments = () => {
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="viewAssignmentsTable"
-        ButtonGroup={AttendeeButtonGroup}
+        ButtonGroup={AttendeeDropdown}
         isSelectVisible={true}
         filters={filters}
         setFilters={setFilters}

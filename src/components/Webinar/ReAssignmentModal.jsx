@@ -17,6 +17,7 @@ import {
   moveAttendeesToPullbacks,
 } from "../../features/actions/reAssign";
 import { resetReAssignSuccess } from "../../features/slices/reAssign.slice";
+import AssignedEmployeeTable from "./AssignedEmployeeTable";
 
 const ReAssignmentModal = ({
   modalName,
@@ -48,11 +49,13 @@ const ReAssignmentModal = ({
     .map((item) => ({
       value: item?._id,
       label: item?.userName,
+      contactCount: item?.dailyContactCount || 0,
+      contactLimit: item?.dailyContactLimit || 0,
     }));
 
   const handleSubmit = () => {
     if (isAttendee && isPullbackVisible) {
-      if (moveToPullbacks ) {
+      if (moveToPullbacks) {
         const payload = {
           recordType: tabValue,
           webinarId: webinarid,
@@ -61,8 +64,7 @@ const ReAssignmentModal = ({
         console.log("Pullbacks Payload:", payload);
         // Dispatch your specific action for "Move to Pullbacks"
         dispatch(moveAttendeesToPullbacks(payload));
-      }
-      else{
+      } else {
         const payload = {
           isTemp: assignmentType === "temporary" ? true : false,
           employeeId: selectedEmployee,
@@ -119,7 +121,7 @@ const ReAssignmentModal = ({
   return (
     <Modal open={open} onClose={handleCancel}>
       <Box
-        className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto mt-20"
+        className="bg-white rounded-lg shadow-lg p-6 max-w-lg mx-auto mt-20"
         sx={{ outline: "none" }}
       >
         <h2 className="text-lg font-bold mb-4 border-b">Re-Assign Attendee</h2>
@@ -165,24 +167,12 @@ const ReAssignmentModal = ({
         </div>
 
         {/* Employees */}
-        <div className="mb-4">
-          <label className="block font-medium mb-2">Select Employee</label>
-          <RadioGroup
-            value={selectedEmployee}
-            onChange={(e) => setSelectedEmployee(e.target.value)}
-            className="flex flex-col space-y-2"
-          >
-            {options.map((employee) => (
-              <FormControlLabel
-                key={employee?.value}
-                value={employee?.value}
-                control={<Radio />}
-                label={employee?.label}
-                disabled={moveToPullbacks}
-              />
-            ))}
-          </RadioGroup>
-        </div>
+        <AssignedEmployeeTable
+          options={options}
+          selectedEmployee={selectedEmployee}
+          setSelectedEmployee={setSelectedEmployee}
+          moveToPullbacks={moveToPullbacks}
+        />
 
         {/* Actions */}
         <div className="flex justify-end space-x-2">

@@ -29,6 +29,7 @@ const Sidebar = () => {
   const { isSidebarOpen } = useSelector((state) => state.globalData);
   const [showImportantLinks, setShowImportantLinks] = useState(false); // toggle state for sub-links
   const role = userData?.role || "";
+  const { employeeModeId } = useSelector((state) => state.employee);
 
   const navItems = [
     {
@@ -44,6 +45,16 @@ const Sidebar = () => {
     {
       roles: [roles.ADMIN],
       items: [
+          // {
+          //   path: `/employee/dashboard/${employeeModeId}`,
+          //   label: "Employee Dashboard",
+          //   icon: <TbLayoutDashboardFilled size={30} />,
+          // },
+          // {
+          //   path: `/employee/assignments/${employeeModeId}`,
+          //   label: "Employee Assignments",
+          //   icon: <MdAssignment size={30} />,
+          // },
         {
           path: "/webinarDetails",
           label: "Webinars",
@@ -161,9 +172,7 @@ const Sidebar = () => {
                   <Link
                     to={item.path}
                     onClick={() => handleNavigation(item.path)}
-                    className={`flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group ${
-                      item.label === "Products" ? " border border-red-500" : ""
-                    }`}
+                    className={`flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group`}
                   >
                     {item.icon}
                     <span className="flex-1 ms-3 whitespace-nowrap">
