@@ -35,7 +35,6 @@ function PasswordUpdateForm() {
   };
 
   const onSubmit = (data) => {
-    console.log("Password updated successfully", data);
     dispatch(updatePassword(data));
     logUserActivity({
       action: "update",

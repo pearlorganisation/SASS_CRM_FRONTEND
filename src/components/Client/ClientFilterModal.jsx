@@ -52,7 +52,6 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   };
 
   useEffect(() => {
-    console.log("open", filters);
     if (open) {
       reset({
         ...filters,
