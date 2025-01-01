@@ -11,6 +11,7 @@ import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { resetProductState } from "../../features/slices/product";
 import useRoles from "../../hooks/useRoles";
 import { getAllProducts } from "../../features/actions/product";
+import EditProductModal from "./Modal/EditProductModal";
 
 const ViewProducts = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -34,6 +35,9 @@ const ViewProducts = () => {
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
 
+  const [product, setProduct] = useState(null);
+  const [openModal, setOpenModal] = useState(false);
+
   useEffect(() => {
     setSearchParams({ page: page });
   }, [page]);
@@ -54,7 +58,10 @@ const ViewProducts = () => {
     {
       icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
       tooltip: "Edit Product",
-      onClick: (item) => {},
+      onClick: (item) => {
+        setProduct(item);
+        setOpenModal(true);
+      },
     },
     {
       icon: (item) => (
@@ -87,10 +94,12 @@ const ViewProducts = () => {
         setFilters={setFilters}
         tableData={{
           columns: productTableColumns,
-          rows: Array.isArray(productData) ? productData.map((item) => ({
-            ...item,
-            level: `L${item.level}`,
-          })) : [],
+          rows: Array.isArray(productData)
+            ? productData.map((item) => ({
+                ...item,
+                level: `L${item.level}`,
+              }))
+            : [],
         }}
         actions={actionIcons}
         totalPages={totalPages}
@@ -101,6 +110,14 @@ const ViewProducts = () => {
         exportModalName={exportModalName}
         isLoading={isLoading}
       />
+      {openModal && (
+        <EditProductModal
+          product={product}
+          setModal={setOpenModal}
+          page={page}
+          LIMIT={LIMIT}
+        />
+      )}
     </div>
   );
 };

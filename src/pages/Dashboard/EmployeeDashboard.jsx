@@ -5,8 +5,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
 import { getDashboardData } from "../../features/actions/globalData";
 import { errorToast } from "../../utils/extra";
+import { useParams } from "react-router-dom";
 
 const EmployeeDashboard = () => {
+  const employeeId = useParams()?.id;
   const dispatch = useDispatch();
   const { dashBoardCardsData } = useSelector((state) => state.globalData);
 
@@ -18,7 +20,7 @@ const EmployeeDashboard = () => {
 
   useEffect(() => {
     if (startDate && endDate) {
-      dispatch(getDashboardData({ startDate, endDate }));
+      dispatch(getDashboardData({ startDate, endDate, employeeId }));
     }
   }, [startDate, endDate]);
 

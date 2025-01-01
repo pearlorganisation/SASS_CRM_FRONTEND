@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { Tab, Tabs } from "@mui/material";
 import { getUserActivity } from "../../features/actions/userActivity";
@@ -12,7 +12,7 @@ import {
   getAssignments,
   getAssignmentsActivity,
 } from "../../features/actions/assign";
-import { Delete, Edit, Visibility } from "@mui/icons-material";
+import { Visibility,  } from "@mui/icons-material";
 import AssignmentActivity from "../../components/Employee/AssignmentActivity";
 import { AssignmentStatus } from "../../utils/extra";
 
@@ -62,23 +62,7 @@ const ViewEmployee = () => {
       onClick: (item) => {
         console.log(`Viewing details for row with id: ${item?._id}`);
       },
-    },
-    {
-      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
-      tooltip: "Edit Attendee",
-      onClick: (item) => {
-        console.log(`Editing row with id: ${item?._id}`);
-      },
-    },
-    {
-      icon: (item) => (
-        <Delete className="text-red-500 group-hover:text-red-600" />
-      ),
-      tooltip: "Delete Attendee",
-      onClick: (item) => {
-        console.log(`Deleting row with id: ${item?._id}`);
-      },
-    },
+    }
   ];
 
   return (

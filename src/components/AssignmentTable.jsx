@@ -19,7 +19,6 @@ const AssignmentTable = (props) => {
 
   const handleViewFullDetails = (item) => {
 
-    console.log('assignment details clicked')
 
     navigate(
       `/particularContact?email=${encodeURIComponent(

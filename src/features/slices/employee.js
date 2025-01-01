@@ -2,8 +2,6 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 
-import { toast } from "sonner";
-
 import {
   addEmployee,
   getAllEmployees,
@@ -25,6 +23,7 @@ const initialState = {
   errorMessage: "",
   employeeAssignments: [],
   Stats: null,
+  employeeModeId: null,
 };
 
 // ---------------------------------------------------------------------------------------
@@ -35,6 +34,10 @@ export const employeeSlice = createSlice({
   reducers: {
     clearSuccess(state) {
       state.isSuccess = false;
+    },
+
+    setEmployeeModeId(state, action) {
+      state.employeeModeId = action.payload ? action.payload : null;
     },
   },
   extraReducers: (builder) => {
@@ -159,7 +162,7 @@ export const employeeSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { clearSuccess } = employeeSlice.actions;
+export const { clearSuccess, setEmployeeModeId } = employeeSlice.actions;
 export default employeeSlice.reducer;
 
 // ================================================== THE END ==================================================

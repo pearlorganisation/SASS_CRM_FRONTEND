@@ -56,8 +56,6 @@ const ExportClientExcelModal = ({ modalName, filters }) => {
   const handleSubmit = () => {
     const limitValue = limit || null;
     const columns = selectedColumns.join(",");
-    console.log("Limit:", limitValue);
-    console.log("Columns:", columns);
     dispatch(exportClientExcel({ limit: limitValue, columns, filters }));
     //
   };

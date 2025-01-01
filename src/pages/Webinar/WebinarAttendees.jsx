@@ -147,7 +147,7 @@ const WebinarAttendees = () => {
           label="Enrollments"
           value="enrollments"
           style={{
-            border: "1px solid red",
+            // border: "1px solid red",
             color: "gray",
           }}
         />
@@ -181,6 +181,7 @@ const WebinarAttendees = () => {
             conditions={[
               userData?.isActive,
               tabValue !== "enrollments",
+              subTabValue === "attendees",
               selectedRows.length === 0,
             ]}
           >
@@ -358,6 +359,7 @@ const WebinarAttendeesPage = (props) => {
       dispatch(clearSuccess());
       dispatch(resetReAssignSuccess());
       dispatch(resetAssignSuccess());
+      setSelectedRows([]);
     }
   }, [isSuccess, assignSuccess, isSuccessReAssign]);
 
