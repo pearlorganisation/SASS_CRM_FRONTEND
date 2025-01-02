@@ -30,6 +30,7 @@ const ViewProducts = () => {
     (state) => state.product
   );
 
+  const { employeeModeData } = useSelector((state) => state.employee);
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(searchParams.get("page") || 1);
@@ -54,7 +55,7 @@ const ViewProducts = () => {
   }, [isSuccess]);
   // ----------------------- Action Icons -----------------------
 
-  const actionIcons = [
+  const actionIcons =  employeeModeData ? [] : [
     {
       icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
       tooltip: "Edit Product",
@@ -76,7 +77,7 @@ const ViewProducts = () => {
       <div className="flex gap-4 justify-end">
         <ComponentGuard
           allowedRoles={[roles.ADMIN]}
-          conditions={[userData?.isActive]}
+          conditions={[userData?.isActive, employeeModeData ? false : true]}
         >
           <Button
             onClick={() => navigate("/products/addProduct")}
@@ -107,7 +108,6 @@ const ViewProducts = () => {
         setPage={setPage}
         limit={LIMIT}
         filterModalName={filterModalName}
-        exportModalName={exportModalName}
         isLoading={isLoading}
       />
       {openModal && (

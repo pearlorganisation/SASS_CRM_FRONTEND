@@ -20,12 +20,12 @@ import { resetReAssignSuccess } from "../../features/slices/reAssign.slice";
 import AssignedEmployeeTable from "./AssignedEmployeeTable";
 
 const ReAssignmentModal = ({
-  modalName,
   tabValue,
   webinarid,
   selectedRows,
   isPullbackVisible = false,
   isAttendee = false,
+  setReAssignModal
 }) => {
   const dispatch = useDispatch();
   const roles = useRoles();
@@ -34,8 +34,6 @@ const ReAssignmentModal = ({
 
   const [moveToPullbacks, setMoveToPullbacks] = useState(false);
   const { reAssignData, isSuccess } = useSelector((state) => state.reAssign);
-  const { modals } = useSelector((state) => state.modals);
-  const open = modals[modalName] ? true : false;
   const { assignedEmployees, isLoading } = useSelector(
     (state) => state.webinarContact
   );
@@ -94,17 +92,15 @@ const ReAssignmentModal = ({
   };
 
   const handleCancel = () => {
-    dispatch(closeModal(modalName));
+    setReAssignModal(false);
     setAssignmentType("temporary");
     setSelectedEmployee("");
     setMoveToPullbacks(false);
   };
 
   useEffect(() => {
-    if (open) {
       dispatch(getAssignedEmployees(webinarid));
-    }
-  }, [open]);
+  }, []);
 
   useEffect(() => {
     if (isSuccess) {
@@ -119,7 +115,7 @@ const ReAssignmentModal = ({
   }, [isSuccess]);
 
   return (
-    <Modal open={open} onClose={handleCancel}>
+    <Modal open={true} onClose={handleCancel}>
       <Box
         className="bg-white rounded-lg shadow-lg p-6 max-w-lg mx-auto mt-20"
         sx={{ outline: "none" }}

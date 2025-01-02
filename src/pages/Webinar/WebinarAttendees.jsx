@@ -1,57 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Button,
-  Tabs,
-  Tab,
-  IconButton,
-  Tooltip,
-  ButtonGroup,
-  Modal,
-  Select,
-  FormControl,
-  InputLabel,
-  MenuItem,
-} from "@mui/material";
+import { Button, Tabs, Tab } from "@mui/material";
 import { createPortal } from "react-dom";
 import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
-import {
-  clearSuccess,
-  setTabValue as setTab,
-} from "../../features/slices/attendees";
-import { getAttendees } from "../../features/actions/attendees";
-import { attendeeTableColumns } from "../../utils/columnData";
-import {
-  Edit,
-  Delete,
-  Visibility,
-  AttachFile,
-  ContentCopy,
-} from "@mui/icons-material";
-import DataTable from "../../components/Table/DataTable";
+import { setTabValue as setTab } from "../../features/slices/attendees";
+import { AttachFile } from "@mui/icons-material";
 import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import { openModal } from "../../features/slices/modalSlice";
-import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
-import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
-import ComponentGuard from "../../components/AccessControl/ComponentGuard";
-import useAddUserActivity from "../../hooks/useAddUserActivity";
-import { getLeadType, getPullbacks } from "../../features/actions/assign";
-import { toast } from "sonner";
+import { getLeadType } from "../../features/actions/assign";
 import Pullbacks from "./Pullbacks";
 import { AssignmentStatus } from "../../utils/extra";
 import ReAssignmentModal from "../../components/Webinar/ReAssignmentModal";
 import { getAllEmployees } from "../../features/actions/employee";
 import Enrollments from "./Enrollments";
-import { resetReAssignSuccess } from "../../features/slices/reAssign.slice";
-import { resetAssignSuccess } from "../../features/slices/assign";
+import WebinarAttendeesPage from "./WebinarAttendeesPage";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const WebinarAttendees = () => {
-  // ----------------------- ModalNames for Redux -----------------------
-
-  const employeeAssignModalName = "employeeAssignModal";
-  const reAssignmentModalName = "ReAssignmentModal";
-  // ----------------------- etcetra -----------------------
   const { id } = useParams();
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
@@ -63,6 +29,8 @@ const WebinarAttendees = () => {
   const [isSelectVisible, setIsSelectVisible] = useState(false);
   const [selectedAssignmentType, setSelectedAssignmentType] = useState("All");
 
+  const [assignModal, setAssignModal] = useState(false);
+  const [reAssignModal, setReAssignModal] = useState(false);
   const webinarName = searchParams.get("webinarName");
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [tabValue, setTabValue] = useState(
@@ -106,7 +74,6 @@ const WebinarAttendees = () => {
 
   // Tabs change handler
   const handleTabChange = (_, newValue) => {
-    dispatch(setTab(newValue));
     setTabValue(newValue);
     setPage(1);
     setSelectedRows([]);
@@ -157,16 +124,17 @@ const WebinarAttendees = () => {
 
       <div className="flex gap-4 justify-between items-center">
         <div className="flex gap-4">
-          <ComponentGuard conditions={[selectedRows.length > 0]}>
-            <Button
+          {selectedRows.length > 0 && (
+            <button
+              className=" px-4 py-2 text-white bg-blue-500 rounded-md"
               onClick={() => {
                 if (
                   subTabValue === "attendees" &&
                   selectedAssignmentType === "Not Assigned"
                 ) {
-                  dispatch(openModal(employeeAssignModalName));
+                  setAssignModal(true);
                 } else {
-                  dispatch(openModal(reAssignmentModalName));
+                  setReAssignModal(true);
                 }
               }}
               variant="contained"
@@ -175,27 +143,22 @@ const WebinarAttendees = () => {
               selectedAssignmentType === "Not Assigned"
                 ? "Assign"
                 : "Re-Assign"}
-            </Button>
-          </ComponentGuard>
-          <ComponentGuard
-            conditions={[
-              userData?.isActive,
-              tabValue !== "enrollments",
-              subTabValue === "attendees",
-              selectedRows.length === 0,
-            ]}
-          >
-            <Button
-              onClick={() => setShowModal((prev) => !prev)}
-              variant="contained"
-              startIcon={<AttachFile />}
-            >
-              Import
-            </Button>
-          </ComponentGuard>
+            </button>
+          )}
+          {userData?.isActive &&
+            tabValue !== "enrollments" &&
+            subTabValue === "attendees" &&
+            selectedRows.length === 0 && (
+              <Button
+                onClick={() => setShowModal((prev) => !prev)}
+                variant="contained"
+                startIcon={<AttachFile />}
+              >
+                Import
+              </Button>
+            )}
         </div>
-
-        <ComponentGuard conditions={[tabValue !== "enrollments"]}>
+        {tabValue !== "enrollments" && (
           <Tabs
             value={subTabValue}
             onChange={handleSubTabChange}
@@ -218,7 +181,7 @@ const WebinarAttendees = () => {
 
             {/* <Tab label="UnAttended" value="unattended" className="text-gray-600" /> */}
           </Tabs>
-        </ComponentGuard>
+        )}
       </div>
       {subTabValue === "attendees" && tabValue !== "enrollments" && (
         <WebinarAttendeesPage
@@ -234,10 +197,7 @@ const WebinarAttendees = () => {
           setSelectedAssignmentType={setSelectedAssignmentType}
         />
       )}
-
-      <ComponentGuard
-        conditions={[subTabValue !== "attendees", tabValue !== "enrollments"]}
-      >
+      {subTabValue !== "attendees" && tabValue !== "enrollments" && (
         <Pullbacks
           subTabValue={subTabValue}
           page={page}
@@ -246,32 +206,35 @@ const WebinarAttendees = () => {
           selectedRows={selectedRows}
           setSelectedRows={setSelectedRows}
         />
-      </ComponentGuard>
-
-      <ComponentGuard conditions={[tabValue === "enrollments"]}>
+      )}
+      {tabValue === "enrollments" && (
         <Enrollments page={page} setPage={setPage} tabValue={tabValue} />
-      </ComponentGuard>
+      )}
 
-      <ReAssignmentModal
-        selectedRows={selectedRows}
-        webinarid={id}
-        tabValue={tabValue}
-        modalName={reAssignmentModalName}
-        isPullbackVisible={
-          tabValue !== "enrollments" && subTabValue === "attendees"
-        }
-        isAttendee={true}
-      />
+      {reAssignModal && (
+        <ReAssignmentModal
+          selectedRows={selectedRows}
+          webinarid={id}
+          tabValue={tabValue}
+          isPullbackVisible={
+            tabValue !== "enrollments" && subTabValue === "attendees"
+          }
+          isAttendee={true}
+          setReAssignModal={setReAssignModal}
+        />
+      )}
 
-      <EmployeeAssignModal
-        tabValue={tabValue}
-        selectedRows={selectedRows.map((rowId) => ({
-          attendee: rowId,
-          recordType: tabValue,
-        }))}
-        modalName={employeeAssignModalName}
-        webinarId={id}
-      />
+      {assignModal && (
+        <EmployeeAssignModal
+          tabValue={tabValue}
+          selectedRows={selectedRows.map((rowId) => ({
+            attendee: rowId,
+            recordType: tabValue,
+          }))}
+          setAssignModal={setAssignModal}
+          webinarId={id}
+        />
+      )}
 
       {showModal &&
         createPortal(
@@ -283,194 +246,3 @@ const WebinarAttendees = () => {
 };
 
 export default WebinarAttendees;
-
-const WebinarAttendeesPage = (props) => {
-  const {
-    tabValue,
-    page,
-    setPage,
-    subTabValue,
-    selectedRows,
-    setSelectedRows,
-    isSelectVisible,
-    setIsSelectVisible,
-    setSelectedAssignmentType,
-    selectedAssignmentType,
-  } = props;
-
-  const tableHeader = "Attendees Table";
-  const exportExcelModalName = "ExportWebinarAttendeesExcel";
-  const AttendeesFilterModalName = "AttendeesFilterModal";
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { id } = useParams();
-
-  const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
-    (state) => state.attendee
-  );
-  const { isSuccess: isSuccessReAssign } = useSelector(
-    (state) => state.reAssign
-  );
-  const { leadTypeData, isSuccess: assignSuccess } = useSelector(
-    (state) => state.assign
-  );
-  const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
-
-  const [filters, setFilters] = useState({});
-  const [selected, setSelected] = useState("All");
-
-  useEffect(() => {
-    if (tabValue !== "enrollments" && subTabValue === "attendees") {
-      dispatch(
-        getAttendees({
-          id,
-          isAttended: tabValue === "postWebinar",
-          page,
-          limit: LIMIT,
-          filters,
-          validCall: selected === "All" ? undefined : selected,
-          assignmentType:
-            selectedAssignmentType === "All"
-              ? undefined
-              : selectedAssignmentType,
-        })
-      );
-    }
-  }, [page, tabValue, LIMIT, filters, selected, selectedAssignmentType]);
-
-  useEffect(() => {
-    if (isSuccess || assignSuccess || isSuccessReAssign) {
-      console.log("isssucess", isSuccess, assignSuccess, isSuccessReAssign);
-      dispatch(
-        getAttendees({
-          id,
-          isAttended: tabValue === "postWebinar",
-          page: 1,
-          limit: LIMIT,
-          filters,
-          validCall: selected === "All" ? undefined : selected,
-          assignmentType:
-            selectedAssignmentType === "All"
-              ? undefined
-              : selectedAssignmentType,
-        })
-      );
-      dispatch(clearSuccess());
-      dispatch(resetReAssignSuccess());
-      dispatch(resetAssignSuccess());
-      setSelectedRows([]);
-    }
-  }, [isSuccess, assignSuccess, isSuccessReAssign]);
-
-  const actionIcons = [
-    {
-      icon: () => (
-        <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
-      ),
-      tooltip: "View Attendee Info",
-      onClick: (item) => {
-        navigate(
-          `/particularContact?email=${item?.email}&attendeeId=${item?._id}`
-        );
-      },
-      readOnly: true,
-    },
-  ];
-
-  const AttendeeDropdown = () => {
-    const handleChange = (event) => {
-      const label = event.target.value;
-      setSelected(label);
-      setPage(1);
-    };
-
-    const handleAssignmentChange = (event) => {
-      const label = event.target.value;
-      if (label === "All") {
-        setIsSelectVisible(false);
-        setSelectedRows([]);
-      } else {
-        setIsSelectVisible(true);
-        setSelectedRows([]);
-      }
-      setSelectedAssignmentType(label);
-      setPage(1);
-    };
-
-    return (
-      <div className="flex gap-4">
-        <FormControl className="w-40 " variant="outlined">
-          <InputLabel id="attendee-label">Activity</InputLabel>
-          <Select
-            labelId="attendee-label"
-            className="h-10"
-            value={selected}
-            onChange={handleChange}
-            label="Activity"
-          >
-            <MenuItem value="All">All</MenuItem>
-            <MenuItem value="Worked">Worked</MenuItem>
-            <MenuItem value="Pending">Pending</MenuItem>
-          </Select>
-        </FormControl>
-
-        <FormControl className="w-40 " variant="outlined">
-          <InputLabel id="attendee-label">Assignment</InputLabel>
-          <Select
-            labelId="attendee-label"
-            className="h-10"
-            value={selectedAssignmentType}
-            onChange={handleAssignmentChange}
-            label="Assignment"
-          >
-            <MenuItem value="All">All</MenuItem>
-            <MenuItem value="Assigned">Assigned</MenuItem>
-            <MenuItem value="Not Assigned"> Not Assigned</MenuItem>
-          </Select>
-        </FormControl>
-      </div>
-    );
-  };
-  return (
-    <>
-      <DataTable
-        tableHeader={tableHeader}
-        tableUniqueKey="webinarAttendeesTable"
-        ButtonGroup={AttendeeDropdown}
-        isSelectVisible={isSelectVisible}
-        filters={filters}
-        setFilters={setFilters}
-        tableData={{
-          columns: attendeeTableColumns,
-          rows: attendeeData.map((row) => ({
-            ...row,
-            leadType: leadTypeData.find((lead) => lead._id === row?.leadType),
-          })),
-        }}
-        actions={actionIcons}
-        totalPages={totalPages}
-        page={page}
-        setPage={setPage}
-        selectedRows={selectedRows}
-        setSelectedRows={setSelectedRows}
-        limit={LIMIT}
-        filterModalName={AttendeesFilterModalName}
-        exportModalName={exportExcelModalName}
-        isLoading={isLoading}
-        isLeadType={true}
-      />
-      <AttendeesFilterModal
-        modalName={AttendeesFilterModalName}
-        filters={filters}
-        setFilters={setFilters}
-      />
-      <ExportWebinarAttendeesModal
-        modalName={exportExcelModalName}
-        filters={filters}
-        webinarId={id}
-        isAttended={tabValue === "postWebinar" ? true : false}
-      />
-    </>
-  );
-};

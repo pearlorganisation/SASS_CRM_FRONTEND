@@ -52,6 +52,7 @@ export const getAttendees = createAsyncThunk(
   ) => {
     try {
       const currentTIme = new Date().getTime();
+      console.log("currentTIme", currentTIme);
       const response = await instance.post(
         `/attendees/webinar`,
         {

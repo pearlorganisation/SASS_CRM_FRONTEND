@@ -54,7 +54,7 @@ const App = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
-
+  console.log("App -> render");
   const { userData, isUserLoggedIn, subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
   const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed  || false;
