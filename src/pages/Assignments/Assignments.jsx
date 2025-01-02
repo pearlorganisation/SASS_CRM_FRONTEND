@@ -217,7 +217,7 @@ const Assignments = () => {
         tableHeader={tableHeader}
         tableUniqueKey="viewAssignmentsTable"
         ButtonGroup={AttendeeDropdown}
-        isSelectVisible={true}
+        isSelectVisible={employeeId ? false : true}
         filters={filters}
         setFilters={setFilters}
         tableData={{

@@ -23,7 +23,7 @@ const initialState = {
   errorMessage: "",
   employeeAssignments: [],
   Stats: null,
-  employeeModeId: null,
+  employeeModeData: null,
 };
 
 // ---------------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ export const employeeSlice = createSlice({
     },
 
     setEmployeeModeId(state, action) {
-      state.employeeModeId = action.payload ? action.payload : null;
+      state.employeeModeData = action.payload ? action.payload : null;
     },
   },
   extraReducers: (builder) => {

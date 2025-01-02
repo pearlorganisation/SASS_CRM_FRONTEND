@@ -1,37 +1,18 @@
 import React, { useEffect, useState } from "react";
-import {
-  Modal,
-  Box,
-  Typography,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  Button,
-} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { closeModal } from "../../../features/slices/modalSlice";
-import { getAllEmployees } from "../../../features/actions/employee";
 import useRoles from "../../../hooks/useRoles";
 import { addAssign } from "../../../features/actions/assign";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 import { getAssignedEmployees } from "../../../features/actions/webinarContact";
 
-function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
-
+function EmployeeAssignModal({ selectedRows, webinarId, tabValue, setAssignModal }) {
   const dispatch = useDispatch();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
 
-  
   const { isSuccess } = useSelector((state) => state.assign);
-  const { modals } = useSelector((state) => state.modals);
-  const open = modals[modalName] ? true : false;
-
   const [selectedEmployee, setSelectedEmployee] = useState(null);
-
-  const { assignedEmployees, isLoading } = useSelector(
-    (state) => state.webinarContact
-  );
+  const { assignedEmployees } = useSelector((state) => state.webinarContact);
 
   const selectedType =
     tabValue === "preWebinar" ? "EMPLOYEE REMINDER" : "EMPLOYEE SALES";
@@ -45,7 +26,6 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
     }));
 
   const handleAssign = () => {
-
     if (selectedEmployee) {
       dispatch(
         addAssign({
@@ -64,16 +44,13 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
   };
 
   const onClose = () => {
-    dispatch(closeModal(modalName));
+    setAssignModal(false);
     setSelectedEmployee(null);
   };
 
-
-    useEffect(() => {
-      if (open) {
-        dispatch(getAssignedEmployees(webinarId));
-      }
-    }, [open]);
+  useEffect(() => {
+    dispatch(getAssignedEmployees(webinarId));
+  }, [dispatch, webinarId]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -82,55 +59,55 @@ function EmployeeAssignModal({ modalName, selectedRows, webinarId, tabValue }) {
   }, [isSuccess]);
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box
-        className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto mt-20 space-y-4"
-        sx={{ outline: "none" }}
-      >
+    <div className="fixed inset-0 top-0 flex z-50 items-center justify-center bg-gray-900 bg-opacity-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto mt-20 space-y-4">
         {/* Modal Header */}
-        <Typography variant="h6" className="text-gray-800 font-semibold">
-          Select an Employee
-        </Typography>
+        <div className="text-gray-800 font-semibold text-xl">
+          <h2>Select an Employee</h2>
+        </div>
 
         {/* Employee Options */}
-        <RadioGroup
-          value={selectedEmployee}
-          onChange={(e) => setSelectedEmployee(e.target.value)}
-          className="space-y-3"
-        >
+        <div className="space-y-3">
           {options.map((option) => (
-            <FormControlLabel
-              key={option.value}
-              value={option.value}
-              control={<Radio color="primary" />}
-              label={<span className="text-gray-700">{option.label}</span>}
-              className="flex items-center"
-            />
+            <div key={option.value} className="flex items-center">
+              <input
+                type="radio"
+                id={option.value}
+                name="employee"
+                value={option.value}
+                checked={selectedEmployee === option.value}
+                onChange={() => setSelectedEmployee(option.value)}
+                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <label htmlFor={option.value} className="ml-3 text-gray-700">
+                {option.label}
+              </label>
+            </div>
           ))}
-        </RadioGroup>
+        </div>
 
         {/* Action Buttons */}
         <div className="flex justify-end space-x-3 mt-4">
-          <Button
-            variant="contained"
-            color="primary"
-            disabled={!selectedEmployee}
+          <button
             onClick={handleAssign}
-            className="capitalize"
+            disabled={!selectedEmployee}
+            className={`${
+              !selectedEmployee
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            } text-white py-2 px-6 rounded-md transition-all duration-200`}
           >
             Assign
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
+          </button>
+          <button
             onClick={onClose}
-            className="capitalize"
+            className="border border-gray-300 text-gray-700 py-2 px-6 rounded-md hover:bg-gray-200 transition-all duration-200"
           >
             Cancel
-          </Button>
+          </button>
         </div>
-      </Box>
-    </Modal>
+      </div>
+    </div>
   );
 }
 
