@@ -38,3 +38,7 @@
     background-color: #ffffff;
     box-shadow: -1px 0 6px rgba(0, 0, 0, 0.25);
   }
+
+  .MuiPopper-root {
+    z-index: 9999 !important;
+  }
