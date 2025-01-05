@@ -58,7 +58,7 @@ const App = () => {
   // console.log("App -> render");
   const { userData, isUserLoggedIn, subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
-  const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed  || false;
+  const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed || false;
 
 
   const [isConnected, setIsConnected] = useState(socket.connected);
@@ -72,21 +72,31 @@ const App = () => {
       setIsConnected(false);
     }
 
+    function onAlarmPlay(data) {
+      alert(data)
+    }
+
     socket.on('connect', onConnect);
     socket.on('disconnect', onDisconnect);
+    socket.on('playAlarm', onAlarmPlay);
+
 
     return () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
+      socket.off('playAlarm', onAlarmPlay);
+
     };
   }, []);
 
 
   useEffect(() => {
+    if(isConnected){
+      console.log('join emitted')
+      socket.emit('join', { user: userData._id });
+    }
 
-    console.log(socket)
-      socket.emit('join', { userId: userData._id });
-  }, [userData])
+  }, [userData, isConnected])
 
 
 
@@ -95,6 +105,12 @@ const App = () => {
   }
 
   useEffect(() => {
+
+    if (isUserLoggedIn) {
+      console.log('connecting socket')
+      socket.connect();
+    }
+
     function initFunctions() {
       if (isUserLoggedIn && userData?.role) {
         // && !roles.isEmployeeId(role) removed this from the condition
@@ -105,9 +121,8 @@ const App = () => {
     initFunctions();
 
     if (isUserLoggedIn && userData?.role) {
-      console.log('connecting socket')
-      socket.connect();
-      
+
+
       logUserActivity({
         action: "login/refresh",
         details: "User logged in or refreshed successfully",

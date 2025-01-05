@@ -22,6 +22,7 @@ import filterPresetReducer from './slices/filter-preset'
 import tableReducer from './slices/tableSlice'
 import noticeBoardSlice from "./slices/noticeBoard";
 import reAssign from "./slices/reAssign.slice";
+import alarm from "./slices/alarm"
 
 // Combine your individual reducers here
 const rootReducer = combineReducers({
@@ -44,6 +45,7 @@ const rootReducer = combineReducers({
   table: tableReducer,
   noticeBoard: noticeBoardSlice,
   reAssign,
+  alarm
 });
 
 // Custom root reducer handling a clear action

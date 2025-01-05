@@ -6,7 +6,7 @@ const URL =
     ? import.meta.env.VITE_REACT_APP_API_BASE_URL_DEVELOPMENT
     : import.meta.env.VITE_REACT_APP_API_BASE_URL_MAIN_PRODUCTION;
 
-export const socket = io(URL, {
+export const socket = io("http://localhost:3000", {
   autoConnect: false,
   transports: ['websocket'], // Enforce WebSocket transport
   reconnectionAttempts: 3,  // Limit reconnection attempts

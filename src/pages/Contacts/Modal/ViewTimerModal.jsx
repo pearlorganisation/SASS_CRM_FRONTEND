@@ -1,5 +1,7 @@
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { setAlarm } from "../../../features/actions/alarm";
 
 const ViewTimerModal = ({ setModal }) => {
   const {
@@ -10,8 +12,11 @@ const ViewTimerModal = ({ setModal }) => {
     formState: { errors },
   } = useForm();
 
+  const dispatch = useDispatch()
+
   const onSubmit = (data) => {
     console.log(data);
+    dispatch(setAlarm(data))
   };
 
   return (
