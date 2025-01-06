@@ -1,12 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   addPricePlans,
+  createAddon,
   deletePricePlan,
+  getAddons,
+  getClientAddons,
   getPricePlan,
   getPricePlans,
   updatePricePlans,
 } from "../actions/pricePlan";
 import { toast } from "sonner";
+import { errorToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
@@ -16,12 +20,17 @@ const initialState = {
   errorMessage: "",
   planData: null,
   singlePlanData: null,
+  addonsData: []
 };
 
 const pricePlans = createSlice({
   name: "PricePlans",
   initialState,
-  reducers: {},
+  reducers: {
+    resetPricePlanSuccess: (state) => {
+      state.isSuccess = false;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(addPricePlans.pending, (state, action) => {
@@ -37,7 +46,7 @@ const pricePlans = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.isSuccess = false;
-        toast.error("Error On Plan Creation!", { position: "top-center" });
+        errorToast("Error On Plan Creation!");
       })
 
       //get price plans
@@ -56,7 +65,7 @@ const pricePlans = createSlice({
       .addCase(getPricePlans.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error("Error On Getting Plan!", { position: "top-center" });
+        errorToast("Error On Getting Plan!");
       })
       .addCase(getPricePlan.pending, (state, action) => {
         state.isLoading = true;
@@ -72,7 +81,7 @@ const pricePlans = createSlice({
       .addCase(getPricePlan.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        toast.error("Error On Getting Plan!", { position: "top-center" });
+        errorToast("Error On Getting Plan!");
       })
 
       //update price plans
@@ -92,7 +101,7 @@ const pricePlans = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.isSuccess = false;
-        toast.error("Error On Updating Plan!", { position: "top-center" });
+        errorToast("Error On Updating Plan!");
       })
 
       //delete price plans
@@ -111,9 +120,44 @@ const pricePlans = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.isSuccess = false;
-        toast.error("Error On Deleting Plan!", { position: "top-center" });
+        errorToast("Error On Deleting Plan!");
+      })
+      .addCase(createAddon.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(createAddon.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+      })
+      .addCase(createAddon.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = false;
+        errorToast("Error On Plan Creation!");
+      })
+      .addCase(getAddons.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getAddons.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.addonsData = Array.isArray(action.payload) ? action.payload : [];
+      })
+      .addCase(getAddons.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast("Error On Plan Creation!");
+      })
+      .addCase(getClientAddons.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getClientAddons.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.addonsData = Array.isArray(action.payload) ? action.payload : [];
+      })
+      .addCase(getClientAddons.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast("Error On Plan Creation!");
       });
   },
 });
-export const {} = pricePlans.actions;
+export const {resetPricePlanSuccess} = pricePlans.actions;
 export default pricePlans.reducer;

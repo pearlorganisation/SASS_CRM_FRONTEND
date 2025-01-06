@@ -75,3 +75,42 @@ export const getPricePlan = createAsyncThunk(
     }
   }
 );
+
+//create AddOn
+export const createAddon = createAsyncThunk(
+  "addon/create",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.post(`addon`, payload);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+//get AddOn
+export const getAddons = createAsyncThunk(
+  "addon/fetchData",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`addon`, payload);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+//get AddOn
+export const getClientAddons = createAsyncThunk(
+  "clinetAddons/fetchData",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`addon/client/${id}`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

@@ -7,7 +7,7 @@ import {
   createCustomOption,
   createGlobalData,
   deleteCustomOption,
-  getDashboardData, 
+  getDashboardData,
   getCustomOptions,
   getDashboardCardsData,
   getDashboardPlansData,
@@ -15,6 +15,7 @@ import {
   getDashboardUsersData,
   getGlobalData,
   getCustomOptionsForFilters,
+  deleteAllData,
 } from "../actions/globalData";
 import { errorToast, successToast } from "../../utils/extra";
 
@@ -104,7 +105,7 @@ export const globalDataSlice = createSlice({
       .addCase(createCustomOption.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        successToast("Option Created Successfully"); 
+        successToast("Option Created Successfully");
       })
       .addCase(createCustomOption.rejected, (state, action) => {
         state.isLoading = false;
@@ -147,14 +148,12 @@ export const globalDataSlice = createSlice({
       .addCase(getDashboardData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.dashBoardCardsData = action.payload
+        state.dashBoardCardsData = action.payload;
       })
       .addCase(getDashboardData.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
       })
-
-
 
       .addCase(getDashboardPlansData.pending, (state, action) => {
         state.isLoading = true;
@@ -201,6 +200,20 @@ export const globalDataSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
       })
+
+      .addCase(deleteAllData.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(deleteAllData.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        successToast("Data Deleted Successfully");
+      })
+      .addCase(deleteAllData.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      });
   },
 });
 
