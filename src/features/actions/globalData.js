@@ -141,3 +141,16 @@ export const getDashboardRevenueData = createAsyncThunk(
   }
 );
 
+
+export const deleteAllData = createAsyncThunk(
+  "allData/delete",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.delete(`/delete-data`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
