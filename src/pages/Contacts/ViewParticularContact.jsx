@@ -31,6 +31,7 @@ import { Add, OpenInNew } from "@mui/icons-material";
 import { clearLeadType } from "../../features/slices/attendees";
 import { useNavigate } from "react-router-dom";
 import AddEnrollmentModal from "./Modal/AddEnrollmentModal";
+import { getAttendeeAlarm } from "../../features/actions/alarm";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -38,7 +39,6 @@ const ViewParticularContact = () => {
   const searchParams = new URLSearchParams(location.search);
   const email = searchParams.get("email");
   const attendeeId = searchParams.get("attendeeId");
-
   const [showTimerModal, setShowTimerModal] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [uniquePhones, setUniquePhones] = useState([]);
@@ -46,29 +46,27 @@ const ViewParticularContact = () => {
   const [uniqueNames, setUniqueNames] = useState([]);
   const [noteModalData, setNoteModalData] = useState(null);
   const [editModalData, setEditModalData] = useState(null);
-  
   const [leadTypeOptions, setLeadTypeOptions] = useState([]);
-
-const [showEnrollmentModal, setShowEnrollmentModal] = useState(false)
+  const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
 
   const { attendeeContactDetails } = useSelector(
     (state) => state.webinarContact
   );
 
-  const { selectedAttendee, attendeeLeadType, attendeeEnrollments } = useSelector(
-    (state) => state.attendee
-  );
+  const { selectedAttendee, attendeeLeadType, attendeeEnrollments } =
+    useSelector((state) => state.attendee);
 
   const { noteData, isFormLoading, leadTypeData } = useSelector(
     (state) => state.assign
   );
+
+  const { attendeeAlarm } = useSelector((state) => state.alarm);
 
   useEffect(() => {
     return () => {
       dispatch(clearLeadType());
     };
   }, []);
-  console.log("attendeeLeadType", attendeeLeadType);
 
   useEffect(() => {
     console.log("attendeeLeadType in", attendeeLeadType);
@@ -143,6 +141,7 @@ const [showEnrollmentModal, setShowEnrollmentModal] = useState(false)
     dispatch(getAttendee({ email }));
     dispatch(getLeadType());
     dispatch(getAttendeeLeadTypeByEmail(email));
+    dispatch(getAttendeeAlarm({email}));
   }, [email]);
 
   const handleTimerModal = () => {
@@ -172,15 +171,13 @@ const [showEnrollmentModal, setShowEnrollmentModal] = useState(false)
     setUniquePhonesCount(badgeCount);
   }, [noteData, uniquePhones]);
 
-
   useEffect(() => {
     dispatch(getEnrollments({ id: email }));
-  }, [email])
+  }, [email]);
 
   useEffect(() => {
-    console.log(attendeeEnrollments)
-  }, [attendeeEnrollments])
-
+    console.log(attendeeAlarm);
+  }, [attendeeAlarm]);
 
   return (
     <div className="px-4 pt-14 space-y-6">
@@ -443,8 +440,7 @@ const [showEnrollmentModal, setShowEnrollmentModal] = useState(false)
             )}
           </div>
           <div className="mt-12 shadow-lg rounded-lg overflow-x-auto">
-            {!attendeeEnrollments &&
-            attendeeEnrollments.length <= 0 ? (
+            {!attendeeEnrollments && attendeeEnrollments.length <= 0 ? (
               <div className="text-lg p-2 flex justify-center w-full">
                 No record found
               </div>
@@ -456,9 +452,7 @@ const [showEnrollmentModal, setShowEnrollmentModal] = useState(false)
                   </span>
                   <Add
                     className="cursor-pointer hover:bg-gray-200 transition duration-300"
-                    onClick={() =>
-                      setShowEnrollmentModal(true)
-                    }
+                    onClick={() => setShowEnrollmentModal(true)}
                     fontSize="medium"
                   >
                     <OpenInNew />
@@ -499,27 +493,22 @@ const [showEnrollmentModal, setShowEnrollmentModal] = useState(false)
                             </td>
 
                             <td className="px-2 py-4 whitespace-nowrap ">
-                              {item?.webinar 
-                                ? item?.webinar.webinarName
-                                : "-"}
+                              {item?.webinar ? item?.webinar.webinarName : "-"}
                             </td>
 
                             <td className="px-2 py-4 whitespace-nowrap ">
-                              {item?.attendee && item?.attendee.email || "-"}
+                              {(item?.attendee && item?.attendee.email) || "-"}
                             </td>
-                            
 
                             <td className=" py-4 text-center whitespace-nowrap">
                               {item?.product && item?.product?.name}
                             </td>
                             <td className="px-3 py-4 whitespace-nowrap">
-                            {item?.product && item?.product?.price}
-
+                              {item?.product && item?.product?.price}
                             </td>
 
                             <td className="px-3 py-4 whitespace-nowrap">
-                            {item?.product && item?.product?.level}
-
+                              {item?.product && item?.product?.level}
                             </td>
 
                             {/* <td className="px-3 py-4 h-full">
@@ -545,7 +534,9 @@ const [showEnrollmentModal, setShowEnrollmentModal] = useState(false)
           setModalData={setNoteModalData}
         />
       )}
-      {showTimerModal && <ViewTimerModal setModal={setShowTimerModal} />}
+      {showTimerModal && (
+        <ViewTimerModal setModal={setShowTimerModal} email={email} />
+      )}
       {editModalData && (
         <EditModal
           setModal={setEditModalData}
