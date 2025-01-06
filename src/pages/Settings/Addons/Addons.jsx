@@ -92,7 +92,7 @@ const AddOnsPage = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen px-6 pt-14">
-      <h1 className="text-2xl font-bold text-center mb-6">AddOns</h1>
+      <h1 className="text-2xl font-bold text-center mb-6"> {id ? "My" : ""} AddOns</h1>
 
       <div className="flex justify-end mb-6">
         <ComponentGuard allowedRoles={[roles.SUPER_ADMIN]}>
