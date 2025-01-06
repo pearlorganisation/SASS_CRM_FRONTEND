@@ -25,15 +25,16 @@ import { errorToast } from "../../utils/extra";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const FilterPresetModal = ({
-  modalName,
+  setIsPresetModalOpen,
   tableName = "",
   filters = {},
   setFilters,
 }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
+  // console.log('FilterPresetModal -> Rendered')
+
   const { modals } = useSelector((state) => state.modals);
-  const open = modals[modalName] ? true : false;
   const { filterPresets, isSuccess } = useSelector(
     (state) => state.filterPreset
   );
@@ -65,7 +66,7 @@ const FilterPresetModal = ({
 
   const onApplyPreset = (preset) => {
     setFilters(preset.filters);
-    dispatch(closeModal(modalName));
+    setIsPresetModalOpen(false);
     logUserActivity({
       action: "filter",
       type: `Preset for Table - ${tableName}`,
@@ -74,15 +75,13 @@ const FilterPresetModal = ({
   };
 
   const onClose = () => {
-    dispatch(closeModal(modalName));
+    setIsPresetModalOpen(false);
     dispatch(clearPreset());
   };
 
   useEffect(() => {
-    if (open && tableName !== "") {
       dispatch(getFilterPreset(tableName));
-    }
-  }, [open]);
+  }, []);
 
   useEffect(() => {
     if (isSuccess) {
@@ -92,7 +91,7 @@ const FilterPresetModal = ({
   }, [isSuccess]);
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={true} onClose={onClose}>
       <Box className="p-4 max-w-full w-96 sm:max-w-xl sm:w-full  bg-gray-50 rounded-lg shadow-xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <Typography variant="h6" component="h2" gutterBottom>
           Filter Presets

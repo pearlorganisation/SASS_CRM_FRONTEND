@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { formatDateAsNumber } from "../../utils/extra";
 import {
   Checkbox,
@@ -15,7 +14,6 @@ import {
   Skeleton,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import ComponentGuard from "../AccessControl/ComponentGuard";
 
 const tableCellStyles = {
   paddingTop: "6px",
@@ -46,6 +44,7 @@ const RawTable = (props) => {
   } = props;
   const dispatch = useDispatch();
   const { isTablesMasked } = useSelector((state) => state.table);
+  console.log("RawTable -> Rendered");
 
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
@@ -208,16 +207,11 @@ const RawTable = (props) => {
                   sx={{ ...tableCellStyles, borderLeft: "1px solid #ccc" }}
                 >
                   <div className="flex gap-2">
-                    {actions?.map((action, index) => (
-                      <ComponentGuard
-                        key={index}
-                        conditions={[
-                          action?.readOnly || userData?.isActive,
-                          action?.hideCondition
-                            ? action.hideCondition(row)
-                            : true,
-                        ]}
-                      >
+                    {actions?.map((action, index) =>
+                      (action?.readOnly || userData?.isActive,
+                      action?.hideCondition
+                        ? action.hideCondition(row)
+                        : true) ? (
                         <div key={index}>
                           <Tooltip title={action.tooltip} arrow>
                             <IconButton
@@ -228,8 +222,8 @@ const RawTable = (props) => {
                             </IconButton>
                           </Tooltip>
                         </div>
-                      </ComponentGuard>
-                    ))}
+                      ) : null
+                    )}
                   </div>
                 </TableCell>
               </TableRow>

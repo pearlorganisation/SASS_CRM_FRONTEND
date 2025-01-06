@@ -51,6 +51,8 @@ export const getAttendees = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
+      const currentTIme = new Date().getTime();
+      console.log("currentTIme", currentTIme);
       const response = await instance.post(
         `/attendees/webinar`,
         {
@@ -64,6 +66,11 @@ export const getAttendees = createAsyncThunk(
         {
           params: { page, limit },
         }
+      );
+      const responseTime = new Date().getTime();
+      console.log(
+        "responseTime - currentTIme",
+        responseTime - currentTIme, response
       );
       return response?.data;
     } catch (e) {

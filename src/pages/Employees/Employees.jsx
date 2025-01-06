@@ -88,8 +88,8 @@ const Employees = () => {
       icon: () => <Dashboard className="text-neutral-500 group-hover:text-neutral-600" />,
       tooltip: "Visit Dashboard",
       onClick: (item) => {
-        dispatch(setEmployeeModeId(item._id));
-        navigate('/');
+        dispatch(setEmployeeModeId(item));
+        navigate('/employee/dashboard/' + item?._id);
       },
     },
     {

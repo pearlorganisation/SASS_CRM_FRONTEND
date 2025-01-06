@@ -18,7 +18,6 @@ import { MdAssignment } from "react-icons/md";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
 const Sidebar = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
@@ -29,7 +28,9 @@ const Sidebar = () => {
   const { isSidebarOpen } = useSelector((state) => state.globalData);
   const [showImportantLinks, setShowImportantLinks] = useState(false); // toggle state for sub-links
   const role = userData?.role || "";
-  const { employeeModeId } = useSelector((state) => state.employee);
+  const { employeeModeData } = useSelector((state) => state.employee);
+
+  console.log("Sidebar -> render");
 
   const navItems = [
     {
@@ -44,33 +45,36 @@ const Sidebar = () => {
     },
     {
       roles: [roles.ADMIN],
-      items: [
-          // {
-          //   path: `/employee/dashboard/${employeeModeId}`,
-          //   label: "Employee Dashboard",
-          //   icon: <TbLayoutDashboardFilled size={30} />,
-          // },
-          // {
-          //   path: `/employee/assignments/${employeeModeId}`,
-          //   label: "Employee Assignments",
-          //   icon: <MdAssignment size={30} />,
-          // },
-        {
-          path: "/webinarDetails",
-          label: "Webinars",
-          icon: <SiGooglemeet size={30} />,
-        },
-        {
-          path: "/attendees",
-          label: "Attendees",
-          icon: <HiUserGroup size={30} />,
-        },
-        {
-          path: "/employees",
-          label: "Employees",
-          icon: <IoPeople size={30} />,
-        },
-      ],
+      items: employeeModeData
+        ? [
+            {
+              path: `/employee/dashboard/${employeeModeData?._id}`,
+              label: "Dashboard",
+              icon: <TbLayoutDashboardFilled size={30} />,
+            },
+            {
+              path: `/employee/assignments/${employeeModeData?._id}`,
+              label: "Assignments",
+              icon: <MdAssignment size={30} />,
+            },
+          ]
+        : [
+            {
+              path: "/webinarDetails",
+              label: "Webinars",
+              icon: <SiGooglemeet size={30} />,
+            },
+            {
+              path: "/attendees",
+              label: "Attendees",
+              icon: <HiUserGroup size={30} />,
+            },
+            {
+              path: "/employees",
+              label: "Employees",
+              icon: <IoPeople size={30} />,
+            },
+          ],
     },
     {
       roles: [roles.EMPLOYEE_SALES, roles.EMPLOYEE_REMINDER],
@@ -153,15 +157,17 @@ const Sidebar = () => {
       <div className="h-full px-3 pb-4 overflow-y-auto bg-white">
         <ul className="space-y-2 font-medium">
           {/* Dashboard Link */}
-          <li>
-            <Link
-              to="/"
-              className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
-            >
-              <TbLayoutDashboardFilled size={30} />
-              <span className="ms-3">Dashboard</span>
-            </Link>
-          </li>
+          {!employeeModeData && (
+            <li>
+              <Link
+                to="/"
+                className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
+              >
+                <TbLayoutDashboardFilled size={30} />
+                <span className="ms-3">Dashboard</span>
+              </Link>
+            </li>
+          )}
 
           {/* Render navigation items based on roles */}
           {navItems.map(

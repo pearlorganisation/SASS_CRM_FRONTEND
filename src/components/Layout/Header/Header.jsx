@@ -4,15 +4,22 @@ import { Link, useNavigate } from "react-router-dom";
 import { getRoleNameByID } from "../../../utils/roles";
 import { toggleSidebar } from "../../../features/slices/globalData";
 import { FaUserCircle } from "react-icons/fa"; // Importing profile icon
+import { setEmployeeModeId } from "../../../features/slices/employee";
 
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate(); // Initialize useNavigate for navigation
   const { userData } = useSelector((state) => state.auth);
+  const { employeeModeData } = useSelector((state) => state.employee);
 
   const handleProfileClick = () => {
     // Navigate to the profile page
     navigate("/profile");
+  };
+
+  const onExit = () => {
+    navigate("/");
+    dispatch(setEmployeeModeId());
   };
 
   return (
@@ -53,12 +60,41 @@ const Header = () => {
               </span>
             </Link>
           </div>
+
+          {employeeModeData && (
+              <div className="flex items-center gap-4 justify-between bg-gray-100 shadow-md py-1 px-3 rounded-md w-fit max-w-md">
+                {/* Employee Info */}
+                <div className="flex items-center space-x-4">
+                  <div className="text-sm">
+                    <p className="text-gray-600 font-medium">
+                      {employeeModeData?.userName}
+                    </p>
+                    <p className="text-gray-500">{employeeModeData?.role}</p>
+                  </div>
+                </div>
+
+                {/* Exit Button */}
+                <button
+                  onClick={onExit}
+                  className="bg-red-500 text-white px-4 py-2 rounded font-medium text-sm"
+                >
+                  Exit
+                </button>
+              </div>
+            )}
           <div className="flex items-center">
-            <div className="flex items-center ms-3 cursor-pointer" onClick={handleProfileClick}>
+           
+
+            <div
+              className="flex items-center ms-3 cursor-pointer"
+              onClick={handleProfileClick}
+            >
               <div className="flex items-center space-x-3">
                 <div className="text-sm text-black">
                   <p className="font-medium">{userData?.userName}</p>
-                  <p className="text-gray-400">{getRoleNameByID(userData?.role)}</p>
+                  <p className="text-gray-400">
+                    {getRoleNameByID(userData?.role)}
+                  </p>
                 </div>
                 <div className="text-gray-500">
                   {/* Profile Icon */}

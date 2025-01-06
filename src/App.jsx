@@ -43,27 +43,74 @@ import {
 } from "./features/actions/auth";
 import UpdateNoticeBoard from "./pages/NoticeBoard/UpdateNoticeBoard";
 import NoticeBoard from "./pages/NoticeBoard/NoticeBoard";
-import { getNoticeBoard } from "./features/actions/noticeBoard";
+// import { getNoticeBoard } from "./features/actions/noticeBoard";
 import useRoles from "./hooks/useRoles";
 import useAddUserActivity from "./hooks/useAddUserActivity";
 import ViewEmployee from "./pages/Employees/ViewEmployee";
 import LeadTypes from "./pages/Settings/LeadType/ManageLeadTypes";
 import EmployeeDashboard from "./pages/Dashboard/EmployeeDashboard";
+import { socket } from "./socket"
 
 const App = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
-
+  // console.log("App -> render");
   const { userData, isUserLoggedIn, subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
-  const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed  || false;
+  const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed || false;
+
+
+  const [isConnected, setIsConnected] = useState(socket.connected);
+
+  useEffect(() => {
+    function onConnect() {
+      setIsConnected(true);
+    }
+
+    function onDisconnect() {
+      setIsConnected(false);
+    }
+
+    function onAlarmPlay(data) {
+      alert(data)
+    }
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('playAlarm', onAlarmPlay);
+
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('playAlarm', onAlarmPlay);
+
+    };
+  }, []);
+
+
+  useEffect(() => {
+    if(isConnected){
+      console.log('join emitted')
+      socket.emit('join', { user: userData._id });
+    }
+
+  }, [userData, isConnected])
+
+
 
   if (isUserLoggedIn && !userData?.role) {
     dispatch(logout());
   }
 
   useEffect(() => {
+
+    if (isUserLoggedIn) {
+      console.log('connecting socket')
+      socket.connect();
+    }
+
     function initFunctions() {
       if (isUserLoggedIn && userData?.role) {
         // && !roles.isEmployeeId(role) removed this from the condition
@@ -74,6 +121,8 @@ const App = () => {
     initFunctions();
 
     if (isUserLoggedIn && userData?.role) {
+
+
       logUserActivity({
         action: "login/refresh",
         details: "User logged in or refreshed successfully",

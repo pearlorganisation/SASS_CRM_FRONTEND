@@ -9,6 +9,7 @@ const PageLimitEditor = ({ pageId = "defaultPage" }) => {
   const logUserActivity = useAddUserActivity();
   const dispatch = useDispatch();
   const limitFromRedux = useSelector((state) => state.pageLimits[pageId] || 10);
+  // console.log('PageLimitEditor -> Rendered')
 
   const [isEditing, setIsEditing] = useState(false);
   const [pageLimit, setPageLimitState] = useState(limitFromRedux);
