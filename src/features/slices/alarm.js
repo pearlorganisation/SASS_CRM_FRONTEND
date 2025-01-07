@@ -2,13 +2,14 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
-import { getAttendeeAlarm, setAlarm } from "../actions/alarm";
+import { getAttendeeAlarm, getUserAlarms, setAlarm } from "../actions/alarm";
 
 const initialState = {
   isLoading: false,
   isSuccess: false,
   isFormLoading: false,
-  alarmData:[],
+  alarmData: [],
+  userAlarms: [],
   attendeeAlarm: null,
   totalPages: 1,
   errorMessage: "",
@@ -48,13 +49,23 @@ export const alarmSlice = createSlice({
       .addCase(getAttendeeAlarm.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.attendeeAlarm = action.payload
+        state.attendeeAlarm = action.payload;
       })
       .addCase(getAttendeeAlarm.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       })
-      
+      .addCase(getUserAlarms.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getUserAlarms.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.userAlarms = Array.isArray(action.payload) ? action.payload : [];
+      })
+      .addCase(getUserAlarms.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      });
   },
 });
 

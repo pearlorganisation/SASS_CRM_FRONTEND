@@ -1,0 +1,20 @@
+.custom-calendar {
+    width: 100%;
+    max-width: 800px;
+    font-size: 1.5rem;
+    border-radius: 5px;
+  }
+  
+  .custom-calendar .react-calendar__tile {
+    height: 60px;
+  }
+
+  .alarm {
+    color: #171717;
+  }
+  
+
+  .all-cell{
+
+    border-radius: 5px;
+  }

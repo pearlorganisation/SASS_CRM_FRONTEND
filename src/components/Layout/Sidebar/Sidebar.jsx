@@ -16,7 +16,7 @@ import { getNoticeBoard } from "../../../features/actions/noticeBoard";
 import useRoles from "../../../hooks/useRoles";
 import { MdAssignment } from "react-icons/md";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
-
+import { FaCalendarAlt } from "react-icons/fa";
 const Sidebar = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
@@ -89,6 +89,11 @@ const Sidebar = () => {
     {
       roles: [roles.EMPLOYEE_SALES, roles.EMPLOYEE_REMINDER, roles.ADMIN],
       items: [
+        {
+          path: "/calendar",
+          label: "Calendar",
+          icon: <FaCalendarAlt size={30} />,
+        },
         {
           path: "/products",
           label: "Products",
