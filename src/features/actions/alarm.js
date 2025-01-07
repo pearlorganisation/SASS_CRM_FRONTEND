@@ -31,9 +31,25 @@ export const getAttendeeAlarm = createAsyncThunk(
         `/alarm?email=${email}`,
         
       );
-      successToast(response?.data);
       return response?.data;
-      
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+
+//set alarm
+export const cancelAlarm = createAsyncThunk(
+  "alarm/cancel",
+  async ({id}, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(
+        `/alarm`,
+        {id}
+      );
+      successToast('Alarm cancelled.');
+      return response?.data;
 
     } catch (e) {
       return rejectWithValue(e);

@@ -55,6 +55,7 @@ import { Box, Button, Fade, Paper, Stack, Typography } from "@mui/material";
 import AddOnsPage from "./pages/Settings/Addons/Addons";
 import alarm from '/alarm.wav'
 import { setEmployeeModeId } from "./features/slices/employee";
+import { resetAlarmData } from "./features/slices/alarm";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -99,6 +100,7 @@ const App = () => {
       setBannerOpen(true);
       setBannerTitle(data.message)
       setBannerMsg(data.deleteResult.note);
+      dispatch(resetAlarmData())
     }
 
     function onReminderPlay(data) {
