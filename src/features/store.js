@@ -63,7 +63,7 @@ const persistConfig = {
   key: "SaasCrmClientPanel",
   version: 1,
   storage,
-  whitelist: ["auth", "pabblyToken","pageLimits", "noticeBoard", "employee"],
+  whitelist: ["auth", "pabblyToken","pageLimits", "noticeBoard"],
   transforms: [
     encryptTransform({
       secretKey: `${import.meta.env.VITE_REACT_APP_REDUX_PERSIST_SECRET_KEY}`,

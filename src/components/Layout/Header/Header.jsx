@@ -5,9 +5,11 @@ import { getRoleNameByID } from "../../../utils/roles";
 import { toggleSidebar } from "../../../features/slices/globalData";
 import { FaUserCircle } from "react-icons/fa"; // Importing profile icon
 import { setEmployeeModeId } from "../../../features/slices/employee";
-
+import ComponentGuard from "../../AccessControl/ComponentGuard";
+import useRoles from "../../../hooks/useRoles";
 const Header = () => {
   const dispatch = useDispatch();
+  const roles = useRoles();
   const navigate = useNavigate(); // Initialize useNavigate for navigation
   const { userData } = useSelector((state) => state.auth);
   const { employeeModeData } = useSelector((state) => state.employee);
@@ -61,8 +63,10 @@ const Header = () => {
             </Link>
           </div>
 
-          {employeeModeData && (
-              <div className="flex items-center gap-4 justify-between bg-gray-100 shadow-md py-1 px-3 rounded-md w-fit max-w-md">
+
+
+          <ComponentGuard allowedRoles={[roles.ADMIN]} conditions={[employeeModeData ? true : false]}>
+          <div className="flex items-center gap-4 justify-between bg-gray-100 shadow-md py-1 px-3 rounded-md w-fit max-w-md">
                 {/* Employee Info */}
                 <div className="flex items-center space-x-4">
                   <div className="text-sm">
@@ -81,7 +85,7 @@ const Header = () => {
                   Exit
                 </button>
               </div>
-            )}
+            </ComponentGuard>
           <div className="flex items-center">
            
 

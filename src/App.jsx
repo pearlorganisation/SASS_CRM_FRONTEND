@@ -54,6 +54,7 @@ import TrapFocus from "@mui/material/Unstable_TrapFocus";
 import { Box, Button, Fade, Paper, Stack, Typography } from "@mui/material";
 import AddOnsPage from "./pages/Settings/Addons/Addons";
 import alarm from '/alarm.wav'
+import { setEmployeeModeId } from "./features/slices/employee";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -129,6 +130,8 @@ const App = () => {
   }
 
   useEffect(() => {
+    dispatch(setEmployeeModeId());
+
     if (isUserLoggedIn) {
       console.log("connecting socket");
       socket.connect();
