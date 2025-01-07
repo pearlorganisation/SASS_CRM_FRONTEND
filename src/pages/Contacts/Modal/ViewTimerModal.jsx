@@ -79,8 +79,8 @@ const ViewTimerModal = ({ setModal, email }) => {
                 <textarea
                   {...register("note", { required: true })}
                   className="w-full bg-white mt-1  px-5 py-2 text-gray-500 text-sm border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
-                  placeholder="Write a note (Max. 300 chars)"
-                  maxLength={300}
+                  placeholder="Write a note (Max. 600 chars)"
+                  maxLength={600}
                 />
                 {/* {errors.duration && (
                    <span className="text-red-500">
