@@ -21,6 +21,11 @@ import {
   Box,
   Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   IconButton,
   InputLabel,
@@ -64,6 +69,16 @@ const ViewParticularContact = () => {
   );
 
   const { attendeeAlarm } = useSelector((state) => state.alarm);
+
+  const [openCancelDialog, setOpenCancelDialog] = useState(false);
+
+  const openCancelAlarmDialog = () => {
+    setOpenCancelDialog(true);
+  };
+
+  const closeCancelAlarmDialog = () => {
+    setOpenCancelDialog(false);
+  };
 
   useEffect(() => {
     return () => {
@@ -178,12 +193,12 @@ const ViewParticularContact = () => {
     dispatch(getEnrollments({ id: email }));
   }, [email]);
 
-  useEffect(() => {
-    console.log("alarm", attendeeAlarm);
-  }, [attendeeAlarm]);
+  // useEffect(() => {
+  //   console.log("alarm", attendeeAlarm);
+  // }, [attendeeAlarm]);
 
   const cancelMyAlarm = (id) => {
-    dispatch(cancelAlarm({id}));
+    dispatch(cancelAlarm({ id }));
   };
 
   return (
@@ -202,10 +217,9 @@ const ViewParticularContact = () => {
                 <Button
                   color="error"
                   size="small"
-                  onClick={(e) => {
-                    cancelMyAlarm(attendeeAlarm._id)
-                  }
-                }
+                  onClick={() => {
+                    openCancelAlarmDialog();
+                  }}
                 >
                   Cancel Alarm
                 </Button>
@@ -586,6 +600,31 @@ const ViewParticularContact = () => {
           attendeeId={attendeeId}
         />
       )}
+      <Dialog
+        open={openCancelDialog}
+        onClose={closeCancelAlarmDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Cancel Alarm?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to cancel this alarm?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeCancelAlarmDialog}>Disagree</Button>
+          <Button onClick={() => {
+            cancelMyAlarm(attendeeAlarm._id)
+            closeCancelAlarmDialog()
+          } 
+          } autoFocus>
+            Agree
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
