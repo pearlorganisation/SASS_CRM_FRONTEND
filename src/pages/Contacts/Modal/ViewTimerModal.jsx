@@ -1,9 +1,9 @@
 import React from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { setAlarm } from "../../../features/actions/alarm";
 
-const ViewTimerModal = ({ setModal }) => {
+const ViewTimerModal = ({ setModal, email }) => {
   const {
     control,
     register,
@@ -16,7 +16,9 @@ const ViewTimerModal = ({ setModal }) => {
 
   const onSubmit = (data) => {
     console.log(data);
+    data['email'] = email
     dispatch(setAlarm(data))
+    setModal(false)
   };
 
   return (
@@ -29,10 +31,17 @@ const ViewTimerModal = ({ setModal }) => {
     >
       {/*    <!-- Modal --> */}
       <div
-        className="flex h-auto sm:w-[35%]  flex-col gap-6 overflow-hidden rounded bg-white p-6 shadow-xl "
+        className="relative h-auto max-w-full  flex-col gap-6 overflow-hidden rounded bg-white p-6 shadow-xl "
         id="modal"
         role="document"
       >
+             <button
+              onClick={() => setModal(false)}
+              className="absolute right-2 top-2 w-8 h-8 rounded-full hover:bg-green-500 hover:text-white transition duration-300"
+              aria-label="close dialog"
+            >
+            X
+            </button>
         <div className="flex gap-5">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className=" rounded-lg p-5 bg-slate-50 w-full">
@@ -75,42 +84,12 @@ const ViewTimerModal = ({ setModal }) => {
                    </span>
                  )} */}
               </div>
-              <button className="text-white bg-blue-600 hover:bg-blue-700  py-1 px-4 mt-2 rounded-md  border-md">
+              <button className="text-white bg-blue-600 hover:bg-blue-700  py-1 px-4 mt-2 rounded-md  border-md w-full">
                 Set Alarm
               </button>
             </div>
           </form>
 
-          <div>
-            <button
-              onClick={() => setModal(false)}
-              className="inline-flex h-10 items-center justify-center gap-2 justify-self-center whitespace-nowrap rounded-full px-5 text-sm font-medium tracking-wide text-emerald-500 transition duration-300 hover:bg-emerald-100 hover:text-emerald-600 focus:bg-emerald-200 focus:text-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:text-emerald-300 disabled:shadow-none disabled:hover:bg-transparent"
-              aria-label="close dialog"
-            >
-              <span className="relative only:-mx-5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  role="graphics-symbol"
-                  aria-labelledby="title-79 desc-79"
-                >
-                  <title id="title-79">Icon title</title>
-                  <desc id="desc-79">
-                    A more detailed description of the icon
-                  </desc>
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </span>
-            </button>
-          </div>
         </div>
       </div>
     </div>

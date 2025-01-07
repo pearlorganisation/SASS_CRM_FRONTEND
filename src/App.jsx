@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
@@ -49,19 +49,39 @@ import useAddUserActivity from "./hooks/useAddUserActivity";
 import ViewEmployee from "./pages/Employees/ViewEmployee";
 import LeadTypes from "./pages/Settings/LeadType/ManageLeadTypes";
 import EmployeeDashboard from "./pages/Dashboard/EmployeeDashboard";
-import { socket } from "./socket"
+import { socket } from "./socket";
+import TrapFocus from "@mui/material/Unstable_TrapFocus";
+import { Box, Button, Fade, Paper, Stack, Typography } from "@mui/material";
+import AddOnsPage from "./pages/Settings/Addons/Addons";
+import alarm from '/alarm.wav'
+import { setEmployeeModeId } from "./features/slices/employee";
 
 const App = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
   // console.log("App -> render");
-  const { userData, isUserLoggedIn, subscription } = useSelector((state) => state.auth);
+  const { userData, isUserLoggedIn, subscription } = useSelector(
+    (state) => state.auth
+  );
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
   const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed || false;
 
+  const [bannerOpen, setBannerOpen] = useState(false);
+  const [bannerTitle, setBannerTitle] = useState("");
+
+  const [bannerMsg, setBannerMsg] = useState("");
+
+  const closeBanner = () => {
+    audioRef.current.pause()
+    audioRef.current.loop = false
+    audioRef.current.currentTime  = 0
+    setBannerOpen(false);
+  };
 
   const [isConnected, setIsConnected] = useState(socket.connected);
+
+  const audioRef = useRef(new Audio(alarm))
 
   useEffect(() => {
     function onConnect() {
@@ -73,41 +93,47 @@ const App = () => {
     }
 
     function onAlarmPlay(data) {
-      alert(data)
+      const audio = audioRef.current;
+      audio.loop = true; // Enable looping
+      audio.play().catch((err) => console.error("Audio play error:", err)); // Handle potential play errors
+      setBannerOpen(true);
+      setBannerTitle(data.message)
+      setBannerMsg(data.deleteResult.note);
     }
 
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    socket.on('playAlarm', onAlarmPlay);
+    function onReminderPlay(data) {
+      console.log(data);
+    }
 
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+    socket.on("playAlarm", onAlarmPlay);
+    socket.on("playReminder", onReminderPlay);
 
     return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.off('playAlarm', onAlarmPlay);
-
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+      socket.off("playAlarm", onAlarmPlay);
+      socket.off("playReminder", onReminderPlay);
     };
   }, []);
 
-
   useEffect(() => {
-    if(isConnected){
-      console.log('join emitted')
-      socket.emit('join', { user: userData._id });
+    if (isConnected) {
+      console.log("join emitted");
+      socket.emit("join", { user: userData._id });
     }
-
-  }, [userData, isConnected])
-
-
+  }, [userData, isConnected]);
 
   if (isUserLoggedIn && !userData?.role) {
     dispatch(logout());
   }
 
   useEffect(() => {
+    dispatch(setEmployeeModeId());
 
     if (isUserLoggedIn) {
-      console.log('connecting socket')
+      console.log("connecting socket");
       socket.connect();
     }
 
@@ -121,8 +147,6 @@ const App = () => {
     initFunctions();
 
     if (isUserLoggedIn && userData?.role) {
-
-
       logUserActivity({
         action: "login/refresh",
         details: "User logged in or refreshed successfully",
@@ -266,7 +290,10 @@ const App = () => {
         {
           path: "/settings/custom-status",
           element: (
-            <RouteGuard conditions={[isCustomStatusEnabled || roles.isSuperAdmin()]} roleNames={["SUPER_ADMIN", "ADMIN"]}>
+            <RouteGuard
+              conditions={[isCustomStatusEnabled || roles.isSuperAdmin()]}
+              roleNames={["SUPER_ADMIN", "ADMIN"]}
+            >
               <CustomOptions />
             </RouteGuard>
           ),
@@ -276,6 +303,22 @@ const App = () => {
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
               <ViewPlans />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/addons",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
+              <AddOnsPage />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/addons/:id",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
+              <AddOnsPage />
             </RouteGuard>
           ),
         },
@@ -376,6 +419,68 @@ const App = () => {
     <div className="">
       <Toaster position="top-center" richColors />
       <RouterProvider router={router} />
+      <TrapFocus open disableAutoFocus disableEnforceFocus>
+        <Fade appear={false} in={bannerOpen}>
+          <Paper
+            role="dialog"
+            aria-modal="false"
+            aria-label="Alarm banner"
+            square
+            variant="outlined"
+            tabIndex={-1}
+            sx={{
+              position: "fixed",
+              bottom: 15,
+              // left: 0,
+              right: 5,
+              m: 0,
+              p: 2,
+              color: '#ffffff',
+              borderWidth: 0,
+              border:1,
+              borderColor: '#117195f0',
+              borderRadius: '10px',
+              width:400,
+              minHeight: 150,
+              maxWidth:'100%',
+              background: '#23a7daee'
+            }}
+          >
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              sx={{ justifyContent: "space-between", alignItems: "center", gap: 2 }}
+            >
+              <Box
+                sx={{
+                  flexShrink: 1,
+                  alignSelf: { xs: "flex-start", sm: "center" },
+                }}
+              >
+                <Typography sx={{ fontWeight: "bold" }}>{bannerTitle}</Typography>
+                <Typography variant="body2">{bannerMsg}</Typography>
+              </Box>
+              <Stack
+                direction={{
+                  xs: "row-reverse",
+                  sm: "row",
+                }}
+                sx={{
+                  gap: 2,
+                  flexShrink: 0,
+                  alignSelf: { xs: "flex-end", sm: "center" },
+                }}
+              >
+                <Button size="small" onClick={closeBanner} variant="contained">
+                  Stop Alarm
+                </Button>
+                {/* <Button size="small" onClick={closeBanner}>
+                  Reject all
+                </Button> */}
+              </Stack>
+            </Stack>
+          </Paper>
+        </Fade>
+      </TrapFocus>
     </div>
   );
 };
