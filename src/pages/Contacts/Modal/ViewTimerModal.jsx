@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { setAlarm } from "../../../features/actions/alarm";
+import { getAttendeeAlarm, setAlarm } from "../../../features/actions/alarm";
 
 const ViewTimerModal = ({ setModal, email }) => {
   const {
@@ -17,7 +17,9 @@ const ViewTimerModal = ({ setModal, email }) => {
   const onSubmit = (data) => {
     console.log(data);
     data['email'] = email
-    dispatch(setAlarm(data))
+    dispatch(setAlarm(data)).then(() => {
+      dispatch(getAttendeeAlarm({email}))
+    })
     setModal(false)
   };
 
@@ -77,6 +79,8 @@ const ViewTimerModal = ({ setModal, email }) => {
                 <textarea
                   {...register("note", { required: true })}
                   className="w-full bg-white mt-1  px-5 py-2 text-gray-500 text-sm border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
+                  placeholder="Write a note (Max. 300 chars)"
+                  maxLength={300}
                 />
                 {/* {errors.duration && (
                    <span className="text-red-500">

@@ -21,8 +21,10 @@ export const getAttendeeAlarm = createAsyncThunk(
   "alarm/get",
   async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/alarm?email=${email}`);
-      // successToast(response?.data);
+      const response = await instance.get(
+        `/alarm?email=${email}`,
+        
+      );
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
@@ -30,15 +32,19 @@ export const getAttendeeAlarm = createAsyncThunk(
   }
 );
 
-//get User alarms
-export const getUserAlarms = createAsyncThunk(
-  "alarm/user/fetchData",
-  async ({ id, year, month }, { rejectWithValue }) => {
+
+//set alarm
+export const cancelAlarm = createAsyncThunk(
+  "alarm/cancel",
+  async ({id}, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/alarm/user/${id}`, {
-        params: { year, month },
-      });
+      const response = await instance.patch(
+        `/alarm`,
+        {id}
+      );
+      successToast('Alarm cancelled.');
       return response?.data;
+
     } catch (e) {
       return rejectWithValue(e);
     }
