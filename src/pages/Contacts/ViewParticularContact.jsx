@@ -16,9 +16,16 @@ import {
   updateAttendeeLeadType,
 } from "../../features/actions/attendees";
 import {
+  Alert,
   Badge,
+  Box,
   Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   IconButton,
   InputLabel,
@@ -26,12 +33,13 @@ import {
   ListItemText,
   MenuItem,
   Select,
+  Stack,
 } from "@mui/material";
 import { Add, OpenInNew } from "@mui/icons-material";
 import { clearLeadType } from "../../features/slices/attendees";
 import { useNavigate } from "react-router-dom";
 import AddEnrollmentModal from "./Modal/AddEnrollmentModal";
-import { getAttendeeAlarm } from "../../features/actions/alarm";
+import { cancelAlarm, getAttendeeAlarm } from "../../features/actions/alarm";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -61,6 +69,16 @@ const ViewParticularContact = () => {
   );
 
   const { attendeeAlarm } = useSelector((state) => state.alarm);
+
+  const [openCancelDialog, setOpenCancelDialog] = useState(false);
+
+  const openCancelAlarmDialog = () => {
+    setOpenCancelDialog(true);
+  };
+
+  const closeCancelAlarmDialog = () => {
+    setOpenCancelDialog(false);
+  };
 
   useEffect(() => {
     return () => {
@@ -141,7 +159,7 @@ const ViewParticularContact = () => {
     dispatch(getAttendee({ email }));
     dispatch(getLeadType());
     dispatch(getAttendeeLeadTypeByEmail(email));
-    dispatch(getAttendeeAlarm({email}));
+    dispatch(getAttendeeAlarm({ email }));
   }, [email]);
 
   const handleTimerModal = () => {
@@ -175,17 +193,49 @@ const ViewParticularContact = () => {
     dispatch(getEnrollments({ id: email }));
   }, [email]);
 
-  useEffect(() => {
-    console.log(attendeeAlarm);
-  }, [attendeeAlarm]);
+  // useEffect(() => {
+  //   console.log("alarm", attendeeAlarm);
+  // }, [attendeeAlarm]);
+
+  const cancelMyAlarm = (id) => {
+    dispatch(cancelAlarm({ id }));
+  };
 
   return (
-    <div className="px-4 pt-14 space-y-6">
+    <div className=" px-4 pt-14 space-y-6">
       <div className="md:p-6 p-3 bg-gray-50 rounded-lg ">
-        <div className="flex gap-4 justify-between items-center mb-6">
+        <div className="flex flex-col lg:flex-row gap-4 justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-700">
             Attendee Contact Details
           </h2>
+          {attendeeAlarm && (
+            <Alert
+              className="right-6 top-3"
+              severity="info"
+              icon={false}
+              action={
+                <Button
+                  color="error"
+                  size="small"
+                  onClick={() => {
+                    openCancelAlarmDialog();
+                  }}
+                >
+                  Cancel Alarm
+                </Button>
+              }
+            >
+              <Stack>
+                <Box>
+                  <strong>Date:</strong>
+                  {new Date(attendeeAlarm.date).toLocaleString("en-IN")}
+                </Box>
+                <Box className="line-clamp-2">
+                  <strong>Note:</strong> {attendeeAlarm.note}
+                </Box>
+              </Stack>
+            </Alert>
+          )}
         </div>
         <div className=" grid lg:grid-cols-2 mb-6 gap-4 w-full">
           <div className="space-y-2">
@@ -255,7 +305,7 @@ const ViewParticularContact = () => {
 
           <div className="space-y-3 flex-col h-full">
             <div className="flex  justify-between gap-10  items-center">
-              <div className="flex border border-red-600 items-center gap-3">
+              <div className="flex border items-center gap-3">
                 <Button
                   variant="contained"
                   className="h-10"
@@ -550,6 +600,31 @@ const ViewParticularContact = () => {
           attendeeId={attendeeId}
         />
       )}
+      <Dialog
+        open={openCancelDialog}
+        onClose={closeCancelAlarmDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Cancel Alarm?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to cancel this alarm?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeCancelAlarmDialog}>Disagree</Button>
+          <Button onClick={() => {
+            cancelMyAlarm(attendeeAlarm._id)
+            closeCancelAlarmDialog()
+          } 
+          } autoFocus>
+            Agree
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

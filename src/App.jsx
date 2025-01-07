@@ -55,6 +55,8 @@ import { Box, Button, Fade, Paper, Stack, Typography } from "@mui/material";
 import AddOnsPage from "./pages/Settings/Addons/Addons";
 import alarm from '/alarm.wav'
 import { setEmployeeModeId } from "./features/slices/employee";
+import CalendarPage from "./pages/Calendar/CalendarPage";
+import { resetAlarmData } from "./features/slices/alarm";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -99,6 +101,7 @@ const App = () => {
       setBannerOpen(true);
       setBannerTitle(data.message)
       setBannerMsg(data.deleteResult.note);
+      dispatch(resetAlarmData())
     }
 
     function onReminderPlay(data) {
@@ -264,6 +267,14 @@ const App = () => {
           element: (
             <RouteGuard roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER"]}>
               <Assignments />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/calendar",
+          element: (
+            <RouteGuard roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER","ADMIN"]}>
+              <CalendarPage />
             </RouteGuard>
           ),
         },
