@@ -50,3 +50,19 @@ export const cancelAlarm = createAsyncThunk(
     }
   }
 );
+
+
+//get User alarms
+export const getUserAlarms = createAsyncThunk(
+  "alarm/user/fetchData",
+  async ({ id, year, month }, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`/alarm/user/${id}`, {
+        params: { year, month },
+      });
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
