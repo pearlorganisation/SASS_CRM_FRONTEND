@@ -1,21 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
+
+const Pullbacks = lazy(() => import("./Pullbacks"));
+const Enrollments = lazy(() => import("./Enrollments"));
+const WebinarAttendeesPage = lazy(() => import("./WebinarAttendeesPage"));
+
 import { useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Tab } from "@mui/material";
 import { createPortal } from "react-dom";
-import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
-import { setTabValue as setTab } from "../../features/slices/attendees";
 import { AttachFile } from "@mui/icons-material";
-import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
-import { openModal } from "../../features/slices/modalSlice";
 import { getLeadType } from "../../features/actions/assign";
-import Pullbacks from "./Pullbacks";
 import { AssignmentStatus } from "../../utils/extra";
-import ReAssignmentModal from "../../components/Webinar/ReAssignmentModal";
 import { getAllEmployees } from "../../features/actions/employee";
-import Enrollments from "./Enrollments";
-import WebinarAttendeesPage from "./WebinarAttendeesPage";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
+import ReAssignmentModal from "../../components/Webinar/ReAssignmentModal";
+import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
+import DataTableFallback from "../../components/Fallback/DataTableFallback";
 
 const WebinarAttendees = () => {
   const { id } = useParams();
@@ -158,6 +159,7 @@ const WebinarAttendees = () => {
               </Button>
             )}
         </div>
+
         {tabValue !== "enrollments" && (
           <Tabs
             value={subTabValue}
@@ -183,33 +185,35 @@ const WebinarAttendees = () => {
           </Tabs>
         )}
       </div>
-      {subTabValue === "attendees" && tabValue !== "enrollments" && (
-        <WebinarAttendeesPage
-          tabValue={tabValue}
-          page={page}
-          setPage={setPage}
-          subTabValue={subTabValue}
-          selectedRows={selectedRows}
-          setSelectedRows={setSelectedRows}
-          isSelectVisible={isSelectVisible}
-          setIsSelectVisible={setIsSelectVisible}
-          selectedAssignmentType={selectedAssignmentType}
-          setSelectedAssignmentType={setSelectedAssignmentType}
-        />
-      )}
-      {subTabValue !== "attendees" && tabValue !== "enrollments" && (
-        <Pullbacks
-          subTabValue={subTabValue}
-          page={page}
-          setPage={setPage}
-          tabValue={tabValue}
-          selectedRows={selectedRows}
-          setSelectedRows={setSelectedRows}
-        />
-      )}
-      {tabValue === "enrollments" && (
-        <Enrollments page={page} setPage={setPage} tabValue={tabValue} />
-      )}
+      <Suspense fallback={<DataTableFallback/>}>
+        {subTabValue === "attendees" && tabValue !== "enrollments" && (
+          <WebinarAttendeesPage
+            tabValue={tabValue}
+            page={page}
+            setPage={setPage}
+            subTabValue={subTabValue}
+            selectedRows={selectedRows}
+            setSelectedRows={setSelectedRows}
+            isSelectVisible={isSelectVisible}
+            setIsSelectVisible={setIsSelectVisible}
+            selectedAssignmentType={selectedAssignmentType}
+            setSelectedAssignmentType={setSelectedAssignmentType}
+          />
+        )}
+        {subTabValue !== "attendees" && tabValue !== "enrollments" && (
+          <Pullbacks
+            subTabValue={subTabValue}
+            page={page}
+            setPage={setPage}
+            tabValue={tabValue}
+            selectedRows={selectedRows}
+            setSelectedRows={setSelectedRows}
+          />
+        )}
+        {tabValue === "enrollments" && (
+          <Enrollments page={page} setPage={setPage} tabValue={tabValue} />
+        )}
+      </Suspense>
 
       {reAssignModal && (
         <ReAssignmentModal

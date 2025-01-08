@@ -4,6 +4,7 @@ import useRoles from "../../../hooks/useRoles";
 import { addAssign } from "../../../features/actions/assign";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 import { getAssignedEmployees } from "../../../features/actions/webinarContact";
+import AssignedEmployeeTable from "../../../components/Webinar/AssignedEmployeeTable";
 
 function EmployeeAssignModal({ selectedRows, webinarId, tabValue, setAssignModal }) {
   const dispatch = useDispatch();
@@ -13,6 +14,7 @@ function EmployeeAssignModal({ selectedRows, webinarId, tabValue, setAssignModal
   const { isSuccess } = useSelector((state) => state.assign);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const { assignedEmployees } = useSelector((state) => state.webinarContact);
+  console.log("assignedEmployees", assignedEmployees); 
 
   const selectedType =
     tabValue === "preWebinar" ? "EMPLOYEE REMINDER" : "EMPLOYEE SALES";
@@ -23,6 +25,8 @@ function EmployeeAssignModal({ selectedRows, webinarId, tabValue, setAssignModal
     .map((item) => ({
       value: item?._id,
       label: item?.userName,
+      contactCount: item?.dailyContactCount || 0,
+      contactLimit: item?.dailyContactLimit || 0,
     }));
 
   const handleAssign = () => {
@@ -67,24 +71,12 @@ function EmployeeAssignModal({ selectedRows, webinarId, tabValue, setAssignModal
         </div>
 
         {/* Employee Options */}
-        <div className="space-y-3">
-          {options.map((option) => (
-            <div key={option.value} className="flex items-center">
-              <input
-                type="radio"
-                id={option.value}
-                name="employee"
-                value={option.value}
-                checked={selectedEmployee === option.value}
-                onChange={() => setSelectedEmployee(option.value)}
-                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor={option.value} className="ml-3 text-gray-700">
-                {option.label}
-              </label>
-            </div>
-          ))}
-        </div>
+        <AssignedEmployeeTable
+          options={options}
+          selectedEmployee={selectedEmployee}
+          setSelectedEmployee={setSelectedEmployee}
+          moveToPullbacks={false}
+        />
 
         {/* Action Buttons */}
         <div className="flex justify-end space-x-3 mt-4">

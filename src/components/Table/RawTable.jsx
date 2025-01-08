@@ -63,7 +63,7 @@ const RawTable = ({
           </tr>
         </thead>
         <tbody>
-          {isLoading ? (
+          {isLoading && tableData?.rows?.length > 0 ? (
             Array.from({ length: limit <= 10 ? limit : 10 }).map((_, index) => (
               <tr className="border" key={index}>
                 <td className=" flex justify-center px-4 py-4">
@@ -84,11 +84,11 @@ const RawTable = ({
               <tr
                 key={row?._id}
                 className={`${
-                  isRowSelected(row?._id) ? "bg-blue-50" : "bg-white"
+                  isRowSelected(row?._id) ? "bg-blue-50 " : "bg-white"
                 } hover:bg-gray-50 border-b whitespace-nowrap`}
               >
                 <td
-                  className={`px-4 py-2 text-gray-600 ${
+                  className={`px-4 text-gray-600 ${
                     isRowClickable ? "cursor-pointer" : ""
                   }`}
                   onClick={() => rowClick(row)}
@@ -98,9 +98,10 @@ const RawTable = ({
                       !isLeadType ? "px-3" : ""
                     }`}
                   >
+                    {console.log(row?.leadType?.color, isLeadType)}
                     {isLeadType && (
                       <div
-                        className="w-2 h-full rounded"
+                        className="w-2 h-14 rounded-sm"
                         style={{
                           backgroundColor:
                             row?.leadType?.color || "transparent",

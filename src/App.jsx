@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
@@ -34,6 +34,13 @@ import {
   WebinarAttendees,
   NotesPage,
   AttendeeHistory,
+  CalendarPage,
+  AddOnsPage,
+  ViewEmployee,
+  LeadTypes,
+  EmployeeDashboard,
+  UpdateNoticeBoard,
+  NoticeBoard,
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 import {
@@ -41,21 +48,17 @@ import {
   getCurrentUser,
   getUserSubscription,
 } from "./features/actions/auth";
-import UpdateNoticeBoard from "./pages/NoticeBoard/UpdateNoticeBoard";
-import NoticeBoard from "./pages/NoticeBoard/NoticeBoard";
 // import { getNoticeBoard } from "./features/actions/noticeBoard";
 import useRoles from "./hooks/useRoles";
 import useAddUserActivity from "./hooks/useAddUserActivity";
-import ViewEmployee from "./pages/Employees/ViewEmployee";
-import LeadTypes from "./pages/Settings/LeadType/ManageLeadTypes";
-import EmployeeDashboard from "./pages/Dashboard/EmployeeDashboard";
+
 import { socket } from "./socket";
 import TrapFocus from "@mui/material/Unstable_TrapFocus";
 import { Box, Button, Fade, Paper, Stack, Typography } from "@mui/material";
-import AddOnsPage from "./pages/Settings/Addons/Addons";
+
 import alarm from '/alarm.wav'
 import { setEmployeeModeId } from "./features/slices/employee";
-import CalendarPage from "./pages/Calendar/CalendarPage";
+
 import { resetAlarmData } from "./features/slices/alarm";
 
 const App = () => {
@@ -163,10 +166,15 @@ const App = () => {
 
   // dispatch(clearLoadingAndData())
 
+
   const router = createBrowserRouter([
     {
       path: "/",
-      element: isUserLoggedIn ? <Layout /> : <Login />,
+      element: (
+       
+          isUserLoggedIn ? <Layout /> : <Login />
+        
+      ),
 
       children: [
         {
