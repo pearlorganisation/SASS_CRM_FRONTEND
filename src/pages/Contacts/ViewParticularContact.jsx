@@ -210,7 +210,7 @@ const ViewParticularContact = () => {
           </h2>
           {attendeeAlarm && (
             <Alert
-              className="right-6 top-3"
+              className="right-6 top-3 w-full md:max-w-[500px] transition duration-300 " 
               severity="info"
               icon={false}
               action={
@@ -230,7 +230,7 @@ const ViewParticularContact = () => {
                   <strong>Date:</strong>
                   {new Date(attendeeAlarm.date).toLocaleString("en-IN")}
                 </Box>
-                <Box className="line-clamp-2">
+                <Box className="line-clamp-1 hover:line-clamp-none overflow-hidden transition duration-300">
                   <strong>Note:</strong> {attendeeAlarm.note}
                 </Box>
               </Stack>
