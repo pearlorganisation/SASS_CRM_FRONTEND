@@ -27,7 +27,7 @@ const initialState = {
   customOptions: [],
   customOptionsForFilters: [],
   isSidebarOpen: false,
-  dashBoardCardsData: {},
+  dashBoardCardsData: [],
   plansGraphData: [],
   usersGraphData: [],
   revenueGraphData: [],
@@ -41,6 +41,10 @@ export const globalDataSlice = createSlice({
   reducers: {
     toggleSidebar: (state) => {
       state.isSidebarOpen = !state.isSidebarOpen;
+    },
+
+    resetDashboardData: (state) => {
+      state.dashBoardCardsData = [];
     },
   },
   extraReducers: (builder) => {
@@ -134,7 +138,7 @@ export const globalDataSlice = createSlice({
         state.dashBoardCardsData =
           Array.isArray(action.payload) && action.payload.length > 0
             ? action.payload[0]
-            : {};
+            : [];
       })
       .addCase(getDashboardCardsData.rejected, (state, action) => {
         state.isLoading = false;
@@ -220,7 +224,7 @@ export const globalDataSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { toggleSidebar } = globalDataSlice.actions;
+export const { toggleSidebar, resetDashboardData } = globalDataSlice.actions;
 export default globalDataSlice.reducer;
 
 // ================================================== THE END ==================================================

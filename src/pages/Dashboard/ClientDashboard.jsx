@@ -6,6 +6,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
 import { getDashboardData } from "../../features/actions/globalData";
 import { errorToast } from "../../utils/extra";
+import { resetDashboardData } from "../../features/slices/globalData";
 
 const ClientDashboard = () => {
   const dispatch = useDispatch();
@@ -64,6 +65,8 @@ const ClientDashboard = () => {
 
       setRows(rows);
     }
+
+
   }, [dashBoardCardsData]);
 
   useEffect(() => {
@@ -79,6 +82,11 @@ const ClientDashboard = () => {
 
     setStartDate(oneWeekAgo);
     setEndDate(today);
+
+    return () => {
+      dispatch(resetDashboardData());
+      console.log('returign')
+    }
   }, []);
 
   const handleStartDateChange = (date) => {
