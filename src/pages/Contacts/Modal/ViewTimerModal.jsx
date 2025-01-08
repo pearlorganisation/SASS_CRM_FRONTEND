@@ -15,8 +15,9 @@ const ViewTimerModal = ({ setModal, email }) => {
   const dispatch = useDispatch()
 
   const onSubmit = (data) => {
-    console.log(data);
     data['email'] = email
+    data['date'] = new Date(data['date']).toISOString()
+    console.log(data);
     dispatch(setAlarm(data)).then(() => {
       dispatch(getAttendeeAlarm({email}))
     })
