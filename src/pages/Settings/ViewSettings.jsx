@@ -49,7 +49,7 @@ const ViewSettings = () => {
       to: "/pabblyToken",
       name: "External API Token",
       icon: <PiLetterCirclePBold size={40} />,
-      allowedRoles: [roles.ADMIN],
+      allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
     },
     {
       to: "/settings/custom-status",
