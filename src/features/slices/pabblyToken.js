@@ -1,14 +1,16 @@
 // ----------------------------------------------------------------------------------------------------
 
 import { createSlice } from "@reduxjs/toolkit";
-import { getPabblyToken } from "../actions/pabblyToken";
-
+import { getPabblyToken, getUserNotifications } from "../actions/pabblyToken";
 
 const initialState = {
   isLoading: false,
-pabblyTokenData: [],
+  pabblyTokenData: [],
   errorMessage: "",
-  isSuccess: false
+  isSuccess: false,
+  notifications: [],
+  totalPages: 1,
+  unSeenCount: 0,
 };
 
 // ---------------------------------------------------------------------------------------
@@ -16,7 +18,11 @@ pabblyTokenData: [],
 export const globalDataSlice = createSlice({
   name: "globalData",
   initialState,
-  reducers: {},
+  reducers: {
+    incrementUnseenCount(state, action) {
+      state.unSeenCount = state.unSeenCount + (action.payload || 0);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getPabblyToken.pending, (state, action) => {
@@ -32,8 +38,18 @@ export const globalDataSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
       })
-     
- 
+      .addCase(getUserNotifications.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getUserNotifications.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.notifications = action.payload.notifications || [];
+        state.totalPages = action.payload.totalPages || 1;
+        state.unSeenCount = action.payload.unSeenCount || 0;
+      })
+      .addCase(getUserNotifications.rejected, (state, action) => {
+        state.isLoading = false;
+      });
   },
 });
 

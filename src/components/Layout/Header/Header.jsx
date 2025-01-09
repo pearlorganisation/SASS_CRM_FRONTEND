@@ -7,6 +7,7 @@ import { FaUserCircle } from "react-icons/fa"; // Importing profile icon
 import { setEmployeeModeId } from "../../../features/slices/employee";
 import ComponentGuard from "../../AccessControl/ComponentGuard";
 import useRoles from "../../../hooks/useRoles";
+import NotificationBell from "../../Notification/NotificationBell";
 const Header = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
@@ -87,6 +88,7 @@ const Header = () => {
               </div>
             </ComponentGuard>
           <div className="flex items-center">
+            <NotificationBell/>
            
 
             <div

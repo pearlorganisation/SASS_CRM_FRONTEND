@@ -16,6 +16,7 @@ import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
 import { Button } from "@mui/material";
 import { ContentCopy } from "@mui/icons-material";
 import { toast } from "sonner";
+import { copyToClipboard } from "../../../utils/extra";
 
 const PlanCard = (props) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -63,18 +64,6 @@ const PlanCard = (props) => {
     employeeStatus,
     employeeActivity,
   } = plan;
-
-  // Copy Plan ID to Clipboard
-  const copyToClipboard = (id) => {
-    navigator.clipboard.writeText(id).then(
-      () => {
-        toast.success("Plan ID copied!");
-      },
-      (err) => {
-        console.error("Failed to copy text: ", err);
-      }
-    );
-  };
 
   return (
     <div className="relative mx-auto border border-gray-200 p-6 overflow-hidden rounded-xl shadow-lg max-w-sm bg-white m-4 transition-all duration-300 hover:shadow-xl">
@@ -135,7 +124,7 @@ const PlanCard = (props) => {
       {/* Copy Plan ID Button */}
       <div className="flex justify-center items-center mt-4">
         <Button
-          onClick={() => copyToClipboard(plan?._id)}
+          onClick={() => copyToClipboard(plan?._id, "Plan")}
           variant="outlined"
           endIcon={<ContentCopy />}
           style={{ textTransform: "none" }}
