@@ -169,7 +169,7 @@ const DataTable = React.memo(
                 });
               }}
               count={totalPages || 1}
-              page={page}
+              page={Number(page) || 1}
               variant="outlined"
               shape="rounded"
             />

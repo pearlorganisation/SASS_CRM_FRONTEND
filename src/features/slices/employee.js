@@ -60,29 +60,24 @@ export const employeeSlice = createSlice({
         errorToast(action?.payload);
       })
       .addCase(updateEmployee.pending, (state, action) => {
-        state.isLoading = true;
         state.isSuccess = false;
       })
       .addCase(updateEmployee.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.isSuccess = true;
         successToast("Employee Updated Successfully");
       })
       .addCase(updateEmployee.rejected, (state, action) => {
-        state.isLoading = false;
         errorToast(action?.payload);
       })
       .addCase(updateEmployeeStatus.pending, (state, action) => {
-        state.isLoading = true;
         state.isSuccess = false;
       })
       .addCase(updateEmployeeStatus.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.isSuccess = true;
         successToast("Employee Status Updated Successfully");
       })
       .addCase(updateEmployeeStatus.rejected, (state, action) => {
-        state.isLoading = false;
+        state.isSuccess = false;
         errorToast(action?.payload);
       })
       .addCase(getAllEmployees.pending, (state, action) => {

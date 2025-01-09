@@ -18,6 +18,7 @@ import {
 } from "../../features/actions/reAssign";
 import { resetReAssignSuccess } from "../../features/slices/reAssign.slice";
 import AssignedEmployeeTable from "./AssignedEmployeeTable";
+import { getAllEmployees } from "../../features/actions/employee";
 
 const ReAssignmentModal = ({
   tabValue,
@@ -34,16 +35,14 @@ const ReAssignmentModal = ({
 
   const [moveToPullbacks, setMoveToPullbacks] = useState(false);
   const { reAssignData, isSuccess } = useSelector((state) => state.reAssign);
-  const { assignedEmployees, isLoading } = useSelector(
-    (state) => state.webinarContact
-  );
+  const { employeeData : assignedEmployees } = useSelector((state) => state.employee);
 
   const selectedType =
-    tabValue === "preWebinar" ? "EMPLOYEE REMINDER" : "EMPLOYEE SALES";
+    tabValue === "preWebinar" ? "EMPLOYEE_REMINDER" : "EMPLOYEE_SALES";
 
-  // Filter employees based on the selected role
+  console.log(selectedType, assignedEmployees)
   const options = assignedEmployees
-    .filter((item) => roles.getRoleNameById(item?.role) === selectedType)
+    .filter((item) => item?.role === selectedType)
     .map((item) => ({
       value: item?._id,
       label: item?.userName,
@@ -99,7 +98,7 @@ const ReAssignmentModal = ({
   };
 
   useEffect(() => {
-      dispatch(getAssignedEmployees(webinarid));
+    dispatch(getAllEmployees({ page: 1, limit: 100, filters: { isActive: "active" } }));
   }, []);
 
   useEffect(() => {

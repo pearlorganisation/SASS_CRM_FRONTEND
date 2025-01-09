@@ -8,19 +8,49 @@ import {
   FaPencilAlt,
   FaEllipsisV,
   FaToggleOn,
+  FaClipboard,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { roles } from "../../../utils/roles";
 import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
+import { Button } from "@mui/material";
+import { ContentCopy } from "@mui/icons-material";
+import { toast } from "sonner";
 
 const PlanCard = (props) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
   const {
     plan,
     isMenuVisible = false,
-    handlePlanSelection = () => {},
+    handlePlanSelection = (id) => {
+      //razorpay logic
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Replace with your Razorpay key_id
+        amount: '50000', // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+        currency: 'INR',
+        name: 'Acme Corp',
+        description: 'Test Transaction',
+        order_id: 'order_IluGWxBm9U8zJ8', // This is the order_id created in the backend
+        callback_url: 'http://localhost:3000/payment-success', // Your success URL
+        prefill: {
+          name: 'Gaurav Kumar',
+          email: 'gaurav.kumar@example.com',
+          contact: '9999999999'
+        },
+        theme: {
+          color: '#F37254'
+        },
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+
+
+    },
     selectedPlan = null,
   } = props;
+
   const {
     name,
     amount,
@@ -33,6 +63,18 @@ const PlanCard = (props) => {
     employeeStatus,
     employeeActivity,
   } = plan;
+
+  // Copy Plan ID to Clipboard
+  const copyToClipboard = (id) => {
+    navigator.clipboard.writeText(id).then(
+      () => {
+        toast.success("Plan ID copied!");
+      },
+      (err) => {
+        console.error("Failed to copy text: ", err);
+      }
+    );
+  };
 
   return (
     <div className="relative mx-auto border border-gray-200 p-6 overflow-hidden rounded-xl shadow-lg max-w-sm bg-white m-4 transition-all duration-300 hover:shadow-xl">
@@ -59,11 +101,13 @@ const PlanCard = (props) => {
           )}
         </div>
       </ComponentGuard>
+
       {/* Card Content */}
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">{name}</h2>
         <p className="text-4xl font-extrabold text-blue-600">
-        {"\u20B9"}{amount}
+          {"\u20B9"}
+          {amount}
           <span className="text-base font-normal text-gray-500">/month</span>
         </p>
       </div>
@@ -78,10 +122,7 @@ const PlanCard = (props) => {
           icon={<FaAddressBook />}
           label={`${contactLimit} contact uploads`}
         />
-        <Feature
-          icon={<FaToggleOn  />}
-          label={`${toggleLimit} Toggle Limit`}
-        />
+        <Feature icon={<FaToggleOn />} label={`${toggleLimit} Toggle Limit`} />
       </div>
 
       <div className="border-t border-gray-200 pt-4 space-y-2">
@@ -91,11 +132,23 @@ const PlanCard = (props) => {
         <Feature label="Employee Activity" enabled={employeeActivity} />
       </div>
 
+      {/* Copy Plan ID Button */}
+      <div className="flex justify-center items-center mt-4">
+        <Button
+          onClick={() => copyToClipboard(plan?._id)}
+          variant="outlined"
+          endIcon={<ContentCopy />}
+          style={{ textTransform: "none" }}
+        >
+          {plan?._id}
+        </Button>
+      </div>
+
       <button
         onClick={() => handlePlanSelection(plan?._id)}
-        className={` ${
+        className={`${
           selectedPlan === plan?._id ? "bg-green-600" : "bg-blue-500"
-        } w-full mt-6  text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
+        } w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
       >
         {selectedPlan === null
           ? "Choose Plan"

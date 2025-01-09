@@ -13,7 +13,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import PasswordUpdateForm from "../../components/Profile/PasswordUpdateForm";
 import EditUserForm from "../../components/Profile/EditUserForm";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteUserDocumet, updateUser } from "../../features/actions/auth";
+import { deleteUserDocumet, getCurrentUser, getUserSubscription, updateUser } from "../../features/actions/auth";
 import { ExpandLess, ExpandMore, Delete } from "@mui/icons-material";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import useRoles from "../../hooks/useRoles";
@@ -72,6 +72,11 @@ const ProfilePage = () => {
       setIsEditingInfo(false);
     }
   }, [isSuccess]);
+
+  useEffect(() => {
+    dispatch(getCurrentUser());
+    dispatch(getUserSubscription());
+  },[])
 
   return (
     <>

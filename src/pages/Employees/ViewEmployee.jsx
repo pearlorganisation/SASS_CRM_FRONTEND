@@ -41,7 +41,10 @@ const ViewEmployee = () => {
       dispatch(getUserActivity({ id, page: page, limit: LIMIT }));
     else if (tabValue === "activity")
       dispatch(getAssignmentsActivity({ empId: id }));
-    else dispatch(getAssignments({ id, page, limit: LIMIT, filters, assignmentStatus: AssignmentStatus.ACTIVE }));
+    else if(tabValue === "history")
+      dispatch(getAssignments({ id, page, limit: LIMIT, filters, assignmentStatus: AssignmentStatus.COMPLETED, validCall: "Worked" }));
+    else
+    dispatch(getAssignments({ id, page, limit: LIMIT, filters, assignmentStatus: AssignmentStatus.ACTIVE, validCall: "Pending" }));
   }, [page, LIMIT, filters, tabValue]);
 
   const handleTabChange = (_, newValue) => {
@@ -84,10 +87,6 @@ const ViewEmployee = () => {
         <Tab
           label="History"
           value="history"
-          style={{
-            border: "1px solid red",
-            color: "gray",
-          }}
           className="text-gray-600"
         />
         <Tab

@@ -10,10 +10,10 @@ import { ClipLoader } from "react-spinners";
 import { clearSuccess } from "../../../features/slices/attendees";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
-const UploadCsvModal = ({ setModal, update }) => {
+const UploadCsvModal = ({tabValue, setModal, update }) => {
   const logUserActivity = useAddUserActivity();
 
-  const { tabValue, isLoading, isSuccess } = useSelector(
+  const {  isLoading, isSuccess } = useSelector(
     (state) => state.attendee
   );
   const { id } = useParams();
