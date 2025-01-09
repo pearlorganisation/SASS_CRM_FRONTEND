@@ -2,9 +2,10 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getPricePlans } from "../../../features/actions/pricePlan";
 import PlanCard from "./PlanCard";
+import { getUserSubscription } from "../../../features/actions/auth";
 
 const ViewPlans = () => {
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, subscription } = useSelector((state) => state.auth);
   const role = userData?.role || "";
   const { planData, isPlanDeleted } = useSelector((state) => state.pricePlans);
   const dispatch = useDispatch();
@@ -14,6 +15,13 @@ const ViewPlans = () => {
   useEffect(() => {
     dispatch(getPricePlans());
   }, [isPlanDeleted]);
+  useEffect(() => {
+    dispatch(getUserSubscription());
+  }, []);
+
+  useEffect(() => {
+    console.log(subscription)
+  }, [subscription])
 
   return (
     <div className="p-4 sm:p-6 md:p-10 text-center text-gray-800 bg-gray-50 min-h-screen mt-12">

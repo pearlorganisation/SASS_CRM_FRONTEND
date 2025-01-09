@@ -23,6 +23,7 @@ import tableReducer from './slices/tableSlice'
 import noticeBoardSlice from "./slices/noticeBoard";
 import reAssign from "./slices/reAssign.slice";
 import alarm from "./slices/alarm"
+import { razorpaySlice } from "./slices/razorpay";
 
 // Combine your individual reducers here
 const rootReducer = combineReducers({
@@ -45,7 +46,8 @@ const rootReducer = combineReducers({
   table: tableReducer,
   noticeBoard: noticeBoardSlice,
   reAssign,
-  alarm
+  alarm,
+  razorpaySlice
 });
 
 // Custom root reducer handling a clear action
