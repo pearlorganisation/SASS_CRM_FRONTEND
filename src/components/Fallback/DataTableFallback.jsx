@@ -20,14 +20,14 @@ const DataTableFallback = () => {
       {/* Table Skeleton */}
       <div className="overflow-hidden bg-white rounded-lg shadow-md">
         <div className="grid grid-cols-8 gap-4 p-4 animate-pulse">
+          {/* <div className=" h-8 bg-gray-300 rounded-lg"></div>
           <div className=" h-8 bg-gray-300 rounded-lg"></div>
           <div className=" h-8 bg-gray-300 rounded-lg"></div>
           <div className=" h-8 bg-gray-300 rounded-lg"></div>
           <div className=" h-8 bg-gray-300 rounded-lg"></div>
           <div className=" h-8 bg-gray-300 rounded-lg"></div>
           <div className=" h-8 bg-gray-300 rounded-lg"></div>
-          <div className=" h-8 bg-gray-300 rounded-lg"></div>
-          <div className=" h-8 bg-gray-300 rounded-lg"></div>
+          <div className=" h-8 bg-gray-300 rounded-lg"></div> */}
         </div>
         <div className="p-4 animate-pulse">
           <div className="w-full h-64 bg-gray-200 rounded-lg"></div>
@@ -35,10 +35,10 @@ const DataTableFallback = () => {
       </div>
 
       {/* Pagination Skeleton */}
-      <div className="flex gap-4 md:flex-row flex-col flex-wrap items-center justify-between py-4 mt-4">
+      {/* <div className="flex gap-4 md:flex-row flex-col flex-wrap items-center justify-between py-4 mt-4">
         <div className="w-24 h-8 bg-gray-300 rounded-lg animate-pulse"></div>
         <div className="w-24 h-8 bg-gray-300 rounded-lg animate-pulse"></div>
-      </div>
+      </div> */}
     </div>
   );
 };

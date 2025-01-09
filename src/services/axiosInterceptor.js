@@ -24,7 +24,7 @@ instance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    const loggedInUserName = store.getState()?.auth?.userData?.userName;
+    const loggedInUserEmail = store.getState()?.auth?.userData?.email;
 
     if (
       (error?.response?.status === 401 || error?.response?.status === 403) &&
@@ -34,7 +34,7 @@ instance.interceptors.response.use(
         // console.log("Refreshing token...");
         // await delay(1000 * retryTracker.get(originalRequest.url)); // Exponential backoff
         // console.log('sf --- > ')
-        await instance.post("/auth/refresh", { userName: loggedInUserName });
+        await instance.post("/auth/refresh", { email: loggedInUserEmail });
         // console.log('< ---- sf --- > ')
 
         return instance(originalRequest);

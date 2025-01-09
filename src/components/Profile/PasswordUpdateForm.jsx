@@ -78,7 +78,7 @@ function PasswordUpdateForm() {
                 </InputAdornment>
               ),
             }}
-          />
+          /> 
         </div>
 
         {/* New Password Field */}

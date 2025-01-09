@@ -11,12 +11,15 @@ import {
   Typography,
   TextField,
   MenuItem,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import { clientSignup } from "../../features/actions/client";
 import { getPricePlans } from "../../features/actions/pricePlan";
 import PlanCard from "../Settings/Plans/PlanCard";
 import { errorToast } from "../../utils/extra";
 import { useNavigate } from "react-router-dom";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 function CreateClient() {
   const dispatch = useDispatch();
@@ -27,6 +30,10 @@ function CreateClient() {
   const steps = ["Client Information", "Choose Plan"];
   const [activeStep, setActiveStep] = useState(0);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [showPassword, setShowPassword] = useState({
+    password: false,
+    confirmPassword: false,
+  });
 
   const {
     register,
@@ -54,6 +61,13 @@ function CreateClient() {
 
   const handleBack = () => {
     if (activeStep > 0) setActiveStep(activeStep - 1);
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
   };
 
   useEffect(() => {
@@ -96,7 +110,9 @@ function CreateClient() {
                 fullWidth
                 label="Company Name"
                 variant="outlined"
-                {...register("companyName", { required: "Company Name is required" })}
+                {...register("companyName", {
+                  required: "Company Name is required",
+                })}
                 error={!!errors.companyName}
                 helperText={errors.companyName?.message}
               />
@@ -123,26 +139,58 @@ function CreateClient() {
                 helperText={errors.phone?.message}
               />
               <TextField
-                fullWidth
-                label="Password"
-                type="password"
-                variant="outlined"
                 {...register("password", { required: "Password is required" })}
+                label="Password"
+                type={showPassword.password ? "text" : "password"}
+                fullWidth
+                variant="outlined"
                 error={!!errors.password}
                 helperText={errors.password?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => togglePasswordVisibility("password")}
+                      >
+                        {showPassword.password ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
+
               <TextField
-                fullWidth
-                label="Confirm Password"
-                type="password"
-                variant="outlined"
                 {...register("confirmPassword", {
                   required: "Please confirm your password",
                   validate: (value) =>
                     value === watch("password") || "Passwords do not match",
                 })}
+                label="Confirm Password"
+                type={showPassword.confirmPassword ? "text" : "password"}
+                fullWidth
                 error={!!errors.confirmPassword}
                 helperText={errors.confirmPassword?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          togglePasswordVisibility("confirmPassword")
+                        }
+                      >
+                        {showPassword.confirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Box>
             <Box className="flex justify-between mt-4">

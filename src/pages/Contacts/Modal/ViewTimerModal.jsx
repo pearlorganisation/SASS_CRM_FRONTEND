@@ -51,10 +51,10 @@ const ViewTimerModal = ({ setModal, email }) => {
               <div className="">
                 <label className="font-medium text-sm ">Time </label>
                 <div className="  w-full flex  items-center gap-3 p-1">
-                  <div class="relative max-w-sm">
-                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                  <div className="relative max-w-sm">
+                    <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                       <svg
-                        class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                        className="w-4 h-4 text-gray-500 dark:text-gray-400"
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="currentColor"
@@ -69,7 +69,7 @@ const ViewTimerModal = ({ setModal, email }) => {
                       datepicker
                       datepicker-format="mm-dd-yyyy"
                       type="datetime-local"
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 "
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 "
                       placeholder="Select date"
                     />
                   </div>

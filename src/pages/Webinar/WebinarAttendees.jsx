@@ -242,7 +242,7 @@ const WebinarAttendees = () => {
 
       {showModal &&
         createPortal(
-          <UpdateCsvXslxModal setModal={setShowModal} csvId={id} />,
+          <UpdateCsvXslxModal tabValue={tabValue}  setModal={setShowModal} csvId={id} />,
           document.body
         )}
     </div>

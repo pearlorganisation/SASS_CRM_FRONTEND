@@ -15,6 +15,8 @@ import {
   FormHelperText,
   TextField,
   Button,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import { ClipLoader } from "react-spinners";
 import { clearSuccess } from "../../features/slices/employee";
@@ -23,6 +25,7 @@ import { getRoleNameByID } from "../../utils/roles";
 import useRoles from "../../hooks/useRoles";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import FormInput from "../../components/FormInput";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const CreateEmployee = () => {
   const dispatch = useDispatch();
@@ -47,6 +50,17 @@ const CreateEmployee = () => {
   const { isLoading, isSuccess, singleEmployeeData } = useSelector(
     (state) => state.employee
   );
+
+  const [showPassword, setShowPassword] = useState({
+    password: false,
+    confirmPassword: false,
+  });
+  const togglePasswordVisibility = (field) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
 
   const onSubmit = (data) => {
     console.log(userData);
@@ -76,13 +90,6 @@ const CreateEmployee = () => {
 
   const [isPasswordHidden, setPasswordHidden] = useState(true);
 
-  const togglePasswordVisibility = () => {
-    setPasswordHidden(!isPasswordHidden);
-    const passwordInput = document.getElementById("hs-toggle-password");
-    if (passwordInput) {
-      passwordInput.type = isPasswordHidden ? "text" : "password";
-    }
-  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -281,12 +288,26 @@ const CreateEmployee = () => {
                       required: "Password is required",
                     })}
                     label="Password"
-                    type="password"
-                    variant="outlined"
+                    type={showPassword.password ? "text" : "password"}
                     fullWidth
-                    error={Boolean(errors.password)}
+                    variant="outlined"
+                    error={!!errors.password}
                     helperText={errors.password?.message}
-                    className="mt-2"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => togglePasswordVisibility("password")}
+                          >
+                            {showPassword.password ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </div>
 
@@ -296,17 +317,30 @@ const CreateEmployee = () => {
                     {...register("confirmPassword", {
                       required: "Please confirm your password",
                       validate: (value) =>
-                        value === watch("password") ||
-                        "The passwords do not match",
+                        value === watch("password") || "Passwords do not match",
                     })}
-                    id="hs-toggle-password"
                     label="Confirm Password"
-                    type="password"
-                    variant="outlined"
+                    type={showPassword.confirmPassword ? "text" : "password"}
                     fullWidth
-                    error={Boolean(errors.confirmPassword)}
+                    error={!!errors.confirmPassword}
                     helperText={errors.confirmPassword?.message}
-                    className="mt-2"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() =>
+                              togglePasswordVisibility("confirmPassword")
+                            }
+                          >
+                            {showPassword.confirmPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </div>
               </div>

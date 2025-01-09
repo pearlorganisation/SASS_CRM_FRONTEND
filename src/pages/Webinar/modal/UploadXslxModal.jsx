@@ -10,10 +10,10 @@ import { addAttendees } from "../../../features/actions/attendees";
 import { ClipLoader } from "react-spinners";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
-const UploadXslxModal = ({ setModal, update }) => {
+const UploadXslxModal = ({tabValue, setModal, update }) => {
   const logUserActivity = useAddUserActivity();
 
-  const { tabValue, isLoading, isSuccess } = useSelector(
+  const {  isLoading, isSuccess } = useSelector(
     (state) => state.attendee
   );
   const { id } = useParams();
