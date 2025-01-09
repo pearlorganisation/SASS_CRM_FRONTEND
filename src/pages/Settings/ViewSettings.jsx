@@ -94,6 +94,7 @@ const ViewSettings = () => {
     <Box className="mt-10 text-center">
       <Typography variant="h4" className="font-bold">
         SETTINGS
+        
       </Typography>
       {/* Tailwind Grid Layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 my-10 md:mx-10">
