@@ -131,15 +131,16 @@ function Login() {
             Sign in to your account
           </h1>
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {/* Username */}
+            {/* Email */}
             <TextField
               fullWidth
-              label="Username"
+              label="Email"
               variant="outlined"
+              type="email"
               className="bg-gray-50"
-              {...register("userName", { required: true })}
-              error={!!errors.userName}
-              helperText={errors.userName && "Username is required"}
+              {...register("email", { required: true })}
+              error={!!errors.email}
+              helperText={errors.email && "Email is required"}
             />
 
             {/* Password */}
