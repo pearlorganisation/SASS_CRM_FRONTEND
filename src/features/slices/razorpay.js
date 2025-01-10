@@ -2,7 +2,7 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
-import { checkout } from "../actions/razorpay";
+import { checkout, checkoutAddon } from "../actions/razorpay";
 
 const initialState = {
   isLoading: false,
@@ -38,6 +38,19 @@ export const razorpaySlice = createSlice({
         state.checkoutData = action.payload;
       })
       .addCase(checkout.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(checkoutAddon.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(checkoutAddon.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.checkoutData = action.payload;
+      })
+      .addCase(checkoutAddon.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });

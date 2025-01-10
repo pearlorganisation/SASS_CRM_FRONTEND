@@ -14,7 +14,16 @@ export const checkout = createAsyncThunk(
   }
 );
 
-
-
-
-
+export const checkoutAddon = createAsyncThunk(
+  "checkout/addon",
+  async ({ addon }, { rejectWithValue }) => {
+    try {
+      const response = await instance.post(`/razorpay/addon/checkout`, {
+        addon,
+      });
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

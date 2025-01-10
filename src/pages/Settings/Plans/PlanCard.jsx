@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaCheck,
   FaTimes,
@@ -8,14 +8,12 @@ import {
   FaPencilAlt,
   FaEllipsisV,
   FaToggleOn,
-  FaClipboard,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { roles } from "../../../utils/roles";
 import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
 import { Button } from "@mui/material";
 import { ContentCopy } from "@mui/icons-material";
-import { toast } from "sonner";
 import { copyToClipboard } from "../../../utils/extra";
 import { useDispatch, useSelector } from "react-redux";
 import { checkout } from "../../../features/actions/razorpay";
@@ -31,8 +29,8 @@ const PlanCard = (props) => {
     handlePlanSelection = (id) => {
       dispatch(checkout({ plan: id })).then((res) => {
         if (res?.payload?.result) {
-          const order = res?.payload?.result
-          const plan = res?.payload?.planData
+          const order = res?.payload?.result;
+          const plan = res?.payload?.planData;
           const options = {
             key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Replace with your Razorpay key_id
             amount: order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
@@ -43,7 +41,9 @@ const PlanCard = (props) => {
               "development"
                 ? import.meta.env.VITE_REACT_APP_API_BASE_URL_DEVELOPMENT
                 : import.meta.env.VITE_REACT_APP_API_BASE_URL_MAIN_PRODUCTION
-            }/razorpay/payment-success?planId=${plan._id}&adminId=${userData?._id}`, // Your success URL
+            }/razorpay/payment-success?planId=${plan._id}&adminId=${
+              userData?._id
+            }`, // Your success URL
             theme: {
               color: "#F37254",
             },
@@ -55,6 +55,7 @@ const PlanCard = (props) => {
       });
     },
     selectedPlan = null,
+    currentPlan = null,
   } = props;
 
   const {
@@ -69,6 +70,11 @@ const PlanCard = (props) => {
     employeeStatus,
     employeeActivity,
   } = plan;
+
+
+  useEffect(() => {
+    console.log(currentPlan)
+  }, [currentPlan])
 
   return (
     <div className="relative mx-auto border border-gray-200 p-6 overflow-hidden rounded-xl shadow-lg max-w-sm bg-white m-4 transition-all duration-300 hover:shadow-xl">
@@ -138,18 +144,27 @@ const PlanCard = (props) => {
         </Button>
       </div>
 
-      <button
-        onClick={() => handlePlanSelection(plan?._id)}
-        className={`${
-          selectedPlan === plan?._id ? "bg-green-600" : "bg-blue-500"
-        } w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
-      >
-        {selectedPlan === null
-          ? "Choose Plan"
-          : selectedPlan === plan?._id
-          ? "Selected"
-          : "Choose Plan"}
-      </button>
+      {currentPlan === plan?._id ? (
+        <button
+          className={`bg-green-600 w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
+          disabled
+        >
+          Current Plan
+        </button>
+      ) : (
+        <button
+          onClick={() => handlePlanSelection(plan?._id)}
+          className={`${
+            selectedPlan === plan?._id ? "bg-green-600" : "bg-blue-500"
+          } w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
+        >
+          {selectedPlan === null
+            ? "Choose Plan"
+            : selectedPlan === plan?._id
+            ? "Selected"
+            : "Choose Plan"}
+        </button>
+      )}
     </div>
   );
 };
