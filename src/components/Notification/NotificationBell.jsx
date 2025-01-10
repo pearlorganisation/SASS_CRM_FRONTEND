@@ -1,59 +1,48 @@
-import React, { useState } from "react";
-import { IconButton, Badge, Box, Typography, Divider, List, ListItem, ListItemText, ListItemAvatar, Avatar } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import {
+  IconButton,
+  Badge,
+  Box,
+  Typography,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserNotifications, resetUnseenCount } from "../../features/actions/pabblyToken";
 
-const notificationsData = [
-  {
-    id: 1,
-    title: "New Task Assigned",
-    message: "You have been assigned a new task by your admin.",
-    isRead: false,
-    type: "assignment"
-  },
-  {
-    id: 2,
-    title: "Task Reassigned",
-    message: "Your task has been reassigned to a different employee.",
-    isRead: true,
-    type: "reassignment"
-  },
-  {
-    id: 3,
-    title: "User Inactivity",
-    message: "You have been inactive for a while. Please take action.",
-    isRead: false,
-    type: "inactivity"
-  }
-];
-
-const NotificationBell = () => {
+const NotificationBell = ({ userData }) => {
+  const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState(notificationsData);
 
-  const unreadCount = notifications.filter((notif) => !notif.isRead).length;
+  const { notifications, totalPages, unseenCount } = useSelector(
+    (state) => state.pabblyToken
+  );
 
   const handleBellClick = () => {
     setIsOpen(!isOpen);
+    if(unseenCount  === 0) return 
+    dispatch(resetUnseenCount());
   };
 
-  const markAsRead = (id) => {
-    setNotifications((prevNotifications) =>
-      prevNotifications.map((notif) =>
-        notif.id === id ? { ...notif, isRead: true } : notif
-      )
-    );
-  };
+  const markAsRead = (id) => {};
+
+  useEffect(() => {
+    dispatch(getUserNotifications(userData?._id));
+  }, []);
 
   return (
     <div className="sm:relative">
       {/* Bell Icon */}
       <IconButton onClick={handleBellClick}>
         <Badge
-          badgeContent={unreadCount}
+          badgeContent={unseenCount}
           color="error"
           anchorOrigin={{
             vertical: "top",
-            horizontal: "right"
+            horizontal: "right",
           }}
         >
           <NotificationsIcon />
@@ -63,29 +52,21 @@ const NotificationBell = () => {
       {/* Notification Box */}
       {isOpen && (
         <Box
-          className="absolute right-0 mt-2 w-80 p-4 bg-white shadow-lg rounded-lg border border-gray-200"
+          className="absolute right-0 mt-2 w-96 p-4 bg-white shadow-lg rounded-lg border border-gray-200"
           sx={{ maxHeight: "400px", overflowY: "auto" }}
         >
           <Typography variant="h6" className="font-bold mb-2">
             Notifications
           </Typography>
-          <Divider className="mb-2" />
-          <List>
+          <Divider />
+          <List className=" h-80 overflow-y-auto">
             {notifications.map((notif) => (
               <ListItem
                 key={notif.id}
                 onClick={() => markAsRead(notif.id)}
-                className={`cursor-pointer ${notif.isRead ? "bg-gray-100" : "bg-blue-50"}`}
+                className={` border-b`}
               >
-                <ListItemAvatar>
-                  <Avatar className={`bg-${notif.type === 'assignment' ? 'green' : notif.type === 'reassignment' ? 'orange' : 'red'}-500`}>
-                    {notif.title[0]}
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary={notif.title}
-                  secondary={notif.message}
-                />
+                <ListItemText primary={notif.title} secondary={notif.message} />
               </ListItem>
             ))}
           </List>

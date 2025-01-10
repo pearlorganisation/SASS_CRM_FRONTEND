@@ -24,3 +24,15 @@ export const getUserNotifications = createAsyncThunk(
     }
   }
 );
+
+export const resetUnseenCount = createAsyncThunk(
+  "userNotifications/Unseen",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.patch(`/notification/unseen`);
+      return data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

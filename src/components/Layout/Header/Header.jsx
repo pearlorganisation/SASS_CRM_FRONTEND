@@ -88,7 +88,7 @@ const Header = () => {
               </div>
             </ComponentGuard>
           <div className="flex items-center">
-            <NotificationBell/>
+            <NotificationBell userData={userData}/>
            
 
             <div

@@ -8,14 +8,12 @@ import {
   FaPencilAlt,
   FaEllipsisV,
   FaToggleOn,
-  FaClipboard,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { roles } from "../../../utils/roles";
 import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
 import { Button } from "@mui/material";
 import { ContentCopy } from "@mui/icons-material";
-import { toast } from "sonner";
 import { copyToClipboard } from "../../../utils/extra";
 import { useDispatch, useSelector } from "react-redux";
 import { checkout } from "../../../features/actions/razorpay";

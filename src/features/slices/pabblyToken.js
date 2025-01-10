@@ -1,7 +1,7 @@
 // ----------------------------------------------------------------------------------------------------
 
 import { createSlice } from "@reduxjs/toolkit";
-import { getPabblyToken, getUserNotifications } from "../actions/pabblyToken";
+import { getPabblyToken, getUserNotifications, resetUnseenCount } from "../actions/pabblyToken";
 
 const initialState = {
   isLoading: false,
@@ -10,7 +10,7 @@ const initialState = {
   isSuccess: false,
   notifications: [],
   totalPages: 1,
-  unSeenCount: 0,
+  unseenCount: 0,
 };
 
 // ---------------------------------------------------------------------------------------
@@ -19,9 +19,11 @@ export const globalDataSlice = createSlice({
   name: "globalData",
   initialState,
   reducers: {
-    incrementUnseenCount(state, action) {
-      state.unSeenCount = state.unSeenCount + (action.payload || 0);
+    newNotification(state, action) {
+      state.notifications = [action.payload,...state.notifications];
+      state.unseenCount = state.unseenCount + 1;
     },
+
   },
   extraReducers: (builder) => {
     builder
@@ -45,10 +47,13 @@ export const globalDataSlice = createSlice({
         state.isLoading = false;
         state.notifications = action.payload.notifications || [];
         state.totalPages = action.payload.totalPages || 1;
-        state.unSeenCount = action.payload.unSeenCount || 0;
+        state.unseenCount = action.payload.unseenCount || 0;
       })
       .addCase(getUserNotifications.rejected, (state, action) => {
         state.isLoading = false;
+      })
+      .addCase(resetUnseenCount.pending, (state, action) => {
+        state.unseenCount = 0
       });
   },
 });
@@ -56,7 +61,7 @@ export const globalDataSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {} = globalDataSlice.actions;
+export const { newNotification} = globalDataSlice.actions;
 export default globalDataSlice.reducer;
 
 // ================================================== THE END ==================================================
