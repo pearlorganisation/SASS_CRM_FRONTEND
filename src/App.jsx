@@ -61,12 +61,12 @@ import { setEmployeeModeId } from "./features/slices/employee";
 
 import { resetAlarmData } from "./features/slices/alarm";
 import { newNotification } from "./features/slices/pabblyToken";
+import MyAddOns from "./pages/Settings/Addons/MyAddons";
 
 const App = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
-  // console.log("App -> render");
   const { userData, isUserLoggedIn, subscription } = useSelector(
     (state) => state.auth
   );
@@ -346,7 +346,7 @@ const App = () => {
           path: "/addons/:id",
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
-              <AddOnsPage />
+              <MyAddOns />
             </RouteGuard>
           ),
         },

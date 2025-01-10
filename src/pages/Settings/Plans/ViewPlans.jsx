@@ -16,7 +16,8 @@ const ViewPlans = () => {
     dispatch(getPricePlans());
   }, [isPlanDeleted]);
   useEffect(() => {
-    dispatch(getUserSubscription());
+    dispatch(getUserSubscription
+      ());
   }, []);
 
   useEffect(() => {
@@ -53,7 +54,7 @@ const ViewPlans = () => {
           planData?.map((item, idx) => {
             return (
               <div key={idx} className="">
-                <PlanCard plan={item} isMenuVisible={true} key={item?._id} />
+                <PlanCard plan={item} isMenuVisible={true} key={item?._id} currentPlan={subscription?.plan?._id} />
               </div>
             );
           })}
