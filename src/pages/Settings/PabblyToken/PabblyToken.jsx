@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react";
-import {  useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Typography } from "@mui/material";
 import useRoles from "../../../hooks/useRoles";
 import WebinarDropdown from "../../../components/Webinar/WebinarDropdown";
+import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
 
 const PabblyToken = () => {
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role;
   const roles = useRoles();
 
-
   const [title, setTitle] = useState("");
-
   const [pabblyTokenData, setPabblyTokenData] = useState(
     userData?.pabblyToken || "No Token"
   );
-
   const [jsonBody, setJsonBody] = useState("");
 
   const apiUrl = `${
@@ -36,6 +34,7 @@ const PabblyToken = () => {
   "password": "test4@123",
   "email": "test4@test.com",
   "plan": "673eeed7069c45d78e917ef4"
+  "companyName": "test company",
 }`
       );
       setEndpoint(`${apiUrl}/auth/client`);
@@ -51,7 +50,6 @@ const PabblyToken = () => {
     "firstName": "d", 
     "lastName":"", 
     "phone": "7675849958", 
-    timeInSession: 0 
   } // attendee details, email is mandatory
 }
       `);
@@ -60,7 +58,6 @@ const PabblyToken = () => {
       setPabblyTokenData("No Token");
     }
   }, [roles]);
-
 
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text);
@@ -73,7 +70,9 @@ const PabblyToken = () => {
         <Typography variant="h4" component="h1">
           {title}:
         </Typography>
-        <WebinarDropdown/>
+        <ComponentGuard allowedRoles={[roles.ADMIN]}>
+          <WebinarDropdown />
+        </ComponentGuard>
         {/* Box for Endpoint */}
         <div className="bg-white shadow-md rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">

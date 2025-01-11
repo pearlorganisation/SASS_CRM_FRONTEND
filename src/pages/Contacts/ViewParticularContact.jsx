@@ -40,6 +40,7 @@ import { clearLeadType } from "../../features/slices/attendees";
 import { useNavigate } from "react-router-dom";
 import AddEnrollmentModal from "./Modal/AddEnrollmentModal";
 import { cancelAlarm, getAttendeeAlarm } from "../../features/actions/alarm";
+import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -60,14 +61,14 @@ const ViewParticularContact = () => {
   const { attendeeContactDetails } = useSelector(
     (state) => state.webinarContact
   );
-
+  const { userData } = useSelector((state) => state.auth);
   const { selectedAttendee, attendeeLeadType, attendeeEnrollments } =
     useSelector((state) => state.attendee);
 
   const { noteData, isFormLoading, leadTypeData } = useSelector(
     (state) => state.assign
   );
-
+  const { employeeModeData } = useSelector((state) => state.employee);
   const { attendeeAlarm } = useSelector((state) => state.alarm);
 
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
@@ -208,9 +209,9 @@ const ViewParticularContact = () => {
           <h2 className="text-2xl font-bold text-gray-700">
             Attendee Contact Details
           </h2>
-          {attendeeAlarm && (
+          {attendeeAlarm && userData?.isActive && (
             <Alert
-              className="right-6 top-3 w-full md:max-w-[500px] transition duration-300 " 
+              className="right-6 top-3 w-full md:max-w-[500px] transition duration-300 "
               severity="info"
               icon={false}
               action={
@@ -304,75 +305,80 @@ const ViewParticularContact = () => {
           </div>
 
           <div className="space-y-3 flex-col h-full">
-            <div className="flex  justify-between gap-10  items-center">
-              <div className="flex border items-center gap-3">
-                <Button
-                  variant="contained"
-                  className="h-10"
-                  onClick={handleTimerModal}
-                >
-                  Set Alarm
-                </Button>
-              </div>
-              <div className="flex items-center w-fit min-w-40 px-1 gap-3">
-                <FormControl fullWidth>
-                  <Select
-                    labelId="lead-type-select-label"
-                    value={selectedOption || ""}
-                    onChange={handleChange}
-                    className="shadow h-10 font-semibold"
-                    displayEmpty
-                    renderValue={(selected) => {
-                      if (!selected) {
-                        return (
-                          <span style={{ color: "#888" }}>
-                            Select Lead Type
-                          </span> // Placeholder style
-                        );
-                      }
-                      const selectedOption = leadTypeOptions.find(
-                        (option) => option.value === selected
-                      );
-                      return (
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px",
-                          }}
-                        >
-                          <div
-                            style={{
-                              width: "16px",
-                              height: "16px",
-                              borderRadius: "50%",
-                              backgroundColor: selectedOption?.color || "#000",
-                            }}
-                          />
-                          <span>{selectedOption?.label}</span>
-                        </div>
-                      );
-                    }}
+            <ComponentGuard
+              conditions={[employeeModeData ? false : true, userData?.isActive]}
+            >
+              <div className="flex  justify-between gap-10  items-center">
+                <div className="flex border items-center gap-3">
+                  <Button
+                    variant="contained"
+                    className="h-10"
+                    onClick={handleTimerModal}
                   >
-                    {leadTypeOptions.map((option) => (
-                      <MenuItem key={option.value} value={option.value}>
-                        <ListItemIcon>
+                    Set Alarm
+                  </Button>
+                </div>
+                <div className="flex items-center w-fit min-w-40 px-1 gap-3">
+                  <FormControl fullWidth>
+                    <Select
+                      labelId="lead-type-select-label"
+                      value={selectedOption || ""}
+                      onChange={handleChange}
+                      className="shadow h-10 font-semibold"
+                      displayEmpty
+                      renderValue={(selected) => {
+                        if (!selected) {
+                          return (
+                            <span style={{ color: "#888" }}>
+                              Select Lead Type
+                            </span> // Placeholder style
+                          );
+                        }
+                        const selectedOption = leadTypeOptions.find(
+                          (option) => option.value === selected
+                        );
+                        return (
                           <div
                             style={{
-                              width: "16px",
-                              height: "16px",
-                              borderRadius: "50%",
-                              backgroundColor: option.color,
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
                             }}
-                          />
-                        </ListItemIcon>
-                        <ListItemText primary={option.label} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+                          >
+                            <div
+                              style={{
+                                width: "16px",
+                                height: "16px",
+                                borderRadius: "50%",
+                                backgroundColor:
+                                  selectedOption?.color || "#000",
+                              }}
+                            />
+                            <span>{selectedOption?.label}</span>
+                          </div>
+                        );
+                      }}
+                    >
+                      {leadTypeOptions.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          <ListItemIcon>
+                            <div
+                              style={{
+                                width: "16px",
+                                height: "16px",
+                                borderRadius: "50%",
+                                backgroundColor: option.color,
+                              }}
+                            />
+                          </ListItemIcon>
+                          <ListItemText primary={option.label} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </div>
               </div>
-            </div>
+            </ComponentGuard>
 
             <div className="border rounded-lg space-y-3 shadow-md  ">
               <div className="border-b-4 py-2">
@@ -380,6 +386,8 @@ const ViewParticularContact = () => {
               </div>
               <AddNoteForm
                 uniquePhones={uniquePhones}
+                userData={userData}
+                employeeModeData={employeeModeData}
                 email={email}
                 attendeeId={attendeeId}
                 addUserActivityLog={addUserActivityLog}
@@ -473,13 +481,19 @@ const ViewParticularContact = () => {
                                   ).toDateString()
                                 : "-"}
                             </td>
-
-                            <td className="px-3 py-4 h-full">
-                              <FaRegEdit
-                                onClick={() => setEditModalData(item)}
-                                className="text-xl cursor-pointer"
-                              />
-                            </td>
+                            <ComponentGuard
+                              conditions={[
+                                employeeModeData ? false : true,
+                                userData?.isActive,
+                              ]}
+                            >
+                              <td className="px-3 py-4 h-full">
+                                <FaRegEdit
+                                  onClick={() => setEditModalData(item)}
+                                  className="text-xl cursor-pointer"
+                                />
+                              </td>
+                            </ComponentGuard>
                           </tr>
                         );
                       })
@@ -500,13 +514,21 @@ const ViewParticularContact = () => {
                   <span className="font-semibold text-xl  ">
                     Enrollments History
                   </span>
-                  <Add
-                    className="cursor-pointer hover:bg-gray-200 transition duration-300"
-                    onClick={() => setShowEnrollmentModal(true)}
-                    fontSize="medium"
+
+                  <ComponentGuard
+                    conditions={[
+                      employeeModeData ? false : true,
+                      userData?.isActive,
+                    ]}
                   >
-                    <OpenInNew />
-                  </Add>
+                    <Add
+                      className="cursor-pointer hover:bg-gray-200 transition duration-300"
+                      onClick={() => setShowEnrollmentModal(true)}
+                      fontSize="medium"
+                    >
+                      <OpenInNew />
+                    </Add>
+                  </ComponentGuard>
                 </div>
                 <table className="w-full table-auto text-sm text-left ">
                   <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
@@ -606,9 +628,7 @@ const ViewParticularContact = () => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">
-          {"Cancel Alarm?"}
-        </DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"Cancel Alarm?"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             Are you sure you want to cancel this alarm?
@@ -616,11 +636,13 @@ const ViewParticularContact = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={closeCancelAlarmDialog}>Disagree</Button>
-          <Button onClick={() => {
-            cancelMyAlarm(attendeeAlarm._id)
-            closeCancelAlarmDialog()
-          } 
-          } autoFocus>
+          <Button
+            onClick={() => {
+              cancelMyAlarm(attendeeAlarm._id);
+              closeCancelAlarmDialog();
+            }}
+            autoFocus
+          >
             Agree
           </Button>
         </DialogActions>

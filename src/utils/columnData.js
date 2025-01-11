@@ -50,7 +50,7 @@ export const employeeTableColumns = [
     type: "",
   },
   {
-    header: "Inactivity Time(Min)",
+    header: "Inactivity Time(Sec)",
     key: "inactivityTime",
     width: 20,
     type: "",

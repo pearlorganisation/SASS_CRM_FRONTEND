@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   IconButton,
   Badge,
@@ -11,32 +11,62 @@ import {
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserNotifications, resetUnseenCount } from "../../features/actions/pabblyToken";
+import {
+  getUserNotifications,
+  resetUnseenCount,
+} from "../../features/actions/notification";
+import { useNavigate } from "react-router-dom";
 
 const NotificationBell = ({ userData }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
+  const bellRef = useRef(null);
+  const dropdownRef = useRef(null);
 
-  const { notifications, totalPages, unseenCount } = useSelector(
-    (state) => state.pabblyToken
+  const { employeeModeData } = useSelector((state) => state.employee);
+  const { notifications, unseenCount } = useSelector(
+    (state) => state.notification
   );
 
   const handleBellClick = () => {
-    setIsOpen(!isOpen);
-    if(unseenCount  === 0) return 
-    dispatch(resetUnseenCount());
+    setIsOpen((prev) => !prev);
+    if (unseenCount > 0 && !employeeModeData) {
+      dispatch(resetUnseenCount());
+    }
   };
 
-  const markAsRead = (id) => {};
+  const handleOutsideClick = (event) => {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target) &&
+      bellRef.current &&
+      !bellRef.current.contains(event.target)
+    ) {
+      setIsOpen(false);
+    }
+  };
 
   useEffect(() => {
-    dispatch(getUserNotifications(userData?._id));
-  }, []);
+    if (isOpen) {
+      document.addEventListener("mousedown", handleOutsideClick);
+    } else {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (userData?._id) {
+      dispatch(getUserNotifications({ id: employeeModeData ? employeeModeData?._id : userData?._id  }));
+    }
+  }, [userData, employeeModeData]);
 
   return (
     <div className="sm:relative">
-      {/* Bell Icon */}
-      <IconButton onClick={handleBellClick}>
+      <IconButton ref={bellRef} onClick={handleBellClick}>
         <Badge
           badgeContent={unseenCount}
           color="error"
@@ -49,26 +79,44 @@ const NotificationBell = ({ userData }) => {
         </Badge>
       </IconButton>
 
-      {/* Notification Box */}
       {isOpen && (
         <Box
+          ref={dropdownRef}
           className="absolute right-0 mt-2 w-96 p-4 bg-white shadow-lg rounded-lg border border-gray-200"
           sx={{ maxHeight: "400px", overflowY: "auto" }}
         >
-          <Typography variant="h6" className="font-bold mb-2">
-            Notifications
-          </Typography>
+          <div className="flex justify-between">
+            <Typography variant="h6" className="font-bold mb-2">
+              Notifications
+            </Typography>
+            <div
+              onClick={() => {
+                navigate(`/notifications/${userData?._id}`)
+                setIsOpen(false);
+              }}
+              className="text-gray-500 cursor-pointer hover:text-gray-900 hover:underline"
+            >
+              View All
+            </div>
+          </div>
           <Divider />
-          <List className=" h-80 overflow-y-auto">
+          <List>
             {notifications.map((notif) => (
-              <ListItem
-                key={notif.id}
-                onClick={() => markAsRead(notif.id)}
-                className={` border-b`}
-              >
-                <ListItemText primary={notif.title} secondary={notif.message} />
+              <ListItem key={notif._id} className="border-b">
+                <ListItemText
+                  primary={notif?.title}
+                  secondary={notif?.message}
+                />
               </ListItem>
             ))}
+
+            {notifications.length === 0 && (
+              <div className="flex justify-center items-center">
+                <p className="text-lg font-semibold text-gray-700">
+                  No notifications found
+                </p>
+              </div>
+            )}
           </List>
         </Box>
       )}

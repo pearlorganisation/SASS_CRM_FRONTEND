@@ -1,11 +1,10 @@
 // ----------------------------------------------------------------------------------------------------
 
 import { createSlice } from "@reduxjs/toolkit";
-import { getPabblyToken, getUserNotifications, resetUnseenCount } from "../actions/pabblyToken";
+import { getPabblyToken, getUserNotifications, resetUnseenCount } from "../actions/notification";
 
 const initialState = {
   isLoading: false,
-  pabblyTokenData: [],
   errorMessage: "",
   isSuccess: false,
   notifications: [],
@@ -15,7 +14,7 @@ const initialState = {
 
 // ---------------------------------------------------------------------------------------
 
-export const globalDataSlice = createSlice({
+export const notificationSlice = createSlice({
   name: "globalData",
   initialState,
   reducers: {
@@ -61,7 +60,7 @@ export const globalDataSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { newNotification} = globalDataSlice.actions;
-export default globalDataSlice.reducer;
+export const { newNotification} = notificationSlice.actions;
+export default notificationSlice.reducer;
 
 // ================================================== THE END ==================================================

@@ -196,6 +196,7 @@ const WebinarAttendees = () => {
       <Suspense fallback={<DataTableFallback />}>
         {subTabValue === "attendees" && tabValue !== "enrollments" && (
           <WebinarAttendeesPage
+          userData={userData}
             tabValue={tabValue}
             page={page}
             setPage={setPage}

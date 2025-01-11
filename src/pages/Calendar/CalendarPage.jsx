@@ -9,6 +9,7 @@ const CalendarPage = () => {
   const dispatch = useDispatch();
   const [value, onChange] = useState(new Date());
 
+  const { employeeModeData } = useSelector((state) => state.employee);
   const { userAlarms } = useSelector((state) => state.alarm);
   const { userData } = useSelector((state) => state.auth);
   const [dateMapping, setDateMapping] = useState(new Map());
@@ -35,7 +36,7 @@ const CalendarPage = () => {
     const date = new Date();
     dispatch(
       getUserAlarms({
-        id: userData?._id,
+        id: employeeModeData ? employeeModeData?._id : userData?._id,
         month: date.getMonth() + 1,
         year: date.getFullYear(),
       })

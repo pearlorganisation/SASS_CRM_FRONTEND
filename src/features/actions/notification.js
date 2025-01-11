@@ -15,9 +15,11 @@ export const getPabblyToken = createAsyncThunk(
 
 export const getUserNotifications = createAsyncThunk(
   "userNotifications/fetchData",
-  async (id, { rejectWithValue }) => {
+  async ({id, page=1, limit=6}, { rejectWithValue }) => {
     try {
-      const { data } = await instance.get(`/notification/${id}`);
+      const { data } = await instance.get(`/notification/${id}`,{
+        params: { page, limit },
+      });
       return data;
     } catch (e) {
       return rejectWithValue(e);

@@ -14,7 +14,14 @@ const AddNoteForm = (props) => {
   const { customOptions } = useSelector((state) => state.globalData);
   const dispatch = useDispatch();
   const { isFormLoading } = useSelector((state) => state.assign);
-  const { email, attendeeId, uniquePhones, addUserActivityLog } = props;
+  const {
+    email,
+    attendeeId,
+    uniquePhones,
+    addUserActivityLog,
+    employeeModeData,
+    userData,
+  } = props;
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -102,7 +109,7 @@ const AddNoteForm = (props) => {
     setValue("image", file);
   };
 
-  const handleInput = (e, maxValue, numAllowed=2) => {
+  const handleInput = (e, maxValue, numAllowed = 2) => {
     let value = e.target.value;
 
     value = value.replace(/[^0-9]/g, "");
@@ -127,8 +134,7 @@ const AddNoteForm = (props) => {
 
       <div className="w-full flex gap-5 items-center">
         <label className="font-medium text-sm">
-          Call Duration{" "}
-          <span className="font-normal text-xs">(min : sec)</span>
+          Call Duration <span className="font-normal text-xs">(min : sec)</span>
         </label>
         <div className="mt-1 flex items-center">
           {/* <input
@@ -358,6 +364,7 @@ const AddNoteForm = (props) => {
 
       <button
         type="submit"
+        disabled={isFormLoading || employeeModeData ? true : false || !userData?.isActive}
         className="bg-indigo-700 w-full hover:bg-indigo-800 mt-2 text-white py-2 px-4 rounded-md"
       >
         {isFormLoading ? <ClipLoader color="#c4c2c2" /> : "Add Note"}

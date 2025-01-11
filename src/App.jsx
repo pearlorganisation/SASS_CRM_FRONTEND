@@ -60,8 +60,9 @@ import alarm from '/alarm.wav'
 import { setEmployeeModeId } from "./features/slices/employee";
 
 import { resetAlarmData } from "./features/slices/alarm";
-import { newNotification } from "./features/slices/pabblyToken";
+import { newNotification } from "./features/slices/notification";
 import MyAddOns from "./pages/Settings/Addons/MyAddons";
+import Notifications from "./pages/Notifications/Notifications";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -278,6 +279,10 @@ const App = () => {
         {
           path: "/products",
           element: <ViewProducts />,
+        },
+        {
+          path: "/notifications/:userId",
+          element: <Notifications />,
         },
         {
           path: "/assignments",

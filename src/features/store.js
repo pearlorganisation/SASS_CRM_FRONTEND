@@ -11,7 +11,7 @@ import sidebarLink from "./slices/sidebarLink";
 import assign from "./slices/assign";
 import globalData from "./slices/globalData";
 import userActivityReducer from "./slices/userActivity";
-import pabblyToken from "./slices/pabblyToken";
+import notification from "./slices/notification";
 import pricePlanReducer from "./slices/pricePlan";
 import clientReducer from './slices/client'
 import exportReducer from './slices/export-excel'
@@ -35,7 +35,7 @@ const rootReducer = combineReducers({
   assign,
   globalData,
   userActivity: userActivityReducer,
-  pabblyToken,
+  notification,
   pricePlans: pricePlanReducer,
   client: clientReducer,
   modals: modalReducer,
@@ -65,7 +65,7 @@ const persistConfig = {
   key: "SaasCrmClientPanel",
   version: 1,
   storage,
-  whitelist: ["auth", "pabblyToken","pageLimits", "noticeBoard"],
+  whitelist: ["auth","pageLimits", "noticeBoard"],
   transforms: [
     encryptTransform({
       secretKey: `${import.meta.env.VITE_REACT_APP_REDUX_PERSIST_SECRET_KEY}`,
