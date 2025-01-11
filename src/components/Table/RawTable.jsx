@@ -98,7 +98,6 @@ const RawTable = ({
                       !isLeadType ? "px-3" : ""
                     }`}
                   >
-                    {console.log(row?.leadType?.color, isLeadType)}
                     {isLeadType && (
                       <div
                         className="w-2 h-14 rounded-sm"

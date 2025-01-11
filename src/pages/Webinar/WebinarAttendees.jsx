@@ -8,9 +8,9 @@ import { useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Tabs, Tab } from "@mui/material";
 import { createPortal } from "react-dom";
-import { AttachFile } from "@mui/icons-material";
+import { AttachFile, ContentCopy } from "@mui/icons-material";
 import { getLeadType } from "../../features/actions/assign";
-import { AssignmentStatus } from "../../utils/extra";
+import { AssignmentStatus, copyToClipboard } from "../../utils/extra";
 import { getAllEmployees } from "../../features/actions/employee";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
@@ -123,8 +123,16 @@ const WebinarAttendees = () => {
         {/* <Tab label="UnAttended" value="unattended" className="text-gray-600" /> */}
       </Tabs>
 
-      <div className="flex gap-4 justify-between items-center">
+      <div className="flex gap-4 justify-between flex-wrap items-center">
         <div className="flex gap-4">
+          <Button
+            onClick={() => copyToClipboard(id, "Webinar")}
+            variant="outlined"
+            endIcon={<ContentCopy />}
+            style={{ textTransform: "none" }}
+          >
+            {id}
+          </Button>
           {selectedRows.length > 0 && (
             <button
               className=" px-4 py-2 text-white bg-blue-500 rounded-md"
@@ -185,9 +193,10 @@ const WebinarAttendees = () => {
           </Tabs>
         )}
       </div>
-      <Suspense fallback={<DataTableFallback/>}>
+      <Suspense fallback={<DataTableFallback />}>
         {subTabValue === "attendees" && tabValue !== "enrollments" && (
           <WebinarAttendeesPage
+          userData={userData}
             tabValue={tabValue}
             page={page}
             setPage={setPage}
@@ -242,7 +251,11 @@ const WebinarAttendees = () => {
 
       {showModal &&
         createPortal(
-          <UpdateCsvXslxModal tabValue={tabValue}  setModal={setShowModal} csvId={id} />,
+          <UpdateCsvXslxModal
+            tabValue={tabValue}
+            setModal={setShowModal}
+            csvId={id}
+          />,
           document.body
         )}
     </div>

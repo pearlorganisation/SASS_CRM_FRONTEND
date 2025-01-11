@@ -110,12 +110,11 @@ const Assignments = () => {
     navigate(
       `/particularContact?email=${item?.email}&attendeeId=${item?.attendeeId}`
     );
-    dispatch(
-      addUserActivity({
-        action: "viewDetails",
-        details: `User viewed details of Attendee with Email: ${item?._id} and Record Type: ${recordType}`,
-      })
-    );
+    console.log(addUserActivity);
+    addUserActivity({
+      action: "viewDetails",
+      details: `User viewed details of Attendee with Email: ${item?._id} and Record Type: ${recordType}`,
+    });
   };
 
   // ----------------------- Action Icons -----------------------
@@ -180,10 +179,12 @@ const Assignments = () => {
 
       <div
         className={`flex items-center gap-4 ${
-          selectedRows.length > 0 ? "justify-between" : "justify-end"
+          selectedRows.length > 0 && userData?.isActive
+            ? "justify-between"
+            : "justify-end"
         } `}
       >
-        {selectedRows.length > 0 && (
+        {selectedRows.length > 0 && userData?.isActive && (
           <Button
             onClick={() => dispatch(requestReAssignment(selectedRows))}
             className="h-10"
@@ -217,7 +218,7 @@ const Assignments = () => {
         tableHeader={tableHeader}
         tableUniqueKey="viewAssignmentsTable"
         ButtonGroup={AttendeeDropdown}
-        isSelectVisible={employeeId ? false : true}
+        isSelectVisible={employeeId || !userData?.isActive ? false : true}
         filters={filters}
         setFilters={setFilters}
         tableData={{

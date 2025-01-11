@@ -1,6 +1,6 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Toaster } from "sonner";
+import { toast, Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 
 ///// pages /////
@@ -60,12 +60,14 @@ import alarm from '/alarm.wav'
 import { setEmployeeModeId } from "./features/slices/employee";
 
 import { resetAlarmData } from "./features/slices/alarm";
+import { newNotification } from "./features/slices/notification";
+import MyAddOns from "./pages/Settings/Addons/MyAddons";
+import Notifications from "./pages/Notifications/Notifications";
 
 const App = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
-  // console.log("App -> render");
   const { userData, isUserLoggedIn, subscription } = useSelector(
     (state) => state.auth
   );
@@ -107,6 +109,12 @@ const App = () => {
       dispatch(resetAlarmData())
     }
 
+    function onNotification(data) {
+     console.log(data)
+     dispatch(newNotification(data))
+     toast.info(data.title || "New Notification");
+    }
+
     function onReminderPlay(data) {
       console.log(data);
     }
@@ -114,12 +122,14 @@ const App = () => {
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("playAlarm", onAlarmPlay);
+    socket.on("notification", onNotification);
     socket.on("playReminder", onReminderPlay);
 
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
       socket.off("playAlarm", onAlarmPlay);
+      socket.off("notification", onNotification);
       socket.off("playReminder", onReminderPlay);
     };
   }, []);
@@ -271,6 +281,10 @@ const App = () => {
           element: <ViewProducts />,
         },
         {
+          path: "/notifications/:userId",
+          element: <Notifications />,
+        },
+        {
           path: "/assignments",
           element: (
             <RouteGuard roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER"]}>
@@ -337,7 +351,7 @@ const App = () => {
           path: "/addons/:id",
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
-              <AddOnsPage />
+              <MyAddOns />
             </RouteGuard>
           ),
         },

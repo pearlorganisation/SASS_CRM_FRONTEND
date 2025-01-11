@@ -208,15 +208,12 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                   )}
                 />
               )}
-              {tableConfig?.leadType?.filterable && (
+              {/* {tableConfig?.leadType?.filterable && (
                 <FormControl fullWidth>
                   <Select
                     labelId="lead-type-select-label"
                     value={selectedOption || ""}
-                    style={{
-                      border: "1px solid red",
-                      color: "gray",
-                    }}
+                   
                     className="shadow font-semibold"
                     displayEmpty
                     renderValue={(selected) => {
@@ -268,7 +265,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                     ))}
                   </Select>
                 </FormControl>
-              )}
+              )} */}
             </div>
           </div>
 

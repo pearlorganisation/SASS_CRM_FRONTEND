@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setPageLimit } from "../features/slices/pageLimits";
 import useAddUserActivity from "../hooks/useAddUserActivity";
 
-const PageLimitEditor = ({ pageId = "defaultPage" }) => {
+const PageLimitEditor = ({ pageId = "defaultPage", setPage= () => {} }) => {
   const logUserActivity = useAddUserActivity();
   const dispatch = useDispatch();
   const limitFromRedux = useSelector((state) => state.pageLimits[pageId] || 10);
@@ -18,9 +18,6 @@ const PageLimitEditor = ({ pageId = "defaultPage" }) => {
     setPageLimitState(limitFromRedux);
   }, [limitFromRedux]);
 
-  useEffect(() => {
-  }, []);
-
   const handleEditClick = () => {
     setIsEditing(true);
   };
@@ -32,6 +29,7 @@ const PageLimitEditor = ({ pageId = "defaultPage" }) => {
       details: `User Updated Page Limit For ${pageId}: ${pageLimit}`,
     })
     setIsEditing(false);
+    setPage(1);
   };
 
   return (

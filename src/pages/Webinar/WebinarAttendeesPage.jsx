@@ -27,6 +27,7 @@ const WebinarAttendeesPage = (props) => {
     tabValue,
     page,
     setPage,
+    userData,
     subTabValue,
     selectedRows,
     setSelectedRows,
@@ -176,7 +177,7 @@ const WebinarAttendeesPage = (props) => {
         tableHeader={tableHeader}
         tableUniqueKey="webinarAttendeesTable"
         ButtonGroup={AttendeeDropdown}
-        isSelectVisible={isSelectVisible}
+        isSelectVisible={isSelectVisible && userData?.isActive}
         filters={filters}
         setFilters={setFilters}
         tableData={{

@@ -1,9 +1,16 @@
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { addUserActivity, sendInactiveUserEmail } from "../features/actions/userActivity";
+import {
+  addUserActivity,
+  sendInactiveNotification,
+} from "../features/actions/userActivity";
 import useRoles from "./useRoles";
+import store from "../features/store";
 
-const INACTIVITY_LIMIT = 60 * 10 * 1000; 
+const userData = store.getState()?.auth?.userData;
+const InactivityTimeInSeconds = userData?.inactivityTime || 600;
+const INACTIVITY_LIMIT = InactivityTimeInSeconds * 1000;
+console.log("INACTIVITY_LIMIT in ms ------ > ", INACTIVITY_LIMIT);
 
 // Singleton state variables
 let inactivityTimer = null;
@@ -18,7 +25,13 @@ const resetInactivityTimer = (roles, dispatch) => {
   }
 
   inactivityTimer = setTimeout(() => {
-    dispatch(sendInactiveUserEmail());
+    dispatch(
+      sendInactiveNotification({
+        userName: userData?.userName,
+        email: userData?.email,
+        userId: userData?._id,
+      })
+    );
 
     dispatch(
       addUserActivity({ action: "inactive", details: "User is inactive" })

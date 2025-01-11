@@ -127,3 +127,14 @@ export const AssignmentStatus = {
   REASSIGN_REQUESTED: 'reassignrequested',
   REASSIGN_APPROVED: 'reassignapproved'
 };
+
+export const copyToClipboard = (id, name) => {
+  navigator.clipboard.writeText(id).then(
+    () => {
+      toast.success(`${name} ID copied!`);
+    },
+    (err) => {
+      toast.error(`Failed to copy ${name} ID!`);
+    }
+  );
+};

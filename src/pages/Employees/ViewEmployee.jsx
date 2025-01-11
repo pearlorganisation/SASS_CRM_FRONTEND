@@ -12,7 +12,7 @@ import {
   getAssignments,
   getAssignmentsActivity,
 } from "../../features/actions/assign";
-import { Visibility,  } from "@mui/icons-material";
+import { Visibility } from "@mui/icons-material";
 import AssignmentActivity from "../../components/Employee/AssignmentActivity";
 import { AssignmentStatus } from "../../utils/extra";
 
@@ -41,10 +41,28 @@ const ViewEmployee = () => {
       dispatch(getUserActivity({ id, page: page, limit: LIMIT }));
     else if (tabValue === "activity")
       dispatch(getAssignmentsActivity({ empId: id }));
-    else if(tabValue === "history")
-      dispatch(getAssignments({ id, page, limit: LIMIT, filters, assignmentStatus: AssignmentStatus.COMPLETED, validCall: "Worked" }));
+    else if (tabValue === "history")
+      dispatch(
+        getAssignments({
+          id,
+          page,
+          limit: LIMIT,
+          filters,
+          assignmentStatus: AssignmentStatus.ACTIVE,
+          validCall: "Worked",
+        })
+      );
     else
-    dispatch(getAssignments({ id, page, limit: LIMIT, filters, assignmentStatus: AssignmentStatus.ACTIVE, validCall: "Pending" }));
+      dispatch(
+        getAssignments({
+          id,
+          page,
+          limit: LIMIT,
+          filters,
+          assignmentStatus: AssignmentStatus.ACTIVE,
+          validCall: "Pending",
+        })
+      );
   }, [page, LIMIT, filters, tabValue]);
 
   const handleTabChange = (_, newValue) => {
@@ -65,7 +83,7 @@ const ViewEmployee = () => {
       onClick: (item) => {
         console.log(`Viewing details for row with id: ${item?._id}`);
       },
-    }
+    },
   ];
 
   return (
@@ -84,11 +102,7 @@ const ViewEmployee = () => {
           value="assignments"
           className="text-gray-600"
         />
-        <Tab
-          label="History"
-          value="history"
-          className="text-gray-600"
-        />
+        <Tab label="History" value="history" className="text-gray-600" />
         <Tab
           label="Activity Logs"
           value="activityLogs"

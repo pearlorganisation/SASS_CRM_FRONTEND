@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getPabblyToken } from "../../../features/actions/pabblyToken";
+import { useSelector } from "react-redux";
 import { Typography } from "@mui/material";
 import useRoles from "../../../hooks/useRoles";
+import WebinarDropdown from "../../../components/Webinar/WebinarDropdown";
+import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
 
 const PabblyToken = () => {
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role;
   const roles = useRoles();
 
-
   const [title, setTitle] = useState("");
-
   const [pabblyTokenData, setPabblyTokenData] = useState(
     userData?.pabblyToken || "No Token"
   );
-
   const [jsonBody, setJsonBody] = useState("");
 
   const apiUrl = `${
@@ -31,11 +29,12 @@ const PabblyToken = () => {
       setTitle("External API for Creating User (Role: ADMIN)");
       setPabblyTokenData(userData?.pabblyToken || "No Token");
       setJsonBody(
-`{
+        `{
   "userName": "test4",
   "password": "test4@123",
   "email": "test4@test.com",
   "plan": "673eeed7069c45d78e917ef4"
+  "companyName": "test company",
 }`
       );
       setEndpoint(`${apiUrl}/auth/client`);
@@ -51,23 +50,14 @@ const PabblyToken = () => {
     "firstName": "d", 
     "lastName":"", 
     "phone": "7675849958", 
-    timeInSession: 0 
   } // attendee details, email is mandatory
 }
-      `
-      );
+      `);
       setEndpoint(`${apiUrl}/assignment/prewebinar`);
     } else {
       setPabblyTokenData("No Token");
     }
   }, [roles]);
-
-  console.log(userData);
-
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(getPabblyToken());
-  }, [dispatch]);
 
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text);
@@ -80,6 +70,9 @@ const PabblyToken = () => {
         <Typography variant="h4" component="h1">
           {title}:
         </Typography>
+        <ComponentGuard allowedRoles={[roles.ADMIN]}>
+          <WebinarDropdown />
+        </ComponentGuard>
         {/* Box for Endpoint */}
         <div className="bg-white shadow-md rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
@@ -98,7 +91,9 @@ const PabblyToken = () => {
           {/* Box for JSON Body */}
           <div className="bg-white shadow-md rounded-lg p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">JSON Body:</h2>
+              <h2 className="text-lg font-semibold text-gray-800">
+                JSON Body:
+              </h2>
               <button
                 onClick={() => handleCopy(jsonBody)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"

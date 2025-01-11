@@ -2,7 +2,6 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 
-import { toast } from "sonner";
 import { addUserActivity, getUserActivity } from "../actions/userActivity.js";
 
 const initialState = {

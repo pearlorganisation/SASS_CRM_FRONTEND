@@ -69,6 +69,7 @@ const Pullbacks = (props) => {
           handleReAssigmentRequest({
             status: "approved",
             assignments: [item?._id],
+            userId: item?.user,
           })
         );
       },
@@ -83,6 +84,7 @@ const Pullbacks = (props) => {
           handleReAssigmentRequest({
             status: "rejected",
             assignments: [item?._id],
+            userId: item?.user,
           })
         );
       },

@@ -173,7 +173,7 @@ const DataTable = React.memo(
               variant="outlined"
               shape="rounded"
             />
-            <PageLimitEditor pageId={tableHeader} />
+            <PageLimitEditor setPage={setPage} pageId={tableHeader} />
           </div>
         )}
         {isPresetModalOpen && (
