@@ -4,6 +4,7 @@ import {
   createAddon,
   deletePricePlan,
   getAddons,
+  getAdminBillingHistory,
   getClientAddons,
   getPricePlan,
   getPricePlans,
@@ -20,7 +21,9 @@ const initialState = {
   errorMessage: "",
   planData: null,
   singlePlanData: null,
-  addonsData: []
+  addonsData: [],
+  billingHistory:[],
+  totalPages: 1,
 };
 
 const pricePlans = createSlice({
@@ -154,6 +157,18 @@ const pricePlans = createSlice({
         state.addonsData = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(getClientAddons.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast("Error On Plan Creation!");
+      })
+      .addCase(getAdminBillingHistory.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getAdminBillingHistory.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.billingHistory = Array.isArray(action.payload?.data) ? action.payload.data : [];
+        state.totalPages = action.payload.totalPages || 1;
+      })
+      .addCase(getAdminBillingHistory.rejected, (state, action) => {
         state.isLoading = false;
         errorToast("Error On Plan Creation!");
       });

@@ -75,7 +75,7 @@ export const successToast = (message) => {
   // ) {
   //   errorMessage = message[0];
   // }
-  console.log(successMessage)
+  console.log(successMessage);
 
   toast.success(successMessage, {
     position: "top-center",
@@ -121,11 +121,18 @@ export function filterTruthyValues(obj) {
 }
 
 export const AssignmentStatus = {
-  ACTIVE: 'active',
-  INACTIVE: 'inactive',
-  COMPLETED: 'completed',
-  REASSIGN_REQUESTED: 'reassignrequested',
-  REASSIGN_APPROVED: 'reassignapproved'
+  ACTIVE: "active",
+  INACTIVE: "inactive",
+  COMPLETED: "completed",
+  REASSIGN_REQUESTED: "reassignrequested",
+  REASSIGN_APPROVED: "reassignapproved",
+};
+
+export const NotifActionType = {
+  REASSIGNMENT: "reassignment",
+  ASSIGNMENT: "assignment",
+  USER_ACTIVITY: "user_activity",
+  WEBINAR_ASSIGNMENT: "webinar_assignment",
 };
 
 export const copyToClipboard = (id, name) => {

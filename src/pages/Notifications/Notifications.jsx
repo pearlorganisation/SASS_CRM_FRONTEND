@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getUserNotifications } from "../../features/actions/notification";
 import PageLimitEditor from "../../components/PageLimitEditor";
 import { Pagination } from "@mui/material";
+import { NotifActionType } from "../../utils/extra";
+import useRoles from "../../hooks/useRoles";
 
 const Notifications = () => {
   const dispatch = useDispatch();
+
+  const roles = useRoles();
+  const navigate = useNavigate();
+  const { userData } = useSelector((state) => state.auth);
+
   const { userId } = useParams();
   const [page, setPage] = useState(1);
   const LIMIT = useSelector(
@@ -20,9 +27,48 @@ const Notifications = () => {
 
   useEffect(() => {
     if (userId) {
-      dispatch(getUserNotifications({ id:  employeeModeData ? employeeModeData?._id : userId, page: page, limit: LIMIT }));
+      dispatch(
+        getUserNotifications({
+          id: employeeModeData ? employeeModeData?._id : userId,
+          page: page,
+          limit: LIMIT,
+        })
+      );
     }
   }, [userId, page, LIMIT]);
+
+  function handleClick(notif) {
+    console.log(notif);
+    const role = userData?.role;
+    const isEmployee = roles.isEmployeeId(role);
+
+    if (isEmployee) {
+      if (
+        notif.actionType === NotifActionType.WEBINAR_ASSIGNMENT ||
+        notif.actionType === NotifActionType.ASSIGNMENT ||
+        notif.actionType === NotifActionType.REASSIGNMENT
+      ) {
+        if (notif.metadata?.webinarId) {
+          navigate(`/assignments?webinarId=${notif.metadata.webinarId}`);
+        }
+      }
+
+      return;
+    }
+
+    if (notif.actionType === NotifActionType.USER_ACTIVITY) {
+      navigate(
+        `/employee/view/${notif?.metadata?.userId}?page=1&tabValue=activityLogs`
+      );
+    }
+
+    if (notif.actionType === NotifActionType.REASSIGNMENT) {
+      if (!notif?.metadata?.webinarId) return;
+      navigate(
+        `/webinarDetails/${notif.metadata.webinarId}?tabValue=preWebinar&page=1&subTabValue=reassignrequested`
+      );
+    }
+  }
 
   return (
     <div className=" w-full pt-14 p-6">
@@ -34,9 +80,10 @@ const Notifications = () => {
           {notifications.map((notif) => (
             <div
               key={notif?._id}
+              onClick={() => handleClick(notif)}
               className={`p-4 rounded-lg border ${
                 notif?.isSeen ? "bg-gray-100" : "bg-white"
-              } shadow-md hover:shadow-lg transition-all`}
+              } shadow-md cursor-pointer hover:shadow-lg transition-all`}
             >
               {/* Notif?ication Type */}
               <div

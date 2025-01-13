@@ -70,6 +70,7 @@ const Pullbacks = (props) => {
             status: "approved",
             assignments: [item?._id],
             userId: item?.user,
+            webinarId: item?.webinar,
           })
         );
       },
@@ -85,6 +86,7 @@ const Pullbacks = (props) => {
             status: "rejected",
             assignments: [item?._id],
             userId: item?.user,
+            webinarId: item?.webinar,
           })
         );
       },

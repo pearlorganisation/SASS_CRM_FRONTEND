@@ -16,8 +16,9 @@ import {
   resetUnseenCount,
 } from "../../features/actions/notification";
 import { useNavigate } from "react-router-dom";
+import { NotifActionType } from "../../utils/extra";
 
-const NotificationBell = ({ userData }) => {
+const NotificationBell = ({ userData, roles }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
@@ -64,6 +65,41 @@ const NotificationBell = ({ userData }) => {
     }
   }, [userData, employeeModeData]);
 
+
+  function handleClick(notif) {
+    console.log(notif);
+    setIsOpen(false);
+    const role = userData?.role;
+    const isEmployee = roles.isEmployeeId(role);
+
+    if (isEmployee) {
+      if (
+        notif.actionType === NotifActionType.WEBINAR_ASSIGNMENT ||
+        notif.actionType === NotifActionType.ASSIGNMENT ||
+        notif.actionType === NotifActionType.REASSIGNMENT
+      ) {
+        if (notif.metadata?.webinarId) {
+          navigate(`/assignments?webinarId=${notif.metadata.webinarId}`);
+        }
+      }
+
+      return;
+    }
+
+    if (notif.actionType === NotifActionType.USER_ACTIVITY) {
+      navigate(
+        `/employee/view/${notif?.metadata?.userId}?page=1&tabValue=activityLogs`
+      );
+    }
+
+    if (notif.actionType === NotifActionType.REASSIGNMENT) {
+      if (!notif?.metadata?.webinarId) return;
+      navigate(
+        `/webinarDetails/${notif.metadata.webinarId}?tabValue=preWebinar&page=1&subTabValue=reassignrequested`
+      );
+    }
+  }
+
   return (
     <div className="sm:relative">
       <IconButton ref={bellRef} onClick={handleBellClick}>
@@ -102,7 +138,9 @@ const NotificationBell = ({ userData }) => {
           <Divider />
           <List>
             {notifications.map((notif) => (
-              <ListItem key={notif._id} className="border-b">
+              <ListItem key={notif._id} 
+              onClick={() => handleClick(notif)}
+              className="border-b cursor-pointer">
                 <ListItemText
                   primary={notif?.title}
                   secondary={notif?.message}

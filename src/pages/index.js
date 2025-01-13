@@ -37,6 +37,10 @@ const LeadTypes = lazy(() => import('./Settings/LeadType/ManageLeadTypes'));
 const EmployeeDashboard = lazy(() => import('./Dashboard/EmployeeDashboard'));
 const UpdateNoticeBoard = lazy(() => import('./NoticeBoard/UpdateNoticeBoard'));
 const NoticeBoard = lazy(() => import('./NoticeBoard/NoticeBoard'));
+const MyAddOns = lazy(() => import('./Settings/Addons/MyAddons'));
+const Notifications = lazy(() => import('./Notifications/Notifications'));
+const BillingHistory = lazy(() => import('./Settings/BillingHistory/BillingHistory'));
+
 
 export {
   CalendarPage,
@@ -74,5 +78,8 @@ export {
   ViewClient,
   Profile,
   WebinarAttendees,
-  NotesPage
+  NotesPage,
+  MyAddOns,
+  Notifications,
+  BillingHistory
 };

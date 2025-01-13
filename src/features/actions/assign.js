@@ -183,14 +183,15 @@ export const getAssignmentsActivity = createAsyncThunk(
 
 export const requestReAssignment = createAsyncThunk(
   "assignments/requestReAssignment",
-  async (payload = [], { rejectWithValue }) => {
+  async ({ assignments = [], webinarId }, { rejectWithValue }) => {
     try {
       const response = await instance.patch(`assignment/reassign`, {
-        assignments: payload,
+        assignments,
+        webinarId,
       });
       return {
         response: response.data,
-        requestIds: payload,
+        requestIds: assignments,
       };
     } catch (e) {
       return rejectWithValue(e);

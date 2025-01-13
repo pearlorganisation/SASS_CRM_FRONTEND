@@ -48,13 +48,13 @@ const Assignments = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [filters, setFilters] = useState({});
-  const [currentWebinar, setCurrentWebinar] = useState("");
+  const [currentWebinar, setCurrentWebinar] = useState(searchParams.get("webinarId") || "");
   const [selected, setSelected] = useState("All");
   const [tabValue, setTabValue] = useState(AssignmentStatus.ACTIVE);
 
   useEffect(() => {
-    setSearchParams({ page: page });
-  }, [page]);
+    setSearchParams({ page: page, webinarId: currentWebinar });
+  }, [page, currentWebinar]);
 
   useEffect(() => {
     if (currentWebinar)
@@ -100,7 +100,7 @@ const Assignments = () => {
   }, []);
 
   useEffect(() => {
-    if (Array.isArray(webinarData) && webinarData.length > 0) {
+    if (Array.isArray(webinarData) && webinarData.length > 0 && !currentWebinar) {
       setCurrentWebinar(webinarData[0]._id);
     }
   }, [webinarData]);
@@ -186,7 +186,7 @@ const Assignments = () => {
       >
         {selectedRows.length > 0 && userData?.isActive && (
           <Button
-            onClick={() => dispatch(requestReAssignment(selectedRows))}
+            onClick={() => dispatch(requestReAssignment({assignments: selectedRows, webinarId: currentWebinar}))}
             className="h-10"
             variant="contained"
           >
