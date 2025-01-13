@@ -78,7 +78,7 @@ const persistConfig = {
 
 // Persisted root reducer
 const persistedReducer = persistReducer(persistConfig, rootReducerWithClear);
-
+console.log("persistedReducer", import.meta.env.VITE_REACT_APP_WORKING_ENVIRONMENT);
 // Configure and create the Redux store
 const store = configureStore({
   reducer: persistedReducer,

@@ -28,12 +28,13 @@ export const fetchReAssignments = createAsyncThunk(
 
 export const handleReAssigmentRequest = createAsyncThunk(
   "assignments/handleReAssigmentRequest",
-  async ({ status, assignments = [], userId }, { rejectWithValue }) => {
+  async ({ status, assignments = [], userId, webinarId }, { rejectWithValue }) => {
     try {
       const response = await instance.patch(`assignment/reassign/approve`, {
         assignments,
         status,
         userId,
+        webinarId,
       });
       return response?.data;
     } catch (e) {

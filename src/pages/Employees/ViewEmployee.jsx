@@ -25,15 +25,19 @@ const ViewEmployee = () => {
   const { id } = useParams();
   const logUserActivity = useAddUserActivity();
   const dispatch = useDispatch();
-
+  
+  const [searchParams, setSearchParams] = useSearchParams();
   const { assignData, isLoading, isSuccess, totalPages, activityAssignMents } =
     useSelector((state) => state.assign);
   console.log("activityAssignMents", activityAssignMents);
-  const [tabValue, setTabValue] = useState("assignments");
+  const [tabValue, setTabValue] = useState(searchParams.get("tabValue") ||  "assignments");
   const LIMIT = useSelector((state) => state.pageLimits[tabValue] || 10);
-  const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
+
+  useEffect(() => {
+    setSearchParams({ page: page, tabValue: tabValue });
+  },[page,tabValue]);
 
   useEffect(() => {
     console.log("tabValue", tabValue);

@@ -34,36 +34,6 @@ const AddOnsPage = () => {
     (state) => state.pricePlans
     );
  
-  // console.log("addonsdata", addonsData);
-
-  // Static data for addons
-  // const addons = [
-  //   {
-  //     id: 1,
-  //     name: "Basic AddOn",
-  //     employeeLimit: 10,
-  //     contactLimit: 100,
-  //     addOnPrice: 20,
-  //     validityInDays: 30,
-  //     isActive: true,
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Contact Only AddOn",
-  //     contactLimit: 200,
-  //     addOnPrice: 15,
-  //     validityInDays: 15,
-  //     isActive: true,
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Employee Only AddOn",
-  //     employeeLimit: 50,
-  //     addOnPrice: 25,
-  //     validityInDays: 60,
-  //     isActive: false,
-  //   },
-  // ];
 
   useEffect(() => {
     if (!id) dispatch(getAddons());

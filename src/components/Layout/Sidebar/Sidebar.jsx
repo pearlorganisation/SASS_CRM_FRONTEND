@@ -133,6 +133,7 @@ const Sidebar = () => {
   };
 
   useEffect(() => {
+    if(userData)
     dispatch(getAllSidebarLinks());
   }, []);
 

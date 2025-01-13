@@ -41,6 +41,9 @@ import {
   EmployeeDashboard,
   UpdateNoticeBoard,
   NoticeBoard,
+  MyAddOns,
+  Notifications,
+  BillingHistory
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 import {
@@ -61,8 +64,6 @@ import { setEmployeeModeId } from "./features/slices/employee";
 
 import { resetAlarmData } from "./features/slices/alarm";
 import { newNotification } from "./features/slices/notification";
-import MyAddOns from "./pages/Settings/Addons/MyAddons";
-import Notifications from "./pages/Notifications/Notifications";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -350,8 +351,16 @@ const App = () => {
         {
           path: "/addons/:id",
           element: (
-            <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
+            <RouteGuard roleNames={[ "ADMIN"]}>
               <MyAddOns />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/billing-history",
+          element: (
+            <RouteGuard roleNames={[ "ADMIN"]}>
+              <BillingHistory />
             </RouteGuard>
           ),
         },
