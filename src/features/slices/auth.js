@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { deleteUserDocumet, getAllRoles, getCurrentUser, getUserSubscription, logIn, signUp, updatePassword, updateUser } from "../actions/auth";
+import { deleteUserDocumet, getAllRoles, getCurrentUser, getSuperAdmin, getUserSubscription, logIn, signUp, updatePassword, updateUser } from "../actions/auth";
 import { toast } from "sonner";
 import { errorToast, successToast } from "../../utils/extra";
 // -------------------------------------------------------------------------------------------
@@ -13,7 +13,8 @@ const initialState = {
   isSuccess: false,
   isRolesLoading: false,
   roles: [],
-  subscription: null
+  subscription: null,
+  superAdminData:null
 };
 
 // -------------------------------------- Slices------------------------------------------------
@@ -23,6 +24,8 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.isUserLoggedIn = false;
+      state.userData = null;
+      state.subscription = null;
     },
     clearLoadingAndData: (state) => {
       (state.isLoading = false), (state.userData = null);
@@ -139,6 +142,9 @@ const authSlice = createSlice({
       .addCase(deleteUserDocumet.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
+      })
+      .addCase(getSuperAdmin.fulfilled, (state, action) => {
+        state.superAdminData = action.payload || null;
       })
 
   },
