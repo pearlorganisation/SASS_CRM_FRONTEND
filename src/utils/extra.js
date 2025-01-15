@@ -133,6 +133,7 @@ export const NotifActionType = {
   ASSIGNMENT: "assignment",
   USER_ACTIVITY: "user_activity",
   WEBINAR_ASSIGNMENT: "webinar_assignment",
+  ACCOUNT_DEACTIVATION: "account_deactivation",
 };
 
 export const copyToClipboard = (id, name) => {

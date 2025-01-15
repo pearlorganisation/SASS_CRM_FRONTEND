@@ -78,39 +78,43 @@ const Webinar = () => {
 
   const actionIcons = [
     {
-      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
-      tooltip: "Edit Attendee",
-
-      onClick: (item) => {
-        dispatch(
-          openModal({
-            modalName: createWebinarModalName,
-            data: item,
-          })
-        );
-      },
-    },
-    {
       icon: () => (
         <ContentCopy className="text-blue-500 group-hover:text-blue-600" />
       ),
       tooltip: "Copy Webinar Id",
-
       onClick: (item) => {
         navigator.clipboard.writeText(item?._id);
         toast.success("Copied to clipboard");
       },
     },
-    {
-      icon: (item) => (
-        <Delete className="text-red-500 group-hover:text-red-600" />
-      ),
-      tooltip: "Delete Attendee",
-      hideCondition: (item) => item?.totalParticipants <= 0,
-      onClick: (item) => {
-        handleDeleteModal(item?._id, item?.webinarName);
-      },
-    },
+    ...(userData?.isActive
+      ? [
+          {
+            icon: () => (
+              <Edit className="text-blue-500 group-hover:text-blue-600" />
+            ),
+            tooltip: "Edit Attendee",
+            onClick: (item) => {
+              dispatch(
+                openModal({
+                  modalName: createWebinarModalName,
+                  data: item,
+                })
+              );
+            },
+          },
+          {
+            icon: (item) => (
+              <Delete className="text-red-500 group-hover:text-red-600" />
+            ),
+            tooltip: "Delete Attendee",
+            hideCondition: (item) => item?.totalParticipants <= 0,
+            onClick: (item) => {
+              handleDeleteModal(item?._id, item?.webinarName);
+            },
+          },
+        ]
+      : []),
   ];
   return (
     <div className="px-6 md:px-10 pt-14 space-y-6">

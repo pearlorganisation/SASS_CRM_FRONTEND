@@ -43,7 +43,7 @@ import {
   NoticeBoard,
   MyAddOns,
   Notifications,
-  BillingHistory
+  BillingHistory,
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 import {
@@ -59,11 +59,13 @@ import { socket } from "./socket";
 import TrapFocus from "@mui/material/Unstable_TrapFocus";
 import { Box, Button, Fade, Paper, Stack, Typography } from "@mui/material";
 
-import alarm from '/alarm.wav'
+import alarm from "/alarm.wav";
 import { setEmployeeModeId } from "./features/slices/employee";
 
 import { resetAlarmData } from "./features/slices/alarm";
 import { newNotification } from "./features/slices/notification";
+import { NotifActionType } from "./utils/extra";
+import { logout } from "./features/slices/auth";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -81,15 +83,15 @@ const App = () => {
   const [bannerMsg, setBannerMsg] = useState("");
 
   const closeBanner = () => {
-    audioRef.current.pause()
-    audioRef.current.loop = false
-    audioRef.current.currentTime  = 0
+    audioRef.current.pause();
+    audioRef.current.loop = false;
+    audioRef.current.currentTime = 0;
     setBannerOpen(false);
   };
 
   const [isConnected, setIsConnected] = useState(socket.connected);
 
-  const audioRef = useRef(new Audio(alarm))
+  const audioRef = useRef(new Audio(alarm));
 
   useEffect(() => {
     function onConnect() {
@@ -105,15 +107,18 @@ const App = () => {
       audio.loop = true; // Enable looping
       audio.play().catch((err) => console.error("Audio play error:", err)); // Handle potential play errors
       setBannerOpen(true);
-      setBannerTitle(data.message)
+      setBannerTitle(data.message);
       setBannerMsg(data.deleteResult.note);
-      dispatch(resetAlarmData())
+      dispatch(resetAlarmData());
     }
 
     function onNotification(data) {
-     console.log(data)
-     dispatch(newNotification(data))
-     toast.info(data.title || "New Notification");
+      console.log(data);
+      dispatch(newNotification(data));
+      toast.info(data.title || "New Notification");
+      if(data.actionType === NotifActionType.ACCOUNT_DEACTIVATION){
+        dispatch(logout());
+      }
     }
 
     function onReminderPlay(data) {
@@ -136,7 +141,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (isConnected) {
+    if (isConnected && userData) {
       console.log("join emitted");
       socket.emit("join", { user: userData._id });
     }
@@ -177,15 +182,10 @@ const App = () => {
 
   // dispatch(clearLoadingAndData())
 
-
   const router = createBrowserRouter([
     {
       path: "/",
-      element: (
-       
-          isUserLoggedIn ? <Layout /> : <Login />
-        
-      ),
+      element: isUserLoggedIn ? <Layout /> : <Login />,
 
       children: [
         {
@@ -296,7 +296,9 @@ const App = () => {
         {
           path: "/calendar",
           element: (
-            <RouteGuard roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER","ADMIN"]}>
+            <RouteGuard
+              roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER", "ADMIN"]}
+            >
               <CalendarPage />
             </RouteGuard>
           ),
@@ -351,7 +353,7 @@ const App = () => {
         {
           path: "/addons/:id",
           element: (
-            <RouteGuard roleNames={[ "ADMIN"]}>
+            <RouteGuard roleNames={["ADMIN"]}>
               <MyAddOns />
             </RouteGuard>
           ),
@@ -359,7 +361,7 @@ const App = () => {
         {
           path: "/billing-history",
           element: (
-            <RouteGuard roleNames={[ "ADMIN"]}>
+            <RouteGuard roleNames={["ADMIN"]}>
               <BillingHistory />
             </RouteGuard>
           ),
@@ -477,20 +479,24 @@ const App = () => {
               right: 5,
               m: 0,
               p: 2,
-              color: '#ffffff',
+              color: "#ffffff",
               borderWidth: 0,
-              border:1,
-              borderColor: '#117195f0',
-              borderRadius: '10px',
-              width:400,
+              border: 1,
+              borderColor: "#117195f0",
+              borderRadius: "10px",
+              width: 400,
               minHeight: 150,
-              maxWidth:'100%',
-              background: '#23a7daee'
+              maxWidth: "100%",
+              background: "#23a7daee",
             }}
           >
             <Stack
               direction={{ xs: "column", sm: "row" }}
-              sx={{ justifyContent: "space-between", alignItems: "center", gap: 2 }}
+              sx={{
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 2,
+              }}
             >
               <Box
                 sx={{
@@ -498,7 +504,9 @@ const App = () => {
                   alignSelf: { xs: "flex-start", sm: "center" },
                 }}
               >
-                <Typography sx={{ fontWeight: "bold" }}>{bannerTitle}</Typography>
+                <Typography sx={{ fontWeight: "bold" }}>
+                  {bannerTitle}
+                </Typography>
                 <Typography variant="body2">{bannerMsg}</Typography>
               </Box>
               <Stack
