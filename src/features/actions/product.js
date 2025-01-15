@@ -49,7 +49,7 @@ export const getAllProductsByAdminId = createAsyncThunk(
   "attendeeProductsByAdminId/fetch",
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await instance.get(`/product/all`);
+      const { data } = await instance.get(`/products/all`);
       return data;
     } catch (e) {
       return rejectWithValue(e);
