@@ -30,6 +30,7 @@ const initialState = {
   totalPages: 1,
   errorMessage: "",
   activityAssignMents: [],
+  assignLoading: false,
 };
 
 // ---------------------------------------------------------------------------------------
@@ -168,21 +169,23 @@ export const assignSlice = createSlice({
         errorToast(action?.payload);
       })
       .addCase(requestReAssignment.pending, (state, action) => {
-        state.isLoading = true;
+        state.assignLoading = true;
         state.isSuccess = false;
       })
       .addCase(requestReAssignment.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.assignLoading = false;
         state.isSuccess = true;
         console.log(action?.payload);
         const { requestIds = [] } = action.payload;
-        state.assignData = state.assignData.filter((item) =>
-          !requestIds.includes(item._id)
+       if(state.totalPages === 1){
+        state.assignData = state.assignData.filter(
+          (item) => !requestIds.includes(item._id)
         );
+       }
         successToast("Request Sent Successfully");
       })
       .addCase(requestReAssignment.rejected, (state, action) => {
-        state.isLoading = false;
+        state.assignLoading = false;
         errorToast(action?.payload);
       })
       .addCase(getRequestedReAssignments.pending, (state, action) => {

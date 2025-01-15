@@ -19,6 +19,8 @@ import {
 import { resetReAssignSuccess } from "../../features/slices/reAssign.slice";
 import AssignedEmployeeTable from "./AssignedEmployeeTable";
 import { getAllEmployees } from "../../features/actions/employee";
+import { ClipLoader } from "react-spinners";
+import { toast } from "sonner";
 
 const ReAssignmentModal = ({
   tabValue,
@@ -26,7 +28,7 @@ const ReAssignmentModal = ({
   selectedRows,
   isPullbackVisible = false,
   isAttendee = false,
-  setReAssignModal
+  setReAssignModal,
 }) => {
   const dispatch = useDispatch();
   const roles = useRoles();
@@ -34,13 +36,19 @@ const ReAssignmentModal = ({
   const [selectedEmployee, setSelectedEmployee] = useState("");
 
   const [moveToPullbacks, setMoveToPullbacks] = useState(false);
-  const { reAssignData, isSuccess } = useSelector((state) => state.reAssign);
-  const { employeeData : assignedEmployees } = useSelector((state) => state.employee);
+  const [isLoading, setIsLoading] = useState(false);
+  const {
+    reAssignData,
+    isSuccess,
+    isLoading: reassignLoading,
+  } = useSelector((state) => state.reAssign);
+  const { employeeData: assignedEmployees } = useSelector(
+    (state) => state.employee
+  );
 
   const selectedType =
     tabValue === "preWebinar" ? "EMPLOYEE_REMINDER" : "EMPLOYEE_SALES";
 
-  console.log(selectedType, assignedEmployees)
   const options = assignedEmployees
     .filter((item) => item?.role === selectedType)
     .map((item) => ({
@@ -56,23 +64,50 @@ const ReAssignmentModal = ({
         const payload = {
           recordType: tabValue,
           webinarId: webinarid,
-          attendees: selectedRows.map((id) => id),
+          attendees: selectedRows,
         };
-        console.log("Pullbacks Payload:", payload);
         // Dispatch your specific action for "Move to Pullbacks"
         dispatch(moveAttendeesToPullbacks(payload));
       } else {
+        const employee = options.find(
+          (item) => item.value === selectedEmployee
+        );
+        console.log("employee ---- > ", employee, (employee.contactLimit - employee.contactCount) < selectedRows.length);
+        if (
+          employee &&
+          (employee.contactLimit - employee.contactCount) < selectedRows.length
+        ) {
+          toast.error(
+            `Cannot assign more than ${
+              (employee.contactLimit - employee.contactCount)
+            } attendees to this employee.`
+          );
+          return;
+        }
         const payload = {
           isTemp: assignmentType === "temporary" ? true : false,
           employeeId: selectedEmployee,
           webinarId: webinarid,
           recordType: tabValue,
-          attendees: selectedRows.map((id) => id),
+          attendees: selectedRows,
         };
-        console.log(payload);
         dispatch(moveAttendeesToPullbacks(payload));
       }
     } else {
+      const employee = options.find((item) => item.value === selectedEmployee);
+      console.log("employee ---- > ", employee);
+      if (
+        employee &&
+        (employee.contactLimit - employee.contactCount) < selectedRows.length
+      ) {
+        toast.error(
+          `Cannot assign more than ${
+            (employee.contactLimit - employee.contactCount)
+          } attendees to this employee.`
+        );
+        return;
+      }
+
       const payload = {
         isTemp: assignmentType === "temporary" ? true : false,
         employeeId: selectedEmployee,
@@ -85,7 +120,6 @@ const ReAssignmentModal = ({
             attendeeId: item?.attendee,
           })),
       };
-      console.log(payload);
       dispatch(changeAssignment(payload));
     }
   };
@@ -98,7 +132,9 @@ const ReAssignmentModal = ({
   };
 
   useEffect(() => {
-    dispatch(getAllEmployees({ page: 1, limit: 100, filters: { isActive: "active" } }));
+    dispatch(
+      getAllEmployees({ page: 1, limit: 100, filters: { isActive: "active" } })
+    );
   }, []);
 
   useEffect(() => {
@@ -112,6 +148,16 @@ const ReAssignmentModal = ({
       }
     };
   }, [isSuccess]);
+
+  useEffect(() => {
+    if (reassignLoading) {
+      setIsLoading(true);
+    } else {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 200);
+    }
+  }, [reassignLoading]);
 
   return (
     <Modal open={true} onClose={handleCancel}>
@@ -176,10 +222,10 @@ const ReAssignmentModal = ({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={!selectedEmployee && !moveToPullbacks}
+            disabled={(!selectedEmployee && !moveToPullbacks) || isLoading || reassignLoading}
             variant="contained"
           >
-            Submit
+            {reassignLoading ? <ClipLoader color="#fff" size={20} /> : "Assign"}
           </Button>
         </div>
       </Box>

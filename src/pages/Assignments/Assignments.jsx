@@ -22,7 +22,8 @@ import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModa
 import { getEmployeeWebinars } from "../../features/actions/webinarContact";
 import { resetAssignedData } from "../../features/slices/assign";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
-import { AssignmentStatus } from "../../utils/extra";
+import { AssignmentStatus, NotifActionType } from "../../utils/extra";
+import { socket } from "../../socket";
 
 const Assignments = () => {
   const employeeId = useParams()?.id;
@@ -39,22 +40,32 @@ const Assignments = () => {
   const [selectedRows, setSelectedRows] = useState([]);
 
   const { userData } = useSelector((state) => state.auth);
-  const { assignData, isLoading, isSuccess, totalPages } = useSelector(
-    (state) => state.assign
-  );
+  const { assignData, isLoading, isSuccess, totalPages, assignLoading } =
+    useSelector((state) => state.assign);
 
   const { webinarData } = useSelector((state) => state.webinarContact);
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
+
+  const [isConnected, setIsConnected] = useState(socket.connected);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [filters, setFilters] = useState({});
-  const [currentWebinar, setCurrentWebinar] = useState(searchParams.get("webinarId") || "");
+  const [currentWebinar, setCurrentWebinar] = useState(
+    searchParams.get("webinarId") || ""
+  );
   const [selected, setSelected] = useState("All");
-  const [tabValue, setTabValue] = useState(AssignmentStatus.ACTIVE);
+  const [tabValue, setTabValue] = useState(
+    searchParams.get("tabValue") || AssignmentStatus.ACTIVE
+  );
 
   useEffect(() => {
-    setSearchParams({ page: page, webinarId: currentWebinar });
-  }, [page, currentWebinar]);
+    setSearchParams({
+      page: page,
+      webinarId: currentWebinar,
+      tabValue,
+      limit: LIMIT,
+    });
+  }, [page, currentWebinar, tabValue, LIMIT]);
 
   useEffect(() => {
     if (currentWebinar)
@@ -89,6 +100,18 @@ const Assignments = () => {
   useEffect(() => {
     if (isSuccess) {
       setSelectedRows([]);
+      if (totalPages > 1)
+        dispatch(
+          getAssignments({
+            id: employeeId || userData?._id,
+            page: 1,
+            limit: LIMIT,
+            filters,
+            webinarId: currentWebinar,
+            validCall: selected === "All" ? undefined : selected,
+            assignmentStatus: tabValue,
+          })
+        );
     }
   }, [isSuccess]);
 
@@ -100,10 +123,41 @@ const Assignments = () => {
   }, []);
 
   useEffect(() => {
-    if (Array.isArray(webinarData) && webinarData.length > 0 && !currentWebinar) {
+    if (
+      Array.isArray(webinarData) &&
+      webinarData.length > 0 &&
+      !currentWebinar
+    ) {
       setCurrentWebinar(webinarData[0]._id);
     }
   }, [webinarData]);
+
+  useEffect(() => {
+    function onNotification(data) {
+      if (
+        currentWebinar &&
+        (data.actionType === NotifActionType.ASSIGNMENT ||
+          data.actionType === NotifActionType.REASSIGNMENT)
+      )
+        if (page === 1) {
+          dispatch(
+            getAssignments({
+              id: employeeId || userData?._id,
+              page: 1,
+              limit: LIMIT,
+              filters,
+              webinarId: currentWebinar,
+              validCall: selected === "All" ? undefined : selected,
+              assignmentStatus: tabValue,
+            })
+          );
+        } else setPage(1);
+    }
+    socket.on("notification", onNotification);
+    return () => {
+      socket.off("notification", onNotification);
+    };
+  }, [page, LIMIT, filters, selected, tabValue, currentWebinar]);
 
   const handleViewFullDetails = (item) => {
     const recordType = item?.isAttended ? "postWebinar" : "preWebinar";
@@ -184,15 +238,25 @@ const Assignments = () => {
             : "justify-end"
         } `}
       >
-        {selectedRows.length > 0 && userData?.isActive && (
-          <Button
-            onClick={() => dispatch(requestReAssignment({assignments: selectedRows, webinarId: currentWebinar}))}
-            className="h-10"
-            variant="contained"
-          >
-            Request ReAssignment
-          </Button>
-        )}
+        {selectedRows.length > 0 &&
+          userData?.isActive &&
+          tabValue === AssignmentStatus.ACTIVE && (
+            <Button
+              disabled={assignLoading}
+              onClick={() =>
+                dispatch(
+                  requestReAssignment({
+                    assignments: selectedRows,
+                    webinarId: currentWebinar,
+                  })
+                )
+              }
+              className="h-10"
+              variant="contained"
+            >
+              Request ReAssignment
+            </Button>
+          )}
 
         <FormControl className="w-60">
           <InputLabel id="webinar-label">Webinar</InputLabel>
@@ -218,7 +282,10 @@ const Assignments = () => {
         tableHeader={tableHeader}
         tableUniqueKey="viewAssignmentsTable"
         ButtonGroup={AttendeeDropdown}
-        isSelectVisible={employeeId || !userData?.isActive ? false : true}
+        isSelectVisible={
+          (employeeId || !userData?.isActive ? false : true) &&
+          tabValue === AssignmentStatus.ACTIVE
+        }
         filters={filters}
         setFilters={setFilters}
         tableData={{

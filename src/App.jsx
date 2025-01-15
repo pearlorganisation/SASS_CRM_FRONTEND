@@ -79,7 +79,6 @@ const App = () => {
 
   const [bannerOpen, setBannerOpen] = useState(false);
   const [bannerTitle, setBannerTitle] = useState("");
-
   const [bannerMsg, setBannerMsg] = useState("");
 
   const closeBanner = () => {
@@ -116,7 +115,7 @@ const App = () => {
       console.log(data);
       dispatch(newNotification(data));
       toast.info(data.title || "New Notification");
-      if(data.actionType === NotifActionType.ACCOUNT_DEACTIVATION){
+      if (data.actionType === NotifActionType.ACCOUNT_DEACTIVATION) {
         dispatch(logout());
       }
     }

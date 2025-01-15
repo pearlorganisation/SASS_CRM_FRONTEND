@@ -196,7 +196,7 @@ const WebinarAttendees = () => {
       <Suspense fallback={<DataTableFallback />}>
         {subTabValue === "attendees" && tabValue !== "enrollments" && (
           <WebinarAttendeesPage
-          userData={userData}
+            userData={userData}
             tabValue={tabValue}
             page={page}
             setPage={setPage}
@@ -237,17 +237,19 @@ const WebinarAttendees = () => {
         />
       )}
 
-      {assignModal && (
-        <EmployeeAssignModal
-          tabValue={tabValue}
-          selectedRows={selectedRows.map((rowId) => ({
-            attendee: rowId,
-            recordType: tabValue,
-          }))}
-          setAssignModal={setAssignModal}
-          webinarId={id}
-        />
-      )}
+      {assignModal &&
+        createPortal(
+          <EmployeeAssignModal
+            tabValue={tabValue}
+            selectedRows={selectedRows.map((rowId) => ({
+              attendee: rowId,
+              recordType: tabValue,
+            }))}
+            setAssignModal={setAssignModal}
+            webinarId={id}
+          />,
+          document.body
+        )}
 
       {showModal &&
         createPortal(
