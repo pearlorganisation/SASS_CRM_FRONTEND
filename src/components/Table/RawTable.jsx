@@ -90,7 +90,7 @@ const RawTable = ({
                 <td
                   className={`px-4 text-gray-600 ${
                     isRowClickable ? "cursor-pointer" : ""
-                  }`}
+                  } line-clamp-2`}
                   onClick={() => rowClick(row)}
                 >
                   <div

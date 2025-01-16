@@ -3,6 +3,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
+
 import {
   addProduct,
   deleteProduct,
@@ -10,7 +11,7 @@ import {
   getAllProductsByAdminId,
   updateProduct,
 } from "../actions/product";
-import { errorToast } from "../../utils/extra";
+import { errorToast, successToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
@@ -104,7 +105,7 @@ export const productSlice = createSlice({
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        successToast(action?.payload);
+        successToast(action?.payload?.data);
       })
       .addCase(deleteProduct.rejected, (state, action) => {
         state.isLoading = false;

@@ -84,6 +84,7 @@ export const productTableColumns = [
     width: 10,
     type: "",
   },
+  { header: "Description", key: "description", width: 20, type: "" },
 ];
 
 export const pullbacksTableColumns = [

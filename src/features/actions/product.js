@@ -78,8 +78,6 @@ export const deleteProduct = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await instance.delete(`products/${id}`);
-      
-      successToast()
       return response;
     } catch (e) {
       return rejectWithValue(e);
