@@ -214,8 +214,8 @@ const CreateEmployee = () => {
                   validation={{
                     required: "Phone number is required",
                     pattern: {
-                      value: /^[0-9]{10}$/,
-                      message: "Phone number must be numeric and 10 digits",
+                      value: /^\+\d{1,3}\d{9}$/,
+                      message: "10 Digit Phone number with Country Code is required, eg: +911234567890",
                     },
                   }}
                 />
