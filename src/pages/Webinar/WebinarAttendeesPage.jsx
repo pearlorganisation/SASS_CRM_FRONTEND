@@ -1,26 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Select,
-  FormControl,
-  InputLabel,
-  MenuItem,
-} from "@mui/material";
+import { Select, FormControl, InputLabel, MenuItem } from "@mui/material";
 import {
   clearSuccess,
   setTabValue as setTab,
 } from "../../features/slices/attendees";
-import { getAttendees } from "../../features/actions/attendees";
-import { attendeeTableColumns } from "../../utils/columnData";
 import {
-  Visibility,
-} from "@mui/icons-material";
+  getAttendees,
+  swapAttendeeFields,
+} from "../../features/actions/attendees";
+import { attendeeTableColumns } from "../../utils/columnData";
+import { Visibility } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
-import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
+const AttendeesFilterModal = lazy(() =>
+  import("../../components/Attendees/AttendeesFilterModal")
+);
 import { resetReAssignSuccess } from "../../features/slices/reAssign.slice";
 import { resetAssignSuccess } from "../../features/slices/assign";
-import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
+const ExportWebinarAttendeesModal = lazy(() =>
+  import("../../components/Export/ExportWebinarAttendeesModal")
+);
+const SwapAttendeeFieldsModal = lazy(() =>
+  import("../../components/Webinar/SwapAttendeeFieldsModal")
+);
+import { createPortal } from "react-dom";
+import ModalFallback from "../../components/Fallback/ModalFallback";
 
 const WebinarAttendeesPage = (props) => {
   const {
@@ -28,11 +33,11 @@ const WebinarAttendeesPage = (props) => {
     page,
     setPage,
     userData,
+    isSwapOpen,
+    setSwapOpen,
     subTabValue,
     selectedRows,
     setSelectedRows,
-    isSelectVisible,
-    setIsSelectVisible,
     setSelectedAssignmentType,
     selectedAssignmentType,
   } = props;
@@ -80,7 +85,6 @@ const WebinarAttendeesPage = (props) => {
 
   useEffect(() => {
     if (isSuccess || assignSuccess || isSuccessReAssign) {
-      console.log("isssucess", isSuccess, assignSuccess, isSuccessReAssign);
       dispatch(
         getAttendees({
           id,
@@ -117,6 +121,14 @@ const WebinarAttendeesPage = (props) => {
     },
   ];
 
+  const handleColumnSwap = (field1, field2) => {
+    dispatch(
+      swapAttendeeFields({ attendees: selectedRows, field1, field2 })
+    ).then((res) => {
+      res?.meta?.requestStatus === "fulfilled" && setSelectedRows([]);
+    });
+  };
+
   const AttendeeDropdown = () => {
     const handleChange = (event) => {
       const label = event.target.value;
@@ -126,13 +138,7 @@ const WebinarAttendeesPage = (props) => {
 
     const handleAssignmentChange = (event) => {
       const label = event.target.value;
-      if (label === "All") {
-        setIsSelectVisible(false);
-        setSelectedRows([]);
-      } else {
-        setIsSelectVisible(true);
-        setSelectedRows([]);
-      }
+      setSelectedRows([]);
       setSelectedAssignmentType(label);
       setPage(1);
     };
@@ -177,7 +183,7 @@ const WebinarAttendeesPage = (props) => {
         tableHeader={tableHeader}
         tableUniqueKey="webinarAttendeesTable"
         ButtonGroup={AttendeeDropdown}
-        isSelectVisible={isSelectVisible && userData?.isActive}
+        isSelectVisible={userData?.isActive}
         filters={filters}
         setFilters={setFilters}
         tableData={{
@@ -199,6 +205,7 @@ const WebinarAttendeesPage = (props) => {
         isLoading={isLoading}
         isLeadType={true}
       />
+
       <AttendeesFilterModal
         modalName={AttendeesFilterModalName}
         filters={filters}
@@ -210,6 +217,16 @@ const WebinarAttendeesPage = (props) => {
         webinarId={id}
         isAttended={tabValue === "postWebinar" ? true : false}
       />
+      {isSwapOpen &&
+        createPortal(
+          <Suspense fallback={<ModalFallback />}>
+            <SwapAttendeeFieldsModal
+              onClose={() => setSwapOpen(false)}
+              onSubmit={handleColumnSwap}
+            />
+          </Suspense>,
+          document.body
+        )}
     </>
   );
 };

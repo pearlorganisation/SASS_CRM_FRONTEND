@@ -4,9 +4,11 @@ import "react-calendar/dist/Calendar.css";
 import "./CalendarPage.css"; // Import your custom CSS file
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAlarms } from "../../features/actions/alarm";
+import { useNavigate } from "react-router-dom";
 
 const CalendarPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [value, onChange] = useState(new Date());
 
   const { employeeModeData } = useSelector((state) => state.employee);
@@ -61,6 +63,13 @@ const CalendarPage = () => {
     setSelectedDateAlarms(dateMapping.get(selectedDateKey) || []);
   }, [value, dateMapping]);
 
+  const handleAlarmClick = (alarm) => {
+    if (alarm.email && alarm.attendeeId)
+      navigate(
+        `/particularContact?email=${alarm.email}&attendeeId=${alarm.attendeeId}`
+      );
+  };
+
   return (
     <div className="py-14 px-6 flex flex-col items-center">
       <div className="p-6 bg-gray-50 rounded-lg">
@@ -91,7 +100,8 @@ const CalendarPage = () => {
               selectedDateAlarms.map((alarm) => (
                 <div
                   key={alarm._id}
-                  className="p-4 bg-white shadow-md rounded-md border border-gray-200"
+                  onClick={() => handleAlarmClick(alarm)}
+                  className="p-4 bg-white cursor-pointer shadow-md rounded-md border border-gray-200"
                 >
                   <p className="text-sm text-gray-500">
                     <strong>Date:</strong>{" "}

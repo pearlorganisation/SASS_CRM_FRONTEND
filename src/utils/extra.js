@@ -54,7 +54,7 @@ export const errorToast = (message) => {
   ) {
     errorMessage = message[0];
   }
-
+  toast.dismiss();
   toast.error(errorMessage, {
     position: "top-center",
     hideProgressBar: true,
@@ -75,8 +75,7 @@ export const successToast = (message) => {
   // ) {
   //   errorMessage = message[0];
   // }
-  console.log(successMessage);
-
+toast.dismiss();
   toast.success(successMessage, {
     position: "top-center",
     hideProgressBar: true,
@@ -139,9 +138,11 @@ export const NotifActionType = {
 export const copyToClipboard = (id, name) => {
   navigator.clipboard.writeText(id).then(
     () => {
+      toast.dismiss();
       toast.success(`${name} ID copied!`);
     },
     (err) => {
+      toast.dismiss();
       toast.error(`Failed to copy ${name} ID!`);
     }
   );

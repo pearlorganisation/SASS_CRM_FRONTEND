@@ -186,7 +186,15 @@ const App = () => {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: isUserLoggedIn ? <Layout /> : <Login />,
+      element: isUserLoggedIn ? (
+        <Suspense fallback={<></>}>
+          <Layout />
+        </Suspense>
+      ) : (
+        <Suspense fallback={<></>}>
+          <Login />
+        </Suspense>
+      ),
 
       children: [
         {
