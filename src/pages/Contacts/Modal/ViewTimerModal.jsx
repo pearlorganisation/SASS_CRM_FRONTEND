@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { getAttendeeAlarm, setAlarm } from "../../../features/actions/alarm";
 
-const ViewTimerModal = ({ setModal, email }) => {
+const ViewTimerModal = ({ setModal, email, attendeeId }) => {
   const {
     control,
     register,
@@ -16,8 +16,8 @@ const ViewTimerModal = ({ setModal, email }) => {
 
   const onSubmit = (data) => {
     data['email'] = email
+    data['attendeeId'] = attendeeId
     data['date'] = new Date(data['date']).toISOString()
-    console.log(data);
     dispatch(setAlarm(data)).then(() => {
       dispatch(getAttendeeAlarm({email}))
     })
@@ -69,7 +69,7 @@ const ViewTimerModal = ({ setModal, email }) => {
                       datepicker
                       datepicker-format="mm-dd-yyyy"
                       type="datetime-local"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 "
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dateTime-picker"
                       placeholder="Select date"
                     />
                   </div>

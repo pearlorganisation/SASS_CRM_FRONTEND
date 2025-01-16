@@ -607,7 +607,7 @@ const ViewParticularContact = () => {
         />
       )}
       {showTimerModal && (
-        <ViewTimerModal setModal={setShowTimerModal} email={email} />
+        <ViewTimerModal setModal={setShowTimerModal} email={email} attendeeId={attendeeId} />
       )}
       {editModalData && (
         <EditModal

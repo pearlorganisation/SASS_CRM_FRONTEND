@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Link, RouterProvider } from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -80,6 +80,7 @@ const App = () => {
   const [bannerOpen, setBannerOpen] = useState(false);
   const [bannerTitle, setBannerTitle] = useState("");
   const [bannerMsg, setBannerMsg] = useState("");
+  const [bannerData, setBannerData] = useState(null);
 
   const closeBanner = () => {
     audioRef.current.pause();
@@ -108,6 +109,7 @@ const App = () => {
       setBannerOpen(true);
       setBannerTitle(data.message);
       setBannerMsg(data.deleteResult.note);
+      setBannerData(data);
       dispatch(resetAlarmData());
     }
 
@@ -503,15 +505,24 @@ const App = () => {
                   alignSelf: { xs: "flex-start", sm: "center" },
                 }}
               >
-                <Typography sx={{ fontWeight: "bold" }}>
-                  {bannerTitle}
-                </Typography>
-                <Typography variant="body2">{bannerMsg}</Typography>
+                {bannerData && (
+                  <>
+                    <Typography sx={{ fontWeight: "bold" }}>
+                      {bannerData.message}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>E-Mail:</strong> {bannerData.deleteResult.email}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Note:</strong> {bannerData.deleteResult.note}
+                    </Typography>
+                  </>
+                )}
               </Box>
               <Stack
                 direction={{
                   xs: "row-reverse",
-                  sm: "row",
+                  sm: "column",
                 }}
                 sx={{
                   gap: 2,
@@ -519,6 +530,15 @@ const App = () => {
                   alignSelf: { xs: "flex-end", sm: "center" },
                 }}
               >
+                {bannerData && (
+                  <a
+                    href={`/particularContact?email=${bannerData?.deleteResult?.email}&attendeeId=${bannerData?.deleteResult?.attendeeId}`}
+                  >
+                    <Button size="small" variant="contained">
+                      View Attendee
+                    </Button>
+                  </a>
+                )}
                 <Button size="small" onClick={closeBanner} variant="contained">
                   Stop Alarm
                 </Button>
