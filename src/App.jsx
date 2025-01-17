@@ -19,7 +19,6 @@ import {
   CreateEmployee,
   ViewSettings,
   ViewPlans,
-  SignUp,
   AddPlan,
   ViewSidebarLinks,
   CreateSidebarLink,

@@ -17,7 +17,6 @@ const ViewAttendees = lazy(() => import("./Attendees/ViewAttendees"));
 const CreateEmployee = lazy(() => import("./Employees/CreateEmployee"));
 const ViewSettings = lazy(() => import("./Settings/ViewSettings"));
 const ViewPlans = lazy(() => import("./Settings/Plans/ViewPlans"));
-const SignUp = lazy(() => import("./Auth/SignUp/SignUp"));
 const AddPlan = lazy(() => import("./Settings/Plans/AddPlan"));
 const ViewSidebarLinks = lazy(() =>
   import("./Settings/SidebarLinks/ViewSidebarLinks")
@@ -76,7 +75,6 @@ export {
   CreateEmployee,
   ViewSettings,
   ViewPlans,
-  SignUp,
   AddPlan,
   ViewSidebarLinks,
   CreateSidebarLink,
