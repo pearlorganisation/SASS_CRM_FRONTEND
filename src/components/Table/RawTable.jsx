@@ -91,9 +91,9 @@ const RawTable = ({
                 } hover:bg-gray-50 border-b whitespace-nowrap`}
               >
                 <td
-                  className={`px-4 text-gray-600 ${
+                  className={`px-4 py-2 text-gray-600 ${
                     isRowClickable ? "cursor-pointer" : ""
-                  } line-clamp-2`}
+                  }`}
                   onClick={() => rowClick(row)}
                 >
                   <div
