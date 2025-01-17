@@ -13,6 +13,7 @@ import {
   TextField,
   IconButton,
   Typography,
+  Checkbox,
 } from "@mui/material"; // Importing MUI components
 import useRoles from "../../../hooks/useRoles";
 import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
@@ -83,9 +84,7 @@ const CustomOptions = () => {
   return (
     <div className="container mx-auto mt-10 p-4">
       <div className="flex justify-between py-6 items-center">
-        <h1 className="text-2xl font-bold">
-          {pageTitle} Options
-        </h1>
+        <h1 className="text-2xl font-bold">{pageTitle} Options</h1>
         <ComponentGuard conditions={[userData?.isActive]}>
           <Button
             variant="contained"
@@ -104,6 +103,7 @@ const CustomOptions = () => {
             <tr className="border-b bg-gray-100">
               <th className="p-4 text-left">#</th>
               <th className="p-4 text-left">Label</th>
+              <th className="p-4 text-left">Is Worked</th>
               <th className="p-4 text-left">Action</th>
             </tr>
           </thead>
@@ -112,6 +112,7 @@ const CustomOptions = () => {
               <tr key={index} className="border-b">
                 <td className="p-4">{index + 1}</td>
                 <td className="p-4">{option.label}</td>
+                <td className="p-4">{option.isWorked ? "Yes" : "No"}</td>
                 <td className="p-4">
                   <IconButton
                     onClick={() => {
@@ -136,11 +137,9 @@ const CustomOptions = () => {
         className="flex items-center justify-center"
       >
         <div className="bg-white p-6 rounded shadow-lg w-80">
-          <h2 className="text-xl font-semibold mb-4">
-            Add {pageTitle} Option
-          </h2>
+          <h2 className="text-xl font-semibold mb-4">Add {pageTitle} Option</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="mb-4">
+            <div className="mb-4 space-y-4">
               <TextField
                 label="Label"
                 variant="outlined"
@@ -150,6 +149,14 @@ const CustomOptions = () => {
                 helperText={errors.label?.message}
                 className="mb-4"
               />
+
+              {/* Checkbox for IsWorked */}
+              <div className=" flex items-center">
+                <Checkbox {...register("isWorked")} color="primary" />
+                <label htmlFor="isWorked" className="text-sm font-medium">
+                  IsWorked
+                </label>
+              </div>
             </div>
 
             <div className="flex justify-end space-x-4">

@@ -40,37 +40,41 @@ function Login() {
     dispatch(getGlobalData());
   }, []);
 
-  function getFileURL(filename="", destination="", baseUrl="") {
-    // Remove '/api/v1' from the baseUrl if it exists
-    const cleanedBaseUrl = baseUrl.replace(/\/api\/v1$/, '');
-  
-    // Remove leading './' or '/' from the destination for URL safety
-    const normalizedDestination = destination.replace(/^(\.\/|\/)/, '');
-    
-    // Ensure the destination uses forward slashes and combine it with the filename
-    const relativePath = `${normalizedDestination}/${filename}`.replace(/\\/g, '/');
-    
-    // Construct the full URL
+  function getFileURL(filename = "", destination = "") {
+    const baseUrl =
+      import.meta.env.VITE_REACT_APP_WORKING_ENVIRONMENT === "development"
+        ? import.meta.env.VITE_REACT_APP_API_BASE_URL_DEVELOPMENT
+        : import.meta.env.VITE_REACT_APP_API_BASE_URL_MAIN_PRODUCTION;
+
+    const cleanedBaseUrl = baseUrl.replace(/\/api\/v1$/, "");
+
+    const normalizedDestination = destination.replace(/^(\.\/|\/)/, "");
+
+    const relativePath = `${normalizedDestination}/${filename}`.replace(
+      /\\/g,
+      "/"
+    );
+
     return `${cleanedBaseUrl}/${relativePath}`;
   }
   return (
     <div className="flex md:flex-row flex-col h-screen w-full">
       {/* Left Section */}
-      <div className="flex flex-col w-full md:w-3/5 bg-gray-100">
+      <div className="flex flex-col w-full  md:w-3/5 bg-gray-100">
         {/* Video/Banner Section */}
-        <div className="relative h-3/5">
+        <div
+          className={`relative ${
+            landingGlobalData?.title ||
+            landingGlobalData?.subTitle ||
+            landingGlobalData?.buttonName
+              ? "h-3/5"
+              : "h-full object-cover"
+          } `}
+        >
           {landingGlobalData?.file?.mimetype !== "video/mp4" ? (
             <img
               className="w-full h-full object-cover"
-              src={getFileURL(
-                landingGlobalData?.file?.filename,
-                landingGlobalData?.file?.destination,
-                import.meta.env.VITE_REACT_APP_WORKING_ENVIRONMENT ===
-                  "development"
-                  ? import.meta.env.VITE_REACT_APP_API_BASE_URL_DEVELOPMENT
-                  : import.meta.env
-                      .VITE_REACT_APP_API_BASE_URL_MAIN_PRODUCTION
-              )}
+              src={landingGlobalData?.file?.url}
               alt="Banner"
               loading="lazy"
             />
@@ -86,12 +90,7 @@ function Login() {
               <source
                 src={getFileURL(
                   landingGlobalData?.file?.filename,
-                  landingGlobalData?.file?.destination,
-                  import.meta.env.VITE_REACT_APP_WORKING_ENVIRONMENT ===
-                    "development"
-                    ? import.meta.env.VITE_REACT_APP_API_BASE_URL_DEVELOPMENT
-                    : import.meta.env
-                        .VITE_REACT_APP_API_BASE_URL_MAIN_PRODUCTION
+                  landingGlobalData?.file?.destination
                 )}
                 type="video/mp4"
               />
@@ -99,29 +98,41 @@ function Login() {
             </video>
           )}
         </div>
+        {(landingGlobalData?.title ||
+          landingGlobalData?.subTitle ||
+          landingGlobalData?.buttonName) && (
+          <div className="flex flex-col justify-center items-center bg-gray-200 h-2/5 p-6">
+            {landingGlobalData?.title && (
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                {landingGlobalData.title || "Welcome Back"}
+              </h2>
+            )}
 
-        {/* Text Section */}
-        <div className="flex flex-col justify-center items-center bg-gray-200 h-2/5 p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            {landingGlobalData?.title || "Welcome Back"}
-          </h2>
-          <p className="text-gray-600 text-center mb-6">
-            {landingGlobalData?.subTitle || "Please sign in to continue"}
-          </p>
-          <Button
-            variant="contained"
-            color="primary"
-            size="large"
-            className="rounded-lg"
-            style={{
-              height: landingGlobalData?.buttonHeight || "auto",
-              width: landingGlobalData?.buttonWidth || "auto",
-            }}
-            onClick={() => window.open(landingGlobalData?.link || "/", "_blank")}
-          >
-            {landingGlobalData?.buttonName || "Click Me"}
-          </Button>
-        </div>
+            {landingGlobalData?.subTitle && (
+              <p className="text-gray-600 text-center mb-6">
+                {landingGlobalData.subTitle}
+              </p>
+            )}
+
+            {landingGlobalData?.buttonName && (
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                className="rounded-lg"
+                style={{
+                  height: landingGlobalData?.buttonHeight || "auto",
+                  width: landingGlobalData?.buttonWidth || "auto",
+                }}
+                onClick={() =>
+                  window.open(landingGlobalData?.link || "/", "_blank")
+                }
+              >
+                {landingGlobalData.buttonName}
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Right Section - Login Form */}
@@ -214,7 +225,7 @@ function Login() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default Login;

@@ -17,6 +17,7 @@ import {
   getGlobalData,
 } from "../../../features/actions/globalData";
 import FormInput from "../../../components/FormInput";
+import { ClipLoader } from "react-spinners";
 
 const LandingPageForm = () => {
   const {
@@ -31,7 +32,9 @@ const LandingPageForm = () => {
   const [selectedType, setSelectedType] = useState("image");
   const [isControlsVisible, setIsControlsVisible] = useState(false);
 
-  const { landingGlobalData } = useSelector((state) => state.globalData);
+  const { landingGlobalData, isLoading } = useSelector(
+    (state) => state.globalData
+  );
   // console.log('landingGlobalData', landingGlobalData)
   const dispatch = useDispatch();
 
@@ -94,7 +97,6 @@ const LandingPageForm = () => {
               name="title"
               label="Heading"
               control={control}
-              validation={{ required: "Heading is required" }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
@@ -102,7 +104,6 @@ const LandingPageForm = () => {
               name="subTitle"
               label="Sub Heading"
               control={control}
-              validation={{ required: "Sub Heading is required" }}
             />
           </Grid>
         </Grid>
@@ -173,7 +174,10 @@ const LandingPageForm = () => {
               label="Button Name"
               control={control}
               validation={{
-                required: "Button name is required",
+                validate: (value) => {
+                  // No validation for buttonName, always valid
+                  return true;
+                },
               }}
             />
           </Grid>
@@ -182,7 +186,16 @@ const LandingPageForm = () => {
               name="link"
               label="Button Link"
               control={control}
-              validation={{ required: "Link is required" }}
+              validation={{
+                validate: (value, context) => {
+                  if (context.buttonName) {
+                    return value
+                      ? true
+                      : "Link is required when Button Name is present";
+                  }
+                  return true; // No validation required if buttonName is not present
+                },
+              }}
             />
           </Grid>
         </Grid>
@@ -195,16 +208,34 @@ const LandingPageForm = () => {
               label="Height (px)"
               control={control}
               type="number"
-              validation={{ required: "Height is required" }}
+              validation={{
+                validate: (value, context) => {
+                  if (context.buttonName) {
+                    return value
+                      ? true
+                      : "Height is required when Button Name is present";
+                  }
+                  return true; // No validation required if buttonName is not present
+                },
+              }}
             />
           </Grid>
           <Grid item xs={12} md={6}>
-          <FormInput
+            <FormInput
               name="buttonWidth"
               label="Width (px)"
               control={control}
               type="number"
-              validation={{ required: "Width is required" }}
+              validation={{
+                validate: (value, context) => {
+                  if (context.buttonName) {
+                    return value
+                      ? true
+                      : "Width is required when Button Name is present";
+                  }
+                  return true; // No validation required if buttonName is not present
+                },
+              }}
             />
           </Grid>
         </Grid>
@@ -224,7 +255,11 @@ const LandingPageForm = () => {
 
         {/* Submit Button */}
         <Button type="submit" variant="contained" color="primary" fullWidth>
-          Update Landing Page
+          {isLoading ? (
+            <ClipLoader size={20} color="#fff" />
+          ) : (
+            "Update Landing Page"
+          )}
         </Button>
       </form>
     </div>

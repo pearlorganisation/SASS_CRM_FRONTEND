@@ -52,11 +52,11 @@ export const globalDataSlice = createSlice({
 
       .addCase(createGlobalData.pending, (state, action) => {
         state.isLoading = true;
-        state.errorMessage = "";
+        state.isSuccess = false;
       })
       .addCase(createGlobalData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = "";
+        state.isSuccess = true;
         toast.success("Landing Page Data Updated Successfully", {
           position: "top-center",
         });
