@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 
 const RawTable = ({
   tableData,
-  actions,
+  actions = [],
   isSelectVisible,
   page,
   limit,
@@ -57,9 +57,12 @@ const RawTable = ({
                 {column.header}
               </th>
             ))}
-            <th className="px-4 py-3 text-gray-700 font-normal  text-sm sticky right-0 bg-gray-100 z-10">
-              Actions
-            </th>
+
+            {Array.isArray(actions) && actions.length > 0 && (
+              <th className="px-4 py-3 text-gray-700 font-normal  text-sm sticky right-0 bg-gray-100 z-10">
+                Actions
+              </th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -88,13 +91,13 @@ const RawTable = ({
                 } hover:bg-gray-50 border-b whitespace-nowrap`}
               >
                 <td
-                  className={`px-4 text-gray-600 ${
+                  className={`px-4 py-2 text-gray-600 ${
                     isRowClickable ? "cursor-pointer" : ""
-                  } line-clamp-2`}
+                  }`}
                   onClick={() => rowClick(row)}
                 >
                   <div
-                    className={`flex items-center justify-between ${
+                    className={`flex items-center h-14 justify-between ${
                       !isLeadType ? "px-3" : ""
                     }`}
                   >
@@ -123,7 +126,12 @@ const RawTable = ({
                 {tableData?.columns?.map((column, index) => (
                   <td
                     key={index}
-                    className={`px-4 py-2 text-gray-600 ${
+                    title={
+                      column.type === "" && row?.[column.key]
+                        ? row?.[column.key]
+                        : ""
+                    }
+                    className={`px-4 py-2 text-gray-600 max-w-72 truncate ${
                       isRowClickable ? "cursor-pointer" : ""
                     }`}
                     onClick={() => rowClick(row)}
@@ -159,26 +167,28 @@ const RawTable = ({
                         : "N/A")}
                   </td>
                 ))}
-                <td className="px-4 py-2 sticky right-0 bg-white z-10 border-l">
-                  <div className="flex gap-2">
-                    {actions?.map((action, index) =>
-                      (action?.readOnly || userData?.isActive,
-                      action?.hideCondition
-                        ? action.hideCondition(row)
-                        : true) ? (
-                        <div key={index}>
-                          <button
-                            className="p-2 hover:bg-gray-100 rounded-full group"
-                            onClick={() => action.onClick(row)}
-                            title={action.tooltip}
-                          >
-                            {action.icon(row)}
-                          </button>
-                        </div>
-                      ) : null
-                    )}
-                  </div>
-                </td>
+                {Array.isArray(actions) && actions.length > 0 && (
+                  <td className="px-4 py-2 sticky right-0 bg-white z-10 border-l">
+                    <div className="flex gap-2">
+                      {actions.map((action, index) =>
+                        (action?.readOnly || userData?.isActive,
+                        action?.hideCondition
+                          ? action.hideCondition(row)
+                          : true) ? (
+                          <div key={index}>
+                            <button
+                              className="p-2 hover:bg-gray-100 rounded-full group"
+                              onClick={() => action.onClick(row)}
+                              title={action.tooltip}
+                            >
+                              {action.icon(row)}
+                            </button>
+                          </div>
+                        ) : null
+                      )}
+                    </div>
+                  </td>
+                )}
               </tr>
             ))
           ) : (
