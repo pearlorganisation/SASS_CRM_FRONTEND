@@ -127,9 +127,7 @@ const ViewParticularContact = () => {
         return null;
       })
       .filter(Boolean);
-
     const uniqueNamesArr = Array.from(new Set(namesArr));
-
     setUniqueNames(uniqueNamesArr);
   }, [selectedAttendee]);
 
@@ -194,9 +192,9 @@ const ViewParticularContact = () => {
     dispatch(getEnrollments({ id: email }));
   }, [email]);
 
-  // useEffect(() => {
-  //   console.log("alarm", attendeeAlarm);
-  // }, [attendeeAlarm]);
+  useEffect(() => {
+    console.log(attendeeEnrollments)
+  }, [attendeeEnrollments]);
 
   const cancelMyAlarm = (id) => {
     dispatch(cancelAlarm({ id }));
