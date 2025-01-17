@@ -47,7 +47,15 @@ export const updateAttendee = createAsyncThunk(
 export const getAttendees = createAsyncThunk(
   "attendees/fetchData",
   async (
-    { id, isAttended, page = 1, limit = 10, filters = {}, validCall, assignmentType },
+    {
+      id,
+      isAttended,
+      page = 1,
+      limit = 10,
+      filters = {},
+      validCall,
+      assignmentType,
+    },
     { rejectWithValue }
   ) => {
     try {
@@ -60,8 +68,8 @@ export const getAttendees = createAsyncThunk(
           fieldName: "attendeeTableConfig",
           webinarId: id,
           isAttended,
-          validCall ,
-          assignmentType
+          validCall,
+          assignmentType,
         },
         {
           params: { page, limit },
@@ -70,7 +78,8 @@ export const getAttendees = createAsyncThunk(
       const responseTime = new Date().getTime();
       console.log(
         "responseTime - currentTIme",
-        responseTime - currentTIme, response
+        responseTime - currentTIme,
+        response
       );
       return response?.data;
     } catch (e) {
@@ -78,9 +87,6 @@ export const getAttendees = createAsyncThunk(
     }
   }
 );
-
-
-
 
 //get All Attendees
 export const getAllAttendees = createAsyncThunk(
@@ -134,58 +140,46 @@ export const getAttendeeLeadTypeByEmail = createAsyncThunk(
   }
 );
 
-
 //get All Attendees
 export const getWebinarEnrollments = createAsyncThunk(
   "enrollments/webinar",
   async ({ id, page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(
-        `/enrollments/${id}`,
-        {
-          params: { page, limit },
-        }
-      );
+      const response = await instance.get(`/enrollments/${id}`, {
+        params: { page, limit },
+      });
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
     }
   }
 );
-
 
 //get All Attendees
 export const getEnrollments = createAsyncThunk(
   "enrollments/attendee",
   async ({ id, page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(
-        `/enrollments/attendee/${id}`,
-        {
-          params: { page, limit },
-        }
-      );
+      const response = await instance.get(`/enrollments/attendee/${id}`, {
+        params: { page, limit },
+      });
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
     }
   }
 );
-
 
 //Add Enrollment
 export const addEnrollment = createAsyncThunk(
   "addEnrollment/attendee",
   async ({ attendee, product, webinar }, { rejectWithValue }) => {
     try {
-      const response = await instance.post(
-        `/enrollments`,
-        {
-          attendee,
-          product,
-          webinar,
-        }
-      );
+      const response = await instance.post(`/enrollments`, {
+        attendee,
+        product,
+        webinar,
+      });
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
@@ -193,3 +187,21 @@ export const addEnrollment = createAsyncThunk(
   }
 );
 
+//swap Attendee Fields
+export const swapAttendeeFields = createAsyncThunk(
+  "attendee/swap",
+  async ({ attendees = [], field1 = "", field2 = "" }, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.put(`/attendees/swap`, {
+        attendees,
+        field1,
+        field2,
+      });
+      return {
+        data,field1, field2
+      };
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

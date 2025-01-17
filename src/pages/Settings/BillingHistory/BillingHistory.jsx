@@ -49,10 +49,10 @@ const BillingHistory = () => {
 
     doc.setFontSize(9);
     doc
-      .text("" + bill?._id + "", 200, YAxis + 15, { align: "right" })
+      .text("" + bill?.invoiceNumber || "" + "", 200, YAxis + 15, { align: "right" })
       .setFontSize(10);
 
-    doc.text("Invoice No. :", 200 - doc.getTextWidth(bill?._id), YAxis + 15, {
+    doc.text("Invoice No. :", 200 - doc.getTextWidth(bill?.invoiceNumber || ""), YAxis + 15, {
       align: "right",
     });
 

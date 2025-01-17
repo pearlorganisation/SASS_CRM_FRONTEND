@@ -44,6 +44,22 @@
   }
 
 
+  input.dateTime-picker[type="datetime-local"] {
+    position: relative;
+  }
+  
+  input.dateTime-picker[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    color: transparent;
+    background: transparent;
+  }
+
+
   /* add the code bellow */ 
 @layer utilities {
   /* Hide scrollbar for Chrome, Safari and Opera */

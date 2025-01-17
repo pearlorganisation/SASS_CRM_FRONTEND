@@ -33,7 +33,7 @@ import {
                   <TableCell sx={{padding: 0}} >
                     <Radio
                       value={employee?.value}
-                      disabled={moveToPullbacks}
+                      disabled={moveToPullbacks || employee?.contactCount === employee?.contactLimit}
                     />
                   </TableCell>
                   <TableCell>{employee?.label}</TableCell>

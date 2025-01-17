@@ -98,10 +98,11 @@ const ViewProducts = () => {
       ];
 
   const deleteThisProduct = (item) => {
-    dispatch(deleteProduct(item._id));
+    dispatch(deleteProduct(item._id)).then(res => {
+      dispatch(getAllProducts({ page: page || 1, limit: LIMIT, filters }));
+    });
     setSelectedProduct(null);
     closeConfirmDialog();
-    dispatch(getAllProducts({ page: 1, limit: LIMIT, filters }));
   };
   return (
     <div className="px-6 md:px-10 pt-14 space-y-6">
@@ -133,7 +134,7 @@ const ViewProducts = () => {
               }))
             : [],
         }}
-        actions={actionIcons}
+        actions={userData.role === roles.ADMIN ? actionIcons : []}
         totalPages={totalPages}
         page={page}
         setPage={setPage}

@@ -27,8 +27,8 @@ const WebinarAttendees = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [showModal, setShowModal] = useState(false);
-  const [isSelectVisible, setIsSelectVisible] = useState(false);
   const [selectedAssignmentType, setSelectedAssignmentType] = useState("All");
+  const [isSwapOpen, setSwapOpen] = useState(false);
 
   const [assignModal, setAssignModal] = useState(false);
   const [reAssignModal, setReAssignModal] = useState(false);
@@ -133,7 +133,13 @@ const WebinarAttendees = () => {
           >
             {id}
           </Button>
+
           {selectedRows.length > 0 && (
+            <Button onClick={() => setSwapOpen(true)} variant="contained">
+              Swap Columns
+            </Button>
+          )}
+          {selectedRows.length > 0 && !(selectedAssignmentType === "All") && (
             <button
               className=" px-4 py-2 text-white bg-blue-500 rounded-md"
               onClick={() => {
@@ -196,15 +202,15 @@ const WebinarAttendees = () => {
       <Suspense fallback={<DataTableFallback />}>
         {subTabValue === "attendees" && tabValue !== "enrollments" && (
           <WebinarAttendeesPage
-          userData={userData}
+            userData={userData}
             tabValue={tabValue}
             page={page}
             setPage={setPage}
+            isSwapOpen={isSwapOpen}
+            setSwapOpen={setSwapOpen}
             subTabValue={subTabValue}
             selectedRows={selectedRows}
             setSelectedRows={setSelectedRows}
-            isSelectVisible={isSelectVisible}
-            setIsSelectVisible={setIsSelectVisible}
             selectedAssignmentType={selectedAssignmentType}
             setSelectedAssignmentType={setSelectedAssignmentType}
           />
@@ -237,17 +243,19 @@ const WebinarAttendees = () => {
         />
       )}
 
-      {assignModal && (
-        <EmployeeAssignModal
-          tabValue={tabValue}
-          selectedRows={selectedRows.map((rowId) => ({
-            attendee: rowId,
-            recordType: tabValue,
-          }))}
-          setAssignModal={setAssignModal}
-          webinarId={id}
-        />
-      )}
+      {assignModal &&
+        createPortal(
+          <EmployeeAssignModal
+            tabValue={tabValue}
+            selectedRows={selectedRows.map((rowId) => ({
+              attendee: rowId,
+              recordType: tabValue,
+            }))}
+            setAssignModal={setAssignModal}
+            webinarId={id}
+          />,
+          document.body
+        )}
 
       {showModal &&
         createPortal(

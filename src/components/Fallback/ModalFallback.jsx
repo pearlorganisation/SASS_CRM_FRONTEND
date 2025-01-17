@@ -1,12 +1,18 @@
 import React from "react";
+import { createPortal } from "react-dom";
+import { ClipLoader } from "react-spinners";
 
-const ModalFallback = () => (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-    <div className="flex flex-col justify-center items-center">
-      <div className="animate-spin rounded-full border-4 border-t-4 border-white w-16 h-16 mb-4"></div>
-      <p className="text-white font-semibold">Loading...</p>
-    </div>
-  </div>
-);
+const ModalFallback = () =>
+  createPortal(
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex justify-center items-center">
+      <div className=" rounded-lg p-6 w-full max-w-md text-center">
+        <div className="flex justify-center items-center">
+          <ClipLoader color="#3b82f6" size={50} />
+        </div>
+        <p className="text-gray-700 mt-4">Loading...</p>
+      </div>
+    </div>,
+    document.body
+  );
 
 export default ModalFallback;

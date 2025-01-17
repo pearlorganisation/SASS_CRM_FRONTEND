@@ -10,12 +10,10 @@ import { ClipLoader } from "react-spinners";
 import { clearSuccess } from "../../../features/slices/attendees";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
-const UploadCsvModal = ({tabValue, setModal, update }) => {
+const UploadCsvModal = ({ tabValue, setModal, update }) => {
   const logUserActivity = useAddUserActivity();
 
-  const {  isLoading, isSuccess } = useSelector(
-    (state) => state.attendee
-  );
+  const { isLoading, isSuccess } = useSelector((state) => state.attendee);
   const { id } = useParams();
   const [mapUI, setMapUI] = useState(false);
   const [selectedValues, setSelectedValues] = useState({}); // State to store selected values
@@ -133,7 +131,11 @@ const UploadCsvModal = ({tabValue, setModal, update }) => {
               email: item[emailField],
               firstName: item[firstNameField],
               lastName: item[lastNameField],
-              phone: item[phoneNumberField],
+              phone: item[phoneNumberField]
+                ? item[phoneNumberField].includes("E")
+                  ? Number(item[phoneNumberField]).toFixed(0)
+                  : item[phoneNumberField].toString().replace(/[^0-9]/g, "")
+                : "",
               location: item[locationField],
               gender: item[genderField],
               totalTimeInSession: parseInt(item[sessionMinutesField], 10) || 0,
@@ -153,7 +155,11 @@ const UploadCsvModal = ({tabValue, setModal, update }) => {
               email: item[emailField],
               firstName: item[firstNameField],
               lastName: item[lastNameField],
-              phone: item[phoneNumberField],
+              phone: item[phoneNumberField]
+                ? item[phoneNumberField].includes("E")
+                  ? Number(item[phoneNumberField]).toFixed(0)
+                  : item[phoneNumberField].toString().replace(/[^0-9]/g, "")
+                : "",
               location: item[locationField],
               gender: item[genderField],
               totalTimeInSession: parseInt(item[sessionMinutesField], 10) || 0,
@@ -194,7 +200,7 @@ const UploadCsvModal = ({tabValue, setModal, update }) => {
 
     const mergedResult = mergeDataByEmail(meetingData);
     console.log("mergedResult --- >", mergedResult);
-    setMeetingData(mergedResult);
+    // setMeetingData(mergedResult);
 
     const payloadData = {
       webinarId: id,
@@ -202,26 +208,25 @@ const UploadCsvModal = ({tabValue, setModal, update }) => {
       data: mergedResult,
     };
 
-    dispatch(addAttendees(payloadData));
-    logUserActivity({
-      action: 'import',
-      type: 'CSV Data',
-      detailItem: tabValue
-    })
+    // dispatch(addAttendees(payloadData));
+    // logUserActivity({
+    //   action: 'import',
+    //   type: 'CSV Data',
+    //   detailItem: tabValue
+    // })
   };
 
-  function handleCloseModal(){
+  function handleCloseModal() {
     setModal(false);
     dispatch(clearSuccess());
   }
 
   useEffect(() => {
-    console.log("isSucess ",isSuccess)
-    if(isSuccess){
+    console.log("isSucess ", isSuccess);
+    if (isSuccess) {
       handleCloseModal();
     }
-    
-  },[isSuccess]);
+  }, [isSuccess]);
 
   return (
     <div
@@ -424,6 +429,7 @@ const UploadCsvModal = ({tabValue, setModal, update }) => {
                                 handleSelectChange("firstName", selectedOption);
                               }}
                               className="mt-2"
+                              isClearable={true}
                               placeholder="Select a custom field"
                             />
                           )}
@@ -452,6 +458,7 @@ const UploadCsvModal = ({tabValue, setModal, update }) => {
                                 handleSelectChange("lastName", selectedOption);
                               }}
                               className="mt-2"
+                              isClearable={true}
                               placeholder="Select a custom field"
                             />
                           )}
@@ -484,6 +491,7 @@ const UploadCsvModal = ({tabValue, setModal, update }) => {
                                 );
                               }}
                               className="mt-2"
+                              isClearable={true}
                               placeholder="Select a custom field"
                             />
                           )}
@@ -515,6 +523,7 @@ const UploadCsvModal = ({tabValue, setModal, update }) => {
                                 );
                               }}
                               className="mt-2"
+                              isClearable={true}
                               placeholder="Select a custom field"
                             />
                           )}
@@ -544,6 +553,7 @@ const UploadCsvModal = ({tabValue, setModal, update }) => {
                                 handleSelectChange("location", selectedOption);
                               }}
                               className="mt-2"
+                              isClearable={true}
                               placeholder="Select a custom field"
                               menuPlacement="auto"
                             />
@@ -574,6 +584,7 @@ const UploadCsvModal = ({tabValue, setModal, update }) => {
                                 handleSelectChange("gender", selectedOption);
                               }}
                               className="mt-2"
+                              isClearable={true}
                               placeholder="Select a custom field"
                               menuPlacement="auto"
                             />

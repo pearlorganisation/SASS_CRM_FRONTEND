@@ -6,7 +6,6 @@ import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { Button, TextField } from "@mui/material";
 import { getGlobalData } from "../../../features/actions/globalData";
-import * as path from "path";
 
 function Login() {
   const dispatch = useDispatch();
@@ -73,6 +72,7 @@ function Login() {
                       .VITE_REACT_APP_API_BASE_URL_MAIN_PRODUCTION
               )}
               alt="Banner"
+              loading="lazy"
             />
           ) : (
             <video

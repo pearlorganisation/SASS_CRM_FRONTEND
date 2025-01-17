@@ -5,9 +5,14 @@ import { successToast } from "../../utils/extra";
 //set alarm
 export const setAlarm = createAsyncThunk(
   "alarm",
-  async ({ date, note, email }, { rejectWithValue }) => {
+  async ({ date, note, email, attendeeId }, { rejectWithValue }) => {
     try {
-      const response = await instance.post(`/alarm`, { date, note, email });
+      const response = await instance.post(`/alarm`, {
+        date,
+        note,
+        email,
+        attendeeId,
+      });
       successToast(response?.data);
       return response?.data;
     } catch (e) {
@@ -21,36 +26,27 @@ export const getAttendeeAlarm = createAsyncThunk(
   "alarm/get",
   async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(
-        `/alarm?email=${email}`,
-        
-      );
+      const response = await instance.get(`/alarm?email=${email}`);
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
     }
   }
 );
-
 
 //set alarm
 export const cancelAlarm = createAsyncThunk(
   "alarm/cancel",
-  async ({id}, { rejectWithValue }) => {
+  async ({ id }, { rejectWithValue }) => {
     try {
-      const response = await instance.patch(
-        `/alarm`,
-        {id}
-      );
-      successToast('Alarm cancelled.');
+      const response = await instance.patch(`/alarm`, { id });
+      successToast("Alarm cancelled.");
       return response?.data;
-
     } catch (e) {
       return rejectWithValue(e);
     }
   }
 );
-
 
 //get User alarms
 export const getUserAlarms = createAsyncThunk(
