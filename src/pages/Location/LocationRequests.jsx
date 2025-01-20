@@ -9,21 +9,21 @@ import {
   ToggleOff,
   Dashboard,
 } from "@mui/icons-material";
-import { getAllEmployees } from "../../features/actions/employee";
-import ConfirmActionModal from "./modal/ConfirmActionModal";
+// import ConfirmActionModal from "./modal/ConfirmActionModal";
 import {
   clearSuccess,
   setEmployeeModeId,
 } from "../../features/slices/employee";
 import { openModal } from "../../features/slices/modalSlice";
-import { getUserSubscription } from "../../features/actions/auth";
 import DataTable from "../../components/Table/DataTable";
-import { employeeTableColumns } from "../../utils/columnData";
 import useRoles from "../../hooks/useRoles";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
-import EmployeeFilterModal from "../../components/Filter/EmployeeFilterModal";
-import ExportModal from "../../components/Export/ExportModal";
-import { exportEmployeesExcel } from "../../features/actions/export-excel";
+import {
+  getLocationRequests,
+} from "../../features/actions/location";
+import { locationTableColumns } from "../../utils/columnData";
+// import ConfirmActionModal from "../Employees/modal/ConfirmActionModal";
+// import ExportModal from "../../components/Export/ExportModal";
 
 const tableCellStyles = {
   paddingTop: "8px",
@@ -31,12 +31,12 @@ const tableCellStyles = {
   textWrap: "nowrap",
 };
 
-const Employees = () => {
+const LocationRequests = () => {
   // ----------------------- ModalNames for Redux -----------------------
-  const activeInactiveModalName = "activeInactiveModal";
-  const employeeExportModalName = "EmployeeExportModal";
-  const employeeFilterModalName = "EmployeeFilterModal";
-  const tableHeader = "Employee Table";
+  // const activeInactiveModalName = "activeInactiveModal";
+  //   const employeeExportModalName = "EmployeeExportModal";
+  //   const employeeFilterModalName = "EmployeeFilterModal";
+  const tableHeader = "Location Requests Table";
 
   // ----------------------- Constants -----------------------
   const navigate = useNavigate();
@@ -48,14 +48,14 @@ const Employees = () => {
   const [page, setPage] = useState(searchParams.get("page") || 1);
 
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
-  const { employeeData, isLoading, isSuccess, totalPages } = useSelector(
-    (state) => state.employee
+  const { locationRequests, isLoading, isSuccess, totalPages } = useSelector(
+    (state) => state.location
   );
   const { userData } = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(
-      getAllEmployees({
+      getLocationRequests({
         page: page,
         limit: LIMIT,
         filters: filters,
@@ -63,21 +63,21 @@ const Employees = () => {
     );
   }, [page, LIMIT, filters]);
 
-  const navigateToAdd = () => navigate("/createEmployee");
+  const navigateToAdd = () => navigate("/requestLocation");
 
-  useEffect(() => {
-    if (isSuccess) {
-      dispatch(
-        getAllEmployees({
-          page: 1,
-          limit: LIMIT,
-          filters: filters,
-        })
-      );
-      dispatch(getUserSubscription());
-      dispatch(clearSuccess());
-    }
-  }, [isSuccess]);
+  //   useEffect(() => {
+  //     if (isSuccess) {
+  //       dispatch(
+  //         getAllEmployees({
+  //           page: 1,
+  //           limit: LIMIT,
+  //           filters: filters,
+  //         })
+  //       );
+  //       dispatch(getUserSubscription());
+  //       dispatch(clearSuccess());
+  //     }
+  //   }, [isSuccess]);
 
   useEffect(() => {
     setSearchParams({ page: page });
@@ -91,7 +91,7 @@ const Employees = () => {
       ),
       tooltip: "View Employee Info",
       onClick: (item) => {
-        navigate(`/employee/view/${item?._id}`);
+        navigate(``);
       },
       readOnly: true,
     },
@@ -135,12 +135,12 @@ const Employees = () => {
             ),
             tooltip: "Toggle Status",
             onClick: (item) => {
-              dispatch(
-                openModal({
-                  modalName: activeInactiveModalName,
-                  data: item,
-                })
-              );
+              // dispatch(
+              //   openModal({
+              //     modalName: activeInactiveModalName,
+              //     data: item,
+              //   })
+              // );
             },
           },
         ]
@@ -150,50 +150,41 @@ const Employees = () => {
   return (
     <>
       <div className="pt-14 sm:px-5 px-2">
-        {/* Add Employee Button */}
+        {/* Add location Button */}
         <div className="flex justify-end items-center pb-4">
-          <ComponentGuard conditions={[userData?.isActive]}>
+          <ComponentGuard
+            conditions={[userData?.isActive]}
+            allowedRoles={[roles.SUPER_ADMIN, roles.ADMIN]}
+          >
             <Button variant="contained" onClick={navigateToAdd}>
-              Add Employee
+              Add/Request Location
             </Button>
           </ComponentGuard>
         </div>
 
         <DataTable
           tableHeader={tableHeader}
-          tableUniqueKey="employeeListingTable"
+          tableUniqueKey="locationRequestsTable"
           filters={filters}
           setFilters={setFilters}
           tableData={{
-            columns: employeeTableColumns,
-            rows: employeeData || [],
+            columns: locationTableColumns,
+            rows: locationRequests || [],
           }}
           actions={actionIcons}
           totalPages={totalPages}
           page={page}
           setPage={setPage}
           limit={LIMIT}
-          filterModalName={employeeFilterModalName}
-          exportModalName={employeeExportModalName}
+          //   filterModalName={}
+          //   exportModalName={}
           isLoading={isLoading}
         />
       </div>
 
-      <ConfirmActionModal modalName={activeInactiveModalName} />
-      <EmployeeFilterModal
-        modalName={employeeFilterModalName}
-        filters={filters}
-        setFilters={setFilters}
-      />
-      <ExportModal
-        modalName={employeeExportModalName}
-        defaultColumns={employeeTableColumns}
-        handleExport={({ limit, columns }) => {
-          dispatch(exportEmployeesExcel({ limit, columns, filters }));
-        }}
-      />
+      {/* <ConfirmActionModal modalName={activeInactiveModalName} /> */}
     </>
   );
 };
 
-export default Employees;
+export default LocationRequests;

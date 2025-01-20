@@ -43,9 +43,11 @@ const DataTable = React.memo(
     isRowClickable = false,
     setSelectedRows = () => {},
     isLeadType = false,
+    locations = null,
   }) => {
     const dispatch = useDispatch();
     const logUserActivity = useAddUserActivity();
+
     console.log("DataTable -> Rendered");
 
     const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
@@ -156,6 +158,7 @@ const DataTable = React.memo(
             rowClick={rowClick}
             isRowClickable={isRowClickable}
             isLeadType={isLeadType}
+            locations={locations}
           />
         </div>
         {tableData?.rows?.length > 0 && (

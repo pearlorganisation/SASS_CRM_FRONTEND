@@ -32,7 +32,7 @@ export const attendeeTableColumns = [
   { header: "Status", key: "status", width: 20, type: "" },
   { header: "Time in Session", key: "timeInSession", width: 20, type: "" },
   { header: "Gender", key: "gender", width: 20, type: "" },
-  { header: "Location", key: "location", width: 20, type: "" },
+  { header: "Location", key: "location", width: 20, type: "Location" },
   { header: "Phone", key: "phone", width: 20, type: "" },
 ];
 
@@ -55,6 +55,18 @@ export const employeeTableColumns = [
     width: 20,
     type: "",
   },
+];
+
+
+
+export const locationTableColumns = [
+  { header: "Name", key: "name", width: 50, type: "" },
+  { header: "Previous Name", key: "previousName", width: 20, type: "" },
+  { header: "Is Verified", key: "isVerified", width: 10, type: "status" },
+  { header: "Admin", key: "admin", width: 20, type: "" },
+  { header: "Is Admin Verified", key: "isAdminVerified", width: 10, type: "status" },
+  { header: "Employee", key: "employee", width: 20, type: "" },
+  { header: "Phone", key: "phone", width: 15, type: "" },
 ];
 
 export const webinarTableColumns = [
