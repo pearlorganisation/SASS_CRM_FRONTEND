@@ -65,7 +65,7 @@ const ViewParticularContact = () => {
   const { selectedAttendee, attendeeLeadType, attendeeEnrollments } =
     useSelector((state) => state.attendee);
 
-  const { noteData, isFormLoading, leadTypeData } = useSelector(
+  const { noteData, isFormSuccess, leadTypeData } = useSelector(
     (state) => state.assign
   );
   const { employeeModeData } = useSelector((state) => state.employee);
@@ -82,6 +82,8 @@ const ViewParticularContact = () => {
   };
 
   useEffect(() => {
+    dispatch(getNotes({ email }));
+
     return () => {
       dispatch(clearLeadType());
     };
@@ -149,10 +151,10 @@ const ViewParticularContact = () => {
   };
 
   useEffect(() => {
-    if (!isFormLoading) {
+    if (isFormSuccess) {
       dispatch(getNotes({ email }));
     }
-  }, [isFormLoading]);
+  }, [isFormSuccess]);
 
   useEffect(() => {
     dispatch(getAttendee({ email }));

@@ -23,6 +23,7 @@ const initialState = {
   isLoading: false,
   isSuccess: false,
   isFormLoading: false,
+  isFormSuccess: false,
   assignData: [],
   leadTypeData: [],
   dashboardNotes: [],
@@ -45,6 +46,9 @@ export const assignSlice = createSlice({
     resetAssignedData: (state) => {
       state.assignData = [];
     },
+    resetFormSuccess: state => {
+      state.isFormSuccess = false;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -63,14 +67,17 @@ export const assignSlice = createSlice({
       })
       .addCase(addNote.pending, (state, action) => {
         state.isFormLoading = true;
+        state.isFormSuccess = false;
       })
       .addCase(addNote.fulfilled, (state, action) => {
         state.isFormLoading = false;
+        state.isFormSuccess = true;
         toast.success("Note Added Successfully", {
           position: "top-center",
         });
       })
       .addCase(addNote.rejected, (state, action) => {
+        state.isFormLoading = false;
         errorToast(action?.payload);
       })
       .addCase(getNotes.pending, (state, action) => {
@@ -206,7 +213,7 @@ export const assignSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { resetAssignedData, resetAssignSuccess } = assignSlice.actions;
+export const { resetAssignedData, resetAssignSuccess, resetFormSuccess } = assignSlice.actions;
 export default assignSlice.reducer;
 
 // ================================================== THE END ==================================================
