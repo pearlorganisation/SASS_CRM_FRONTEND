@@ -97,7 +97,7 @@ const RawTable = ({
                   onClick={() => rowClick(row)}
                 >
                   <div
-                    className={`flex items-center h-14 justify-between ${
+                    className={`flex items-center h-12 justify-between ${
                       !isLeadType ? "px-3" : ""
                     }`}
                   >

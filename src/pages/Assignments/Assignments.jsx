@@ -24,6 +24,8 @@ import { resetAssignedData } from "../../features/slices/assign";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { AssignmentStatus, NotifActionType } from "../../utils/extra";
 import { socket } from "../../socket";
+import RequestReassignmentModal from "./ReAssigmentModal";
+import { createPortal } from "react-dom";
 
 const Assignments = () => {
   const employeeId = useParams()?.id;
@@ -46,7 +48,6 @@ const Assignments = () => {
   const { webinarData } = useSelector((state) => state.webinarContact);
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
 
-  const [isConnected, setIsConnected] = useState(socket.connected);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const [filters, setFilters] = useState({});
@@ -57,6 +58,7 @@ const Assignments = () => {
   const [tabValue, setTabValue] = useState(
     searchParams.get("tabValue") || AssignmentStatus.ACTIVE
   );
+  const [openReassignModal, setOpenReassignModal] = useState(false);
 
   useEffect(() => {
     setSearchParams({
@@ -100,6 +102,7 @@ const Assignments = () => {
   useEffect(() => {
     if (isSuccess) {
       setSelectedRows([]);
+      setOpenReassignModal(false);
       if (totalPages > 1)
         dispatch(
           getAssignments({
@@ -169,6 +172,16 @@ const Assignments = () => {
       action: "viewDetails",
       details: `User viewed details of Attendee with Email: ${item?._id} and Record Type: ${recordType}`,
     });
+  };
+
+  const handleReassignRequest = (requestReason) => {
+    dispatch(
+      requestReAssignment({
+        assignments: selectedRows,
+        webinarId: currentWebinar,
+        requestReason
+      })
+    );
   };
 
   // ----------------------- Action Icons -----------------------
@@ -242,15 +255,7 @@ const Assignments = () => {
           userData?.isActive &&
           tabValue === AssignmentStatus.ACTIVE && (
             <Button
-              disabled={assignLoading}
-              onClick={() =>
-                dispatch(
-                  requestReAssignment({
-                    assignments: selectedRows,
-                    webinarId: currentWebinar,
-                  })
-                )
-              }
+              onClick={() => setOpenReassignModal(true)}
               className="h-10"
               variant="contained"
             >
@@ -311,6 +316,14 @@ const Assignments = () => {
         filters={filters}
         setFilters={setFilters}
       />
+      {openReassignModal &&
+        createPortal(
+          <RequestReassignmentModal
+            onClose={() => setOpenReassignModal(false)}
+            onSubmit={(reason) => handleReassignRequest(reason)}
+          />,
+          document.body
+        )}
     </div>
   );
 };

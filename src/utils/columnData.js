@@ -7,7 +7,11 @@ export const clientTableColumns = [
   { header: "Plan Name", key: "planName", width: 20, type: "" },
   { header: "Plan Start Date", key: "planStartDate", width: 20, type: "Date" },
   { header: "Plan Expiry", key: "planExpiry", width: 20, type: "Date" },
+  { header: "Plan Remaining Days", key: "remainingDays", width: 20, type: "" },
   { header: "Contacts Limit", key: "contactsLimit", width: 15, type: "" },
+  { header: "Used Contacts Count", key: "usedContactsCount", width: 15, type: "" },
+  { header: "Employees Limit", key: "employeeLimit", width: 15, type: "" },
+
   { header: "Total Employees", key: "totalEmployees", width: 15, type: "" },
   {
     header: "Employee Sales Count",
@@ -90,6 +94,7 @@ export const productTableColumns = [
 export const pullbacksTableColumns = [
   { header: "Email", key: "attendeeEmail", width: 50, type: "" },
   { header: "Assigned To", key: "assignedTo", width: 20, type: "" },
+  { header: "Reason", key: "requestReason", width: 20, type: "" },
 ];
 
 

@@ -101,12 +101,22 @@ const ViewClient = () => {
 
         {/* Employee Info */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} className="p-4">
+          <Paper elevation={3} className="px-4 py-2">
             <Typography variant="h6" gutterBottom>
               Employee Summary
             </Typography>
             <Divider className="mb-3" />
-            <Box display="flex" alignItems="center" mb={2}>
+            <Box display="flex" alignItems="center" mt={1} mb={1}>
+              <PeopleIcon color="" className="mr-2" />
+              <Typography>
+                <strong>Limit:</strong>{" "}
+                {Array.isArray(clientData?.subscription) &&
+              clientData.subscription.length > 0
+                ? clientData.subscription[0].employeeLimit + clientData.subscription[0].employeeLimitAddon
+                : 0}
+              </Typography>
+            </Box>
+            <Box display="flex" alignItems="center" mb={1}>
               <PeopleIcon color="primary" className="mr-2" />
               <Typography>
                 <strong>Sales:</strong>{" "}
@@ -117,7 +127,7 @@ const ViewClient = () => {
                 }
               </Typography>
             </Box>
-            <Box display="flex" alignItems="center" mb={2}>
+            <Box display="flex" alignItems="center">
               <PeopleIcon color="secondary" className="mr-2" />
               <Typography>
                 <strong>Reminder:</strong>{" "}
@@ -142,7 +152,7 @@ const ViewClient = () => {
               <strong>Limit:</strong>{" "}
               {Array.isArray(clientData?.subscription) &&
               clientData.subscription.length > 0
-                ? clientData.subscription[0].contactLimit
+                ? clientData.subscription[0].contactLimit + clientData.subscription[0].contactLimitAddon
                 : 0}
             </Typography>
             <Typography variant="body1">

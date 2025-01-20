@@ -71,31 +71,35 @@ function Login() {
               : "h-full object-cover"
           } `}
         >
-          {landingGlobalData?.file?.mimetype !== "video/mp4" ? (
-            <img
-              className="w-full h-full object-cover"
-              src={landingGlobalData?.file?.url}
-              alt="Banner"
-              loading="lazy"
-            />
-          ) : (
-            <video
-              className="w-full h-full "
-              autoPlay
-              controls={landingGlobalData?.videoControls}
-              loop
-              muted
-              preload="auto"
-            >
-              <source
-                src={getFileURL(
-                  landingGlobalData?.file?.filename,
-                  landingGlobalData?.file?.destination
-                )}
-                type="video/mp4"
-              />
-              Your browser does not support the video tag.
-            </video>
+          {landingGlobalData?.file && (
+            <>
+              {landingGlobalData?.file?.mimetype !== "video/mp4" ? (
+                <img
+                  className="w-full h-full object-cover"
+                  src={landingGlobalData?.file?.url}
+                  alt="Banner"
+                  loading="lazy"
+                />
+              ) : (
+                <video
+                  className="w-full h-full "
+                  autoPlay
+                  controls={landingGlobalData?.videoControls}
+                  loop
+                  muted
+                  preload="auto"
+                >
+                  <source
+                    src={getFileURL(
+                      landingGlobalData?.file?.filename,
+                      landingGlobalData?.file?.destination
+                    )}
+                    type="video/mp4"
+                  />
+                  Your browser does not support the video tag.
+                </video>
+              )}
+            </>
           )}
         </div>
         {(landingGlobalData?.title ||

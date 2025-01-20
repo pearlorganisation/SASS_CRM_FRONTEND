@@ -120,6 +120,9 @@ const Pullbacks = (props) => {
                 header: 'Previous Assigned To'
               }
             }
+            if(column.header === 'Reason' && subTabValue === AssignmentStatus.REASSIGN_APPROVED){
+              return {}
+            }
             return column
           }),
           rows: reAssignData,
