@@ -243,32 +243,34 @@ const UploadCsvModal = ({ tabValue, setModal, update }) => {
         role="document"
       >
         <div className="flex justify-end px-5">
-        <button
-          onClick={() => setModal(false)}
-          className="me-3 flex h-10 items-center justify-center justify-self-center whitespace-nowrap rounded-full px-5 text-sm font-medium tracking-wide text-emerald-500 transition duration-300 hover:bg-emerald-100 hover:text-emerald-600 focus:bg-emerald-200 focus:text-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:text-emerald-300 disabled:shadow-none disabled:hover:bg-transparent"
-          aria-label="close dialog"
-        >
-          <span className="relative only:-mx-5">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              role="graphics-symbol"
-              aria-labelledby="title-79 desc-79"
-            >
-              <title id="title-79">Icon title</title>
-              <desc id="desc-79">A more detailed description of the icon</desc>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </span>
-        </button>
+          <button
+            onClick={() => setModal(false)}
+            className="me-3 flex h-10 items-center justify-center justify-self-center whitespace-nowrap rounded-full px-5 text-sm font-medium tracking-wide text-emerald-500 transition duration-300 hover:bg-emerald-100 hover:text-emerald-600 focus:bg-emerald-200 focus:text-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:text-emerald-300 disabled:shadow-none disabled:hover:bg-transparent"
+            aria-label="close dialog"
+          >
+            <span className="relative only:-mx-5">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                role="graphics-symbol"
+                aria-labelledby="title-79 desc-79"
+              >
+                <title id="title-79">Icon title</title>
+                <desc id="desc-79">
+                  A more detailed description of the icon
+                </desc>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </span>
+          </button>
         </div>
         <div className="flex flex-col justify-center gap-5">
           {!mapUI && (
@@ -532,38 +534,41 @@ const UploadCsvModal = ({ tabValue, setModal, update }) => {
                         </span>
                       </td>
                     </tr>
-                    <tr>
-                      <td className="px-6 ">Session Minutes</td>
-                      <td className="px-6 pb-2 ">
-                        {" "}
-                        <Controller
-                          control={control}
-                          name="sessionMinutes"
-                          render={({ field }) => (
-                            <Select
-                              value={field.value}
-                              options={generateOptions(meetingData)}
-                              onChange={(selectedOption) => {
-                                field.onChange(selectedOption);
-                                handleSelectChange(
-                                  "sessionMinutes",
-                                  selectedOption
-                                );
-                              }}
-                              className="mt-2"
-                              isClearable={true}
-                              placeholder="Select a custom field"
-                            />
-                          )}
-                        />
-                      </td>
-                      <td className="px-6 pb-2">
-                        <span className="bg-slate-100 rounded-lg p-1">
-                          {/* //here i want to display the value of react-select by selecting the label */}
-                          {selectedValues.sessionMinutes}
-                        </span>
-                      </td>
-                    </tr>
+                    {tabValue === "postWebinar" && (
+                      <tr>
+                        <td className="px-6 ">Session Minutes</td>
+                        <td className="px-6 pb-2 ">
+                          {" "}
+                          <Controller
+                            control={control}
+                            name="sessionMinutes"
+                            render={({ field }) => (
+                              <Select
+                                value={field.value}
+                                options={generateOptions(meetingData)}
+                                onChange={(selectedOption) => {
+                                  field.onChange(selectedOption);
+                                  handleSelectChange(
+                                    "sessionMinutes",
+                                    selectedOption
+                                  );
+                                }}
+                                className="mt-2"
+                                isClearable={true}
+                                placeholder="Select a custom field"
+                                menuPlacement="top"
+                              />
+                            )}
+                          />
+                        </td>
+                        <td className="px-6 pb-2">
+                          <span className="bg-slate-100 rounded-lg p-1">
+                            {/* //here i want to display the value of react-select by selecting the label */}
+                            {selectedValues.sessionMinutes}
+                          </span>
+                        </td>
+                      </tr>
+                    )}
 
                     <tr>
                       <td className="px-6 ">Location</td>
@@ -583,7 +588,7 @@ const UploadCsvModal = ({ tabValue, setModal, update }) => {
                               className="mt-2"
                               isClearable={true}
                               placeholder="Select a custom field"
-                              menuPlacement="auto"
+                              menuPlacement="top"
                             />
                           )}
                         />
@@ -614,7 +619,7 @@ const UploadCsvModal = ({ tabValue, setModal, update }) => {
                               className="mt-2"
                               isClearable={true}
                               placeholder="Select a custom field"
-                              menuPlacement="auto"
+                              menuPlacement="top"
                             />
                           )}
                         />
