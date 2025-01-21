@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Tabs, Tab } from "@mui/material";
+import { Button, Tabs, Tab } from "@mui/material";  
 import { clearSuccess } from "../../features/slices/attendees";
 import { getAllAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
