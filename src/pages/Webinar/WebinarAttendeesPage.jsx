@@ -66,6 +66,7 @@ const WebinarAttendeesPage = (props) => {
 
   useEffect(() => {
     if (tabValue !== "enrollments" && subTabValue === "attendees") {
+      setSelectedRows([]);
       dispatch(
         getAttendees({
           id,

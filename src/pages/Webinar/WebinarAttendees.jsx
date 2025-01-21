@@ -134,7 +134,7 @@ const WebinarAttendees = () => {
             {id}
           </Button>
 
-          {selectedRows.length > 0 && (
+          {selectedRows.length > 0 && subTabValue === "attendees" && tabValue !== "enrollments" && (
             <Button onClick={() => setSwapOpen(true)} variant="contained">
               Swap Columns
             </Button>
