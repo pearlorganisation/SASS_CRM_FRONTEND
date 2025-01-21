@@ -15,6 +15,7 @@ const RawTable = ({
   isRowClickable = false,
   isLeadType = false,
   userData,
+  locations = null,
 }) => {
   const { isTablesMasked } = useSelector((state) => state.table);
 
@@ -151,6 +152,7 @@ const RawTable = ({
                       (formatDateAsNumber(row?.[column.key]) ?? "N/A")}
                     {column.type === "Product" &&
                       (row?.[column.key][column?.subKey] ?? "N/A")}
+                    {column.type === "Location" && ((row?.[column.key] && locations.find((item) => item.name === row?.[column.key]) ? row?.[column.key] : <span className="text-red-500">{row?.[column.key] ?? "N/A"}</span>))}
                     {column.type === "" &&
                       (row?.[column.key] !== undefined &&
                       row?.[column.key] !== null

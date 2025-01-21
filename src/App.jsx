@@ -65,6 +65,8 @@ import { resetAlarmData } from "./features/slices/alarm";
 import { newNotification } from "./features/slices/notification";
 import { NotifActionType } from "./utils/extra";
 import { logout } from "./features/slices/auth";
+import Location from "./pages/Location/Location";
+import LocationRequests from "./pages/Location/LocationRequests";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -209,6 +211,7 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/webinarDetails/:id",
           element: (
@@ -217,26 +220,32 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/particularContact/notes",
           element: <NotesPage />,
         },
+
         {
           path: "/particularContact/attendee-history",
           element: <AttendeeHistory />,
         },
+
         {
           path: "/particularContact",
           element: <ViewParticularContact />,
         },
+
         {
           path: "/lead-type",
           element: <LeadTypes />,
         },
+
         {
           path: "/*",
           element: <ComingSoon />,
         },
+
         {
           path: "/employees",
           element: (
@@ -245,6 +254,7 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/employee/view/:id",
           element: (
@@ -253,6 +263,7 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/employee/edit/:id",
           element: (
@@ -261,6 +272,7 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/clients",
           element: (
@@ -269,6 +281,7 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/add-client",
           element: (
@@ -277,6 +290,7 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/view-client/:id",
           element: (
@@ -285,6 +299,7 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/products",
           element: <ViewProducts />,
@@ -458,6 +473,20 @@ const App = () => {
         {
           path: "/notice-board",
           element: <NoticeBoard />,
+        },
+
+        {
+          path: "/locations",
+          element: <Location />,
+        },
+
+        {
+          path: "/locations/requests",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN","ADMIN"]}>
+              <LocationRequests />
+            </RouteGuard>
+          )
         },
       ],
     },

@@ -28,6 +28,11 @@ const WebinarAttendees = () => {
   const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
     (state) => state.attendee
   );
+
+  const { locationsData } = useSelector(
+    (state) => state.location
+  );
+
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(searchParams.get("page") || 1);
@@ -92,6 +97,7 @@ const WebinarAttendees = () => {
         filterModalName={AttendeesFilterModalName}
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
+        locations={locationsData}
       />
       <AttendeesFilterModal
         modalName={AttendeesFilterModalName}
