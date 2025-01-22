@@ -79,12 +79,12 @@ const ViewClient = () => {
       <Grid container spacing={4} mt={4}>
         {/* Basic Info */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} className="p-4">
+          <Paper elevation={3} className="p-3">
             <Typography variant="h6" gutterBottom>
               Basic Information
             </Typography>
-            <Divider className="mb-3" />
-            <Box display="flex" alignItems="center" mb={2}>
+            <Divider  />
+            <Box display="flex" alignItems="center" className="mt-2" mb={2}>
               <EmailIcon color="primary" className="mr-2" />
               <Typography>
                 <strong>Email:</strong> {clientData?.email}
@@ -143,12 +143,12 @@ const ViewClient = () => {
 
         {/* Contact Info */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} className="p-4">
+          <Paper elevation={3} className="p-3">
             <Typography variant="h6" gutterBottom>
               Contact Usage
             </Typography>
-            <Divider className="mb-3" />
-            <Typography variant="body1" gutterBottom>
+            <Divider  />
+            <Typography mt={1} variant="body1" gutterBottom>
               <strong>Limit:</strong>{" "}
               {Array.isArray(clientData?.subscription) &&
               clientData.subscription.length > 0
@@ -163,12 +163,12 @@ const ViewClient = () => {
 
         {/* Plan Info */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} className="p-4">
+          <Paper elevation={3} className="p-3">
             <Typography variant="h6" gutterBottom>
               Plan Details
             </Typography>
             <Divider className="mb-3" />
-            <Box display="flex" alignItems="center" mb={0.5}>
+            <Box display="flex" className="mt-2" alignItems="center" mb={.5}>
               <Typography>
                 <strong>Type:</strong> {clientData?.plan?.name}
               </Typography>

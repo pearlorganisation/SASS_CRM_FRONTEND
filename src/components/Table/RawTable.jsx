@@ -181,6 +181,7 @@ const RawTable = ({
                           : true) ? (
                           <div key={index}>
                             <button
+                              disabled={action?.disabled ? true: false}
                               className="p-2 hover:bg-gray-100 rounded-full group"
                               onClick={() => action.onClick(row)}
                               title={action.tooltip}

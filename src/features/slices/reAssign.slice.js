@@ -18,6 +18,7 @@ const initialState = {
   errorMessage: "",
   reAssignData: [],
   reAssignCounts: {},
+  requestLoading: false,
 };
 
 // ---------------------------------------------------------------------------------------
@@ -48,20 +49,42 @@ export const reAssignSlice = createSlice({
         errorToast(action?.payload);
       })
       .addCase(fetchPullbackRequestCounts.fulfilled, (state, action) => {
-        state.reAssignCounts = action.payload || {}
+        state.reAssignCounts = action.payload || {};
       })
       .addCase(fetchPullbackRequestCounts.rejected, (state, action) => {
         errorToast(action?.payload);
       })
       .addCase(handleReAssigmentRequest.pending, (state, action) => {
         state.isSuccess = false;
+        state.requestLoading = true;
       })
       .addCase(handleReAssigmentRequest.fulfilled, (state, action) => {
         state.isSuccess = true;
-        successToast("Re-assignment request handled successfully");
+        state.requestLoading = false;
+
+        const { status } = action?.payload || {};
+        let { requests = 0, pullbacks = 0 } = state.reAssignCounts || {};
+
+        if (status === "approved") {
+          requests = Math.max(0, requests - 1); 
+          pullbacks += 1;
+        } else if (status === "rejected") {
+          requests = Math.max(0, requests - 1); 
+        } else {
+          console.warn(`Unexpected status: ${status}`); 
+        }
+
+        state.reAssignCounts = { requests, pullbacks };
+
+        if (status === "approved" || status === "rejected") {
+          successToast("Re-assignment request handled successfully");
+        } else {
+          successToast("Request handled, but status was unexpected");
+        }
       })
       .addCase(handleReAssigmentRequest.rejected, (state, action) => {
         errorToast(action?.payload);
+        state.requestLoading = false;
       })
       .addCase(changeAssignment.pending, (state, action) => {
         state.isLoading = true;
@@ -83,7 +106,7 @@ export const reAssignSlice = createSlice({
       .addCase(moveAttendeesToPullbacks.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        successToast(" Assignment moved to pullbacks successfully");
+        successToast(" Assignment Successful");
       })
       .addCase(moveAttendeesToPullbacks.rejected, (state, action) => {
         state.isLoading = false;
@@ -95,7 +118,8 @@ export const reAssignSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { resetReAssignData, resetReAssignSuccess } = reAssignSlice.actions;
+export const { resetReAssignData, resetReAssignSuccess } =
+  reAssignSlice.actions;
 export default reAssignSlice.reducer;
 
 // ================================================== THE END ==================================================

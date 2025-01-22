@@ -60,7 +60,7 @@ export const handleReAssigmentRequest = createAsyncThunk(
         userId,
         webinarId,
       });
-      return response?.data;
+      return {status};
     } catch (e) {
       return rejectWithValue(e);
     }

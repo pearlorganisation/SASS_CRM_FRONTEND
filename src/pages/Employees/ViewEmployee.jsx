@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
-import { Tab, Tabs } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Tab,
+  Tabs,
+} from "@mui/material";
 import { getUserActivity } from "../../features/actions/userActivity";
 import { useDispatch, useSelector } from "react-redux";
 import UserActivityTable from "../../components/Table/UserActivityTable";
@@ -10,11 +17,11 @@ import { attendeeTableColumns } from "../../utils/columnData";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
 import {
   getAssignments,
-  getAssignmentsActivity,
 } from "../../features/actions/assign";
 import { Visibility } from "@mui/icons-material";
-import AssignmentActivity from "../../components/Employee/AssignmentActivity";
 import { AssignmentStatus } from "../../utils/extra";
+import { useLayoutEffect } from "react";
+import { getEmployeeWebinars } from "../../features/actions/webinarContact";
 
 const ViewEmployee = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -25,38 +32,43 @@ const ViewEmployee = () => {
   const { id } = useParams();
   const logUserActivity = useAddUserActivity();
   const dispatch = useDispatch();
-  
+
   const [searchParams, setSearchParams] = useSearchParams();
   const { assignData, isLoading, isSuccess, totalPages, activityAssignMents } =
     useSelector((state) => state.assign);
-  console.log("activityAssignMents", activityAssignMents);
-  const [tabValue, setTabValue] = useState(searchParams.get("tabValue") ||  "assignments");
+  const { webinarData } = useSelector((state) => state.webinarContact);
+
+  const [tabValue, setTabValue] = useState(
+    searchParams.get("tabValue") || "assignments"
+  );
   const LIMIT = useSelector((state) => state.pageLimits[tabValue] || 10);
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
+  const [currentWebinar, setCurrentWebinar] = useState(
+    searchParams.get("webinarId") || ""
+  );
 
   useEffect(() => {
     setSearchParams({ page: page, tabValue: tabValue });
-  },[page,tabValue]);
+  }, [page, tabValue]);
 
   useEffect(() => {
     console.log("tabValue", tabValue);
     if (tabValue === "activityLogs")
       dispatch(getUserActivity({ id, page: page, limit: LIMIT }));
-    else if (tabValue === "activity")
-      dispatch(getAssignmentsActivity({ empId: id }));
-    else if (tabValue === "history")
+    else if (tabValue === "history" && currentWebinar)
       dispatch(
         getAssignments({
           id,
           page,
           limit: LIMIT,
           filters,
+          webinarId: currentWebinar,
           assignmentStatus: AssignmentStatus.ACTIVE,
           validCall: "Worked",
         })
       );
-    else
+    else if (currentWebinar)
       dispatch(
         getAssignments({
           id,
@@ -65,9 +77,25 @@ const ViewEmployee = () => {
           filters,
           assignmentStatus: AssignmentStatus.ACTIVE,
           validCall: "Pending",
+          webinarId: currentWebinar ? currentWebinar : undefined,
         })
       );
-  }, [page, LIMIT, filters, tabValue]);
+  }, [page, LIMIT, filters, tabValue, currentWebinar]);
+
+  useLayoutEffect(() => {
+    dispatch(getEmployeeWebinars({ employeeId: id }));
+  }, []);
+
+  useEffect(() => {
+    if (
+      Array.isArray(webinarData) &&
+      webinarData.length > 0 &&
+      !currentWebinar
+    ) {
+      setCurrentWebinar(webinarData[0]._id);
+      setPage(1);
+    }
+  }, [webinarData]);
 
   const handleTabChange = (_, newValue) => {
     setTabValue(newValue);
@@ -89,6 +117,35 @@ const ViewEmployee = () => {
       },
     },
   ];
+
+  const WebinarDropdown = () => {
+    return (
+      <div className="flex gap-4">
+        <FormControl className="w-40">
+          <InputLabel id="webinar-label">Webinar</InputLabel>
+          <Select
+            labelId="webinar-label"
+            label="Webinar"
+            className="h-10"
+            value={currentWebinar}
+            onChange={(e) => {
+              setCurrentWebinar(e.target.value);
+              setPage(1);
+            }}
+          >
+            <MenuItem value="" disabled>
+              Select Webinar
+            </MenuItem>
+            {webinarData.map((webinar, index) => (
+              <MenuItem key={index} value={webinar._id}>
+                {webinar.webinarName}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
+    );
+  };
 
   return (
     <div className="px-6 md:px-10 pt-10 space-y-6">
@@ -112,7 +169,6 @@ const ViewEmployee = () => {
           value="activityLogs"
           className="text-gray-600"
         />
-        {/* <Tab label="Activity" value="activity" className="text-gray-600" /> */}
       </Tabs>
 
       {tabValue === "activityLogs" && (
@@ -131,6 +187,7 @@ const ViewEmployee = () => {
 
           <DataTable
             tableHeader={tableHeader}
+            ButtonGroup={WebinarDropdown}
             tableUniqueKey="viewAssignmentsTable"
             // isSelectVisible={true}
             filters={filters}
@@ -157,19 +214,6 @@ const ViewEmployee = () => {
             modalName={filterModalName}
             filters={filters}
             setFilters={setFilters}
-          />
-        </div>
-      )}
-
-      {tabValue === "activity" && (
-        <div className="p-6 bg-gray-50 rounded-lg grid lg:grid-cols-2 gap-4">
-          <AssignmentActivity
-            label="Valid Call Activity"
-            array={activityAssignMents.filter((item) => item.isEligible)}
-          />
-          <AssignmentActivity
-            label="Invalid Call Activity"
-            array={activityAssignMents.filter((item) => !item.isEligible)}
           />
         </div>
       )}

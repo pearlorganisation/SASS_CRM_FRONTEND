@@ -10,7 +10,7 @@ import { Button, Tabs, Tab } from "@mui/material";
 import { createPortal } from "react-dom";
 import { AttachFile, ContentCopy } from "@mui/icons-material";
 import { getLeadType } from "../../features/actions/assign";
-import { AssignmentStatus, copyToClipboard } from "../../utils/extra";
+import { AssignmentStatus, copyToClipboard, NotifActionType } from "../../utils/extra";
 import { getAllEmployees } from "../../features/actions/employee";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
@@ -18,6 +18,7 @@ import ReAssignmentModal from "../../components/Webinar/ReAssignmentModal";
 import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
 import DataTableFallback from "../../components/Fallback/DataTableFallback";
 import { fetchPullbackRequestCounts } from "../../features/actions/reAssign";
+import { socket } from "../../socket";
 
 const WebinarAttendees = () => {
   const { id } = useParams();
@@ -61,6 +62,7 @@ const WebinarAttendees = () => {
       webinarName: webinarName,
       subTabValue: subTabValue,
     });
+    fetchCounts();
   }, [tabValue]);
 
   useEffect(() => {
@@ -75,14 +77,31 @@ const WebinarAttendees = () => {
   useEffect(() => {
     dispatch(getLeadType());
     dispatch(getAllEmployees({}));
-    dispatch(
-      fetchPullbackRequestCounts({
-        webinarId: id,
-        status: "active",
-        recordType: tabValue,
-      })
-    );
   }, []);
+
+  function fetchCounts() {
+    if (tabValue !== "enrollments") {
+      dispatch(
+        fetchPullbackRequestCounts({
+          webinarId: id,
+          status: "active",
+          recordType: tabValue,
+        })
+      );
+    }
+  }
+
+  useEffect(() => {
+    function onNotification(data) {
+      if (data.actionType === NotifActionType.REASSIGNMENT) {
+        fetchCounts();
+      }
+    }
+    socket.on("notification", onNotification);
+    return () => {
+      socket.off("notification", onNotification);
+    };
+  }, [tabValue, id]);
 
   // Tabs change handler
   const handleTabChange = (_, newValue) => {
@@ -220,7 +239,7 @@ const WebinarAttendees = () => {
                 <div className="flex items-center justify-center">
                   Requests
                   <span className="ml-2 bg-blue-100 text-blue-600 text-xs font-semibold px-2.5 py-0.5 rounded">
-                  {reAssignCounts?.requests || 0}
+                    {reAssignCounts?.requests || 0}
                   </span>
                 </div>
               }
