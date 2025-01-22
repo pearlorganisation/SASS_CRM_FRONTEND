@@ -26,9 +26,33 @@ export const fetchReAssignments = createAsyncThunk(
   }
 );
 
+export const fetchPullbackRequestCounts = createAsyncThunk(
+  "assignments/fetchPullbackRequestCounts",
+  async ({ webinarId, status, recordType }, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(
+        `assignment/reassign/fetch`,
+        {
+          params: {
+            webinarId,
+            status,
+            recordType,
+          },
+        }
+      );
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 export const handleReAssigmentRequest = createAsyncThunk(
   "assignments/handleReAssigmentRequest",
-  async ({ status, assignments = [], userId, webinarId }, { rejectWithValue }) => {
+  async (
+    { status, assignments = [], userId, webinarId },
+    { rejectWithValue }
+  ) => {
     try {
       const response = await instance.patch(`assignment/reassign/approve`, {
         assignments,
@@ -60,7 +84,10 @@ export const changeAssignment = createAsyncThunk(
 
 export const moveAttendeesToPullbacks = createAsyncThunk(
   "assignments/reassign/pullback",
-  async ({ attendees = [], webinarId, recordType, employeeId, isTemp }, { rejectWithValue }) => {
+  async (
+    { attendees = [], webinarId, recordType, employeeId, isTemp },
+    { rejectWithValue }
+  ) => {
     try {
       const response = await instance.patch(`assignment/reassign/pullback`, {
         attendees,

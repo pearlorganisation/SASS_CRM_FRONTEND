@@ -94,8 +94,9 @@ const NotificationBell = ({ userData, roles }) => {
 
     if (notif.actionType === NotifActionType.REASSIGNMENT) {
       if (!notif?.metadata?.webinarId) return;
+      const tabValue = notif?.metadata?.recordType || 'preWebinar';
       navigate(
-        `/webinarDetails/${notif.metadata.webinarId}?tabValue=preWebinar&page=1&subTabValue=reassignrequested`
+        `/webinarDetails/${notif.metadata.webinarId}?tabValue=${tabValue}&page=1&subTabValue=reassignrequested`
       );
     }
   }

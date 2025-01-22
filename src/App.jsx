@@ -148,8 +148,8 @@ const App = () => {
       socket.emit("join", { user: userData._id });
     }
 
-    if (!userData) {
-      socket.emit("disconnect");
+    if (!userData & isConnected) {
+      socket.disconnect();
     }
   }, [userData, isConnected]);
 
