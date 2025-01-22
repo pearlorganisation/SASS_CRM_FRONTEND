@@ -66,6 +66,7 @@ const WebinarAttendeesPage = (props) => {
 
   useEffect(() => {
     if (tabValue !== "enrollments" && subTabValue === "attendees") {
+      setSelectedRows([]);
       dispatch(
         getAttendees({
           id,
@@ -187,7 +188,12 @@ const WebinarAttendeesPage = (props) => {
         filters={filters}
         setFilters={setFilters}
         tableData={{
-          columns: attendeeTableColumns,
+          columns:
+            tabValue === "postWebinar"
+              ? attendeeTableColumns
+              : attendeeTableColumns.filter(
+                  (item) => item.key !== "timeInSession"
+                ),
           rows: attendeeData.map((row) => ({
             ...row,
             leadType: leadTypeData.find((lead) => lead._id === row?.leadType),
