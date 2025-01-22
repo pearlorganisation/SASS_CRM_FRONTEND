@@ -20,7 +20,10 @@ import {
 } from "../../features/actions/assign";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
 import { getEmployeeWebinars } from "../../features/actions/webinarContact";
-import { resetAssignedData, resetAssignSuccess } from "../../features/slices/assign";
+import {
+  resetAssignedData,
+  resetAssignSuccess,
+} from "../../features/slices/assign";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { AssignmentStatus, NotifActionType } from "../../utils/extra";
 import { socket } from "../../socket";
@@ -70,7 +73,7 @@ const Assignments = () => {
   }, [page, currentWebinar, tabValue, LIMIT]);
 
   useEffect(() => {
-    if (currentWebinar)
+    if (currentWebinar) {
       dispatch(
         getAssignments({
           id: employeeId || userData?._id,
@@ -82,10 +85,17 @@ const Assignments = () => {
           assignmentStatus: tabValue,
         })
       );
-  }, [page, LIMIT, filters, selected, tabValue]);
+    }
+  }, [page, LIMIT, filters, selected, tabValue, currentWebinar]);
 
   useEffect(() => {
-    if (currentWebinar )
+    if (isSuccess) {
+      setSelectedRows([]);
+      setOpenReassignModal(false);
+      dispatch(resetAssignSuccess());
+      if (totalPages > 1 && currentWebinar)
+        console.log("333333333333333 ---> ");
+
       dispatch(
         getAssignments({
           id: employeeId || userData?._id,
@@ -97,25 +107,6 @@ const Assignments = () => {
           assignmentStatus: tabValue,
         })
       );
-  }, [currentWebinar]);
-
-  useEffect(() => {
-    if (isSuccess) {
-      setSelectedRows([]);
-      setOpenReassignModal(false);
-      dispatch(resetAssignSuccess());
-      if (totalPages > 1 && currentWebinar)
-        dispatch(
-          getAssignments({
-            id: employeeId || userData?._id,
-            page: 1,
-            limit: LIMIT,
-            filters,
-            webinarId: currentWebinar,
-            validCall: selected === "All" ? undefined : selected,
-            assignmentStatus: tabValue,
-          })
-        );
     }
   }, [isSuccess]);
 
@@ -133,6 +124,7 @@ const Assignments = () => {
       !currentWebinar
     ) {
       setCurrentWebinar(webinarData[0]._id);
+      setPage(1);
     }
   }, [webinarData]);
 
@@ -143,7 +135,8 @@ const Assignments = () => {
         (data.actionType === NotifActionType.ASSIGNMENT ||
           data.actionType === NotifActionType.REASSIGNMENT)
       )
-        if (page === 1 && currentWebinar) {
+        if (page === 1) {
+          console.log("888888888888 ---> ", currentWebinar);
 
           dispatch(
             getAssignments({
@@ -180,7 +173,7 @@ const Assignments = () => {
       requestReAssignment({
         assignments: selectedRows,
         webinarId: currentWebinar,
-        requestReason
+        requestReason,
       })
     );
   };
@@ -270,7 +263,10 @@ const Assignments = () => {
             labelId="webinar-label"
             label="Webinar"
             value={currentWebinar}
-            onChange={(e) => setCurrentWebinar(e.target.value)}
+            onChange={(e) => {
+              setCurrentWebinar(e.target.value);
+              setPage(1);
+            }}
           >
             <MenuItem value="" disabled>
               Select Webinar

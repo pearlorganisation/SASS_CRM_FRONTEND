@@ -47,13 +47,13 @@ const UserActivityLogs = ({ isActive, id }) => {
           className="mb-2"
         />
       </div>
-      <Typography>
+      <Typography mb={1}>
         <strong>Last Activity:</strong>{" "}
         {Array.isArray(userActivities) && userActivities.length > 0
           ? new Date(userActivities[0]?.createdAt).toLocaleString()
           : "N/A"}
       </Typography>
-      <Divider className="mb-3" />
+      <Divider  />
 
       {/* Accordion for User Activity Logs */}
       <Accordion>

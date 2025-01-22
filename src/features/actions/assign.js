@@ -37,10 +37,6 @@ export const getAssignments = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      if(!webinarId){
-        console.log('empty webinarId', webinarId);
-        return;
-      }
       const response = await instance.post(
         `assignment/data/${id}`,
         {

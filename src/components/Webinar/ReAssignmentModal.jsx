@@ -14,6 +14,7 @@ import { getAssignedEmployees } from "../../features/actions/webinarContact";
 import useRoles from "../../hooks/useRoles";
 import {
   changeAssignment,
+  fetchPullbackRequestCounts,
   moveAttendeesToPullbacks,
 } from "../../features/actions/reAssign";
 import { resetReAssignSuccess } from "../../features/slices/reAssign.slice";
@@ -72,14 +73,13 @@ const ReAssignmentModal = ({
         const employee = options.find(
           (item) => item.value === selectedEmployee
         );
-        console.log("employee ---- > ", employee, (employee.contactLimit - employee.contactCount) < selectedRows.length);
         if (
           employee &&
-          (employee.contactLimit - employee.contactCount) < selectedRows.length
+          employee.contactLimit - employee.contactCount < selectedRows.length
         ) {
           toast.error(
             `Cannot assign more than ${
-              (employee.contactLimit - employee.contactCount)
+              employee.contactLimit - employee.contactCount
             } attendees to this employee.`
           );
           return;
@@ -91,18 +91,18 @@ const ReAssignmentModal = ({
           recordType: tabValue,
           attendees: selectedRows,
         };
-        dispatch(moveAttendeesToPullbacks(payload));
+        dispatch(moveAttendeesToPullbacks(payload))
       }
     } else {
       const employee = options.find((item) => item.value === selectedEmployee);
       console.log("employee ---- > ", employee);
       if (
         employee &&
-        (employee.contactLimit - employee.contactCount) < selectedRows.length
+        employee.contactLimit - employee.contactCount < selectedRows.length
       ) {
         toast.error(
           `Cannot assign more than ${
-            (employee.contactLimit - employee.contactCount)
+            employee.contactLimit - employee.contactCount
           } attendees to this employee.`
         );
         return;
@@ -120,7 +120,7 @@ const ReAssignmentModal = ({
             attendeeId: item?.attendee,
           })),
       };
-      dispatch(changeAssignment(payload));
+      dispatch(changeAssignment(payload))
     }
   };
 
@@ -140,6 +140,13 @@ const ReAssignmentModal = ({
   useEffect(() => {
     if (isSuccess) {
       handleCancel();
+      dispatch(
+        fetchPullbackRequestCounts({
+          webinarId: webinarid,
+          status: "active",
+          recordType: tabValue,
+        })
+      );
     }
 
     return () => {
@@ -222,7 +229,11 @@ const ReAssignmentModal = ({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={(!selectedEmployee && !moveToPullbacks) || isLoading || reassignLoading}
+            disabled={
+              (!selectedEmployee && !moveToPullbacks) ||
+              isLoading ||
+              reassignLoading
+            }
             variant="contained"
           >
             {reassignLoading ? <ClipLoader color="#fff" size={20} /> : "Assign"}
