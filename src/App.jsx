@@ -147,6 +147,10 @@ const App = () => {
       console.log("join emitted");
       socket.emit("join", { user: userData._id });
     }
+
+    if (!userData) {
+      socket.emit("disconnect");
+    }
   }, [userData, isConnected]);
 
   if (isUserLoggedIn && !userData?.role) {
@@ -483,10 +487,10 @@ const App = () => {
         {
           path: "/locations/requests",
           element: (
-            <RouteGuard roleNames={["SUPER_ADMIN","ADMIN"]}>
+            <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
               <LocationRequests />
             </RouteGuard>
-          )
+          ),
         },
       ],
     },
