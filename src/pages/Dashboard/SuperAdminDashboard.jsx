@@ -32,31 +32,63 @@ import { errorToast } from "../../utils/extra";
 const SuperAdminDashboard = () => {
   const dispatch = useDispatch();
   const { dashBoardCardsData } = useSelector((state) => state.globalData);
+
+  useEffect(() => {
+    console.log(dashBoardCardsData);
+  }, [dashBoardCardsData]);
+
   const cardData = [
     {
       label: "Accounts Created",
-      value: dashBoardCardsData?.accountsCreated || 0,
+      value:
+        (dashBoardCardsData?.adminCount?.totalCount || 0) +
+        (dashBoardCardsData?.employeeCount?.totalCount || 0),
       color: "primary",
     },
     {
       label: "Active Accounts",
-      value: dashBoardCardsData?.activeAccounts || 0,
+      value:
+        (dashBoardCardsData?.adminCount?.activeCount || 0) +
+        (dashBoardCardsData?.employeeCount?.activeCount || 0),
       color: "success",
     },
     {
-      label: "Overall Revenue",
-      value: `\u20B9 ${dashBoardCardsData?.totalRevenue || 0}`,
-      color: "secondary",
+      label: "In-Active Accounts",
+      value:
+        (dashBoardCardsData?.adminCount?.inactiveCount || 0) +
+        (dashBoardCardsData?.employeeCount?.inactiveCount || 0),
+      color: "success",
     },
+
     {
       label: "Total Admins",
-      value: dashBoardCardsData?.totalAdmins || 0,
+      value: dashBoardCardsData?.adminCount?.totalCount || 0,
+      color: "primary",
+    },
+    {
+      label: "Total Active Admins",
+      value: dashBoardCardsData?.adminCount?.activeCount || 0,
+      color: "primary",
+    },
+    {
+      label: "Total In-Active Admins",
+      value: dashBoardCardsData?.adminCount?.inactiveCount || 0,
       color: "primary",
     },
     {
       label: "Total Employees",
-      value: dashBoardCardsData?.totalEmployees || 0,
+      value: dashBoardCardsData?.employeeCount?.totalCount || 0,
       color: "success",
+    },
+    {
+      label: "Total Active Employees",
+      value: dashBoardCardsData?.employeeCount?.activeCount || 0,
+      color: "primary",
+    },
+    {
+      label: "Total In-Active Employees",
+      value: dashBoardCardsData?.employeeCount?.inactiveCount || 0,
+      color: "primary",
     },
     {
       label: "Contacts",
@@ -64,6 +96,11 @@ const SuperAdminDashboard = () => {
         dashBoardCardsData?.totalContactsLimit || 0
       }`,
       color: "textPrimary",
+    },
+    {
+      label: "Overall Revenue",
+      value: `\u20B9 ${dashBoardCardsData?.totalRevenue || 0}`,
+      color: "secondary",
     },
   ];
 
@@ -73,6 +110,7 @@ const SuperAdminDashboard = () => {
   const [visibleCards, setVisibleCards] = useState([
     "Accounts Created",
     "Active Accounts",
+    "In-Active Accounts",
     "Overall Revenue",
     "Total Admins",
     "Total Employees",
