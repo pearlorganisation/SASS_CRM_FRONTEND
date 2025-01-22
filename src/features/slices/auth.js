@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { deleteUserDocumet, getAllRoles, getCurrentUser, getSuperAdmin, getUserSubscription, logIn, signUp, updatePassword, updateUser } from "../actions/auth";
 import { toast } from "sonner";
 import { errorToast, successToast } from "../../utils/extra";
+import { socket } from "../../socket";
 // -------------------------------------------------------------------------------------------
 
 // initialState -- initial state of authentication
@@ -23,6 +24,7 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
+      socket.disconnect();
       state.isUserLoggedIn = false;
       state.userData = null;
       state.subscription = null;

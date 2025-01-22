@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Tabs, Tab } from "@mui/material";  
+import { Button, Tabs, Tab } from "@mui/material";
 import { clearSuccess } from "../../features/slices/attendees";
 import { getAllAttendees } from "../../features/actions/attendees";
 import { attendeeTableColumns } from "../../utils/columnData";
@@ -29,9 +29,7 @@ const WebinarAttendees = () => {
     (state) => state.attendee
   );
 
-  const { locationsData } = useSelector(
-    (state) => state.location
-  );
+  const { locationsData } = useSelector((state) => state.location);
 
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -53,9 +51,9 @@ const WebinarAttendees = () => {
     }
   }, [isSuccess]);
 
-    useEffect(() => {
-      dispatch(getLeadType());
-    }, []);
+  useEffect(() => {
+    dispatch(getLeadType());
+  }, []);
 
   // ----------------------- Action Icons -----------------------
 
@@ -66,7 +64,9 @@ const WebinarAttendees = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
-        navigate(`/particularContact?email=${item?.email}&attendeeId=${item?._id}` );
+        navigate(
+          `/particularContact?email=${item?.email}&attendeeId=${item?._id}`
+        );
       },
     },
   ];
