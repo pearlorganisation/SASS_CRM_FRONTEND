@@ -48,7 +48,7 @@ const DataTable = React.memo(
     const dispatch = useDispatch();
     const logUserActivity = useAddUserActivity();
 
-    console.log("DataTable -> Rendered");
+    // console.log("DataTable -> Rendered");
 
     const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);

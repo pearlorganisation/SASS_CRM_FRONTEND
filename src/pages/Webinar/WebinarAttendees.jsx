@@ -17,6 +17,7 @@ import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
 import ReAssignmentModal from "../../components/Webinar/ReAssignmentModal";
 import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
 import DataTableFallback from "../../components/Fallback/DataTableFallback";
+import { fetchPullbackRequestCounts } from "../../features/actions/reAssign";
 
 const WebinarAttendees = () => {
   const { id } = useParams();
@@ -24,6 +25,9 @@ const WebinarAttendees = () => {
   const logUserActivity = useAddUserActivity();
 
   const { userData } = useSelector((state) => state.auth);
+  const { reAssignCounts } = useSelector((state) => state.reAssign);
+  console.log(reAssignCounts);
+
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [showModal, setShowModal] = useState(false);
@@ -71,6 +75,13 @@ const WebinarAttendees = () => {
   useEffect(() => {
     dispatch(getLeadType());
     dispatch(getAllEmployees({}));
+    dispatch(
+      fetchPullbackRequestCounts({
+        webinarId: id,
+        status: "active",
+        recordType: tabValue,
+      })
+    );
   }, []);
 
   // Tabs change handler
@@ -134,32 +145,36 @@ const WebinarAttendees = () => {
             {id}
           </Button>
 
-          {selectedRows.length > 0 && subTabValue === "attendees" && tabValue !== "enrollments" && (
-            <Button onClick={() => setSwapOpen(true)} variant="contained">
-              Swap Columns
-            </Button>
-          )}
-          {selectedRows.length > 0 && !(selectedAssignmentType === "All") && (
-            <button
-              className=" px-4 py-2 text-white bg-blue-500 rounded-md"
-              onClick={() => {
-                if (
-                  subTabValue === "attendees" &&
-                  selectedAssignmentType === "Not Assigned"
-                ) {
-                  setAssignModal(true);
-                } else {
-                  setReAssignModal(true);
-                }
-              }}
-              variant="contained"
-            >
-              {subTabValue === "attendees" &&
-              selectedAssignmentType === "Not Assigned"
-                ? "Assign"
-                : "Re-Assign"}
-            </button>
-          )}
+          {selectedRows.length > 0 &&
+            subTabValue === "attendees" &&
+            tabValue !== "enrollments" && (
+              <Button onClick={() => setSwapOpen(true)} variant="contained">
+                Swap Columns
+              </Button>
+            )}
+          {selectedRows.length > 0 &&
+            (!(selectedAssignmentType === "All") ||
+              subTabValue !== "attendees") && (
+              <button
+                className=" px-4 py-2 text-white bg-blue-500 rounded-md"
+                onClick={() => {
+                  if (
+                    subTabValue === "attendees" &&
+                    selectedAssignmentType === "Not Assigned"
+                  ) {
+                    setAssignModal(true);
+                  } else {
+                    setReAssignModal(true);
+                  }
+                }}
+                variant="contained"
+              >
+                {subTabValue === "attendees" &&
+                selectedAssignmentType === "Not Assigned"
+                  ? "Assign"
+                  : "Re-Assign"}
+              </button>
+            )}
           {userData?.isActive &&
             tabValue !== "enrollments" &&
             subTabValue === "attendees" &&
@@ -189,13 +204,28 @@ const WebinarAttendees = () => {
               className="text-gray-600"
             />
             <Tab
-              label="Pullbacks"
+              label={
+                <div className="flex items-center justify-center">
+                  Pullbacks
+                  <span className="ml-2 bg-blue-100 text-blue-600 text-xs font-semibold px-2.5 py-0.5 rounded">
+                    {reAssignCounts?.pullbacks || 0}
+                  </span>
+                </div>
+              }
               value={AssignmentStatus.REASSIGN_APPROVED}
               className="text-gray-600"
             />
-            <Tab label="Requests" value={AssignmentStatus.REASSIGN_REQUESTED} />
-
-            {/* <Tab label="UnAttended" value="unattended" className="text-gray-600" /> */}
+            <Tab
+              label={
+                <div className="flex items-center justify-center">
+                  Requests
+                  <span className="ml-2 bg-blue-100 text-blue-600 text-xs font-semibold px-2.5 py-0.5 rounded">
+                  {reAssignCounts?.requests || 0}
+                  </span>
+                </div>
+              }
+              value={AssignmentStatus.REASSIGN_REQUESTED}
+            />
           </Tabs>
         )}
       </div>

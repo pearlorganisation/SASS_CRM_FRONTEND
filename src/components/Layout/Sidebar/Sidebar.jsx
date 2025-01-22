@@ -30,7 +30,6 @@ const Sidebar = () => {
   const role = userData?.role || "";
   const { employeeModeData } = useSelector((state) => state.employee);
 
-  console.log("Sidebar -> render");
 
   const navItems = [
     {

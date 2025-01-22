@@ -20,7 +20,7 @@ import {
 } from "../../features/actions/assign";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
 import { getEmployeeWebinars } from "../../features/actions/webinarContact";
-import { resetAssignedData } from "../../features/slices/assign";
+import { resetAssignedData, resetAssignSuccess } from "../../features/slices/assign";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { AssignmentStatus, NotifActionType } from "../../utils/extra";
 import { socket } from "../../socket";
@@ -85,7 +85,7 @@ const Assignments = () => {
   }, [page, LIMIT, filters, selected, tabValue]);
 
   useEffect(() => {
-    if (currentWebinar)
+    if (currentWebinar )
       dispatch(
         getAssignments({
           id: employeeId || userData?._id,
@@ -103,7 +103,8 @@ const Assignments = () => {
     if (isSuccess) {
       setSelectedRows([]);
       setOpenReassignModal(false);
-      if (totalPages > 1)
+      dispatch(resetAssignSuccess());
+      if (totalPages > 1 && currentWebinar)
         dispatch(
           getAssignments({
             id: employeeId || userData?._id,
@@ -142,7 +143,8 @@ const Assignments = () => {
         (data.actionType === NotifActionType.ASSIGNMENT ||
           data.actionType === NotifActionType.REASSIGNMENT)
       )
-        if (page === 1) {
+        if (page === 1 && currentWebinar) {
+
           dispatch(
             getAssignments({
               id: employeeId || userData?._id,
@@ -167,7 +169,6 @@ const Assignments = () => {
     navigate(
       `/particularContact?email=${item?.email}&attendeeId=${item?.attendeeId}`
     );
-    console.log(addUserActivity);
     addUserActivity({
       action: "viewDetails",
       details: `User viewed details of Attendee with Email: ${item?._id} and Record Type: ${recordType}`,

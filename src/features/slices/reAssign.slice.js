@@ -5,6 +5,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
 import {
   changeAssignment,
+  fetchPullbackRequestCounts,
   fetchReAssignments,
   handleReAssigmentRequest,
   moveAttendeesToPullbacks,
@@ -16,6 +17,7 @@ const initialState = {
   totalPages: 1,
   errorMessage: "",
   reAssignData: [],
+  reAssignCounts: {},
 };
 
 // ---------------------------------------------------------------------------------------
@@ -43,6 +45,12 @@ export const reAssignSlice = createSlice({
       })
       .addCase(fetchReAssignments.rejected, (state, action) => {
         state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(fetchPullbackRequestCounts.fulfilled, (state, action) => {
+        state.reAssignCounts = action.payload || {}
+      })
+      .addCase(fetchPullbackRequestCounts.rejected, (state, action) => {
         errorToast(action?.payload);
       })
       .addCase(handleReAssigmentRequest.pending, (state, action) => {
