@@ -67,6 +67,7 @@ import { NotifActionType } from "./utils/extra";
 import { logout } from "./features/slices/auth";
 import Location from "./pages/Location/Location";
 import LocationRequests from "./pages/Location/LocationRequests";
+import LayoutFallback from "./components/Fallback/LayoutFallback";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -192,7 +193,7 @@ const App = () => {
     {
       path: "/",
       element: isUserLoggedIn ? (
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<LayoutFallback/>}>
           <Layout />
         </Suspense>
       ) : (

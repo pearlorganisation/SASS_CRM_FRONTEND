@@ -17,8 +17,8 @@ import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const ActiveInactiveModal = ({ modalName }) => {
   const logUserActivity = useAddUserActivity();
-  const { modals, modalData: clientData } = useSelector((state) => state.modals);
-  const open = modals[modalName] ? true : false;
+  const { modalData: clientData } = useSelector((state) => state.modals);
+
 
   const dispatch = useDispatch();
   const { isUpdating, isSuccess } = useSelector((state) => state.client);
@@ -73,7 +73,7 @@ const ActiveInactiveModal = ({ modalName }) => {
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={true} onClose={onClose}>
       <Box
         className="relative w-full max-w-lg mx-auto mt-20 bg-white rounded-lg shadow-lg p-6"
       >

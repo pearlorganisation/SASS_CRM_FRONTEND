@@ -1,19 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import DataTable from "../../components/Table/DataTable";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import EditIcon from "@mui/icons-material/Edit";
+
 import { useDispatch, useSelector } from "react-redux";
 import { clientTableColumns } from "../../utils/columnData";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import UpdateClientModal from "../../components/Client/UpdateClientModal";
-import ActiveInactiveModal from "../../components/Client/ActiveInactiveModal";
-import ExportClientExcelModal from "../../components/Export/ExportClientExcelModal";
-import ClientFilterModal from "../../components/Client/ClientFilterModal";
+const UpdateClientModal = lazy(() =>
+  import("../../components/Client/UpdateClientModal")
+);
+const ActiveInactiveModal = lazy(() =>
+  import("../../components/Client/ActiveInactiveModal")
+);
+const ExportClientExcelModal = lazy(() =>
+  import("../../components/Export/ExportClientExcelModal")
+);
+const ClientFilterModal = lazy(() =>
+  import("../../components/Client/ClientFilterModal")
+);
 import { openModal } from "../../features/slices/modalSlice";
-import LogoutIcon from "@mui/icons-material/Logout";
 import { getAllClients } from "../../features/actions/client";
 import { Button } from "@mui/material";
 import ClientCard from "../../components/Client/ClientCard";
+import { MdVisibility, MdEdit, MdLogout } from "react-icons/md";
+import ModalFallback from "../../components/Fallback/ModalFallback";
 
 const Clients = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -23,11 +31,22 @@ const Clients = () => {
   const clientFilterModalName = "ClientFilterModal";
   const tableHeader = "Clients Table";
 
+  const { modals } = useSelector((state) => state.modals);
+  const openClientFilterModal = modals[clientFilterModalName] ? true : false;
+  const openExportExcelModal = modals[exportExcelModalName] ? true : false;
+  const openClientStatusModal = modals[updateClientStatusModalName]
+    ? true
+    : false;
+  const openUpdateClientModal = modals[updateClientModalname] ? true : false;
+
   // ----------------------- Constants -----------------------
   const actionIcons = [
     {
       icon: () => (
-        <VisibilityIcon className="text-indigo-500 group-hover:text-indigo-600" />
+        <MdVisibility
+          size={24}
+          className="text-indigo-500 group-hover:text-indigo-600"
+        />
       ),
       tooltip: "View Client Info",
       onClick: (item) => {
@@ -36,7 +55,7 @@ const Clients = () => {
     },
     {
       icon: () => (
-        <EditIcon className="text-blue-500 group-hover:text-blue-600" />
+        <MdEdit size={24} className="text-blue-500 group-hover:text-blue-600" />
       ),
       tooltip: "Edit Client",
       onClick: (item) => {
@@ -46,7 +65,8 @@ const Clients = () => {
     {
       icon: (item) => (
         <div className={`${item?.isActive ? "" : "rotate-180"}`}>
-          <LogoutIcon
+          <MdLogout
+            size={24}
             className={`${!item?.isActive ? "text-green-700" : "text-red-500"}`}
           />
         </div>
@@ -62,8 +82,6 @@ const Clients = () => {
       },
     },
   ];
-
-
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -83,10 +101,10 @@ const Clients = () => {
   // ----------------------- Functions -----------------------
   const ClientCards = (
     <div className=" gap-4 md:hidden grid  grid-cols-1">
-        {clientsData.map((item, idx) => (
-          <ClientCard key={idx} actions={actionIcons} item={item} />
-        ))}
-      </div>
+      {clientsData.map((item, idx) => (
+        <ClientCard key={idx} actions={actionIcons} item={item} />
+      ))}
+    </div>
   );
 
   // ----------------------- useEffects -----------------------
@@ -108,11 +126,12 @@ const Clients = () => {
   return (
     <div className="w-full pt-14 sm:px-5">
       <div className="flex justify-end mb-5">
-        <Button variant="contained" 
-        onClick={() => navigate("/add-client")}
-        color="primary">
+        <button
+          className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 transition"
+          onClick={() => navigate("/add-client")}
+        >
           Add Client
-        </Button>
+        </button>
       </div>
 
       <DataTable
@@ -134,15 +153,36 @@ const Clients = () => {
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
       />
+      {openUpdateClientModal && (
+        <Suspense fallback={<ModalFallback />}>
+          <UpdateClientModal modalName={updateClientModalname} />
+        </Suspense>
+      )}
 
-      <UpdateClientModal modalName={updateClientModalname} />
-      <ActiveInactiveModal modalName={updateClientStatusModalName} />
-      <ExportClientExcelModal filters={filters} modalName={exportExcelModalName} />
-      <ClientFilterModal
-        setFilters={setFilters}
-        filters={filters}
-        modalName={clientFilterModalName}
-      />
+      {openClientStatusModal && (
+        <Suspense fallback={<ModalFallback />}>
+          <ActiveInactiveModal modalName={updateClientStatusModalName} />
+        </Suspense>
+      )}
+
+      {openExportExcelModal && (
+        <Suspense fallback={<ModalFallback />}>
+          <ExportClientExcelModal
+            filters={filters}
+            modalName={exportExcelModalName}
+          />
+        </Suspense>
+      )}
+
+      {openClientFilterModal && (
+        <Suspense fallback={<ModalFallback />}>
+          <ClientFilterModal
+            setFilters={setFilters}
+            filters={filters}
+            modalName={clientFilterModalName}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };

@@ -40,6 +40,7 @@ function CreateClient() {
     handleSubmit,
     formState: { errors },
     watch,
+    reset
   } = useForm();
 
   const onSubmit = (data) => {
@@ -71,8 +72,9 @@ function CreateClient() {
   };
 
   useEffect(() => {
+    reset({});
     dispatch(getPricePlans());
-  }, [dispatch]);
+  }, []);
 
   return (
     <section className="mt-4 flex justify-center items-center bg-gray-100">

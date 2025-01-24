@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, Suspense, useState, lazy } from "react";
 import {
   Button,
   IconButton,
@@ -17,10 +17,11 @@ import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { openModal } from "../../features/slices/modalSlice";
 import RawTable from "./RawTable";
-import FilterPresetModal from "../Filter/FilterPresetModal";
+const FilterPresetModal = lazy(() => import("../Filter/FilterPresetModal"));
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import ModalFallback from "../Fallback/ModalFallback";
 
-const DataTable = React.memo(
+const DataTable = memo(
   ({
     tableHeader = "Table",
     tableUniqueKey = "id",
@@ -180,12 +181,13 @@ const DataTable = React.memo(
           </div>
         )}
         {isPresetModalOpen && (
+          <Suspense fallback={<ModalFallback />}>
           <FilterPresetModal
             tableName={tableUniqueKey}
             filters={filters}
             setFilters={setFilters}
             setIsPresetModalOpen={setIsPresetModalOpen}
-          />
+          /></Suspense>
         )}
       </div>
     );
