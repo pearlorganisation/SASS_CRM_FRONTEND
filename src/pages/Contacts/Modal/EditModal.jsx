@@ -1,24 +1,35 @@
-import React from "react";
-import { useForm } from "react-hook-form";
+import React, { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { getLocations } from "../../../features/actions/location";
+import Select from "react-select";
 
 const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
+  const dispatch = useDispatch();
 
+  const { locationsData } = useSelector((state) => state.location);
 
-
-
+  useEffect(() => {
+    dispatch(
+      getLocations({
+        page: 1,
+        limit: 1000,
+        filters: undefined,
+      })
+    );
+  }, []);
 
   function removeBlankAttributes(obj) {
     const result = {};
     for (const key in obj) {
-        if ( obj[key] !== null && obj[key] !== undefined && obj[key].length > 0) {
-            result[key] = obj[key];
-        }
+      if (obj[key] !== null && obj[key] !== undefined && obj[key].length > 0) {
+        result[key] = obj[key];
+      }
     }
     return result;
-}
+  }
 
-
-  const { register, handleSubmit } = useForm({
+  const { control, register, handleSubmit, errors } = useForm({
     defaultValues: {
       firstName: initialData?.firstName,
       lastName: initialData?.lastName,
@@ -29,8 +40,8 @@ const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
   });
 
   const onSubmit = (data) => {
-    data['id'] = initialData?._id;
-    let finalData = removeBlankAttributes(data)
+    data["id"] = initialData?._id;
+    let finalData = removeBlankAttributes(data);
     onConfirmEdit(finalData);
   };
 
@@ -75,13 +86,52 @@ const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
             </div>
 
             <div className="flex-1">
-              <label className="block text-sm font-medium">Location</label>
-              <input
+              <div className="flex flex-row justify-between">
+                <label className="block text-sm font-medium">Location</label>
+                <button className="text-sm text-blue-500 hover:text-blue-700 transition duration-300">
+                  Request Location
+                </button>
+              </div>
+              <Controller
+                name="location"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={locationsData.map((option) => ({
+                      value: option?.name,
+                      label: option?.name,
+                    }))}
+                    className="mt-1 text-sm shadow"
+                    placeholder="Choose Location"
+                    value={
+                      field.value
+                        ? { value: field.value, label: field.value }
+                        : null
+                    } // Correctly setting the selected option
+                    onChange={(selected) => {
+                      field.onChange(selected.value);
+                    }}
+                    styles={{
+                      control: (provided) => ({
+                        ...provided,
+                        border: "1px solid #CBD5E1", // Red border if there's an error
+                        borderRadius: "7px",
+                      }),
+                      placeHolder: (provided) => ({
+                        ...provided,
+                        color: "#9CA3AF",
+                      }),
+                    }}
+                  />
+                )}
+              />
+              {/* <input
                 {...register("location")}
                 type="text"
                 className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 focus:border-teal-500 focus:outline-none"
                 placeholder="Enter Location"
-              />
+              /> */}
             </div>
           </div>
 
