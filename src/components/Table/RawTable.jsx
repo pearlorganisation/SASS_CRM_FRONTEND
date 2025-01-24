@@ -152,9 +152,14 @@ const RawTable = ({
                       (formatDateAsNumber(row?.[column.key]) ?? "N/A")}
                     {column.type === "Product" &&
                       (row?.[column.key][column?.subKey] ?? "N/A")}
-                    {column.type === "Location" && ((row?.[column.key] && locations && locations.find((item) => {
+                      {
+                        row?.[column.key] && locations && console.log(locations.findIndex((item) => {
+                          return item.name === row?.[column.key]
+                        }))
+                      }
+                    {column.type === "Location" && ((row?.[column.key] && locations && locations.findIndex((item) => {
                       return item.name === row?.[column.key]
-                    }) ? row?.[column.key] : <span className="text-red-500">{row?.[column.key] ?? "N/A"}</span>))}
+                    }) >= 0 ? row?.[column.key] : <span className="text-red-500">{row?.[column.key] ?? "N/A"}</span>))}
                     {column.type === "" &&
                       (row?.[column.key] !== undefined &&
                       row?.[column.key] !== null
