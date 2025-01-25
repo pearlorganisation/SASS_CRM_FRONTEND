@@ -56,9 +56,10 @@ function EmployeeAssignModal({
 
       dispatch(
         addAssign({
-          webinar: webinarId,
-          employee: selectedEmployee,
-          assignments: selectedRows,
+          webinar: webinarId ,
+          user: selectedEmployee,
+          attendees : selectedRows,
+          recordType: tabValue
         })
       );
       logUserActivity({

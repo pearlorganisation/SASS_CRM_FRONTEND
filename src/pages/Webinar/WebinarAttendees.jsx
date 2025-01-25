@@ -296,10 +296,7 @@ const WebinarAttendees = () => {
         createPortal(
           <EmployeeAssignModal
             tabValue={tabValue}
-            selectedRows={selectedRows.map((rowId) => ({
-              attendee: rowId,
-              recordType: tabValue,
-            }))}
+            selectedRows={selectedRows}
             setAssignModal={setAssignModal}
             webinarId={id}
           />,

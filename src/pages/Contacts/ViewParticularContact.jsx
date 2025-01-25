@@ -194,7 +194,6 @@ const ViewParticularContact = () => {
     dispatch(getEnrollments({ id: email }));
   }, [email]);
 
-
   const cancelMyAlarm = (id) => {
     dispatch(cancelAlarm({ id }));
   };
@@ -249,19 +248,15 @@ const ViewParticularContact = () => {
             <div className="border rounded-lg py-2 px-3 shadow-md">
               <p>
                 Name :{" "}
-                {selectedAttendee &&
-                  selectedAttendee.length > 0 &&
-                  selectedAttendee[0]?.data?.map(
-                    (item, index) =>
-                      item?.firstName && (
-                        <span
-                          key={index}
-                          className="ms-2 bg-slate-100 rounded-md px-3 py-1"
-                        >
-                          {`${item.firstName} ${item.lastName}`}
-                        </span>
-                      )
-                  )}
+                {Array.isArray(uniqueNames) &&
+                  uniqueNames.map((item, index) => (
+                    <span
+                      key={index}
+                      className="ms-2 bg-slate-100 rounded-md px-3 py-1"
+                    >
+                      {`${item || ""}`.trim()}
+                    </span>
+                  ))}
               </p>
             </div>
 
@@ -393,7 +388,7 @@ const ViewParticularContact = () => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+        <div className="grid grid-cols-1 gap-4 ">
           <div className="mt-12 shadow-lg rounded-lg overflow-x-auto">
             {!selectedAttendee &&
             selectedAttendee.length <= 0 &&
@@ -417,20 +412,22 @@ const ViewParticularContact = () => {
                     <OpenInNew />
                   </IconButton>
                 </div>
-                <div className="w-full overflow-auto ">
+                <div className="  h-96 overflow-y-auto">
+                  <div className="w-full overflow-auto ">
                 <table className="table-auto text-sm text-center ">
-                  <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between ">
-                    <tr>
-                      <th className="py-3 px-1">S No.</th>
-                      <th className="py-3 px-1 ">Webinar</th>
-                      <th className="py-3 px-1 min-w-[150px]">First Name</th>
-                      <th className="py-3 px-1 min-w-[150px]">Last Name</th>
-                      <th className="py-3 min-w-[200px]">Webinar Minutes</th>
-                      <th className="py-3 px-1">Location</th>
+                    <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between ">
+                      <tr>
+                        <th className="py-3 px-1">S No.</th>
+                        <th className="py-3 px-1 ">Webinar</th>
+                        <th className="py-3 px-1">Type</th>
+                        <th className="py-3 px-1 min-w-[150px]">First Name</th>
+                        <th className="py-3 px-1 min-w-[150px]">Last Name</th>
+                        <th className="py-3 min-w-[200px]">Webinar Minutes</th>
+                        <th className="py-3 px-1">Location</th>
                       <th className="py-3 px-1 min-w-[150px]">Webinar Date</th>
-                      <th className="py-3 px-1 stickyFieldRight">Action</th>
-                    </tr>
-                  </thead>
+                        <th className="py-3 px-1 stickyFieldRight">Action</th>
+                      </tr>
+                    </thead>
 
                   <tbody className="text-gray-600 divide-y">
                     {false ? (
@@ -454,58 +451,62 @@ const ViewParticularContact = () => {
                               {idx + 1}
                             </td>
 
-                            <td className="px-2 py-4 whitespace-nowrap ">
-                              {Array.isArray(item?.webinar) &&
-                              item.webinar.length > 0
-                                ? item?.webinar[0].webinarName
-                                : "-"}
-                            </td>
+                              <td className="px-2 py-4 whitespace-nowrap ">
+                                {Array.isArray(item?.webinar) &&
+                                item.webinar.length > 0
+                                  ? item?.webinar[0].webinarName
+                                  : "-"}
+                              </td>
+                              <td className="px-2 py-4 whitespace-nowrap ">
+                              {item?.isAttended ? "Sales" : "Reminder"}
+                              </td>
 
-                            <td className="px-2 py-4 whitespace-nowrap ">
-                              {item?.firstName || "-"}
-                            </td>
-
+                              <td className="px-2 py-4 whitespace-nowrap ">
+                                {item?.firstName || "-"}
+                              </td>
+  
                             <td className="px-2 py-4 whitespace-nowrap">
-                              {item?.lastName?.match(/:-\)/)
-                                ? "--"
-                                : item?.lastName || "-"}
-                            </td>
+                                {item?.lastName?.match(/:-\)/)
+                                  ? "--"
+                                  : item?.lastName || "-"}
+                              </td>
 
-                            <td className=" py-4 text-center whitespace-nowrap">
-                              {item?.timeInSession}
-                            </td>
-                            
+                              <td className=" py-4 text-center whitespace-nowrap">
+                                {item?.timeInSession}
+                              </td>
+                              
                             <td className=" py-4 text-center whitespace-nowrap">
                               {item?.location}
                             </td> 
 
                             <td className="px-3 py-4 whitespace-nowrap">
-                              {Array.isArray(item?.webinar) &&
-                              item.webinar.length > 0
-                                ? new Date(
-                                    item?.webinar[0].webinarDate
-                                  ).toDateString()
-                                : "-"}
-                            </td>
-                            <ComponentGuard
-                              conditions={[
-                                employeeModeData ? false : true,
-                                userData?.isActive,
-                              ]}
-                            >
-                              <td className="px-3 py-4 h-full stickyFieldRight" >
-                                <FaRegEdit
-                                  onClick={() => setEditModalData(item)}
-                                  className="text-xl cursor-pointer"
-                                />
+                                {Array.isArray(item?.webinar) &&
+                                item.webinar.length > 0
+                                  ? new Date(
+                                      item?.webinar[0].webinarDate
+                                    ).toDateString()
+                                  : "-"}
                               </td>
-                            </ComponentGuard>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
+                              <ComponentGuard
+                                conditions={[
+                                  employeeModeData ? false : true,
+                                  userData?.isActive,
+                                ]}
+                              >
+                                <td className="px-3 py-4 h-full stickyFieldRight" >
+                                  <FaRegEdit
+                                    onClick={() => setEditModalData(item)}
+                                    className="text-xl cursor-pointer"
+                                  />
+                                </td>
+                              </ComponentGuard>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
                 </div>
               </div>
             )}
@@ -614,7 +615,11 @@ const ViewParticularContact = () => {
         />
       )}
       {showTimerModal && (
-        <ViewTimerModal setModal={setShowTimerModal} email={email} attendeeId={attendeeId} />
+        <ViewTimerModal
+          setModal={setShowTimerModal}
+          email={email}
+          attendeeId={attendeeId}
+        />
       )}
       {editModalData && (
         <EditModal
