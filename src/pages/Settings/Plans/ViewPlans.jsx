@@ -3,10 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { getPricePlans } from "../../../features/actions/pricePlan";
 import PlanCard from "./PlanCard";
 import { getUserSubscription } from "../../../features/actions/auth";
+import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
+import useRoles from "../../../hooks/useRoles";
+import { Link } from "react-router-dom";
 
 const ViewPlans = () => {
+  const roles = useRoles();
   const { userData, subscription } = useSelector((state) => state.auth);
-  const role = userData?.role || "";
   const { planData, isPlanDeleted } = useSelector((state) => state.pricePlans);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -39,15 +42,13 @@ const ViewPlans = () => {
 
       <div className="grid grid-cols-1   lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
         <div className="col-span-full  flex justify-end items-end pt-6">
-          {/* {roles.SUPER_ADMIN === role && (
-            <div className="">
+          <ComponentGuard allowedRoles={[roles.SUPER_ADMIN]}><div className="">
               <Link to="/plans/addPlan">
                 <button className="w-fit  bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300">
                   Add Plan
                 </button>
               </Link>
-            </div>
-          )} */}
+            </div></ComponentGuard>
         </div>
         {planData &&
           Array.isArray(planData) &&

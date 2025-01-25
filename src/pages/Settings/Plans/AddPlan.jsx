@@ -25,12 +25,18 @@ import {
   TableCell,
   Paper,
   TableBody,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
+
 import FormInput from "../../../components/FormInput";
 import { filterTruthyValues } from "../../../utils/extra";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { getCustomOptions } from "../../../features/actions/globalData";
 import { attendeeTableColumns } from "../../../utils/columnData";
+import { getAllClientsForDropdown } from "../../../features/actions/client";
 const tableCellStyles = {
   paddingTop: "6px",
   paddingBottom: "6px",
@@ -206,7 +212,11 @@ export default function AddPlan() {
   const { isLoading, planData, isSuccess, singlePlanData } = useSelector(
     (state) => state.pricePlans
   );
+  const { clientsDropdownData } = useSelector((state) => state.client);
+  console.log(clientsDropdownData);
   const [isTableOpen, setIsTableOpen] = useState(false);
+  const [planType, setPlanType] = useState("normal");
+  const [assignedUsers, setAssignedUsers] = useState([]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -219,6 +229,13 @@ export default function AddPlan() {
     if (isEditMode) {
       payload["_id"] = id;
     }
+    if( planType === 'normal'){
+      payload['planType'] = 'normal'
+    }else if( planType === 'custom'){
+      payload['planType'] = 'custom';
+      payload['assignedUsers'] = assignedUsers;
+    }
+
     dispatch(isEditMode ? updatePricePlans(payload) : addPricePlans(payload));
   };
 
@@ -249,6 +266,10 @@ export default function AddPlan() {
     }
   }, [singlePlanData, isEditMode]);
 
+  useEffect(() => {
+    dispatch(getAllClientsForDropdown());
+  }, []);
+
   return (
     <div className="min-h-screen pt-14 flex justify-center items-center bg-gray-100 px-2">
       <Box className="max-w-4xl w-full bg-white shadow-md rounded-lg">
@@ -257,7 +278,7 @@ export default function AddPlan() {
             {isEditMode ? "Edit Price Plan" : "Add Price Plan"}
           </Typography>
         </Box>
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 w-full">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <FormInput
               name="name"
@@ -273,14 +294,6 @@ export default function AddPlan() {
               control={control}
               required={true}
               errorMessage="Price is required"
-            />
-            <FormInput
-              name="planDuration"
-              label="Plan Expiry (days)"
-              type="number"
-              control={control}
-              required={true}
-              errorMessage="Plan expiry is required"
             />
             <FormInput
               name="employeeCount"
@@ -307,45 +320,79 @@ export default function AddPlan() {
               required={true}
               errorMessage="Toggle limit is required"
             />
+            <FormControl variant="outlined">
+              <InputLabel id="attendee-label">Plan Type</InputLabel>
+              <Select
+                labelId="attendee-label"
+                value={planType}
+                onChange={(e) => setPlanType(e.target.value)}
+                label="Plan Type"
+              >
+                <MenuItem value="normal">Normal</MenuItem>
+                <MenuItem value="custom">Custom</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
 
-            <div className="flex ms-2 items-center">
-              <Typography className="font-semibold text-gray-800">
-                {"Custom Options (Create/Dropdown)"}
-              </Typography>
-              <Controller
-                name={`attendeeTableConfig.isCustomOptionsAllowed`}
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Checkbox
-                    onChange={(e) => {
-                      const isChecked = e.target.checked;
-                      // Update "Downloadable" checkbox
-                      onChange(isChecked);
-                      // Automatically check "Filterable" if "Downloadable" is checked
-                      if (!isChecked) {
-                        setValue(
-                          `attendeeTableConfig.customOptions.filterable`,
-                          false
-                        );
-                        // if (key === "status") {
-                        //   customOptions.forEach((option) =>
-                        //     setValue(
-                        //       `attendeeTableConfig.defaultOptions.${option?.label}`,
-                        //       false
-                        //     )
-                        //   );
-                        //   setValue(
-                        //     `attendeeTableConfig.customOptions.filterable`,
-                        //     false
-                        //   );
-                        // }
-                      }
-                    }}
-                    checked={value || false}
-                  />
-                )}
-              />
+          {planType === "custom" && (
+            <div className="mt-5">
+              <FormControl variant="outlined" className="w-full">
+                <InputLabel id="attendee-label">Users</InputLabel>
+                <Select
+                  labelId="attendee-label"
+                  fullWidth
+                  multiple
+                  value={assignedUsers}
+                  onChange={(e) => setAssignedUsers(e.target.value)}
+                  label="Select Users"
+                >
+                  {clientsDropdownData.map((client, index) => (
+                    <MenuItem key={index} value={client.value}>
+                      {client.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </div>
+          )}
+
+          <div className="flex mt-4 items-center">
+            <Typography className="font-semibold text-gray-800">
+              {"Custom Options (Create/Dropdown)"}
+            </Typography>
+            <Controller
+              name={`attendeeTableConfig.isCustomOptionsAllowed`}
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Checkbox
+                  onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    // Update "Downloadable" checkbox
+                    onChange(isChecked);
+                    // Automatically check "Filterable" if "Downloadable" is checked
+                    if (!isChecked) {
+                      setValue(
+                        `attendeeTableConfig.customOptions.filterable`,
+                        false
+                      );
+                      // if (key === "status") {
+                      //   customOptions.forEach((option) =>
+                      //     setValue(
+                      //       `attendeeTableConfig.defaultOptions.${option?.label}`,
+                      //       false
+                      //     )
+                      //   );
+                      //   setValue(
+                      //     `attendeeTableConfig.customOptions.filterable`,
+                      //     false
+                      //   );
+                      // }
+                    }
+                  }}
+                  checked={value || false}
+                />
+              )}
+            />
           </div>
 
           <Box className="mt-6">

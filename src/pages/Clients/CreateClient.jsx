@@ -52,6 +52,11 @@ function CreateClient() {
         return;
       }
       data["plan"] = selectedPlan;
+      data["planDuration"] = 30;
+      data["itemAmount"] = 1000;
+      data["taxPercent"] = 0;
+      data["taxAmount"] = 0;
+      data["totalAmount"] = 1000;
       dispatch(clientSignup(data)).then((res) => {
         if (res?.meta?.requestStatus === "fulfilled") {
           navigate("/clients", { replace: true });

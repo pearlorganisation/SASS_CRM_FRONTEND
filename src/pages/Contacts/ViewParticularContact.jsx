@@ -194,7 +194,6 @@ const ViewParticularContact = () => {
     dispatch(getEnrollments({ id: email }));
   }, [email]);
 
-
   const cancelMyAlarm = (id) => {
     dispatch(cancelAlarm({ id }));
   };
@@ -249,19 +248,15 @@ const ViewParticularContact = () => {
             <div className="border rounded-lg py-2 px-3 shadow-md">
               <p>
                 Name :{" "}
-                {selectedAttendee &&
-                  selectedAttendee.length > 0 &&
-                  selectedAttendee[0]?.data?.map(
-                    (item, index) =>
-                      item?.firstName && (
-                        <span
-                          key={index}
-                          className="ms-2 bg-slate-100 rounded-md px-3 py-1"
-                        >
-                          {`${item.firstName} ${item.lastName}`}
-                        </span>
-                      )
-                  )}
+                {Array.isArray(uniqueNames) &&
+                  uniqueNames.map((item, index) => (
+                    <span
+                      key={index}
+                      className="ms-2 bg-slate-100 rounded-md px-3 py-1"
+                    >
+                      {`${item || ""}`.trim()}
+                    </span>
+                  ))}
               </p>
             </div>
 
@@ -393,7 +388,7 @@ const ViewParticularContact = () => {
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+        <div className="grid grid-cols-1 gap-4 ">
           <div className="mt-12 shadow-lg rounded-lg overflow-x-auto">
             {!selectedAttendee &&
             selectedAttendee.length <= 0 &&
@@ -417,86 +412,92 @@ const ViewParticularContact = () => {
                     <OpenInNew />
                   </IconButton>
                 </div>
-                <table className="w-full table-auto text-sm text-left ">
-                  <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
-                    <tr>
-                      <th className="py-3 px-1">S No.</th>
-                      <th className="py-3 px-1">Webinar</th>
-                      <th className="py-3 px-1">First Name</th>
-                      <th className="py-3 px-1">Last Name</th>
-                      <th className="py-3  text-center">Webinar Minutes</th>
-                      <th className="py-3 px-1">Webinar Date</th>
-                      <th className="py-3 px-1">Action</th>
-                    </tr>
-                  </thead>
-
-                  <tbody className="text-gray-600 divide-y">
-                    {false ? (
+                <div className="  h-96 overflow-y-auto">
+                  <table className="w-full table-auto text-sm text-left ">
+                    <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
                       <tr>
-                        <td colSpan="8" className="text-center px-6 py-8">
-                          <Stack spacing={4}>
-                            <Skeleton variant="rounded" height={30} />
-                            <Skeleton variant="rounded" height={25} />
-                            <Skeleton variant="rounded" height={20} />
-                            <Skeleton variant="rounded" height={20} />
-                            <Skeleton variant="rounded" height={20} />
-                          </Stack>
-                        </td>
+                        <th className="py-3 px-1">S No.</th>
+                        <th className="py-3 px-1">Webinar</th>
+                        <th className="py-3 px-1">Type</th>
+                        <th className="py-3 px-1">First Name</th>
+                        <th className="py-3 px-1">Last Name</th>
+                        <th className="py-3  text-center">Webinar Minutes</th>
+                        <th className="py-3 px-1">Webinar Date</th>
+                        <th className="py-3 px-1">Action</th>
                       </tr>
-                    ) : (
-                      selectedAttendee[0]?.data?.map((item, idx) => {
-                        return (
-                          <tr key={idx}>
-                            <td className={`px-3 py-4 whitespace-nowrap `}>
-                              {idx + 1}
-                            </td>
+                    </thead>
 
-                            <td className="px-2 py-4 whitespace-nowrap ">
-                              {Array.isArray(item?.webinar) &&
-                              item.webinar.length > 0
-                                ? item?.webinar[0].webinarName
-                                : "-"}
-                            </td>
-
-                            <td className="px-2 py-4 whitespace-nowrap ">
-                              {item?.firstName || "-"}
-                            </td>
-                            <td className="px-2 py-4 whitespace-nowrap">
-                              {item?.lastName?.match(/:-\)/)
-                                ? "--"
-                                : item?.lastName || "-"}
-                            </td>
-
-                            <td className=" py-4 text-center whitespace-nowrap">
-                              {item?.timeInSession}
-                            </td>
-                            <td className="px-3 py-4 whitespace-nowrap">
-                              {Array.isArray(item?.webinar) &&
-                              item.webinar.length > 0
-                                ? new Date(
-                                    item?.webinar[0].webinarDate
-                                  ).toDateString()
-                                : "-"}
-                            </td>
-                            <ComponentGuard
-                              conditions={[
-                                employeeModeData ? false : true,
-                                userData?.isActive,
-                              ]}
-                            >
-                              <td className="px-3 py-4 h-full">
-                                <FaRegEdit
-                                  onClick={() => setEditModalData(item)}
-                                  className="text-xl cursor-pointer"
-                                />
+                    <tbody className="text-gray-600">
+                      {false ? (
+                        <tr>
+                          <td colSpan="8" className="text-center px-6 py-8">
+                            <Stack spacing={4}>
+                              <Skeleton variant="rounded" height={30} />
+                              <Skeleton variant="rounded" height={25} />
+                              <Skeleton variant="rounded" height={20} />
+                              <Skeleton variant="rounded" height={20} />
+                              <Skeleton variant="rounded" height={20} />
+                            </Stack>
+                          </td>
+                        </tr>
+                      ) : (
+                        selectedAttendee[0]?.data?.map((item, idx) => {
+                          return (
+                            <tr key={idx}>
+                              <td className={`px-3 py-4 whitespace-nowrap `}>
+                                {idx + 1}
                               </td>
-                            </ComponentGuard>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
+
+                              <td className="px-2 py-4 whitespace-nowrap ">
+                                {Array.isArray(item?.webinar) &&
+                                item.webinar.length > 0
+                                  ? item?.webinar[0].webinarName
+                                  : "-"}
+                              </td>
+                              <td className="px-2 py-4 whitespace-nowrap ">
+                              {item?.isAttended ? "Sales" : "Reminder"}
+                              </td>
+
+                              <td className="px-2 py-4 whitespace-nowrap ">
+                                {item?.firstName || "-"}
+                              </td>
+                              <td className="px-2 py-4 whitespace-nowrap">
+                                {item?.lastName?.match(/:-\)/)
+                                  ? "--"
+                                  : item?.lastName || "-"}
+                              </td>
+
+                              <td className=" py-4 text-center whitespace-nowrap">
+                                {item?.timeInSession}
+                              </td>
+                              <td className="px-3 py-4 whitespace-nowrap">
+                                {Array.isArray(item?.webinar) &&
+                                item.webinar.length > 0
+                                  ? new Date(
+                                      item?.webinar[0].webinarDate
+                                    ).toDateString()
+                                  : "-"}
+                              </td>
+                              <ComponentGuard
+                                conditions={[
+                                  employeeModeData ? false : true,
+                                  userData?.isActive,
+                                ]}
+                              >
+                                <td className="px-3 py-4 h-full">
+                                  <FaRegEdit
+                                    onClick={() => setEditModalData(item)}
+                                    className="text-xl cursor-pointer"
+                                  />
+                                </td>
+                              </ComponentGuard>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
@@ -604,7 +605,11 @@ const ViewParticularContact = () => {
         />
       )}
       {showTimerModal && (
-        <ViewTimerModal setModal={setShowTimerModal} email={email} attendeeId={attendeeId} />
+        <ViewTimerModal
+          setModal={setShowTimerModal}
+          email={email}
+          attendeeId={attendeeId}
+        />
       )}
       {editModalData && (
         <EditModal
