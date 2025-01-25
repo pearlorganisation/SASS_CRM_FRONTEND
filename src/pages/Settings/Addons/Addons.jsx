@@ -9,7 +9,7 @@ import {
   getAddons,
   getClientAddons,
 } from "../../../features/actions/pricePlan";
-import { resetPricePlanSuccess } from "../../../features/slices/pricePlan";
+import { resetAddonsData, resetPricePlanSuccess } from "../../../features/slices/pricePlan";
 import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
 import useRoles from "../../../hooks/useRoles";
 import { useNavigate, useParams } from "react-router-dom";
@@ -32,12 +32,15 @@ const AddOnsPage = () => {
   const { userData } = useSelector((state) => state.auth);
   const { isLoading, isSuccess, addonsData } = useSelector(
     (state) => state.pricePlans
-    );
- 
+  );
 
   useEffect(() => {
     if (!id) dispatch(getAddons());
     else dispatch(getClientAddons(id));
+
+    return () => {
+      dispatch(resetAddonsData());
+    };
   }, [id]);
 
   useEffect(() => {
@@ -186,4 +189,3 @@ const AddOnsPage = () => {
 };
 
 export default AddOnsPage;
-

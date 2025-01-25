@@ -37,6 +37,7 @@ import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { getCustomOptions } from "../../../features/actions/globalData";
 import { attendeeTableColumns } from "../../../utils/columnData";
 import { getAllClientsForDropdown } from "../../../features/actions/client";
+import { toast } from "sonner";
 const tableCellStyles = {
   paddingTop: "6px",
   paddingBottom: "6px",
@@ -213,9 +214,8 @@ export default function AddPlan() {
     (state) => state.pricePlans
   );
   const { clientsDropdownData } = useSelector((state) => state.client);
-  console.log(clientsDropdownData);
   const [isTableOpen, setIsTableOpen] = useState(false);
-  const [planType, setPlanType] = useState("normal");
+  const [planType, setPlanType] = useState("");
   const [assignedUsers, setAssignedUsers] = useState([]);
 
   const dispatch = useDispatch();
@@ -223,17 +223,19 @@ export default function AddPlan() {
 
   const onSubmit = async (data) => {
     const payload = filterTruthyValues(data);
+
+    if (planType === "custom") {
+      payload["planType"] = "custom";
+      payload["assignedUsers"] = assignedUsers;
+    } else {
+      payload["planType"] = "normal";
+    }
+
     if (!("attendeeTableConfig" in payload)) {
       payload["attendeeTableConfig"] = {};
     }
     if (isEditMode) {
       payload["_id"] = id;
-    }
-    if( planType === 'normal'){
-      payload['planType'] = 'normal'
-    }else if( planType === 'custom'){
-      payload['planType'] = 'custom';
-      payload['assignedUsers'] = assignedUsers;
     }
 
     dispatch(isEditMode ? updatePricePlans(payload) : addPricePlans(payload));
@@ -248,7 +250,7 @@ export default function AddPlan() {
   useEffect(() => {
     if (isEditMode) {
       dispatch(getPricePlan(id));
-      dispatch(getCustomOptions());
+
     }
   }, [id, isEditMode]);
 
@@ -263,11 +265,19 @@ export default function AddPlan() {
         toggleLimit: singlePlanData.toggleLimit || 0,
         attendeeTableConfig: singlePlanData.attendeeTableConfig || {},
       });
+
+      setPlanType(singlePlanData.planType || "normal");
+      setAssignedUsers(singlePlanData.assignedUsers || []);
     }
   }, [singlePlanData, isEditMode]);
 
   useEffect(() => {
+    if(!id){
+      setPlanType("normal");
+    }
+
     dispatch(getAllClientsForDropdown());
+    dispatch(getCustomOptions());
   }, []);
 
   return (

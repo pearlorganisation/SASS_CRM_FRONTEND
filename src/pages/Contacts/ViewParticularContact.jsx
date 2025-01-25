@@ -398,7 +398,7 @@ const ViewParticularContact = () => {
               </div>
             ) : (
               <div className="p-2 bg-neutral-100 rounded-lg shadow-md">
-                <div className=" items-center px-3 text-neutral-800  flex justify-between">
+                <div className="w-full items-center px-3 text-neutral-800  flex justify-between">
                   <span className="font-semibold text-xl  ">
                     Attendee History
                   </span>
@@ -412,41 +412,43 @@ const ViewParticularContact = () => {
                     <OpenInNew />
                   </IconButton>
                 </div>
-                <div className="  h-96 overflow-y-auto">
-                  <table className="w-full table-auto text-sm text-left ">
-                    <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
-                      <tr>
-                        <th className="py-3 px-1">S No.</th>
-                        <th className="py-3 px-1">Webinar</th>
-                        <th className="py-3 px-1">Type</th>
-                        <th className="py-3 px-1">First Name</th>
-                        <th className="py-3 px-1">Last Name</th>
-                        <th className="py-3  text-center">Webinar Minutes</th>
-                        <th className="py-3 px-1">Webinar Date</th>
-                        <th className="py-3 px-1">Action</th>
-                      </tr>
-                    </thead>
+                <div className="w-full max-h-96  overflow-auto ">
+                <table className="table-auto text-sm text-center ">
+                  <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between ">
+                    <tr>
+                      <th className="py-3 px-1">S No.</th>
+                      <th className="py-3 px-1 ">Webinar</th>
+                      <th className="py-3 px-1">Type</th>
+                      <th className="py-3 px-1 min-w-[150px]">First Name</th>
+                      <th className="py-3 px-1 min-w-[150px]">Last Name</th>
+                      <th className="py-3 min-w-[200px]">Webinar Minutes</th>
+                      <th className="py-3 px-1">Location</th>
+                      <th className="py-3 px-1 min-w-[150px]">Webinar Date</th>
+                      <th className="py-3 px-1 stickyFieldRight">Action</th>
+                    </tr>
+                  </thead>
 
-                    <tbody className="text-gray-600">
-                      {false ? (
-                        <tr>
-                          <td colSpan="8" className="text-center px-6 py-8">
-                            <Stack spacing={4}>
-                              <Skeleton variant="rounded" height={30} />
-                              <Skeleton variant="rounded" height={25} />
-                              <Skeleton variant="rounded" height={20} />
-                              <Skeleton variant="rounded" height={20} />
-                              <Skeleton variant="rounded" height={20} />
-                            </Stack>
-                          </td>
-                        </tr>
-                      ) : (
-                        selectedAttendee[0]?.data?.map((item, idx) => {
-                          return (
-                            <tr key={idx}>
-                              <td className={`px-3 py-4 whitespace-nowrap `}>
-                                {idx + 1}
-                              </td>
+                  <tbody className="text-gray-600 divide-y">
+                    {false ? (
+                      <tr>
+                        <td colSpan="8" className="text-center px-6 py-8">
+                          <Stack spacing={4}>
+                            <Skeleton variant="rounded" height={30} />
+                            <Skeleton variant="rounded" height={25} />
+                            <Skeleton variant="rounded" height={20} />
+                            <Skeleton variant="rounded" height={20} />
+                            <Skeleton variant="rounded" height={20} />
+                            <Skeleton variant="rounded" height={20} />
+                          </Stack>
+                        </td>
+                      </tr>
+                    ) : (
+                      selectedAttendee[0]?.data?.map((item, idx) => {
+                        return (
+                          <tr key={idx}>
+                            <td className={`px-3 py-4 whitespace-nowrap `}>
+                              {idx + 1}
+                            </td>
 
                               <td className="px-2 py-4 whitespace-nowrap ">
                                 {Array.isArray(item?.webinar) &&
@@ -458,45 +460,51 @@ const ViewParticularContact = () => {
                               {item?.isAttended ? "Sales" : "Reminder"}
                               </td>
 
-                              <td className="px-2 py-4 whitespace-nowrap ">
-                                {item?.firstName || "-"}
-                              </td>
-                              <td className="px-2 py-4 whitespace-nowrap">
-                                {item?.lastName?.match(/:-\)/)
-                                  ? "--"
-                                  : item?.lastName || "-"}
-                              </td>
+                            <td className="px-2 py-4 whitespace-nowrap ">
+                              {item?.firstName || "-"}
+                            </td>
 
-                              <td className=" py-4 text-center whitespace-nowrap">
-                                {item?.timeInSession}
+                            <td className="px-2 py-4 whitespace-nowrap">
+                              {item?.lastName?.match(/:-\)/)
+                                ? "--"
+                                : item?.lastName || "-"}
+                            </td>
+
+                            <td className=" py-4 text-center whitespace-nowrap">
+                              {item?.timeInSession}
+                            </td>
+                            
+                            <td className=" py-4 text-center whitespace-nowrap">
+                              {item?.location}
+                            </td> 
+
+                            <td className="px-3 py-4 whitespace-nowrap">
+                              {Array.isArray(item?.webinar) &&
+                              item.webinar.length > 0
+                                ? new Date(
+                                    item?.webinar[0].webinarDate
+                                  ).toDateString()
+                                : "-"}
+                            </td>
+                            <ComponentGuard
+                              conditions={[
+                                employeeModeData ? false : true,
+                                userData?.isActive,
+                              ]}
+                            >
+                              <td className="px-3 py-4 h-full stickyFieldRight" >
+                                <FaRegEdit
+                                  onClick={() => setEditModalData(item)}
+                                  className="text-xl cursor-pointer"
+                                />
                               </td>
-                              <td className="px-3 py-4 whitespace-nowrap">
-                                {Array.isArray(item?.webinar) &&
-                                item.webinar.length > 0
-                                  ? new Date(
-                                      item?.webinar[0].webinarDate
-                                    ).toDateString()
-                                  : "-"}
-                              </td>
-                              <ComponentGuard
-                                conditions={[
-                                  employeeModeData ? false : true,
-                                  userData?.isActive,
-                                ]}
-                              >
-                                <td className="px-3 py-4 h-full">
-                                  <FaRegEdit
-                                    onClick={() => setEditModalData(item)}
-                                    className="text-xl cursor-pointer"
-                                  />
-                                </td>
-                              </ComponentGuard>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
+                            </ComponentGuard>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
                 </div>
               </div>
             )}

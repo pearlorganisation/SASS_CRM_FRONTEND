@@ -61,9 +61,9 @@ const Location = () => {
     );
   }, [page, LIMIT, filters]);
 
-  useEffect(() => {
-    console.log(locationsData);
-  }, []);
+  // useEffect(() => {
+  //   console.log(locationsData);
+  // }, []);
 
   const navigateToAdd = () => navigate("/requestLocation");
 

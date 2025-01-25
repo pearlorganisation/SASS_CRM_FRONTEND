@@ -73,9 +73,6 @@ const PlanCard = (props) => {
   } = plan;
 
 
-  useEffect(() => {
-    console.log(currentPlan)
-  }, [currentPlan])
 
   return (
     <div className="relative mx-auto border border-gray-200 p-6 overflow-hidden rounded-xl shadow-lg max-w-sm bg-white m-4 transition-all duration-300 hover:shadow-xl">
