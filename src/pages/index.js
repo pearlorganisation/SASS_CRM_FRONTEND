@@ -51,6 +51,7 @@ const Notifications = lazy(() => import("./Notifications/Notifications"));
 const BillingHistory = lazy(() =>
   import("./Settings/BillingHistory/BillingHistory")
 );
+const PlanOrder = lazy(() => import("./Settings/Plans/PlanOrder"));
 
 export {
   CalendarPage,
@@ -91,4 +92,5 @@ export {
   MyAddOns,
   Notifications,
   BillingHistory,
+  PlanOrder
 };

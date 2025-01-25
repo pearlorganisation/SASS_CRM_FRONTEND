@@ -425,7 +425,7 @@ const ViewParticularContact = () => {
                     <OpenInNew />
                   </IconButton>
                 </div>
-                <div className="  h-96 overflow-y-auto">
+                <div className="  max-h-96 overflow-y-auto">
                   <div className="w-full overflow-auto ">
                     <table className="w-full table-auto text-sm text-center ">
                       <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between ">

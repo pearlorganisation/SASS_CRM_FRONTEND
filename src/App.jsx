@@ -43,6 +43,7 @@ import {
   MyAddOns,
   Notifications,
   BillingHistory,
+  PlanOrder,
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 import {
@@ -399,6 +400,14 @@ const App = () => {
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN"]}>
               <AddPlan />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/plans/order",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN"]}>
+              <PlanOrder />
             </RouteGuard>
           ),
         },

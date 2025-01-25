@@ -46,6 +46,18 @@ export const updatePricePlans = createAsyncThunk(
   }
 );
 
+export const updatePlansOrder = createAsyncThunk(
+  "plans/updateOrder",
+  async ({ plans = [] }, { rejectWithValue }) => {
+    try {
+      const response = await instance.put(`plans/order`, { plans });
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 //update Price Plans
 export const deletePricePlan = createAsyncThunk(
   "deletePricePlan",
@@ -118,9 +130,9 @@ export const getClientAddons = createAsyncThunk(
 //get Admin Billing History
 export const getAdminBillingHistory = createAsyncThunk(
   "billing-history/fetchData",
-  async ({page=1, limit=10}, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`billing-history`,{
+      const response = await instance.get(`billing-history`, {
         params: { page, limit },
       });
       return response?.data;
