@@ -124,9 +124,6 @@ const ViewParticularContact = () => {
     const uniqueNamesArr = Array.from(new Set(namesArr));
     setUniqueNames(uniqueNamesArr);
 
-
-      
-
     setAttendeeHistoryData((prev) => {
       const data = [...selectedAttendee[0]?.data];
       return data?.filter((item) => {
