@@ -124,6 +124,9 @@ const ViewParticularContact = () => {
     const uniqueNamesArr = Array.from(new Set(namesArr));
     setUniqueNames(uniqueNamesArr);
 
+
+      
+
     setAttendeeHistoryData((prev) => {
       const data = [...selectedAttendee[0]?.data];
       return data?.filter((item) => {
@@ -649,7 +652,8 @@ const ViewParticularContact = () => {
       {showEnrollmentModal && (
         <AddEnrollmentModal
           setModal={setShowEnrollmentModal}
-          attendeeId={attendeeId}
+          attendeeEmail={selectedAttendee && selectedAttendee[0]?._id}
+          webinarData={attendeeHistoryData}
         />
       )}
       <Dialog
