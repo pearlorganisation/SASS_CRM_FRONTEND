@@ -18,7 +18,7 @@ import FormInput from "../FormInput";
 import { filterTruthyValues } from "../../utils/extra";
 
 const FilterModal = ({ modalName, setFilters, filters }) => {
-  console.log("filter modal render");
+  // console.log("filter modal render");
   const dispatch = useDispatch();
   const { control, handleSubmit, register, reset } = useForm();
 

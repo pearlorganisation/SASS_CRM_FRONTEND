@@ -12,7 +12,7 @@ const RawTable = (props) => {
     selectedRows,
     setSelectedRows,
     rowClick = (row) => {
-      console.log("Row clicked:", row);
+      // console.log("Row clicked:", row);
     },
     isRowClickable = false,
     isLeadType = false,

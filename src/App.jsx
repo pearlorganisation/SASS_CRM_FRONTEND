@@ -116,7 +116,7 @@ const App = () => {
     }
 
     function onNotification(data) {
-      console.log(data);
+      // console.log(data);
       dispatch(newNotification(data));
       toast.info(data.title || "New Notification");
       if (data.actionType === NotifActionType.ACCOUNT_DEACTIVATION) {
@@ -125,7 +125,7 @@ const App = () => {
     }
 
     function onReminderPlay(data) {
-      console.log(data);
+      // console.log(data);
     }
 
     socket.on("connect", onConnect);
@@ -145,7 +145,7 @@ const App = () => {
 
   useEffect(() => {
     if (isConnected && userData) {
-      console.log("join emitted");
+      // console.log("join emitted");
       socket.emit("join", { user: userData._id });
     }
 
@@ -162,7 +162,7 @@ const App = () => {
     dispatch(setEmployeeModeId());
 
     if (isUserLoggedIn) {
-      console.log("connecting socket");
+      // console.log("connecting socket");
       socket.connect();
     }
 
