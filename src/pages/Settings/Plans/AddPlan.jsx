@@ -38,6 +38,7 @@ import { getCustomOptions } from "../../../features/actions/globalData";
 import { attendeeTableColumns } from "../../../utils/columnData";
 import { getAllClientsForDropdown } from "../../../features/actions/client";
 import { toast } from "sonner";
+import DiscountSection from "./DiscountSection";
 const tableCellStyles = {
   paddingTop: "6px",
   paddingBottom: "6px",
@@ -217,6 +218,28 @@ export default function AddPlan() {
   const [isTableOpen, setIsTableOpen] = useState(false);
   const [planType, setPlanType] = useState("");
   const [assignedUsers, setAssignedUsers] = useState([]);
+  const [planDurationConfig, setPlanDurationConfig] = useState({
+    monthly: {
+      duration: 30,
+      discountType: "percent",
+      discountValue: 0,
+    },
+    quarterly: {
+      duration: 90,
+      discountType: "percent",
+      discountValue: 0,
+    },
+    halfyearly: {
+      duration: 180,
+      discountType: "percent",
+      discountValue: 0,
+    },
+    yearly: {
+      duration: 365,
+      discountType: "percent",
+      discountValue: 0,
+    },
+  });
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -238,6 +261,7 @@ export default function AddPlan() {
       payload["_id"] = id;
     }
 
+    payload['planDurationConfig'] = planDurationConfig;
     dispatch(isEditMode ? updatePricePlans(payload) : addPricePlans(payload));
   };
 
@@ -250,7 +274,6 @@ export default function AddPlan() {
   useEffect(() => {
     if (isEditMode) {
       dispatch(getPricePlan(id));
-
     }
   }, [id, isEditMode]);
 
@@ -268,11 +291,15 @@ export default function AddPlan() {
 
       setPlanType(singlePlanData.planType || "normal");
       setAssignedUsers(singlePlanData.assignedUsers || []);
+
+      if (singlePlanData.planDurationConfig) {
+        setPlanDurationConfig(singlePlanData.planDurationConfig);
+      }
     }
   }, [singlePlanData, isEditMode]);
 
   useEffect(() => {
-    if(!id){
+    if (!id) {
       setPlanType("normal");
     }
 
@@ -405,7 +432,7 @@ export default function AddPlan() {
             />
           </div>
 
-          <Box className="mt-6">
+          <Box className="mt-6 shadow-md">
             <Box
               display="flex"
               alignItems="center"
@@ -427,6 +454,18 @@ export default function AddPlan() {
                 setValue={setValue}
               />
             </Collapse>
+          </Box>
+
+          <Box className="mt-6">
+            <Typography variant="h6" className="mb-2 font-semibold">
+              Discounts
+            </Typography>
+
+            <DiscountSection
+              planDurationConfig={planDurationConfig}
+              setPlanDurationConfig={setPlanDurationConfig}
+              watch={watch}
+            />
           </Box>
 
           <Box className="mt-6">

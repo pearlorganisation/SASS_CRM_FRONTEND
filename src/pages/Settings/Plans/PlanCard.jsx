@@ -72,8 +72,6 @@ const PlanCard = (props) => {
     employeeActivity,
   } = plan;
 
-
-
   return (
     <div className="relative mx-auto border border-gray-200 p-6 overflow-hidden rounded-xl shadow-lg max-w-sm bg-white m-4 transition-all duration-300 hover:shadow-xl">
       <ComponentGuard
@@ -111,7 +109,6 @@ const PlanCard = (props) => {
       </div>
 
       <div className="space-y-4 mb-6">
-          
         <Feature icon={<FaUsers />} label={`${employeeCount} employees`} />
         <Feature
           icon={<FaAddressBook />}
@@ -139,27 +136,29 @@ const PlanCard = (props) => {
         </Button>
       </div>
 
-      {currentPlan === plan?._id ? (
-        <button
-          className={`bg-green-600 w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
-          disabled
-        >
-          Current Plan
-        </button>
-      ) : (
-        <button
-          onClick={() => handlePlanSelection(plan?._id)}
-          className={`${
-            selectedPlan === plan?._id ? "bg-green-600" : "bg-blue-500"
-          } w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
-        >
-          {selectedPlan === null
-            ? "Choose Plan"
-            : selectedPlan === plan?._id
-            ? "Selected"
-            : "Choose Plan"}
-        </button>
-      )}
+      <ComponentGuard allowedRoles={[roles.ADMIN]}>
+        {currentPlan === plan?._id ? (
+          <button
+            className={`bg-green-600 w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
+            disabled
+          >
+            Current Plan
+          </button>
+        ) : (
+          <button
+            onClick={() => handlePlanSelection(plan?._id)}
+            className={`${
+              selectedPlan === plan?._id ? "bg-green-600" : "bg-blue-500"
+            } w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
+          >
+            {selectedPlan === null
+              ? "Choose Plan"
+              : selectedPlan === plan?._id
+              ? "Selected"
+              : "Choose Plan"}
+          </button>
+        )}
+      </ComponentGuard>
     </div>
   );
 };
