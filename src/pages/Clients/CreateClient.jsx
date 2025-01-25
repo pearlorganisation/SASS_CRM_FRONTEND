@@ -40,6 +40,7 @@ function CreateClient() {
     handleSubmit,
     formState: { errors },
     watch,
+    reset
   } = useForm();
 
   const onSubmit = (data) => {
@@ -51,6 +52,11 @@ function CreateClient() {
         return;
       }
       data["plan"] = selectedPlan;
+      data["planDuration"] = 30;
+      data["itemAmount"] = 1000;
+      data["taxPercent"] = 0;
+      data["taxAmount"] = 0;
+      data["totalAmount"] = 1000;
       dispatch(clientSignup(data)).then((res) => {
         if (res?.meta?.requestStatus === "fulfilled") {
           navigate("/clients", { replace: true });
@@ -71,8 +77,9 @@ function CreateClient() {
   };
 
   useEffect(() => {
+    reset({});
     dispatch(getPricePlans());
-  }, [dispatch]);
+  }, []);
 
   return (
     <section className="mt-4 flex justify-center items-center bg-gray-100">

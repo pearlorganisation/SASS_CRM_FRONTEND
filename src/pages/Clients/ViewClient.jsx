@@ -24,7 +24,10 @@ import { formatDate } from "../../utils/extra";
 import useRoles from "../../hooks/useRoles";
 import UserActivityLogs from "../../components/Client/UserActivityLogs";
 import { Delete, ExpandMore, Visibility } from "@mui/icons-material";
-import { deleteUserDocumet, getUserDocuments } from "../../features/actions/auth";
+import {
+  deleteUserDocumet,
+  getUserDocuments,
+} from "../../features/actions/auth";
 
 const ViewClient = () => {
   const { id } = useParams();
@@ -83,7 +86,7 @@ const ViewClient = () => {
             <Typography variant="h6" gutterBottom>
               Basic Information
             </Typography>
-            <Divider  />
+            <Divider />
             <Box display="flex" alignItems="center" className="mt-2" mb={2}>
               <EmailIcon color="primary" className="mr-2" />
               <Typography>
@@ -111,9 +114,10 @@ const ViewClient = () => {
               <Typography>
                 <strong>Limit:</strong>{" "}
                 {Array.isArray(clientData?.subscription) &&
-              clientData.subscription.length > 0
-                ? clientData.subscription[0].employeeLimit + clientData.subscription[0].employeeLimitAddon
-                : 0}
+                clientData.subscription.length > 0
+                  ? clientData.subscription[0].employeeLimit +
+                    clientData.subscription[0].employeeLimitAddon
+                  : 0}
               </Typography>
             </Box>
             <Box display="flex" alignItems="center" mb={1}>
@@ -147,12 +151,13 @@ const ViewClient = () => {
             <Typography variant="h6" gutterBottom>
               Contact Usage
             </Typography>
-            <Divider  />
+            <Divider />
             <Typography mt={1} variant="body1" gutterBottom>
               <strong>Limit:</strong>{" "}
               {Array.isArray(clientData?.subscription) &&
               clientData.subscription.length > 0
-                ? clientData.subscription[0].contactLimit + clientData.subscription[0].contactLimitAddon
+                ? clientData.subscription[0].contactLimit +
+                  clientData.subscription[0].contactLimitAddon
                 : 0}
             </Typography>
             <Typography variant="body1">
@@ -168,7 +173,7 @@ const ViewClient = () => {
               Plan Details
             </Typography>
             <Divider className="mb-3" />
-            <Box display="flex" className="mt-2" alignItems="center" mb={.5}>
+            <Box display="flex" className="mt-2" alignItems="center" mb={0.5}>
               <Typography>
                 <strong>Type:</strong> {clientData?.plan?.name}
               </Typography>
@@ -206,16 +211,18 @@ const ViewClient = () => {
                         </Typography>
 
                         <div className="flex gap-4">
-                        <Tooltip title="Open" arrow>
-                          <button
-                            onClick={() => dispatch(getUserDocuments(doc?.filename))}
-                            className="p-2 rounded-lg text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50"
-                          >
-                            <Visibility />
-                          </button>
-                        </Tooltip>
-                        
-                        {/* <Tooltip title="Delete" arrow>
+                          <Tooltip title="Open" arrow>
+                            <button
+                              onClick={() =>
+                                dispatch(getUserDocuments(doc?.filename))
+                              }
+                              className="p-2 rounded-lg text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50"
+                            >
+                              <Visibility />
+                            </button>
+                          </Tooltip>
+
+                          {/* <Tooltip title="Delete" arrow>
                           <button
                             onClick={() => dispatch(deleteUserDocumet(doc?.filename))}
                             className="p-2 rounded-lg text-red-500 hover:text-red-600 duration-150 hover:bg-gray-50"
@@ -224,12 +231,23 @@ const ViewClient = () => {
                           </button>
                         </Tooltip> */}
                         </div>
-
                       </div>
                     ))
                   : null}
               </AccordionDetails>
             </Accordion>
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Paper elevation={3} className="px-3 py-1">
+            <Typography variant="h6" gutterBottom>
+              Active/Inactive Note
+            </Typography>
+            <Divider />
+            <Typography mt={1} variant="body1" gutterBottom>
+              {clientData?.statusChangeNote}
+            </Typography>
           </Paper>
         </Grid>
 

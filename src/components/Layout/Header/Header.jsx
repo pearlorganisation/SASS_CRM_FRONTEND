@@ -12,7 +12,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
   const navigate = useNavigate(); // Initialize useNavigate for navigation
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, subscription } = useSelector((state) => state.auth);
   const { employeeModeData } = useSelector((state) => state.employee);
 
   const handleProfileClick = () => {
@@ -87,6 +87,13 @@ const Header = () => {
                 </button>
               </div>
             </ComponentGuard>
+
+            <ComponentGuard allowedRoles={[roles.ADMIN]} conditions={[expiryDays ? true : false]}>
+
+              </ComponentGuard>
+
+
+            
           <div className="flex items-center">
             <NotificationBell userData={userData} roles={roles} />
            

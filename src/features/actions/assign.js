@@ -6,14 +6,15 @@ import { AssignmentStatus } from "../../utils/extra";
 export const addAssign = createAsyncThunk(
   "attendee/assign",
   async (
-    { webinar = "", employee = "", assignments = [] },
+    { webinar = "", user = "", attendees = [], recordType = "" },
     { rejectWithValue, dispatch }
   ) => {
     try {
       const response = await instance.post(`assignment`, {
         webinar,
-        employee,
-        assignments,
+        user,
+        attendees,
+        recordType
       });
       return response;
     } catch (e) {

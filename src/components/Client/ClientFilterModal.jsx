@@ -18,9 +18,8 @@ import FormInput from "../FormInput";
 import { filterTruthyValues } from "../../utils/extra";
 
 const FilterModal = ({ modalName, setFilters, filters }) => {
+  // console.log("filter modal render");
   const dispatch = useDispatch();
-  const { modals } = useSelector((state) => state.modals);
-  const open = modals[modalName] ? true : false;
   const { control, handleSubmit, register, reset } = useForm();
 
   const onSubmit = (data) => {
@@ -52,16 +51,16 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   };
 
   useEffect(() => {
-    if (open) {
+    if (filters.isActive) {
       reset({
         ...filters,
         isActive: filters.isActive,
       });
     }
-  }, [open]);
+  }, []);
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={true} onClose={onClose}>
       <Box className="bg-white p-6 rounded-md mx-auto mt-20 w-full max-w-2xl ">
         <Typography variant="h6" className="text-center mb-4">
           Client Filters

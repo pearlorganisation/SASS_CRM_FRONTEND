@@ -8,10 +8,11 @@ import {
   getClientAddons,
   getPricePlan,
   getPricePlans,
+  updatePlansOrder,
   updatePricePlans,
 } from "../actions/pricePlan";
 import { toast } from "sonner";
-import { errorToast } from "../../utils/extra";
+import { errorToast, successToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
@@ -19,10 +20,10 @@ const initialState = {
   isPlanUpdated: false,
   isPlanDeleted: false,
   errorMessage: "",
-  planData: null,
+  planData: [],
   singlePlanData: null,
   addonsData: [],
-  billingHistory:[],
+  billingHistory: [],
   totalPages: 1,
 };
 
@@ -32,6 +33,9 @@ const pricePlans = createSlice({
   reducers: {
     resetPricePlanSuccess: (state) => {
       state.isSuccess = false;
+    },
+    resetAddonsData: (state) => {
+      state.addonsData = [];
     },
   },
   extraReducers: (builder) => {
@@ -165,14 +169,29 @@ const pricePlans = createSlice({
       })
       .addCase(getAdminBillingHistory.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.billingHistory = Array.isArray(action.payload?.data) ? action.payload.data : [];
+        state.billingHistory = Array.isArray(action.payload?.data)
+          ? action.payload.data
+          : [];
         state.totalPages = action.payload.totalPages || 1;
       })
       .addCase(getAdminBillingHistory.rejected, (state, action) => {
         state.isLoading = false;
         errorToast("Error On Plan Creation!");
+      })
+      .addCase(updatePlansOrder.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(updatePlansOrder.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        successToast("Plan Order Updated Successfully!");
+      })
+      .addCase(updatePlansOrder.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast("Error On Plan Order Update!");
       });
   },
 });
-export const {resetPricePlanSuccess} = pricePlans.actions;
+export const { resetPricePlanSuccess, resetAddonsData } = pricePlans.actions;
 export default pricePlans.reducer;

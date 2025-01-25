@@ -53,7 +53,7 @@ const UserActivityLogs = ({ isActive, id }) => {
           ? new Date(userActivities[0]?.createdAt).toLocaleString()
           : "N/A"}
       </Typography>
-      <Divider  />
+      <Divider/>
 
       {/* Accordion for User Activity Logs */}
       <Accordion>

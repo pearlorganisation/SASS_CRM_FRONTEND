@@ -23,10 +23,9 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const UpdateClientModal = ({ modalName }) => {
   const logUserActivity = useAddUserActivity();
-  const { modals, modalData: defaultUserInfo } = useSelector(
+  const {  modalData: defaultUserInfo } = useSelector(
     (state) => state.modals
   );
-  const open = modals[modalName] ? true : false;
 
   const dispatch = useDispatch();
   const { isUpdating, isSuccess } = useSelector((state) => state.client);
@@ -111,7 +110,7 @@ const UpdateClientModal = ({ modalName }) => {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={true} onClose={handleClose}>
       <DialogTitle>Update Client Information</DialogTitle>
       <Tabs
         value={activeTab}
@@ -161,9 +160,8 @@ const UpdateClientModal = ({ modalName }) => {
                 {...register("phone", {
                   required: "Phone number is required.",
                   pattern: {
-                    value: /^[0-9]{10,15}$/,
-                    message:
-                      "Please enter a valid phone number (10-15 digits).",
+                    value: /^\+\d{1,3}\d{9}$/,
+                    message: "10 Digit Phone number with Country Code is required, eg: +911234567890",
                   },
                 })}
                 label="Phone"

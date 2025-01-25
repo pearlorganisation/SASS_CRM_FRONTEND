@@ -43,6 +43,7 @@ import {
   MyAddOns,
   Notifications,
   BillingHistory,
+  PlanOrder,
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 import {
@@ -67,6 +68,7 @@ import { NotifActionType } from "./utils/extra";
 import { logout } from "./features/slices/auth";
 import Location from "./pages/Location/Location";
 import LocationRequests from "./pages/Location/LocationRequests";
+import LayoutFallback from "./components/Fallback/LayoutFallback";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -115,7 +117,7 @@ const App = () => {
     }
 
     function onNotification(data) {
-      console.log(data);
+      // console.log(data);
       dispatch(newNotification(data));
       toast.info(data.title || "New Notification");
       if (data.actionType === NotifActionType.ACCOUNT_DEACTIVATION) {
@@ -124,7 +126,7 @@ const App = () => {
     }
 
     function onReminderPlay(data) {
-      console.log(data);
+      // console.log(data);
     }
 
     socket.on("connect", onConnect);
@@ -144,7 +146,7 @@ const App = () => {
 
   useEffect(() => {
     if (isConnected && userData) {
-      console.log("join emitted");
+      // console.log("join emitted");
       socket.emit("join", { user: userData._id });
     }
 
@@ -161,7 +163,7 @@ const App = () => {
     dispatch(setEmployeeModeId());
 
     if (isUserLoggedIn) {
-      console.log("connecting socket");
+      // console.log("connecting socket");
       socket.connect();
     }
 
@@ -192,7 +194,7 @@ const App = () => {
     {
       path: "/",
       element: isUserLoggedIn ? (
-        <Suspense fallback={<></>}>
+        <Suspense fallback={<LayoutFallback/>}>
           <Layout />
         </Suspense>
       ) : (
@@ -402,14 +404,21 @@ const App = () => {
           ),
         },
         {
-          path: "/plans/addPlan", // TODO: Remove Accessibility after Creating Static Plans
+          path: "/plans/order",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN"]}>
+              <PlanOrder />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/plans/addPlan",
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN"]}>
               <AddPlan />
             </RouteGuard>
           ),
         },
-
         {
           path: "/sidebarLinks",
           element: (
