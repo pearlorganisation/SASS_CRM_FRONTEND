@@ -32,7 +32,7 @@ const FilterPresetModal = ({
 }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
-  console.log('FilterPresetModal -> Rendered')
+  // console.log('FilterPresetModal -> Rendered')
 
   const { filterPresets, isSuccess } = useSelector(
     (state) => state.filterPreset

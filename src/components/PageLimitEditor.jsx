@@ -21,7 +21,7 @@ const PageLimitEditor = ({ pageId = "defaultPage", setPage = () => {} }) => {
   };
 
   const handleSaveClick = () => {
-    console.log("pageLimit", pageLimit);
+    // console.log("pageLimit", pageLimit);
     const validLimit =
       pageLimit === "" ? 10 : Math.max(1, Math.min(100, Number(pageLimit)));
     setPageLimitState(validLimit);

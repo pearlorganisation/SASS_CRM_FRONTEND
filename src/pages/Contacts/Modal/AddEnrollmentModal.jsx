@@ -4,42 +4,31 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllProducts } from "../../../features/actions/product";
 import { addEnrollment, getEnrollments } from "../../../features/actions/attendees";
 
-const AddEnrollmentModal = ({ setModal, onConfirmEdit }) => {
+const AddEnrollmentModal = ({ setModal, attendeeEmail, webinarData }) => {
   const { productData } = useSelector((state) => state.product);
-
   const dispatch = useDispatch();
 
-  const { selectedAttendee } = useSelector((state) => state.attendee);
-
   useEffect(() => {
+    console.log(webinarData)
     dispatch(getAllProducts({}));
   }, []);
 
-  // function removeBlankAttributes(obj) {
-  //   const result = {};
-  //   for (const key in obj) {
-  //     if (obj[key] !== null && obj[key] !== undefined && obj[key].length > 0) {
-  //       result[key] = obj[key];
-  //     }
-  //   }
-  //   return result;
-  // }
 
   const { register, handleSubmit, formState: { errors },
 } = useForm({
     defaultValues: {
-      attendee: "",
+      attendee: attendeeEmail || "",
       product: "",
       webinar: "",
     },
   });
 
   const onSubmit = (data) => {
-    const attendeeEmail = selectedAttendee && selectedAttendee[0]?._id;
     data["attendee"] = attendeeEmail;
     console.log(data)
     dispatch(addEnrollment(data)).then(res => {
       dispatch(getEnrollments({id: attendeeEmail}));
+      setModal(false)
     })
   };
 
@@ -75,9 +64,9 @@ const AddEnrollmentModal = ({ setModal, onConfirmEdit }) => {
               className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 focus:border-red-500 focus:outline-none"
             >
               <option value="">Select Webinar</option>
-              {selectedAttendee &&
-                  selectedAttendee.length > 0 &&
-                  selectedAttendee[0]?.data?.map((item, index) => (
+              {webinarData &&
+                  webinarData.length > 0 &&
+                  webinarData?.map((item, index) => (
                   <option value={item?.webinar[0]?._id} key={index}>
                     {item?.webinar[0]?.webinarName} | {new Date(item?.webinar[0]?.webinarDate).toDateString()}
                   </option>

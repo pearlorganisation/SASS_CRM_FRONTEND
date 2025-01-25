@@ -67,7 +67,7 @@ const NotificationBell = ({ userData, roles }) => {
 
 
   function handleClick(notif) {
-    console.log(notif);
+    // console.log(notif);
     setIsOpen(false);
     const role = userData?.role;
     const isEmployee = roles.isEmployeeId(role);

@@ -57,6 +57,7 @@ const ViewParticularContact = () => {
   const [editModalData, setEditModalData] = useState(null);
   const [leadTypeOptions, setLeadTypeOptions] = useState([]);
   const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
+  const [attendeeHistoryData, setAttendeeHistoryData] = useState([]);
 
   const { attendeeContactDetails } = useSelector(
     (state) => state.webinarContact
@@ -90,7 +91,7 @@ const ViewParticularContact = () => {
   }, []);
 
   useEffect(() => {
-    console.log("attendeeLeadType in", attendeeLeadType);
+    // console.log("attendeeLeadType in", attendeeLeadType);
     setSelectedOption(attendeeLeadType);
   }, [attendeeLeadType]);
 
@@ -105,15 +106,6 @@ const ViewParticularContact = () => {
       !attendee?.data.length
     )
       return;
-
-    // const tempLead = attendee?.data[0]?.leadType;
-
-    // if (tempLead) {
-    //   const leadType = leadTypeOptions.find((item) => item?.value === tempLead);
-    //   setSelectedOption(leadType || null);
-    // } else {
-    //   setSelectedOption(null);
-    // }
 
     const uniquePhonesArr = Array.from(
       new Set(attendee?.data?.map((item) => item?.phone).filter(Boolean))
@@ -131,7 +123,31 @@ const ViewParticularContact = () => {
       .filter(Boolean);
     const uniqueNamesArr = Array.from(new Set(namesArr));
     setUniqueNames(uniqueNamesArr);
+
+
+      
+
+    setAttendeeHistoryData((prev) => {
+      const data = [...selectedAttendee[0]?.data];
+      return data?.filter((item) => {
+        const index = data.findIndex(
+          (item2) =>
+            item.webinar[0].webinarName === item2.webinar[0].webinarName
+        );
+
+        if (index >= 0 && data[index].isAttended === true) {
+          data.splice(index, 1);
+          return item;
+        } else {
+          return item;
+        }
+      });
+    });
   }, [selectedAttendee]);
+
+  useEffect(() => {
+    console.log(attendeeHistoryData);
+  }, [setAttendeeHistoryData]);
 
   useEffect(() => {
     if (!leadTypeData) return;
@@ -412,99 +428,106 @@ const ViewParticularContact = () => {
                     <OpenInNew />
                   </IconButton>
                 </div>
-                <div className="w-full max-h-96  overflow-auto ">
-                <table className="table-auto text-sm text-center ">
-                  <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between ">
-                    <tr>
-                      <th className="py-3 px-1">S No.</th>
-                      <th className="py-3 px-1 ">Webinar</th>
-                      <th className="py-3 px-1">Type</th>
-                      <th className="py-3 px-1 min-w-[150px]">First Name</th>
-                      <th className="py-3 px-1 min-w-[150px]">Last Name</th>
-                      <th className="py-3 min-w-[200px]">Webinar Minutes</th>
-                      <th className="py-3 px-1">Location</th>
-                      <th className="py-3 px-1 min-w-[150px]">Webinar Date</th>
-                      <th className="py-3 px-1 stickyFieldRight">Action</th>
-                    </tr>
-                  </thead>
+                <div className="  max-h-96 overflow-y-auto">
+                  <div className="w-full overflow-auto ">
+                    <table className="w-full table-auto text-sm text-center ">
+                      <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between ">
+                        <tr>
+                          <th className="py-3 px-1">S No.</th>
+                          <th className="py-3 px-1 ">Webinar</th>
+                          <th className="py-3 px-1">Type</th>
+                          <th className="py-3 px-1 min-w-[150px]">
+                            First Name
+                          </th>
+                          <th className="py-3 px-1 min-w-[150px]">Last Name</th>
+                          <th className="py-3 min-w-[200px]">
+                            Webinar Minutes
+                          </th>
+                          <th className="py-3 px-1">Location</th>
+                          <th className="py-3 px-1 min-w-[150px]">
+                            Webinar Date
+                          </th>
+                          <th className="py-3 px-1 stickyFieldRight">Action</th>
+                        </tr>
+                      </thead>
 
-                  <tbody className="text-gray-600 divide-y">
-                    {false ? (
-                      <tr>
-                        <td colSpan="8" className="text-center px-6 py-8">
-                          <Stack spacing={4}>
-                            <Skeleton variant="rounded" height={30} />
-                            <Skeleton variant="rounded" height={25} />
-                            <Skeleton variant="rounded" height={20} />
-                            <Skeleton variant="rounded" height={20} />
-                            <Skeleton variant="rounded" height={20} />
-                            <Skeleton variant="rounded" height={20} />
-                          </Stack>
-                        </td>
-                      </tr>
-                    ) : (
-                      selectedAttendee[0]?.data?.map((item, idx) => {
-                        return (
-                          <tr key={idx}>
-                            <td className={`px-3 py-4 whitespace-nowrap `}>
-                              {idx + 1}
+                      <tbody className="text-gray-600 divide-y">
+                        {false ? (
+                          <tr>
+                            <td colSpan="8" className="text-center px-6 py-8">
+                              <Stack spacing={4}>
+                                <Skeleton variant="rounded" height={30} />
+                                <Skeleton variant="rounded" height={25} />
+                                <Skeleton variant="rounded" height={20} />
+                                <Skeleton variant="rounded" height={20} />
+                                <Skeleton variant="rounded" height={20} />
+                                <Skeleton variant="rounded" height={20} />
+                              </Stack>
                             </td>
-
-                              <td className="px-2 py-4 whitespace-nowrap ">
-                                {Array.isArray(item?.webinar) &&
-                                item.webinar.length > 0
-                                  ? item?.webinar[0].webinarName
-                                  : "-"}
-                              </td>
-                              <td className="px-2 py-4 whitespace-nowrap ">
-                              {item?.isAttended ? "Sales" : "Reminder"}
-                              </td>
-
-                            <td className="px-2 py-4 whitespace-nowrap ">
-                              {item?.firstName || "-"}
-                            </td>
-
-                            <td className="px-2 py-4 whitespace-nowrap">
-                              {item?.lastName?.match(/:-\)/)
-                                ? "--"
-                                : item?.lastName || "-"}
-                            </td>
-
-                            <td className=" py-4 text-center whitespace-nowrap">
-                              {item?.timeInSession}
-                            </td>
-                            
-                            <td className=" py-4 text-center whitespace-nowrap">
-                              {item?.location}
-                            </td> 
-
-                            <td className="px-3 py-4 whitespace-nowrap">
-                              {Array.isArray(item?.webinar) &&
-                              item.webinar.length > 0
-                                ? new Date(
-                                    item?.webinar[0].webinarDate
-                                  ).toDateString()
-                                : "-"}
-                            </td>
-                            <ComponentGuard
-                              conditions={[
-                                employeeModeData ? false : true,
-                                userData?.isActive,
-                              ]}
-                            >
-                              <td className="px-3 py-4 h-full stickyFieldRight" >
-                                <FaRegEdit
-                                  onClick={() => setEditModalData(item)}
-                                  className="text-xl cursor-pointer"
-                                />
-                              </td>
-                            </ComponentGuard>
                           </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
+                        ) : (
+                          attendeeHistoryData?.map((item, idx) => {
+                            return (
+                              <tr key={idx}>
+                                <td className={`px-3 py-4 whitespace-nowrap `}>
+                                  {idx + 1}
+                                </td>
+                                <td className="px-2 py-4 whitespace-nowrap ">
+                                  {Array.isArray(item?.webinar) &&
+                                  item.webinar.length > 0
+                                    ? item?.webinar[0].webinarName
+                                    : "-"}
+                                </td>
+                                <td className="px-2 py-4 whitespace-nowrap ">
+                                  {item?.isAttended ? "Sales" : "Reminder"}
+                                </td>
+
+                                <td className="px-2 py-4 whitespace-nowrap ">
+                                  {item?.firstName || "-"}
+                                </td>
+
+                                <td className="px-2 py-4 whitespace-nowrap">
+                                  {item?.lastName?.match(/:-\)/)
+                                    ? "--"
+                                    : item?.lastName || "-"}
+                                </td>
+
+                                <td className=" py-4 text-center whitespace-nowrap">
+                                  {item?.timeInSession}
+                                </td>
+
+                                <td className=" py-4 text-center whitespace-nowrap">
+                                  {item?.location}
+                                </td>
+
+                                <td className="px-3 py-4 whitespace-nowrap">
+                                  {Array.isArray(item?.webinar) &&
+                                  item.webinar.length > 0
+                                    ? new Date(
+                                        item?.webinar[0].webinarDate
+                                      ).toDateString()
+                                    : "-"}
+                                </td>
+                                <ComponentGuard
+                                  conditions={[
+                                    employeeModeData ? false : true,
+                                    userData?.isActive,
+                                  ]}
+                                >
+                                  <td className="px-3 py-4 h-full stickyFieldRight">
+                                    <FaRegEdit
+                                      onClick={() => setEditModalData(item)}
+                                      className="text-xl cursor-pointer"
+                                    />
+                                  </td>
+                                </ComponentGuard>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             )}
@@ -629,7 +652,8 @@ const ViewParticularContact = () => {
       {showEnrollmentModal && (
         <AddEnrollmentModal
           setModal={setShowEnrollmentModal}
-          attendeeId={attendeeId}
+          attendeeEmail={selectedAttendee && selectedAttendee[0]?._id}
+          webinarData={attendeeHistoryData}
         />
       )}
       <Dialog
