@@ -11,12 +11,12 @@ import { logout } from "../../../features/slices/auth";
 import { getAllSidebarLinks } from "../../../features/actions/sidebarLink";
 import { FaClipboard } from "react-icons/fa";
 import { Badge, Chip } from "@mui/material";
-import { resetSuccessAndUpdate } from "../../../features/slices/noticeBoard";
 import { getNoticeBoard } from "../../../features/actions/noticeBoard";
 import useRoles from "../../../hooks/useRoles";
 import { MdAssignment } from "react-icons/md";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
-
+import { FaCalendarAlt } from "react-icons/fa";
+import ComponentGuard from "../../AccessControl/ComponentGuard";
 const Sidebar = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
@@ -30,7 +30,6 @@ const Sidebar = () => {
   const role = userData?.role || "";
   const { employeeModeData } = useSelector((state) => state.employee);
 
-  console.log("Sidebar -> render");
 
   const navItems = [
     {
@@ -90,6 +89,11 @@ const Sidebar = () => {
       roles: [roles.EMPLOYEE_SALES, roles.EMPLOYEE_REMINDER, roles.ADMIN],
       items: [
         {
+          path: "/calendar",
+          label: "Calendar",
+          icon: <FaCalendarAlt size={30} />,
+        },
+        {
           path: "/products",
           label: "Products",
           icon: <AiFillProduct size={30} />,
@@ -128,6 +132,7 @@ const Sidebar = () => {
   };
 
   useEffect(() => {
+    if(userData)
     dispatch(getAllSidebarLinks());
   }, []);
 
@@ -231,7 +236,8 @@ const Sidebar = () => {
           </li>
 
           {/* Settings Link */}
-          <li>
+        <ComponentGuard conditions={[employeeModeData ? false : true]}>
+        <li>
             <Link
               to="/settings"
               className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
@@ -240,6 +246,8 @@ const Sidebar = () => {
               <span className="flex-1 ms-3 whitespace-nowrap">Settings</span>
             </Link>
           </li>
+        </ComponentGuard>
+          
 
           {/* Logout Button */}
           <li>

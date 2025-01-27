@@ -2,17 +2,26 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@mui/material";
-import { Edit, Visibility, ToggleOn, ToggleOff, Dashboard } from "@mui/icons-material";
+import {
+  Edit,
+  Visibility,
+  ToggleOn,
+  ToggleOff,
+  Dashboard,
+} from "@mui/icons-material";
 import { getAllEmployees } from "../../features/actions/employee";
 import ConfirmActionModal from "./modal/ConfirmActionModal";
-import { clearSuccess, setEmployeeModeId } from "../../features/slices/employee";
+import {
+  clearSuccess,
+  setEmployeeModeId,
+} from "../../features/slices/employee";
 import { openModal } from "../../features/slices/modalSlice";
 import { getUserSubscription } from "../../features/actions/auth";
 import DataTable from "../../components/Table/DataTable";
 import { employeeTableColumns } from "../../utils/columnData";
 import useRoles from "../../hooks/useRoles";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
-import EmployeeFilterModal from '../../components/Filter/EmployeeFilterModal';
+import EmployeeFilterModal from "../../components/Filter/EmployeeFilterModal";
 import ExportModal from "../../components/Export/ExportModal";
 import { exportEmployeesExcel } from "../../features/actions/export-excel";
 
@@ -30,7 +39,6 @@ const Employees = () => {
   const tableHeader = "Employee Table";
 
   // ----------------------- Constants -----------------------
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const roles = useRoles();
@@ -46,22 +54,26 @@ const Employees = () => {
   const { userData } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    dispatch(getAllEmployees({
-      page: page,
-      limit: LIMIT,
-      filters: filters
-    }));
+    dispatch(
+      getAllEmployees({
+        page: page,
+        limit: LIMIT,
+        filters: filters,
+      })
+    );
   }, [page, LIMIT, filters]);
 
   const navigateToAdd = () => navigate("/createEmployee");
 
   useEffect(() => {
     if (isSuccess) {
-      dispatch(getAllEmployees({
-        page: 1,
-        limit: LIMIT,
-        filters: filters
-      }));
+      dispatch(
+        getAllEmployees({
+          page: 1,
+          limit: LIMIT,
+          filters: filters,
+        })
+      );
       dispatch(getUserSubscription());
       dispatch(clearSuccess());
     }
@@ -84,47 +96,55 @@ const Employees = () => {
       readOnly: true,
     },
     ,
-    {
-      icon: () => <Dashboard className="text-neutral-500 group-hover:text-neutral-600" />,
-      tooltip: "Visit Dashboard",
-      onClick: (item) => {
-        dispatch(setEmployeeModeId(item));
-        navigate('/employee/dashboard/' + item?._id);
-      },
-    },
-    {
-      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
-      tooltip: "Edit Employee Data",
-      onClick: (item) => {
-        navigate(`/employee/edit/${item?._id}`);
-      },
-    },
-    {
-      icon: (item) => (
-        <>
-          {item?.isActive ? (
-            <ToggleOff
-              fontSize="large"
-              className="text-red-500 group-hover:text-red-600"
-            />
-          ) : (
-            <ToggleOn
-              fontSize="large"
-              className="text-green-500 group-hover:text-green-600"
-            />
-          )}
-        </>
-      ),
-      tooltip: "Toggle Status",
-      onClick: (item) => {
-        dispatch(
-          openModal({
-            modalName: activeInactiveModalName,
-            data: item,
-          })
-        );
-      },
-    },
+    ...(userData?.isActive
+      ? [
+          {
+            icon: () => (
+              <Dashboard className="text-neutral-500 group-hover:text-neutral-600" />
+            ),
+            tooltip: "Visit Dashboard",
+            onClick: (item) => {
+              dispatch(setEmployeeModeId(item));
+              navigate("/employee/dashboard/" + item?._id);
+            },
+          },
+          {
+            icon: () => (
+              <Edit className="text-blue-500 group-hover:text-blue-600" />
+            ),
+            tooltip: "Edit Employee Data",
+            onClick: (item) => {
+              navigate(`/employee/edit/${item?._id}`);
+            },
+          },
+          {
+            icon: (item) => (
+              <>
+                {item?.isActive ? (
+                  <ToggleOff
+                    fontSize="large"
+                    className="text-red-500 group-hover:text-red-600"
+                  />
+                ) : (
+                  <ToggleOn
+                    fontSize="large"
+                    className="text-green-500 group-hover:text-green-600"
+                  />
+                )}
+              </>
+            ),
+            tooltip: "Toggle Status",
+            onClick: (item) => {
+              dispatch(
+                openModal({
+                  modalName: activeInactiveModalName,
+                  data: item,
+                })
+              );
+            },
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -160,7 +180,11 @@ const Employees = () => {
       </div>
 
       <ConfirmActionModal modalName={activeInactiveModalName} />
-      <EmployeeFilterModal modalName={employeeFilterModalName} filters={filters} setFilters={setFilters} />
+      <EmployeeFilterModal
+        modalName={employeeFilterModalName}
+        filters={filters}
+        setFilters={setFilters}
+      />
       <ExportModal
         modalName={employeeExportModalName}
         defaultColumns={employeeTableColumns}

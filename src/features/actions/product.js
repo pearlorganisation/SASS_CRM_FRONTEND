@@ -1,5 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { instance } from "../../services/axiosInterceptor";
+import { successToast } from "../../utils/extra";
 
 //add product
 export const addProduct = createAsyncThunk(
@@ -48,7 +49,7 @@ export const getAllProductsByAdminId = createAsyncThunk(
   "attendeeProductsByAdminId/fetch",
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await instance.get(`/product/all`);
+      const { data } = await instance.get(`/products/all`);
       return data;
     } catch (e) {
       return rejectWithValue(e);
@@ -56,7 +57,6 @@ export const getAllProductsByAdminId = createAsyncThunk(
   }
 );
 
-// get product data
 export const createAttendeeProduct = createAsyncThunk(
   "attendeeProduct/create",
   async (payload, { rejectWithValue }) => {
@@ -66,5 +66,25 @@ export const createAttendeeProduct = createAsyncThunk(
     } catch (e) {
       return rejectWithValue(e);
     }
+
+    
   }
+  
 );
+
+
+export const deleteProduct = createAsyncThunk(
+  "attendeeProduct/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await instance.delete(`products/${id}`);
+      return response;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+
+    
+  }
+  
+);
+

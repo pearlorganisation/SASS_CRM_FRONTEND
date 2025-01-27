@@ -6,14 +6,15 @@ import { AssignmentStatus } from "../../utils/extra";
 export const addAssign = createAsyncThunk(
   "attendee/assign",
   async (
-    { webinar = "", employee = "", assignments = [] },
+    { webinar = "", user = "", attendees = [], recordType = "" },
     { rejectWithValue, dispatch }
   ) => {
     try {
       const response = await instance.post(`assignment`, {
         webinar,
-        employee,
-        assignments,
+        user,
+        attendees,
+        recordType
       });
       return response;
     } catch (e) {
@@ -183,14 +184,16 @@ export const getAssignmentsActivity = createAsyncThunk(
 
 export const requestReAssignment = createAsyncThunk(
   "assignments/requestReAssignment",
-  async (payload = [], { rejectWithValue }) => {
+  async ({ assignments = [], webinarId, requestReason }, { rejectWithValue }) => {
     try {
       const response = await instance.patch(`assignment/reassign`, {
-        assignments: payload,
+        assignments,
+        webinarId,
+        requestReason
       });
       return {
         response: response.data,
-        requestIds: payload,
+        requestIds: assignments,
       };
     } catch (e) {
       return rejectWithValue(e);

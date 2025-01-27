@@ -4,15 +4,27 @@ import useRoles from "../../../hooks/useRoles";
 import { addAssign } from "../../../features/actions/assign";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 import { getAssignedEmployees } from "../../../features/actions/webinarContact";
+import AssignedEmployeeTable from "../../../components/Webinar/AssignedEmployeeTable";
+import { ClipLoader } from "react-spinners";
+import { toast } from "sonner";
 
-function EmployeeAssignModal({ selectedRows, webinarId, tabValue, setAssignModal }) {
+function EmployeeAssignModal({
+  selectedRows,
+  webinarId,
+  tabValue,
+  setAssignModal,
+}) {
   const dispatch = useDispatch();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
 
-  const { isSuccess } = useSelector((state) => state.assign);
+  const { isSuccess, isLoading: isAssignLoading } = useSelector(
+    (state) => state.assign
+  );
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const { assignedEmployees } = useSelector((state) => state.webinarContact);
+  console.log("assignedEmployees", assignedEmployees);
 
   const selectedType =
     tabValue === "preWebinar" ? "EMPLOYEE REMINDER" : "EMPLOYEE SALES";
@@ -23,15 +35,31 @@ function EmployeeAssignModal({ selectedRows, webinarId, tabValue, setAssignModal
     .map((item) => ({
       value: item?._id,
       label: item?.userName,
+      contactCount: item?.dailyContactCount || 0,
+      contactLimit: item?.dailyContactLimit || 0,
     }));
 
   const handleAssign = () => {
     if (selectedEmployee) {
+      const employee = options.find((item) => item.value === selectedEmployee);
+      if (
+        employee &&
+        ((employee.contactLimit - employee.contactCount) < selectedRows.length)
+      ) {
+        toast.error(
+          `Cannot assign more than ${
+            employee.contactLimit - employee.contactCount
+          } attendees to this employee.`
+        );
+        return;
+      }
+
       dispatch(
         addAssign({
-          webinar: webinarId,
-          employee: selectedEmployee,
-          assignments: selectedRows,
+          webinar: webinarId ,
+          user: selectedEmployee,
+          attendees : selectedRows,
+          recordType: tabValue
         })
       );
       logUserActivity({
@@ -50,7 +78,17 @@ function EmployeeAssignModal({ selectedRows, webinarId, tabValue, setAssignModal
 
   useEffect(() => {
     dispatch(getAssignedEmployees(webinarId));
-  }, [dispatch, webinarId]);
+  }, [webinarId]);
+
+  useEffect(() => {
+    if (isAssignLoading) {
+      setIsLoading(true);
+    } else {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 200);
+    }
+  }, [isAssignLoading]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -67,37 +105,25 @@ function EmployeeAssignModal({ selectedRows, webinarId, tabValue, setAssignModal
         </div>
 
         {/* Employee Options */}
-        <div className="space-y-3">
-          {options.map((option) => (
-            <div key={option.value} className="flex items-center">
-              <input
-                type="radio"
-                id={option.value}
-                name="employee"
-                value={option.value}
-                checked={selectedEmployee === option.value}
-                onChange={() => setSelectedEmployee(option.value)}
-                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor={option.value} className="ml-3 text-gray-700">
-                {option.label}
-              </label>
-            </div>
-          ))}
-        </div>
+        <AssignedEmployeeTable
+          options={options}
+          selectedEmployee={selectedEmployee}
+          setSelectedEmployee={setSelectedEmployee}
+          moveToPullbacks={false}
+        />
 
         {/* Action Buttons */}
         <div className="flex justify-end space-x-3 mt-4">
           <button
             onClick={handleAssign}
-            disabled={!selectedEmployee}
+            disabled={!selectedEmployee || isLoading || isAssignLoading}
             className={`${
               !selectedEmployee
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
             } text-white py-2 px-6 rounded-md transition-all duration-200`}
           >
-            Assign
+            {isLoading ? <ClipLoader color="#fff" size={20} /> : "Assign"}
           </button>
           <button
             onClick={onClose}

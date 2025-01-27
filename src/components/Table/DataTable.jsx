@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, Suspense, useState, lazy } from "react";
 import {
   Button,
   IconButton,
@@ -17,10 +17,11 @@ import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { openModal } from "../../features/slices/modalSlice";
 import RawTable from "./RawTable";
-import FilterPresetModal from "../Filter/FilterPresetModal";
+const FilterPresetModal = lazy(() => import("../Filter/FilterPresetModal"));
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import ModalFallback from "../Fallback/ModalFallback";
 
-const DataTable = React.memo(
+const DataTable = memo(
   ({
     tableHeader = "Table",
     tableUniqueKey = "id",
@@ -43,10 +44,12 @@ const DataTable = React.memo(
     isRowClickable = false,
     setSelectedRows = () => {},
     isLeadType = false,
+    locations = null,
   }) => {
     const dispatch = useDispatch();
     const logUserActivity = useAddUserActivity();
-    console.log("DataTable -> Rendered");
+
+    // console.log("DataTable -> Rendered");
 
     const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -156,6 +159,7 @@ const DataTable = React.memo(
             rowClick={rowClick}
             isRowClickable={isRowClickable}
             isLeadType={isLeadType}
+            locations={locations}
           />
         </div>
         {tableData?.rows?.length > 0 && (
@@ -169,20 +173,21 @@ const DataTable = React.memo(
                 });
               }}
               count={totalPages || 1}
-              page={page}
+              page={Number(page) || 1}
               variant="outlined"
               shape="rounded"
             />
-            <PageLimitEditor pageId={tableHeader} />
+            <PageLimitEditor setPage={setPage} pageId={tableHeader} />
           </div>
         )}
         {isPresetModalOpen && (
+          <Suspense fallback={<ModalFallback />}>
           <FilterPresetModal
             tableName={tableUniqueKey}
             filters={filters}
             setFilters={setFilters}
             setIsPresetModalOpen={setIsPresetModalOpen}
-          />
+          /></Suspense>
         )}
       </div>
     );

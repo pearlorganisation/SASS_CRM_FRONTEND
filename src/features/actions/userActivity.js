@@ -30,11 +30,11 @@ export const getUserActivity = createAsyncThunk(
   }
 );
 
-export const sendInactiveUserEmail = createAsyncThunk(
+export const sendInactiveNotification = createAsyncThunk(
   "userActivity/fetch",
-  async (_, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.put(`/user-activities/inactive`);
+      const response = await instance.put(`/user-activities/inactive`, payload);
       console.log(response.data);
       return response.data;
     } catch (e) {

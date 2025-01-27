@@ -11,12 +11,15 @@ import {
   Typography,
   TextField,
   MenuItem,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import { clientSignup } from "../../features/actions/client";
 import { getPricePlans } from "../../features/actions/pricePlan";
 import PlanCard from "../Settings/Plans/PlanCard";
 import { errorToast } from "../../utils/extra";
 import { useNavigate } from "react-router-dom";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 function CreateClient() {
   const dispatch = useDispatch();
@@ -26,13 +29,19 @@ function CreateClient() {
 
   const steps = ["Client Information", "Choose Plan"];
   const [activeStep, setActiveStep] = useState(0);
+  const [billingData, setBillingData] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [showPassword, setShowPassword] = useState({
+    password: false,
+    confirmPassword: false,
+  });
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
+    reset,
   } = useForm();
 
   const onSubmit = (data) => {
@@ -43,7 +52,10 @@ function CreateClient() {
         errorToast("Please select a plan");
         return;
       }
+      console.log(billingData);
       data["plan"] = selectedPlan;
+      data["durationType"] = billingData.durationType;
+      data["userName"] = data.clientUserName;
       dispatch(clientSignup(data)).then((res) => {
         if (res?.meta?.requestStatus === "fulfilled") {
           navigate("/clients", { replace: true });
@@ -56,9 +68,17 @@ function CreateClient() {
     if (activeStep > 0) setActiveStep(activeStep - 1);
   };
 
+  const togglePasswordVisibility = (field) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
+
   useEffect(() => {
+    reset({});
     dispatch(getPricePlans());
-  }, [dispatch]);
+  }, []);
 
   return (
     <section className="mt-4 flex justify-center items-center bg-gray-100">
@@ -88,15 +108,19 @@ function CreateClient() {
                 fullWidth
                 label="Username"
                 variant="outlined"
-                {...register("userName", { required: "Username is required" })}
-                error={!!errors.userName}
-                helperText={errors.userName?.message}
+                {...register("clientUserName", {
+                  required: "Username is required",
+                })}
+                error={!!errors.clientUserName}
+                helperText={errors.clientUserName?.message}
               />
               <TextField
                 fullWidth
                 label="Company Name"
                 variant="outlined"
-                {...register("companyName", { required: "Company Name is required" })}
+                {...register("companyName", {
+                  required: "Company Name is required",
+                })}
                 error={!!errors.companyName}
                 helperText={errors.companyName?.message}
               />
@@ -115,34 +139,69 @@ function CreateClient() {
                 {...register("phone", {
                   required: "Phone number is required",
                   pattern: {
-                    value: /^[0-9]{10}$/,
-                    message: "Phone number must be 10 digits",
+                    value: /^\+\d{1,3}\d{9}$/,
+                    message:
+                      "10 Digit Phone number with Country Code is required, eg: +911234567890",
                   },
                 })}
                 error={!!errors.phone}
                 helperText={errors.phone?.message}
               />
               <TextField
-                fullWidth
+                {...register("password", {
+                  required: "Password is required",
+                })}
                 label="Password"
-                type="password"
+                type={showPassword.password ? "text" : "password"}
+                fullWidth
                 variant="outlined"
-                {...register("password", { required: "Password is required" })}
                 error={!!errors.password}
                 helperText={errors.password?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => togglePasswordVisibility("password")}
+                      >
+                        {showPassword.password ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
+
               <TextField
-                fullWidth
-                label="Confirm Password"
-                type="password"
-                variant="outlined"
                 {...register("confirmPassword", {
                   required: "Please confirm your password",
                   validate: (value) =>
                     value === watch("password") || "Passwords do not match",
                 })}
+                label="Confirm Password"
+                type={showPassword.confirmPassword ? "text" : "password"}
+                fullWidth
                 error={!!errors.confirmPassword}
                 helperText={errors.confirmPassword?.message}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() =>
+                          togglePasswordVisibility("confirmPassword")
+                        }
+                      >
+                        {showPassword.confirmPassword ? (
+                          <VisibilityOff />
+                        ) : (
+                          <Visibility />
+                        )}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               />
             </Box>
             <Box className="flex justify-between mt-4">
@@ -182,8 +241,13 @@ function CreateClient() {
                     <PlanCard
                       plan={item}
                       key={item._id}
+                      isSelectVisible={true}
                       selectedPlan={selectedPlan}
-                      handlePlanSelection={(id) => setSelectedPlan(id)}
+                      handlePlanSelection={(id, billing) => {
+                        setSelectedPlan(id);
+                        console.log('--->', billing);
+                        setBillingData(billing);
+                      }}
                     />
                   </div>
                 ))}

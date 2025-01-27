@@ -57,7 +57,9 @@ const CreateWebinar = ({ modalName }) => {
 
   useEffect(() => {
     if (open) {
-      dispatch(getAllEmployees({}));
+      dispatch(
+        getAllEmployees({ page: 1, limit: 100, filters: { isActive: "active" } })
+      );
     }
   }, [open]);
 

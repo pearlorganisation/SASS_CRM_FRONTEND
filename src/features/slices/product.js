@@ -3,10 +3,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 import { toast } from "sonner";
-import { addProduct, getAllProducts, getAllProductsByAdminId, updateProduct } from "../actions/product";
-import { errorToast } from "../../utils/extra";
 
-
+import {
+  addProduct,
+  deleteProduct,
+  getAllProducts,
+  getAllProductsByAdminId,
+  updateProduct,
+} from "../actions/product";
+import { errorToast, successToast } from "../../utils/extra";
 
 const initialState = {
   isLoading: false,
@@ -35,7 +40,6 @@ export const productSlice = createSlice({
       .addCase(addProduct.pending, (state, action) => {
         state.isLoading = true;
         state.isSuccess = false;
-
       })
       .addCase(addProduct.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -52,7 +56,6 @@ export const productSlice = createSlice({
       .addCase(updateProduct.pending, (state, action) => {
         state.isLoading = true;
         state.isSuccess = false;
-
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -87,19 +90,35 @@ export const productSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = "";
         state.productDropdownData = action.payload?.data;
+        successToast(action?.payload);
       })
       .addCase(getAllProductsByAdminId.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
+        errorToast(action?.payload);
       })
- 
+
+      .addCase(deleteProduct.pending, (state, action) => {
+        state.isLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = "";
+        successToast(action?.payload?.data);
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.isLoading = false;
+        state.errorMessage = action.payload;
+        errorToast(action?.payload);
+      });
   },
 });
 
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const {resetProductState} = productSlice.actions;
+export const { resetProductState } = productSlice.actions;
 export default productSlice.reducer;
 
 // ================================================== THE END ==================================================

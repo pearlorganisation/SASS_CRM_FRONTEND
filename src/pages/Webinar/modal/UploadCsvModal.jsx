@@ -10,12 +10,10 @@ import { ClipLoader } from "react-spinners";
 import { clearSuccess } from "../../../features/slices/attendees";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
-const UploadCsvModal = ({ setModal, update }) => {
+const UploadCsvModal = ({ tabValue, setModal, update }) => {
   const logUserActivity = useAddUserActivity();
 
-  const { tabValue, isLoading, isSuccess } = useSelector(
-    (state) => state.attendee
-  );
+  const { isLoading, isSuccess } = useSelector((state) => state.attendee);
   const { id } = useParams();
   const [mapUI, setMapUI] = useState(false);
   const [selectedValues, setSelectedValues] = useState({}); // State to store selected values
@@ -133,7 +131,11 @@ const UploadCsvModal = ({ setModal, update }) => {
               email: item[emailField],
               firstName: item[firstNameField],
               lastName: item[lastNameField],
-              phone: item[phoneNumberField],
+              phone: item[phoneNumberField]
+                ? item[phoneNumberField].includes("E")
+                  ? Number(item[phoneNumberField]).toFixed(0)
+                  : item[phoneNumberField].toString().replace(/[^0-9]/g, "")
+                : "",
               location: item[locationField],
               gender: item[genderField],
               totalTimeInSession: parseInt(item[sessionMinutesField], 10) || 0,
@@ -153,7 +155,11 @@ const UploadCsvModal = ({ setModal, update }) => {
               email: item[emailField],
               firstName: item[firstNameField],
               lastName: item[lastNameField],
-              phone: item[phoneNumberField],
+              phone: item[phoneNumberField]
+                ? item[phoneNumberField].includes("E")
+                  ? Number(item[phoneNumberField]).toFixed(0)
+                  : item[phoneNumberField].toString().replace(/[^0-9]/g, "")
+                : "",
               location: item[locationField],
               gender: item[genderField],
               totalTimeInSession: parseInt(item[sessionMinutesField], 10) || 0,
@@ -194,7 +200,7 @@ const UploadCsvModal = ({ setModal, update }) => {
 
     const mergedResult = mergeDataByEmail(meetingData);
     console.log("mergedResult --- >", mergedResult);
-    setMeetingData(mergedResult);
+    // setMeetingData(mergedResult);
 
     const payloadData = {
       webinarId: id,
@@ -204,24 +210,23 @@ const UploadCsvModal = ({ setModal, update }) => {
 
     dispatch(addAttendees(payloadData));
     logUserActivity({
-      action: 'import',
-      type: 'CSV Data',
-      detailItem: tabValue
-    })
+      action: "import",
+      type: "CSV Data",
+      detailItem: tabValue,
+    });
   };
 
-  function handleCloseModal(){
+  function handleCloseModal() {
     setModal(false);
     dispatch(clearSuccess());
   }
 
   useEffect(() => {
-    console.log("isSucess ",isSuccess)
-    if(isSuccess){
+    console.log("isSucess ", isSuccess);
+    if (isSuccess) {
       handleCloseModal();
     }
-    
-  },[isSuccess]);
+  }, [isSuccess]);
 
   return (
     <div
@@ -233,10 +238,40 @@ const UploadCsvModal = ({ setModal, update }) => {
     >
       {/*    <!-- Modal --> */}
       <div
-        className="flex justify-center rounded bg-white py-6 shadow-xl "
+        className="rounded bg-white pb-6 shadow-xl "
         id="modal"
         role="document"
       >
+        <div className="flex justify-end px-5">
+          <button
+            onClick={() => setModal(false)}
+            className="me-3 flex h-10 items-center justify-center justify-self-center whitespace-nowrap rounded-full px-5 text-sm font-medium tracking-wide text-emerald-500 transition duration-300 hover:bg-emerald-100 hover:text-emerald-600 focus:bg-emerald-200 focus:text-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:text-emerald-300 disabled:shadow-none disabled:hover:bg-transparent"
+            aria-label="close dialog"
+          >
+            <span className="relative only:-mx-5">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                role="graphics-symbol"
+                aria-labelledby="title-79 desc-79"
+              >
+                <title id="title-79">Icon title</title>
+                <desc id="desc-79">
+                  A more detailed description of the icon
+                </desc>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
         <div className="flex flex-col justify-center gap-5">
           {!mapUI && (
             <div className="px-8 space-y-5">
@@ -424,6 +459,7 @@ const UploadCsvModal = ({ setModal, update }) => {
                                 handleSelectChange("firstName", selectedOption);
                               }}
                               className="mt-2"
+                              isClearable={true}
                               placeholder="Select a custom field"
                             />
                           )}
@@ -452,6 +488,7 @@ const UploadCsvModal = ({ setModal, update }) => {
                                 handleSelectChange("lastName", selectedOption);
                               }}
                               className="mt-2"
+                              isClearable={true}
                               placeholder="Select a custom field"
                             />
                           )}
@@ -484,6 +521,7 @@ const UploadCsvModal = ({ setModal, update }) => {
                                 );
                               }}
                               className="mt-2"
+                              isClearable={true}
                               placeholder="Select a custom field"
                             />
                           )}
@@ -496,37 +534,41 @@ const UploadCsvModal = ({ setModal, update }) => {
                         </span>
                       </td>
                     </tr>
-                    <tr>
-                      <td className="px-6 ">Session Minutes</td>
-                      <td className="px-6 pb-2 ">
-                        {" "}
-                        <Controller
-                          control={control}
-                          name="sessionMinutes"
-                          render={({ field }) => (
-                            <Select
-                              value={field.value}
-                              options={generateOptions(meetingData)}
-                              onChange={(selectedOption) => {
-                                field.onChange(selectedOption);
-                                handleSelectChange(
-                                  "sessionMinutes",
-                                  selectedOption
-                                );
-                              }}
-                              className="mt-2"
-                              placeholder="Select a custom field"
-                            />
-                          )}
-                        />
-                      </td>
-                      <td className="px-6 pb-2">
-                        <span className="bg-slate-100 rounded-lg p-1">
-                          {/* //here i want to display the value of react-select by selecting the label */}
-                          {selectedValues.sessionMinutes}
-                        </span>
-                      </td>
-                    </tr>
+                    {tabValue === "postWebinar" && (
+                      <tr>
+                        <td className="px-6 ">Session Minutes</td>
+                        <td className="px-6 pb-2 ">
+                          {" "}
+                          <Controller
+                            control={control}
+                            name="sessionMinutes"
+                            render={({ field }) => (
+                              <Select
+                                value={field.value}
+                                options={generateOptions(meetingData)}
+                                onChange={(selectedOption) => {
+                                  field.onChange(selectedOption);
+                                  handleSelectChange(
+                                    "sessionMinutes",
+                                    selectedOption
+                                  );
+                                }}
+                                className="mt-2"
+                                isClearable={true}
+                                placeholder="Select a custom field"
+                                menuPlacement="top"
+                              />
+                            )}
+                          />
+                        </td>
+                        <td className="px-6 pb-2">
+                          <span className="bg-slate-100 rounded-lg p-1">
+                            {/* //here i want to display the value of react-select by selecting the label */}
+                            {selectedValues.sessionMinutes}
+                          </span>
+                        </td>
+                      </tr>
+                    )}
 
                     <tr>
                       <td className="px-6 ">Location</td>
@@ -544,8 +586,9 @@ const UploadCsvModal = ({ setModal, update }) => {
                                 handleSelectChange("location", selectedOption);
                               }}
                               className="mt-2"
+                              isClearable={true}
                               placeholder="Select a custom field"
-                              menuPlacement="auto"
+                              menuPlacement="top"
                             />
                           )}
                         />
@@ -574,8 +617,9 @@ const UploadCsvModal = ({ setModal, update }) => {
                                 handleSelectChange("gender", selectedOption);
                               }}
                               className="mt-2"
+                              isClearable={true}
                               placeholder="Select a custom field"
-                              menuPlacement="auto"
+                              menuPlacement="top"
                             />
                           )}
                         />
@@ -600,32 +644,6 @@ const UploadCsvModal = ({ setModal, update }) => {
             </form>
           )}
         </div>
-        <button
-          onClick={() => setModal(false)}
-          className="me-3 inline-flex h-10 items-center justify-center justify-self-center whitespace-nowrap rounded-full px-5 text-sm font-medium tracking-wide text-emerald-500 transition duration-300 hover:bg-emerald-100 hover:text-emerald-600 focus:bg-emerald-200 focus:text-emerald-700 focus-visible:outline-none disabled:cursor-not-allowed disabled:text-emerald-300 disabled:shadow-none disabled:hover:bg-transparent"
-          aria-label="close dialog"
-        >
-          <span className="relative only:-mx-5">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              role="graphics-symbol"
-              aria-labelledby="title-79 desc-79"
-            >
-              <title id="title-79">Icon title</title>
-              <desc id="desc-79">A more detailed description of the icon</desc>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </span>
-        </button>
       </div>
     </div>
   );

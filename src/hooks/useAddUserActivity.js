@@ -1,34 +1,52 @@
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { addUserActivity, sendInactiveUserEmail } from "../features/actions/userActivity";
+import {
+  addUserActivity,
+  sendInactiveNotification,
+} from "../features/actions/userActivity";
 import useRoles from "./useRoles";
+import store from "../features/store";
 
-const INACTIVITY_LIMIT = 60 * 10 * 1000; 
-
-// Singleton state variables
-let inactivityTimer = null;
-let initialized = false;
-
-// Singleton function to reset the timer
-const resetInactivityTimer = (roles, dispatch) => {
-  if (!roles.isEmployeeId("")) return;
-
-  if (inactivityTimer) {
-    clearTimeout(inactivityTimer);
-  }
-
-  inactivityTimer = setTimeout(() => {
-    dispatch(sendInactiveUserEmail());
-
-    dispatch(
-      addUserActivity({ action: "inactive", details: "User is inactive" })
-    );
-  }, INACTIVITY_LIMIT);
+// Shared state across all instances of the hook
+const sharedState = {
+  inactivityTimer: null,
+  initialized: false,
 };
 
 const useAddUserActivity = () => {
   const roles = useRoles();
   const dispatch = useDispatch();
+
+  const userData = store.getState()?.auth?.userData;
+  const InactivityTimeInSeconds = userData?.inactivityTime || 10;
+  const INACTIVITY_LIMIT = InactivityTimeInSeconds * 1000;
+
+  const resetInactivityTimer = () => {
+    console.log("Resetting inactivity timer...");
+
+    if (!roles.isEmployeeId("")) return;
+
+    // Clear the existing timer
+    if (sharedState.inactivityTimer) {
+      clearTimeout(sharedState.inactivityTimer);
+    }
+
+    // Set a new timer
+    sharedState.inactivityTimer = setTimeout(() => {
+      console.log("User is inactive. Sending notification...");
+      dispatch(
+        sendInactiveNotification({
+          userName: userData?.userName,
+          email: userData?.email,
+          userId: userData?._id,
+        })
+      );
+
+      dispatch(
+        addUserActivity({ action: "inactive", details: "User is inactive" })
+      );
+    }, INACTIVITY_LIMIT);
+  };
 
   const logUserActivity = ({
     action,
@@ -41,7 +59,7 @@ const useAddUserActivity = () => {
 
     if (action && details) {
       dispatch(addUserActivity({ action, details }));
-      resetInactivityTimer(roles, dispatch);
+      resetInactivityTimer();
       return;
     }
 
@@ -73,20 +91,21 @@ const useAddUserActivity = () => {
     }
 
     dispatch(addUserActivity({ action, details: detailLog }));
-    resetInactivityTimer(roles, dispatch);
+    resetInactivityTimer();
   };
 
   useEffect(() => {
-    if (!initialized) {
-      initialized = true;
-      resetInactivityTimer(roles, dispatch);
+    if (!sharedState.initialized) {
+      sharedState.initialized = true;
+      resetInactivityTimer();
+      console.log("Inactivity timer initialized.");
     }
 
     return () => {
-      if (initialized && inactivityTimer) {
-        clearTimeout(inactivityTimer);
-        inactivityTimer = null;
-        initialized = false;
+      if (sharedState.inactivityTimer) {
+        clearTimeout(sharedState.inactivityTimer);
+        sharedState.inactivityTimer = null;
+        sharedState.initialized = false;
       }
     };
   }, [roles, dispatch]);

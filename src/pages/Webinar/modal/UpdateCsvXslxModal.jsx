@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { Button } from "@mui/material";
 import { useSelector } from "react-redux";
 
-const UpdateCsvXslxModal = ({ setModal, csvId }) => {
+const UpdateCsvXslxModal = ({ setModal, csvId, tabValue }) => {
   const [showModal, setShowModal] = useState(false);
   const [showXslxModal, setShowXslxModal] = useState(false);
   const handleModal = () => setShowModal(true);
@@ -54,12 +54,12 @@ const UpdateCsvXslxModal = ({ setModal, csvId }) => {
       </div>
       {showModal &&
         createPortal(
-          <UploadCsvModal setModal={setShowModal} update={csvId} />,
+          <UploadCsvModal tabValue={tabValue} setModal={setShowModal} update={csvId} />,
           document.body
         )}
       {showXslxModal &&
         createPortal(
-          <UploadXslxModal setModal={setShowXslxModal} update={csvId} />,
+          <UploadXslxModal tabValue={tabValue} setModal={setShowXslxModal} update={csvId} />,
           document.body
         )}
     </div>

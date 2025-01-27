@@ -25,12 +25,20 @@ import {
   TableCell,
   Paper,
   TableBody,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
+
 import FormInput from "../../../components/FormInput";
 import { filterTruthyValues } from "../../../utils/extra";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { getCustomOptions } from "../../../features/actions/globalData";
 import { attendeeTableColumns } from "../../../utils/columnData";
+import { getAllClientsForDropdown } from "../../../features/actions/client";
+import { toast } from "sonner";
+import DiscountSection from "./DiscountSection";
 const tableCellStyles = {
   paddingTop: "6px",
   paddingBottom: "6px",
@@ -206,19 +214,54 @@ export default function AddPlan() {
   const { isLoading, planData, isSuccess, singlePlanData } = useSelector(
     (state) => state.pricePlans
   );
+  const { clientsDropdownData } = useSelector((state) => state.client);
   const [isTableOpen, setIsTableOpen] = useState(false);
+  const [planType, setPlanType] = useState("");
+  const [assignedUsers, setAssignedUsers] = useState([]);
+  const [planDurationConfig, setPlanDurationConfig] = useState({
+    monthly: {
+      duration: 30,
+      discountType: "percent",
+      discountValue: 0,
+    },
+    quarterly: {
+      duration: 90,
+      discountType: "percent",
+      discountValue: 0,
+    },
+    halfyearly: {
+      duration: 180,
+      discountType: "percent",
+      discountValue: 0,
+    },
+    yearly: {
+      duration: 365,
+      discountType: "percent",
+      discountValue: 0,
+    },
+  });
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     const payload = filterTruthyValues(data);
+
+    if (planType === "custom") {
+      payload["planType"] = "custom";
+      payload["assignedUsers"] = assignedUsers;
+    } else {
+      payload["planType"] = "normal";
+    }
+
     if (!("attendeeTableConfig" in payload)) {
       payload["attendeeTableConfig"] = {};
     }
     if (isEditMode) {
       payload["_id"] = id;
     }
+
+    payload['planDurationConfig'] = planDurationConfig;
     dispatch(isEditMode ? updatePricePlans(payload) : addPricePlans(payload));
   };
 
@@ -231,7 +274,6 @@ export default function AddPlan() {
   useEffect(() => {
     if (isEditMode) {
       dispatch(getPricePlan(id));
-      dispatch(getCustomOptions());
     }
   }, [id, isEditMode]);
 
@@ -246,8 +288,24 @@ export default function AddPlan() {
         toggleLimit: singlePlanData.toggleLimit || 0,
         attendeeTableConfig: singlePlanData.attendeeTableConfig || {},
       });
+
+      setPlanType(singlePlanData.planType || "normal");
+      setAssignedUsers(singlePlanData.assignedUsers || []);
+
+      if (singlePlanData.planDurationConfig) {
+        setPlanDurationConfig(singlePlanData.planDurationConfig);
+      }
     }
   }, [singlePlanData, isEditMode]);
+
+  useEffect(() => {
+    if (!id) {
+      setPlanType("normal");
+    }
+
+    dispatch(getAllClientsForDropdown());
+    dispatch(getCustomOptions());
+  }, []);
 
   return (
     <div className="min-h-screen pt-14 flex justify-center items-center bg-gray-100 px-2">
@@ -257,7 +315,7 @@ export default function AddPlan() {
             {isEditMode ? "Edit Price Plan" : "Add Price Plan"}
           </Typography>
         </Box>
-        <form onSubmit={handleSubmit(onSubmit)} className="p-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="p-6 w-full">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <FormInput
               name="name"
@@ -273,14 +331,6 @@ export default function AddPlan() {
               control={control}
               required={true}
               errorMessage="Price is required"
-            />
-            <FormInput
-              name="planDuration"
-              label="Plan Expiry (days)"
-              type="number"
-              control={control}
-              required={true}
-              errorMessage="Plan expiry is required"
             />
             <FormInput
               name="employeeCount"
@@ -307,48 +357,82 @@ export default function AddPlan() {
               required={true}
               errorMessage="Toggle limit is required"
             />
-
-            <div className="flex ms-2 items-center">
-              <Typography className="font-semibold text-gray-800">
-                {"Custom Options (Create/Dropdown)"}
-              </Typography>
-              <Controller
-                name={`attendeeTableConfig.isCustomOptionsAllowed`}
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <Checkbox
-                    onChange={(e) => {
-                      const isChecked = e.target.checked;
-                      // Update "Downloadable" checkbox
-                      onChange(isChecked);
-                      // Automatically check "Filterable" if "Downloadable" is checked
-                      if (!isChecked) {
-                        setValue(
-                          `attendeeTableConfig.customOptions.filterable`,
-                          false
-                        );
-                        // if (key === "status") {
-                        //   customOptions.forEach((option) =>
-                        //     setValue(
-                        //       `attendeeTableConfig.defaultOptions.${option?.label}`,
-                        //       false
-                        //     )
-                        //   );
-                        //   setValue(
-                        //     `attendeeTableConfig.customOptions.filterable`,
-                        //     false
-                        //   );
-                        // }
-                      }
-                    }}
-                    checked={value || false}
-                  />
-                )}
-              />
-            </div>
+            <FormControl variant="outlined">
+              <InputLabel id="attendee-label">Plan Type</InputLabel>
+              <Select
+                labelId="attendee-label"
+                value={planType}
+                onChange={(e) => setPlanType(e.target.value)}
+                label="Plan Type"
+              >
+                <MenuItem value="normal">Normal</MenuItem>
+                <MenuItem value="custom">Custom</MenuItem>
+              </Select>
+            </FormControl>
           </div>
 
-          <Box className="mt-6">
+          {planType === "custom" && (
+            <div className="mt-5">
+              <FormControl variant="outlined" className="w-full">
+                <InputLabel id="attendee-label">Users</InputLabel>
+                <Select
+                  labelId="attendee-label"
+                  fullWidth
+                  multiple
+                  value={assignedUsers}
+                  onChange={(e) => setAssignedUsers(e.target.value)}
+                  label="Select Users"
+                >
+                  {clientsDropdownData.map((client, index) => (
+                    <MenuItem key={index} value={client.value}>
+                      {client.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+          )}
+
+          <div className="flex mt-4 items-center">
+            <Typography className="font-semibold text-gray-800">
+              {"Custom Options (Create/Dropdown)"}
+            </Typography>
+            <Controller
+              name={`attendeeTableConfig.isCustomOptionsAllowed`}
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Checkbox
+                  onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    // Update "Downloadable" checkbox
+                    onChange(isChecked);
+                    // Automatically check "Filterable" if "Downloadable" is checked
+                    if (!isChecked) {
+                      setValue(
+                        `attendeeTableConfig.customOptions.filterable`,
+                        false
+                      );
+                      // if (key === "status") {
+                      //   customOptions.forEach((option) =>
+                      //     setValue(
+                      //       `attendeeTableConfig.defaultOptions.${option?.label}`,
+                      //       false
+                      //     )
+                      //   );
+                      //   setValue(
+                      //     `attendeeTableConfig.customOptions.filterable`,
+                      //     false
+                      //   );
+                      // }
+                    }
+                  }}
+                  checked={value || false}
+                />
+              )}
+            />
+          </div>
+
+          <Box className="mt-6 shadow-md">
             <Box
               display="flex"
               alignItems="center"
@@ -370,6 +454,18 @@ export default function AddPlan() {
                 setValue={setValue}
               />
             </Collapse>
+          </Box>
+
+          <Box className="mt-6">
+            <Typography variant="h6" className="mb-2 font-semibold">
+              Discounts
+            </Typography>
+
+            <DiscountSection
+              planDurationConfig={planDurationConfig}
+              setPlanDurationConfig={setPlanDurationConfig}
+              watch={watch}
+            />
           </Box>
 
           <Box className="mt-6">

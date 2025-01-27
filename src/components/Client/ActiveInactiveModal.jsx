@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import {
   Modal,
   Box,
@@ -14,11 +14,14 @@ import { updateClient } from "../../features/actions/client";
 import { resetClientState } from "../../features/slices/client";
 import { closeModal } from "../../features/slices/modalSlice";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { useNavigate } from "react-router-dom";
 
 const ActiveInactiveModal = ({ modalName }) => {
+  const navigate = useNavigate();
   const logUserActivity = useAddUserActivity();
-  const { modals, modalData: clientData } = useSelector((state) => state.modals);
-  const open = modals[modalName] ? true : false;
+  const { modalData: clientData } = useSelector((state) => state.modals);
+  console.log(clientData);
+
 
   const dispatch = useDispatch();
   const { isUpdating, isSuccess } = useSelector((state) => state.client);
@@ -41,6 +44,12 @@ const ActiveInactiveModal = ({ modalName }) => {
       return;
     }
     if (isInputValid) {
+      if(clientData?.remainingDays <= 0 && !clientData.isActive) {
+        navigate(`/client/plan/${clientData?._id}`);
+
+        return;
+      }
+
       dispatch(
         updateClient({
           data: { statusChangeNote: note, isActive: !clientData.isActive },
@@ -73,7 +82,7 @@ const ActiveInactiveModal = ({ modalName }) => {
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={true} onClose={onClose}>
       <Box
         className="relative w-full max-w-lg mx-auto mt-20 bg-white rounded-lg shadow-lg p-6"
       >

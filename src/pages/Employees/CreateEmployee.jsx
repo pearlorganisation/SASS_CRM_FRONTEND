@@ -15,6 +15,8 @@ import {
   FormHelperText,
   TextField,
   Button,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import { ClipLoader } from "react-spinners";
 import { clearSuccess } from "../../features/slices/employee";
@@ -23,6 +25,7 @@ import { getRoleNameByID } from "../../utils/roles";
 import useRoles from "../../hooks/useRoles";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import FormInput from "../../components/FormInput";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const CreateEmployee = () => {
   const dispatch = useDispatch();
@@ -48,8 +51,18 @@ const CreateEmployee = () => {
     (state) => state.employee
   );
 
+  const [showPassword, setShowPassword] = useState({
+    password: false,
+    confirmPassword: false,
+  });
+  const togglePasswordVisibility = (field) => {
+    setShowPassword((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
+
   const onSubmit = (data) => {
-    console.log(userData);
     const newData = {
       ...data,
       validCallTime: isNaN(Number(data.validCallTime))
@@ -60,7 +73,6 @@ const CreateEmployee = () => {
         : Number(data.dailyContactLimit),
       adminId: userData?._id,
     };
-    console.log(newData);
     if (id) {
       dispatch(updateEmployee({ id, data: newData }));
     } else {
@@ -75,14 +87,6 @@ const CreateEmployee = () => {
   };
 
   const [isPasswordHidden, setPasswordHidden] = useState(true);
-
-  const togglePasswordVisibility = () => {
-    setPasswordHidden(!isPasswordHidden);
-    const passwordInput = document.getElementById("hs-toggle-password");
-    if (passwordInput) {
-      passwordInput.type = isPasswordHidden ? "text" : "password";
-    }
-  };
 
   useEffect(() => {
     if (isSuccess) {
@@ -138,29 +142,23 @@ const CreateEmployee = () => {
             <div className="sm:grid sm:grid-cols-2 sm:gap-6">
               {/* User Name */}
               <div className="w-full">
-                <TextField
-                  {...register("userName", {
-                    required: "User Name is required",
-                  })}
+                <FormInput
+                  name="userName"
                   label="User Name"
-                  variant="outlined"
-                  fullWidth
-                  error={Boolean(errors.userName)}
-                  helperText={errors.userName?.message}
-                  className="mt-2"
+                  control={control}
+                  validation={{
+                    required: "User Name is required",
+                  }}
                 />
               </div>
               {/* Email */}
 
               <div className="w-full">
-                <TextField
-                  {...register("email", { required: "Email is required" })}
+                <FormInput
+                  name="email"
                   label="Email"
-                  variant="outlined"
-                  fullWidth
-                  error={Boolean(errors.email)}
-                  helperText={errors.email?.message}
-                  className="mt-2"
+                  control={control}
+                  validation={{ required: "Email is required" }}
                 />
               </div>
             </div>
@@ -168,12 +166,9 @@ const CreateEmployee = () => {
             <div className="sm:grid sm:grid-cols-2 sm:gap-6">
               {/* Valid Call Time (seconds) */}
               <div className="w-full">
-                <TextField
-                  {...register("validCallTime", {
-                    required: "Valid Call Time is required",
-                    validate: numericValidation,
-                  })}
-                  label="Valid Call Time (seconds)"
+                {/* <TextField
+                  {...register("", )}
+                  
                   type="number"
                   variant="outlined"
                   fullWidth
@@ -181,24 +176,28 @@ const CreateEmployee = () => {
                   helperText={errors.validCallTime?.message}
                   className="mt-2"
                   inputProps={{ min: 0 }}
+                /> */}
+                <FormInput
+                  name="validCallTime"
+                  label="Valid Call Time (seconds)"
+                  control={control}
+                  validation={{
+                    required: "Valid Call Time is required",
+                    validate: numericValidation,
+                  }}
                 />
               </div>
 
               {/* Daily Contact Limit */}
               <div className="w-full">
-                <TextField
-                  {...register("dailyContactLimit", {
+                <FormInput
+                  name="dailyContactLimit"
+                  label="Daily Contact Limit"
+                  control={control}
+                  validation={{
                     required: "Daily Contact Limit is required",
                     validate: numericValidation,
-                  })}
-                  label="Daily Contact Limit"
-                  type="number"
-                  variant="outlined"
-                  fullWidth
-                  error={Boolean(errors.dailyContactLimit)}
-                  helperText={errors.dailyContactLimit?.message}
-                  className="mt-2"
-                  inputProps={{ min: 0 }}
+                  }}
                 />
               </div>
             </div>
@@ -206,20 +205,17 @@ const CreateEmployee = () => {
             <div className="sm:grid sm:grid-cols-2 sm:gap-6">
               {/* Phone Number */}
               <div className="w-full">
-                <TextField
-                  {...register("phone", {
+                <FormInput
+                  name="phone"
+                  label="Phone Number"
+                  control={control}
+                  validation={{
                     required: "Phone number is required",
                     pattern: {
-                      value: /^[0-9]{10}$/,
-                      message: "Phone number must be numeric and 10 digits",
+                      value: /^\+\d{1,3}\d{9}$/,
+                      message: "10 Digit Phone number with Country Code is required, eg: +911234567890",
                     },
-                  })}
-                  label="Phone Number"
-                  variant="outlined"
-                  fullWidth
-                  error={Boolean(errors.phone)}
-                  helperText={errors.phone?.message}
-                  className="mt-2"
+                  }}
                 />
               </div>
 
@@ -281,12 +277,26 @@ const CreateEmployee = () => {
                       required: "Password is required",
                     })}
                     label="Password"
-                    type="password"
-                    variant="outlined"
+                    type={showPassword.password ? "text" : "password"}
                     fullWidth
-                    error={Boolean(errors.password)}
+                    variant="outlined"
+                    error={!!errors.password}
                     helperText={errors.password?.message}
-                    className="mt-2"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => togglePasswordVisibility("password")}
+                          >
+                            {showPassword.password ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </div>
 
@@ -296,17 +306,30 @@ const CreateEmployee = () => {
                     {...register("confirmPassword", {
                       required: "Please confirm your password",
                       validate: (value) =>
-                        value === watch("password") ||
-                        "The passwords do not match",
+                        value === watch("password") || "Passwords do not match",
                     })}
-                    id="hs-toggle-password"
                     label="Confirm Password"
-                    type="password"
-                    variant="outlined"
+                    type={showPassword.confirmPassword ? "text" : "password"}
                     fullWidth
-                    error={Boolean(errors.confirmPassword)}
+                    error={!!errors.confirmPassword}
                     helperText={errors.confirmPassword?.message}
-                    className="mt-2"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() =>
+                              togglePasswordVisibility("confirmPassword")
+                            }
+                          >
+                            {showPassword.confirmPassword ? (
+                              <VisibilityOff />
+                            ) : (
+                              <Visibility />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </div>
               </div>
@@ -318,7 +341,7 @@ const CreateEmployee = () => {
               <div className="sm:grid sm:grid-cols-2 sm:gap-6">
                 <FormInput
                   name="inactivityTime"
-                  label="Inactivity Time (Minutes)"
+                  label="Inactivity Time (Seconds)"
                   control={control}
                   type="number"
                   validation={{

@@ -9,15 +9,24 @@ import {
   getAllProductsByAdminId,
 } from "../../features/actions/product";
 import { getCustomOptions } from "../../features/actions/globalData";
+import { resetFormSuccess } from "../../features/slices/assign";
 
 const AddNoteForm = (props) => {
   const { customOptions } = useSelector((state) => state.globalData);
   const dispatch = useDispatch();
-  const { isFormLoading } = useSelector((state) => state.assign);
-  const { email, attendeeId, uniquePhones, addUserActivityLog } = props;
+  const { isFormLoading, isFormSuccess } = useSelector((state) => state.assign);
+  const {
+    email,
+    attendeeId,
+    uniquePhones,
+    addUserActivityLog,
+    employeeModeData,
+    userData,
+  } = props;
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [selectedPhone, setSelectedPhone] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isNoteRequired, setNoteRequired] = useState(false);
   const { productDropdownData } = useSelector((state) => state.product);
 
   const {
@@ -45,7 +54,7 @@ const AddNoteForm = (props) => {
   }, []);
 
   useEffect(() => {
-    if (!isFormLoading) {
+    if (isFormSuccess) {
       reset({
         attendee: attendeeId,
         email: email,
@@ -58,8 +67,9 @@ const AddNoteForm = (props) => {
       setSelectedStatus(null);
       setSelectedPhone(null);
       setSelectedFile(null);
+      dispatch(resetFormSuccess());
     }
-  }, [isFormLoading]);
+  }, [isFormSuccess]);
 
   const onSubmit = (data) => {
     if (selectedStatus !== "Payment") {
@@ -74,8 +84,7 @@ const AddNoteForm = (props) => {
       ? data.callDuration.sec
       : "00";
 
-    const note = data?.note;
-
+    data.isWorked = !isNoteRequired;
     // if (data?.product && data?.product !== "") {
     //   const payload = {
     //     email,
@@ -102,7 +111,7 @@ const AddNoteForm = (props) => {
     setValue("image", file);
   };
 
-  const handleInput = (e, maxValue, numAllowed=2) => {
+  const handleInput = (e, maxValue, numAllowed = 2) => {
     let value = e.target.value;
 
     value = value.replace(/[^0-9]/g, "");
@@ -127,8 +136,7 @@ const AddNoteForm = (props) => {
 
       <div className="w-full flex gap-5 items-center">
         <label className="font-medium text-sm">
-          Call Duration{" "}
-          <span className="font-normal text-xs">(min : sec)</span>
+          Call Duration <span className="font-normal text-xs">(min : sec)</span>
         </label>
         <div className="mt-1 flex items-center">
           {/* <input
@@ -219,6 +227,7 @@ const AddNoteForm = (props) => {
               options={customOptions.map((option) => ({
                 value: option?.label,
                 label: option?.label,
+                isWorked: option?.isWorked,
               }))}
               className="mt-1 text-sm shadow"
               placeholder="Choose Status"
@@ -227,7 +236,8 @@ const AddNoteForm = (props) => {
               } // Correctly setting the selected option
               onChange={(selected) => {
                 field.onChange(selected.value);
-                setSelectedStatus(selected.value); // Update state based on selection
+                setSelectedStatus(selected.value); 
+                setNoteRequired(!selected.isWorked);
               }}
               styles={{
                 control: (provided) => ({
@@ -305,7 +315,7 @@ const AddNoteForm = (props) => {
       <div className="pt-2">
         <label className="font-medium text-sm">Note</label>
         <textarea
-          {...register("note", { required: true })}
+          {...register("note", { required: isNoteRequired })}
           className="w-full mt-1 px-5 py-2 text-gray-500 border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
         />
         {errors.note && <span className="text-red-500">Note is required</span>}
@@ -358,9 +368,10 @@ const AddNoteForm = (props) => {
 
       <button
         type="submit"
+        disabled={isFormLoading || employeeModeData ? true : false || !userData?.isActive}
         className="bg-indigo-700 w-full hover:bg-indigo-800 mt-2 text-white py-2 px-4 rounded-md"
       >
-        {isFormLoading ? <ClipLoader color="#c4c2c2" /> : "Add Note"}
+        {isFormLoading ? <ClipLoader size={17} color="#c4c2c2" /> : "Add Note"}
       </button>
     </form>
   );

@@ -23,6 +23,7 @@ const initialState = {
   isLoading: false,
   isSuccess: false,
   isFormLoading: false,
+  isFormSuccess: false,
   assignData: [],
   leadTypeData: [],
   dashboardNotes: [],
@@ -30,6 +31,7 @@ const initialState = {
   totalPages: 1,
   errorMessage: "",
   activityAssignMents: [],
+  assignLoading: false,
 };
 
 // ---------------------------------------------------------------------------------------
@@ -44,6 +46,9 @@ export const assignSlice = createSlice({
     resetAssignedData: (state) => {
       state.assignData = [];
     },
+    resetFormSuccess: state => {
+      state.isFormSuccess = false;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -54,7 +59,7 @@ export const assignSlice = createSlice({
       .addCase(addAssign.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        successToast("Tempory Toast... will add it later with validation");
+        successToast("Assignment Added Successfully");
       })
       .addCase(addAssign.rejected, (state, action) => {
         state.isLoading = false;
@@ -62,14 +67,17 @@ export const assignSlice = createSlice({
       })
       .addCase(addNote.pending, (state, action) => {
         state.isFormLoading = true;
+        state.isFormSuccess = false;
       })
       .addCase(addNote.fulfilled, (state, action) => {
         state.isFormLoading = false;
+        state.isFormSuccess = true;
         toast.success("Note Added Successfully", {
           position: "top-center",
         });
       })
       .addCase(addNote.rejected, (state, action) => {
+        state.isFormLoading = false;
         errorToast(action?.payload);
       })
       .addCase(getNotes.pending, (state, action) => {
@@ -168,21 +176,23 @@ export const assignSlice = createSlice({
         errorToast(action?.payload);
       })
       .addCase(requestReAssignment.pending, (state, action) => {
-        state.isLoading = true;
+        state.assignLoading = true;
         state.isSuccess = false;
       })
       .addCase(requestReAssignment.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.assignLoading = false;
         state.isSuccess = true;
         console.log(action?.payload);
         const { requestIds = [] } = action.payload;
-        state.assignData = state.assignData.filter((item) =>
-          !requestIds.includes(item._id)
+       if(state.totalPages === 1){
+        state.assignData = state.assignData.filter(
+          (item) => !requestIds.includes(item._id)
         );
+       }
         successToast("Request Sent Successfully");
       })
       .addCase(requestReAssignment.rejected, (state, action) => {
-        state.isLoading = false;
+        state.assignLoading = false;
         errorToast(action?.payload);
       })
       .addCase(getRequestedReAssignments.pending, (state, action) => {
@@ -203,7 +213,7 @@ export const assignSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { resetAssignedData, resetAssignSuccess } = assignSlice.actions;
+export const { resetAssignedData, resetAssignSuccess, resetFormSuccess } = assignSlice.actions;
 export default assignSlice.reducer;
 
 // ================================================== THE END ==================================================

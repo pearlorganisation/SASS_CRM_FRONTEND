@@ -24,7 +24,10 @@ import { formatDate } from "../../utils/extra";
 import useRoles from "../../hooks/useRoles";
 import UserActivityLogs from "../../components/Client/UserActivityLogs";
 import { Delete, ExpandMore, Visibility } from "@mui/icons-material";
-import { deleteUserDocumet, getUserDocuments } from "../../features/actions/auth";
+import {
+  deleteUserDocumet,
+  getUserDocuments,
+} from "../../features/actions/auth";
 
 const ViewClient = () => {
   const { id } = useParams();
@@ -79,12 +82,12 @@ const ViewClient = () => {
       <Grid container spacing={4} mt={4}>
         {/* Basic Info */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} className="p-4">
+          <Paper elevation={3} className="p-3">
             <Typography variant="h6" gutterBottom>
               Basic Information
             </Typography>
-            <Divider className="mb-3" />
-            <Box display="flex" alignItems="center" mb={2}>
+            <Divider />
+            <Box display="flex" alignItems="center" className="mt-2" mb={2}>
               <EmailIcon color="primary" className="mr-2" />
               <Typography>
                 <strong>Email:</strong> {clientData?.email}
@@ -101,12 +104,23 @@ const ViewClient = () => {
 
         {/* Employee Info */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} className="p-4">
+          <Paper elevation={3} className="px-4 py-2">
             <Typography variant="h6" gutterBottom>
               Employee Summary
             </Typography>
             <Divider className="mb-3" />
-            <Box display="flex" alignItems="center" mb={2}>
+            <Box display="flex" alignItems="center" mt={1} mb={1}>
+              <PeopleIcon color="" className="mr-2" />
+              <Typography>
+                <strong>Limit:</strong>{" "}
+                {Array.isArray(clientData?.subscription) &&
+                clientData.subscription.length > 0
+                  ? clientData.subscription[0].employeeLimit +
+                    clientData.subscription[0].employeeLimitAddon
+                  : 0}
+              </Typography>
+            </Box>
+            <Box display="flex" alignItems="center" mb={1}>
               <PeopleIcon color="primary" className="mr-2" />
               <Typography>
                 <strong>Sales:</strong>{" "}
@@ -117,7 +131,7 @@ const ViewClient = () => {
                 }
               </Typography>
             </Box>
-            <Box display="flex" alignItems="center" mb={2}>
+            <Box display="flex" alignItems="center">
               <PeopleIcon color="secondary" className="mr-2" />
               <Typography>
                 <strong>Reminder:</strong>{" "}
@@ -133,16 +147,17 @@ const ViewClient = () => {
 
         {/* Contact Info */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} className="p-4">
+          <Paper elevation={3} className="p-3">
             <Typography variant="h6" gutterBottom>
               Contact Usage
             </Typography>
-            <Divider className="mb-3" />
-            <Typography variant="body1" gutterBottom>
+            <Divider />
+            <Typography mt={1} variant="body1" gutterBottom>
               <strong>Limit:</strong>{" "}
               {Array.isArray(clientData?.subscription) &&
               clientData.subscription.length > 0
-                ? clientData.subscription[0].contactLimit
+                ? clientData.subscription[0].contactLimit +
+                  clientData.subscription[0].contactLimitAddon
                 : 0}
             </Typography>
             <Typography variant="body1">
@@ -153,12 +168,12 @@ const ViewClient = () => {
 
         {/* Plan Info */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={3} className="p-4">
+          <Paper elevation={3} className="p-3">
             <Typography variant="h6" gutterBottom>
               Plan Details
             </Typography>
             <Divider className="mb-3" />
-            <Box display="flex" alignItems="center" mb={0.5}>
+            <Box display="flex" className="mt-2" alignItems="center" mb={0.5}>
               <Typography>
                 <strong>Type:</strong> {clientData?.plan?.name}
               </Typography>
@@ -196,16 +211,18 @@ const ViewClient = () => {
                         </Typography>
 
                         <div className="flex gap-4">
-                        <Tooltip title="Open" arrow>
-                          <button
-                            onClick={() => dispatch(getUserDocuments(doc?.filename))}
-                            className="p-2 rounded-lg text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50"
-                          >
-                            <Visibility />
-                          </button>
-                        </Tooltip>
-                        
-                        {/* <Tooltip title="Delete" arrow>
+                          <Tooltip title="Open" arrow>
+                            <button
+                              onClick={() =>
+                                dispatch(getUserDocuments(doc?.filename))
+                              }
+                              className="p-2 rounded-lg text-indigo-500 hover:text-indigo-600 duration-150 hover:bg-gray-50"
+                            >
+                              <Visibility />
+                            </button>
+                          </Tooltip>
+
+                          {/* <Tooltip title="Delete" arrow>
                           <button
                             onClick={() => dispatch(deleteUserDocumet(doc?.filename))}
                             className="p-2 rounded-lg text-red-500 hover:text-red-600 duration-150 hover:bg-gray-50"
@@ -214,12 +231,23 @@ const ViewClient = () => {
                           </button>
                         </Tooltip> */}
                         </div>
-
                       </div>
                     ))
                   : null}
               </AccordionDetails>
             </Accordion>
+          </Paper>
+        </Grid>
+
+        <Grid item xs={12} md={6}>
+          <Paper elevation={3} className="px-3 py-1">
+            <Typography variant="h6" gutterBottom>
+              Active/Inactive Note
+            </Typography>
+            <Divider />
+            <Typography mt={1} variant="body1" gutterBottom>
+              {clientData?.statusChangeNote}
+            </Typography>
           </Paper>
         </Grid>
 

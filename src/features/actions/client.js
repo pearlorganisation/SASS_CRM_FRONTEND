@@ -4,7 +4,7 @@ import { instance } from "../../services/axiosInterceptor";
 // get employee data
 export const getAllClients = createAsyncThunk(
   "clients/fetchData",
-  async ({ page=1, limit=10, filters={} }, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
     try {
       const params = { page, limit };
       const { data } = await instance.post(`/users/clients`, filters, {
@@ -50,6 +50,35 @@ export const updateClient = createAsyncThunk(
   async ({ data, id }, { rejectWithValue }) => {
     try {
       const response = await instance.patch(`/users/clients/${id}`, data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+// clients data for dropdown
+export const getAllClientsForDropdown = createAsyncThunk(
+  "clients/dropdown/fetchData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.get(`/users/dropdown/clients`);
+      return data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const updateClientPlan = createAsyncThunk(
+  "client/plan/update",
+  async ({   adminId="", planId="", durationType=""}, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`subscription/update`, {
+        adminId,
+        planId,
+        durationType
+      });
       return response;
     } catch (error) {
       return rejectWithValue(error);

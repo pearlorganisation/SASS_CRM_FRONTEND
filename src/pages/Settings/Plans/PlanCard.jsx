@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import {
   FaCheck,
   FaTimes,
@@ -10,17 +10,60 @@ import {
   FaToggleOn,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { roles } from "../../../utils/roles";
 import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
+import { Button } from "@mui/material";
+import { ContentCopy } from "@mui/icons-material";
+import { copyToClipboard } from "../../../utils/extra";
+import { useDispatch, useSelector } from "react-redux";
+import { checkout } from "../../../features/actions/razorpay";
+import useRoles from "../../../hooks/useRoles";
+import ModalFallback from "../../../components/Fallback/ModalFallback";
+import { createPortal } from "react-dom";
+const PlanSelectorModal = lazy(() => import("./PlanSelectorModal"));
 
 const PlanCard = (props) => {
+  const roles = useRoles();
+  const dispatch = useDispatch();
+  const { userData } = useSelector((state) => state.auth);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const [durationModalOpen, setDurationModalOpen] = useState(false);
   const {
     plan,
     isMenuVisible = false,
-    handlePlanSelection = () => {},
+    isSelectVisible = false,
+    handlePlanSelection = (id, billingData) => {
+      dispatch(checkout({ plan: id })).then((res) => {
+        if (res?.payload?.result) {
+          const order = res?.payload?.result;
+          const plan = res?.payload?.planData;
+          const options = {
+            key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Replace with your Razorpay key_id
+            amount: order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            currency: order.currency,
+            order_id: order.id, // This is the order_id created in the backend
+            callback_url: `${
+              import.meta.env.VITE_REACT_APP_WORKING_ENVIRONMENT ===
+              "development"
+                ? import.meta.env.VITE_REACT_APP_API_BASE_URL_DEVELOPMENT
+                : import.meta.env.VITE_REACT_APP_API_BASE_URL_MAIN_PRODUCTION
+            }/razorpay/payment-success?planId=${plan._id}&adminId=${
+              userData?._id
+            }&durationType=${billingData?.durationType} `,
+            theme: {
+              color: "#F37254",
+            },
+          };
+
+          const rzp = new Razorpay(options);
+          rzp.open();
+        }
+      });
+    },
     selectedPlan = null,
+    currentPlan = null,
   } = props;
+
   const {
     name,
     amount,
@@ -59,29 +102,24 @@ const PlanCard = (props) => {
           )}
         </div>
       </ComponentGuard>
+
       {/* Card Content */}
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">{name}</h2>
         <p className="text-4xl font-extrabold text-blue-600">
-        {"\u20B9"}{amount}
+          {"\u20B9"}
+          {amount}
           <span className="text-base font-normal text-gray-500">/month</span>
         </p>
       </div>
 
       <div className="space-y-4 mb-6">
-        <Feature
-          icon={<FaCalendarAlt />}
-          label={`${planDuration} days expiry`}
-        />
         <Feature icon={<FaUsers />} label={`${employeeCount} employees`} />
         <Feature
           icon={<FaAddressBook />}
           label={`${contactLimit} contact uploads`}
         />
-        <Feature
-          icon={<FaToggleOn  />}
-          label={`${toggleLimit} Toggle Limit`}
-        />
+        <Feature icon={<FaToggleOn />} label={`${toggleLimit} Toggle Limit`} />
       </div>
 
       <div className="border-t border-gray-200 pt-4 space-y-2">
@@ -91,18 +129,58 @@ const PlanCard = (props) => {
         <Feature label="Employee Activity" enabled={employeeActivity} />
       </div>
 
-      <button
-        onClick={() => handlePlanSelection(plan?._id)}
-        className={` ${
-          selectedPlan === plan?._id ? "bg-green-600" : "bg-blue-500"
-        } w-full mt-6  text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
-      >
-        {selectedPlan === null
-          ? "Choose Plan"
-          : selectedPlan === plan?._id
-          ? "Selected"
-          : "Choose Plan"}
-      </button>
+      {/* Copy Plan ID Button */}
+      <div className="flex justify-center items-center mt-4">
+        <Button
+          onClick={() => copyToClipboard(plan?._id, "Plan")}
+          variant="outlined"
+          endIcon={<ContentCopy />}
+          style={{ textTransform: "none" }}
+        >
+          {plan?._id}
+        </Button>
+      </div>
+
+      <ComponentGuard allowedRoles={isSelectVisible ? [] : [roles.ADMIN]}>
+        {currentPlan === plan?._id ? (
+          <button
+            className={`bg-green-600 w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
+            disabled
+          >
+            Current Plan
+          </button>
+        ) : (
+          <button
+            onClick={() => setDurationModalOpen(true)}
+            className={`${
+              selectedPlan === plan?._id ? "bg-green-600" : "bg-blue-500"
+            } w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
+          >
+            {selectedPlan === null
+              ? "Choose Plan"
+              : selectedPlan === plan?._id
+              ? "Selected"
+              : "Choose Plan"}
+          </button>
+        )}
+      </ComponentGuard>
+
+      {durationModalOpen &&
+        selectedPlan !== plan?._id &&
+        createPortal(
+          <Suspense fallback={<ModalFallback />}>
+            {" "}
+            <PlanSelectorModal
+              onClose={() => setDurationModalOpen(false)}
+              planData={plan}
+              onSuccess={(billingData) =>
+                handlePlanSelection(plan?._id, billingData)
+              }
+              setModal={setDurationModalOpen}
+            />
+          </Suspense>,
+          document.body
+        )}
     </div>
   );
 };

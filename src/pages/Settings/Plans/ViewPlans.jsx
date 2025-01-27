@@ -2,18 +2,31 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getPricePlans } from "../../../features/actions/pricePlan";
 import PlanCard from "./PlanCard";
+import { getUserSubscription } from "../../../features/actions/auth";
+import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
+import useRoles from "../../../hooks/useRoles";
+import { Link } from "react-router-dom";
+import { resetPricePlanSuccess } from "../../../features/slices/pricePlan";
 
 const ViewPlans = () => {
-  const { userData } = useSelector((state) => state.auth);
-  const role = userData?.role || "";
-  const { planData, isPlanDeleted } = useSelector((state) => state.pricePlans);
+  const roles = useRoles();
+  const { userData, subscription } = useSelector((state) => state.auth);
+  const { planData, isPlanDeleted, isSuccess } = useSelector((state) => state.pricePlans);
   const dispatch = useDispatch();
-  useEffect(() => {
-    console.log(planData, "planData");
-  }, [planData, isPlanDeleted]);
   useEffect(() => {
     dispatch(getPricePlans());
   }, [isPlanDeleted]);
+
+  useEffect(() => {
+    dispatch(getUserSubscription());
+  }, []);
+
+  useEffect(() => {
+    if(isSuccess){
+      resetPricePlanSuccess();
+    }
+  },[])
+
 
   return (
     <div className="p-4 sm:p-6 md:p-10 text-center text-gray-800 bg-gray-50 min-h-screen mt-12">
@@ -30,62 +43,36 @@ const ViewPlans = () => {
 
       <div className="grid grid-cols-1   lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5">
         <div className="col-span-full  flex justify-end items-end pt-6">
-          {/* {roles.SUPER_ADMIN === role && (
-            <div className="">
+          <ComponentGuard allowedRoles={[roles.SUPER_ADMIN]}>
+            <div className=" flex gap-5">
+            <Link to="/plans/order">
+                <button className="w-fit  bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300">
+                  Change Order
+                </button>
+              </Link>
               <Link to="/plans/addPlan">
                 <button className="w-fit  bg-blue-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-300">
                   Add Plan
                 </button>
               </Link>
             </div>
-          )} */}
+          </ComponentGuard>
         </div>
         {planData &&
           Array.isArray(planData) &&
           planData?.map((item, idx) => {
             return (
               <div key={idx} className="">
-                <PlanCard plan={item} isMenuVisible={true} key={item?._id} />
+                <PlanCard
+                  plan={item}
+                  isMenuVisible={true}
+                  key={item?._id}
+                  currentPlan={subscription?.plan?._id}
+                />
               </div>
             );
           })}
 
-        {/* <div className='border bg-white'>
-          <p className='text-center font-bold text-lg pt-6 sm:pt-8 '>Basic Plan</p>
-          <p className='flex justify-center items-end pt-3 sm:pt-4'><FaRupeeSign className='pb-1 text-gray-800' size={20} /><span className='text-4xl sm:text-5xl font-bold'>699 <span className='text-sm sm:text-base font-medium text-gray-500'>/mo</span></span></p>
-
-          <div className='text-gray-500 text-xs sm:text-sm font-medium py-6 sm:py-10'>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Cred sociale lobortis erat</p></div>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Vitae liam lobortis erat</p></div>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Consequat ted tempus</p></div>
-          </div>
-
-          <button className='border-2 cursor-pointer my-4 sm:my-6 border-gray-400 rounded-[5px] hover:border-gray-600 hover:text-gray-700 py-2 px-6 sm:px-10 font-bold text-gray-600 text-sm'>Buy Now</button>
-        </div>
-        <div className='border bg-white'>
-          <p className='text-center font-bold text-lg pt-6 sm:pt-8 '>Basic Plan</p>
-          <p className='flex justify-center items-end pt-3 sm:pt-4'><FaRupeeSign className='pb-1 text-gray-800' size={20} /><span className='text-4xl sm:text-5xl font-bold'>699 <span className='text-sm sm:text-base font-medium text-gray-500'>/mo</span></span></p>
-
-          <div className='text-gray-500 text-xs sm:text-sm font-medium py-6 sm:py-10'>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Cred sociale lobortis erat</p></div>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Vitae liam lobortis erat</p></div>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Consequat ted tempus</p></div>
-          </div>
-
-          <button className='border-2 cursor-pointer my-4 sm:my-6 border-gray-400 rounded-[5px] hover:border-gray-600 hover:text-gray-700 py-2 px-6 sm:px-10 font-bold text-gray-600 text-sm'>Buy Now</button>
-        </div>
-        <div className='border bg-white'>
-          <p className='text-center font-bold text-lg pt-6 sm:pt-8 '>Basic Plan</p>
-          <p className='flex justify-center items-end pt-3 sm:pt-4'><FaRupeeSign className='pb-1 text-gray-800' size={20} /><span className='text-4xl sm:text-5xl font-bold'>699 <span className='text-sm sm:text-base font-medium text-gray-500'>/mo</span></span></p>
-
-          <div className='text-gray-500 text-xs sm:text-sm font-medium py-6 sm:py-10'>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Cred sociale lobortis erat</p></div>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Vitae liam lobortis erat</p></div>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Consequat ted tempus</p></div>
-          </div>
-
-          <button className='border-2 cursor-pointer my-4 sm:my-6 border-gray-400 rounded-[5px] hover:border-gray-600 hover:text-gray-700 py-2 px-6 sm:px-10 font-bold text-gray-600 text-sm'>Buy Now</button>
-        </div> */}
       </div>
     </div>
   );

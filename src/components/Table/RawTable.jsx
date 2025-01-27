@@ -1,50 +1,23 @@
+import React from "react";
 import { formatDateAsNumber } from "../../utils/extra";
-import {
-  Checkbox,
-  Chip,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Tooltip,
-  Skeleton,
-} from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
-const tableCellStyles = {
-  paddingTop: "6px",
-  paddingBottom: "6px",
-  height: "50px",
-  textWrap: "nowrap",
-  color: "#555A68",
-};
-
-const thStyles = " whitespace-nowrap";
-
-const RawTable = (props) => {
-  const {
-    tableData,
-    actions,
-    isSelectVisible,
-    page,
-    limit,
-    isLoading,
-    selectedRows,
-    setSelectedRows,
-    rowClick = (row) => {
-      console.log("Row clicked:", row);
-    },
-    isRowClickable = false,
-    isLeadType = false,
-    userData,
-  } = props;
-  const dispatch = useDispatch();
+const RawTable = ({
+  tableData,
+  actions = [],
+  isSelectVisible,
+  page,
+  limit,
+  isLoading,
+  selectedRows,
+  setSelectedRows,
+  rowClick = (row) => console.log("Row clicked:", row),
+  isRowClickable = false,
+  isLeadType = false,
+  userData,
+  locations = null,
+}) => {
   const { isTablesMasked } = useSelector((state) => state.table);
-  console.log("RawTable -> Rendered");
 
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
@@ -52,140 +25,141 @@ const RawTable = (props) => {
     );
   };
 
-  const isRowSelected = (id) => {
-    return selectedRows.includes(id);
-  };
-
+  const isRowSelected = (id) => selectedRows.includes(id);
   const areAllSelected = selectedRows.length === tableData?.rows?.length;
 
   const handleSelectAllChange = (checked) => {
-    if (checked) {
-      setSelectedRows(tableData?.rows?.map((row) => row._id));
-    } else {
-      setSelectedRows([]);
-    }
+    setSelectedRows(checked ? tableData?.rows?.map((row) => row._id) : []);
   };
 
   return (
-    <TableContainer component={Paper} className="shadow-md">
-      <Table>
-        <TableHead className="bg-gray-100">
-          <TableRow>
-            <TableCell className="">S.No</TableCell>
+    <div className="overflow-x-auto shadow-md rounded-lg">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-100">
+          <tr className="">
+            <th className=" py-6 font-normal text-sm whitespace-nowrap">
+              S.No
+            </th>
             {isSelectVisible && (
-              <TableCell className="">
-                <Checkbox
-                  color="primary"
+              <th className="px-4 py-3">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-gray-300"
                   checked={areAllSelected}
-                  indeterminate={
-                    selectedRows.length > 0 &&
-                    selectedRows.length < tableData?.rows?.length
-                  }
                   onChange={(e) => handleSelectAllChange(e.target.checked)}
                 />
-              </TableCell>
+              </th>
             )}
             {tableData?.columns?.map((column, index) => (
-              <TableCell key={index} className={thStyles}>
+              <th
+                key={index}
+                className="text-start px-4 text-sm font-normal py-3 whitespace-nowrap"
+              >
                 {column.header}
-              </TableCell>
+              </th>
             ))}
-            <TableCell className="font-semibold text-gray-700 sticky right-0 bg-gray-100 z-10">
-              Actions
-            </TableCell>
-          </TableRow>
-        </TableHead>
 
-        <TableBody>
-          {isLoading ? (
-            // Display skeletons while loading
+            {Array.isArray(actions) && actions.length > 0 && (
+              <th className="px-4 py-3 text-gray-700 font-normal  text-sm sticky right-0 bg-gray-100 z-10">
+                Actions
+              </th>
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {isLoading && tableData?.rows?.length > 0 ? (
             Array.from({ length: limit <= 10 ? limit : 10 }).map((_, index) => (
-              <TableRow key={index}>
-                <TableCell sx={tableCellStyles}>
-                  <Skeleton variant="text" width="100%" />
-                </TableCell>
-                {isSelectVisible && (
-                  <TableCell sx={tableCellStyles}>
-                    <Checkbox color="primary" disabled />
-                  </TableCell>
-                )}
-                {tableData?.columns?.map((column, index) => (
-                  <TableCell key={index} sx={tableCellStyles}>
-                    <Skeleton variant="text" width="100%" />
-                  </TableCell>
+              <tr className="border" key={index}>
+                <td className=" flex justify-center px-4 py-4">
+                  <div className="h-4 w-8 bg-gray-200 animate-pulse rounded"></div>
+                </td>
+                {tableData?.columns?.map((_, index) => (
+                  <td key={index} className="px-4 py-2">
+                    <div className="h-4 bg-gray-200 animate-pulse rounded"></div>
+                  </td>
                 ))}
-                <TableCell sx={tableCellStyles}>
-                  <Skeleton variant="circle" width={30} height={30} />
-                </TableCell>
-              </TableRow>
+                <td className="px-4 py-2">
+                  <div className="h-8 w-8 bg-gray-200 animate-pulse rounded-full"></div>
+                </td>
+              </tr>
             ))
           ) : tableData?.rows?.length > 0 ? (
-            // Display actual data when not loading and rows are available
             tableData?.rows?.map((row, index) => (
-              <TableRow
+              <tr
                 key={row?._id}
                 className={`${
-                  isRowSelected(row?._id) ? "bg-blue-50" : "bg-white"
-                } hover:bg-gray-50`}
+                  isRowSelected(row?._id) ? "bg-blue-50 " : "bg-white"
+                } hover:bg-gray-50 border-b whitespace-nowrap`}
               >
-                <TableCell
-                  className={`${isRowClickable ? "cursor-pointer" : ""}`}
+                <td
+                  className={`px-4 py-2 text-gray-600 ${
+                    isRowClickable ? "cursor-pointer" : ""
+                  }`}
                   onClick={() => rowClick(row)}
-                  sx={{
-                    paddingTop: "0px",
-                    paddingBottom: "0px",
-                    height: "30px",
-                    textWrap: "nowrap",
-                    color: "#555A68",
-                  }}
                 >
                   <div
-                    className={`flex h-full items-center justify-between ${
+                    className={`flex items-center h-12 justify-between ${
                       !isLeadType ? "px-3" : ""
                     }`}
                   >
                     {isLeadType && (
                       <div
-                        className="w-2 h-full"
+                        className="w-2 h-14 rounded-sm"
                         style={{
                           backgroundColor:
                             row?.leadType?.color || "transparent",
-                          borderRadius: "5%",
                         }}
                       ></div>
                     )}
-
                     {(page - 1) * limit + index + 1}
                   </div>
-                </TableCell>
+                </td>
                 {isSelectVisible && (
-                  <TableCell sx={tableCellStyles}>
-                    <Checkbox
-                      color="primary"
+                  <td className="px-4 py-2">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300"
                       checked={isRowSelected(row?._id)}
                       onChange={() => handleCheckboxChange(row?._id)}
                     />
-                  </TableCell>
+                  </td>
                 )}
                 {tableData?.columns?.map((column, index) => (
-                  <TableCell
-                    className={`${isRowClickable ? "cursor-pointer" : ""}`}
-                    onClick={() => rowClick(row)}
+                  <td
                     key={index}
-                    sx={tableCellStyles}
+                    title={
+                      column.type === "" && row?.[column.key]
+                        ? row?.[column.key]
+                        : ""
+                    }
+                    className={`px-4 py-2 text-gray-600 max-w-72 truncate ${
+                      isRowClickable ? "cursor-pointer" : ""
+                    }`}
+                    onClick={() => rowClick(row)}
                   >
                     {column.type === "status" && (
-                      <Chip
-                        label={row?.[column.key] ? "Active" : "Inactive"}
-                        color={row?.[column.key] ? "success" : "error"}
-                      />
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          row?.[column.key]
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {row?.[column.key] ? "Active" : "Inactive"}
+                      </span>
                     )}
                     {column.type === "Date" &&
                       (formatDateAsNumber(row?.[column.key]) ?? "N/A")}
-
                     {column.type === "Product" &&
                       (row?.[column.key][column?.subKey] ?? "N/A")}
-
+                      {
+                        row?.[column.key] && locations && console.log(locations.findIndex((item) => {
+                          return item.name === row?.[column.key]
+                        }))
+                      }
+                    {column.type === "Location" && ((row?.[column.key] && locations && locations.findIndex((item) => {
+                      return item.name === row?.[column.key]
+                    }) >= 0 ? row?.[column.key] : <span className="text-red-500">{row?.[column.key] ?? "N/A"}</span>))}
                     {column.type === "" &&
                       (row?.[column.key] !== undefined &&
                       row?.[column.key] !== null
@@ -200,49 +174,46 @@ const RawTable = (props) => {
                           ? `${row[column.key].slice(0, 3)}***`
                           : row[column.key] ?? "N/A"
                         : "N/A")}
-                  </TableCell>
+                  </td>
                 ))}
-                <TableCell
-                  className="sticky right-0 bg-white z-10"
-                  sx={{ ...tableCellStyles, borderLeft: "1px solid #ccc" }}
-                >
-                  <div className="flex gap-2">
-                    {actions?.map((action, index) =>
-                      (action?.readOnly || userData?.isActive,
-                      action?.hideCondition
-                        ? action.hideCondition(row)
-                        : true) ? (
-                        <div key={index}>
-                          <Tooltip title={action.tooltip} arrow>
-                            <IconButton
-                              className="group"
+                {Array.isArray(actions) && actions.length > 0 && (
+                  <td className="px-4 py-2 sticky right-0 bg-white z-10 border-l">
+                    <div className="flex gap-2">
+                      {actions.map((action, index) =>
+                        (action?.readOnly || userData?.isActive,
+                        action?.hideCondition
+                          ? action.hideCondition(row)
+                          : true) ? (
+                          <div key={index}>
+                            <button
+                              disabled={action?.disabled ? true: false}
+                              className="p-2 hover:bg-gray-100 rounded-full group"
                               onClick={() => action.onClick(row)}
+                              title={action.tooltip}
                             >
                               {action.icon(row)}
-                            </IconButton>
-                          </Tooltip>
-                        </div>
-                      ) : null
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
+                            </button>
+                          </div>
+                        ) : null
+                      )}
+                    </div>
+                  </td>
+                )}
+              </tr>
             ))
           ) : (
-            // Display message when no data is available
-            <TableRow>
-              <TableCell
+            <tr>
+              <td
                 colSpan={tableData?.columns?.length + (isSelectVisible ? 2 : 1)}
-                align="center"
-                sx={{ color: "#999", fontStyle: "italic", padding: "20px" }}
+                className="px-4 py-8 text-center text-gray-500 italic"
               >
                 No data available
-              </TableCell>
-            </TableRow>
+              </td>
+            </tr>
           )}
-        </TableBody>
-      </Table>
-    </TableContainer>
+        </tbody>
+      </table>
+    </div>
   );
 };
 

@@ -1,9 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { setAlarm } from "../../../features/actions/alarm";
+import { getAttendeeAlarm, setAlarm } from "../../../features/actions/alarm";
 
-const ViewTimerModal = ({ setModal, email }) => {
+const ViewTimerModal = ({ setModal, email, attendeeId }) => {
   const {
     control,
     register,
@@ -15,9 +15,12 @@ const ViewTimerModal = ({ setModal, email }) => {
   const dispatch = useDispatch()
 
   const onSubmit = (data) => {
-    console.log(data);
     data['email'] = email
-    dispatch(setAlarm(data))
+    data['attendeeId'] = attendeeId
+    data['date'] = new Date(data['date']).toISOString()
+    dispatch(setAlarm(data)).then(() => {
+      dispatch(getAttendeeAlarm({email}))
+    })
     setModal(false)
   };
 
@@ -48,10 +51,10 @@ const ViewTimerModal = ({ setModal, email }) => {
               <div className="">
                 <label className="font-medium text-sm ">Time </label>
                 <div className="  w-full flex  items-center gap-3 p-1">
-                  <div class="relative max-w-sm">
-                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                  <div className="relative max-w-sm">
+                    <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                       <svg
-                        class="w-4 h-4 text-gray-500 dark:text-gray-400"
+                        className="w-4 h-4 text-gray-500 dark:text-gray-400"
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="currentColor"
@@ -66,7 +69,7 @@ const ViewTimerModal = ({ setModal, email }) => {
                       datepicker
                       datepicker-format="mm-dd-yyyy"
                       type="datetime-local"
-                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 "
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dateTime-picker"
                       placeholder="Select date"
                     />
                   </div>
@@ -77,6 +80,8 @@ const ViewTimerModal = ({ setModal, email }) => {
                 <textarea
                   {...register("note", { required: true })}
                   className="w-full bg-white mt-1  px-5 py-2 text-gray-500 text-sm border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
+                  placeholder="Write a note (Max. 600 chars)"
+                  maxLength={600}
                 />
                 {/* {errors.duration && (
                    <span className="text-red-500">

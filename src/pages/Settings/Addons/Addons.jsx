@@ -9,10 +9,11 @@ import {
   getAddons,
   getClientAddons,
 } from "../../../features/actions/pricePlan";
-import { resetPricePlanSuccess } from "../../../features/slices/pricePlan";
+import { resetAddonsData, resetPricePlanSuccess } from "../../../features/slices/pricePlan";
 import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
 import useRoles from "../../../hooks/useRoles";
 import { useNavigate, useParams } from "react-router-dom";
+import AddonCard from "./AddonCard";
 
 const AddOnsPage = () => {
   const dispatch = useDispatch();
@@ -33,40 +34,13 @@ const AddOnsPage = () => {
     (state) => state.pricePlans
   );
 
-  console.log("addonsdata", addonsData);
-
-  // Static data for addons
-  const addons = [
-    {
-      id: 1,
-      name: "Basic AddOn",
-      employeeLimit: 10,
-      contactLimit: 100,
-      addOnPrice: 20,
-      validityInDays: 30,
-      isActive: true,
-    },
-    {
-      id: 2,
-      name: "Contact Only AddOn",
-      contactLimit: 200,
-      addOnPrice: 15,
-      validityInDays: 15,
-      isActive: true,
-    },
-    {
-      id: 3,
-      name: "Employee Only AddOn",
-      employeeLimit: 50,
-      addOnPrice: 25,
-      validityInDays: 60,
-      isActive: false,
-    },
-  ];
-
   useEffect(() => {
     if (!id) dispatch(getAddons());
     else dispatch(getClientAddons(id));
+
+    return () => {
+      dispatch(resetAddonsData());
+    };
   }, [id]);
 
   useEffect(() => {
@@ -92,7 +66,10 @@ const AddOnsPage = () => {
 
   return (
     <div className="bg-gray-100 min-h-screen px-6 pt-14">
-      <h1 className="text-2xl font-bold text-center mb-6"> {id ? "My" : ""} AddOns</h1>
+      <h1 className="text-2xl font-bold text-center mb-6">
+        {" "}
+        {id ? "My" : ""} AddOns
+      </h1>
 
       <div className="flex justify-end mb-6">
         <ComponentGuard allowedRoles={[roles.SUPER_ADMIN]}>
@@ -104,7 +81,10 @@ const AddOnsPage = () => {
           </button>
         </ComponentGuard>
 
-        <ComponentGuard allowedRoles={[roles.ADMIN]} conditions={[!id ? true : false]}>
+        <ComponentGuard
+          allowedRoles={[roles.ADMIN]}
+          conditions={[!id ? true : false]}
+        >
           <button
             onClick={() => {
               navigate(`/addons/${userData?._id}`);
@@ -118,7 +98,12 @@ const AddOnsPage = () => {
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {addonsData.map((addon) => (
-          <AddOnCard key={addon._id} addon={addon} roles={roles} id={id} />
+          <AddonCard
+            key={addon._id}
+            addon={addon}
+            roles={roles}
+            id={addon._id}
+          />
         ))}
       </div>
 
@@ -204,44 +189,3 @@ const AddOnsPage = () => {
 };
 
 export default AddOnsPage;
-
-const AddOnCard = ({ addon, id, roles }) => {
-  return (
-    <div
-      key={addon._id}
-      className={`border h-full rounded-lg p-4 shadow-md bg-white`}
-    >
-      <h2 className="text-lg font-semibold mb-2">{addon.addonName}</h2>
-      <div className="w-full border-b mb-2"></div>
-      {addon.employeeLimit ? (
-        <p className="text-gray-700">Employee Limit: {addon.employeeLimit}</p>
-      ) : null}
-      {addon.contactLimit ? (
-        <p className="text-gray-700">Contact Limit: {addon.contactLimit}</p>
-      ) : null}
-      <p className="text-gray-700">
-        Price: {"\u20B9"}
-        {addon.addOnPrice}
-      </p>
-      {!id ? (
-        <p className="text-gray-700">Validity: {addon.validityInDays} days</p>
-      ) : (
-        <p className="text-gray-700">
-          Expiry Date:{" "}
-          {addon.expiryDate ? addon.expiryDate.split("T")[0] : "N/A"}
-        </p>
-      )}
-       <ComponentGuard allowedRoles={[roles.ADMIN]}>
-       <button className="mt-4 bottom-0 relative w-full py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
-        Select AddOn
-      </button>
-      </ComponentGuard>
-
-      {/* <ComponentGuard allowedRoles={[roles.SUPER_ADMIN]}>
-       <div className="border-t pt-4 w-full mt-2">
-
-       </div>
-      </ComponentGuard> */}
-    </div>
-  );
-};

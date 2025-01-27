@@ -7,7 +7,11 @@ export const clientTableColumns = [
   { header: "Plan Name", key: "planName", width: 20, type: "" },
   { header: "Plan Start Date", key: "planStartDate", width: 20, type: "Date" },
   { header: "Plan Expiry", key: "planExpiry", width: 20, type: "Date" },
+  { header: "Plan Remaining Days", key: "remainingDays", width: 20, type: "" },
   { header: "Contacts Limit", key: "contactsLimit", width: 15, type: "" },
+  { header: "Used Contacts Count", key: "usedContactsCount", width: 15, type: "" },
+  { header: "Employees Limit", key: "employeeLimit", width: 15, type: "" },
+
   { header: "Total Employees", key: "totalEmployees", width: 15, type: "" },
   {
     header: "Employee Sales Count",
@@ -32,7 +36,7 @@ export const attendeeTableColumns = [
   { header: "Status", key: "status", width: 20, type: "" },
   { header: "Time in Session", key: "timeInSession", width: 20, type: "" },
   { header: "Gender", key: "gender", width: 20, type: "" },
-  { header: "Location", key: "location", width: 20, type: "" },
+  { header: "Location", key: "location", width: 20, type: "Location" },
   { header: "Phone", key: "phone", width: 20, type: "" },
 ];
 
@@ -50,11 +54,23 @@ export const employeeTableColumns = [
     type: "",
   },
   {
-    header: "Inactivity Time(Min)",
+    header: "Inactivity Time(Sec)",
     key: "inactivityTime",
     width: 20,
     type: "",
   },
+];
+
+
+
+export const locationTableColumns = [
+  { header: "Name", key: "name", width: 50, type: "" },
+  { header: "Previous Name", key: "previousName", width: 20, type: "" },
+  { header: "Is Verified", key: "isVerified", width: 10, type: "status" },
+  { header: "Admin", key: "admin", width: 20, type: "" },
+  { header: "Is Admin Verified", key: "isAdminVerified", width: 10, type: "status" },
+  { header: "Employee", key: "employee", width: 20, type: "" },
+  { header: "Phone", key: "phone", width: 15, type: "" },
 ];
 
 export const webinarTableColumns = [
@@ -84,11 +100,13 @@ export const productTableColumns = [
     width: 10,
     type: "",
   },
+  { header: "Description", key: "description", width: 20, type: "" },
 ];
 
 export const pullbacksTableColumns = [
   { header: "Email", key: "attendeeEmail", width: 50, type: "" },
   { header: "Assigned To", key: "assignedTo", width: 20, type: "" },
+  { header: "Reason", key: "requestReason", width: 20, type: "" },
 ];
 
 

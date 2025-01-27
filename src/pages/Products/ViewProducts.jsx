@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from "@mui/material";
 import { productTableColumns } from "../../utils/columnData";
 import { Edit, Delete } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
-import { openModal } from "../../features/slices/modalSlice";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { resetProductState } from "../../features/slices/product";
 import useRoles from "../../hooks/useRoles";
-import { getAllProducts } from "../../features/actions/product";
+import { deleteProduct, getAllProducts } from "../../features/actions/product";
 import EditProductModal from "./Modal/EditProductModal";
 
 const ViewProducts = () => {
@@ -39,6 +45,17 @@ const ViewProducts = () => {
   const [product, setProduct] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
+  const [confirmDialog, setConfirmDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(false);
+
+  const openConfirmDialog = () => {
+    setConfirmDialog(true);
+  };
+
+  const closeConfirmDialog = () => {
+    setConfirmDialog(false);
+  };
+
   useEffect(() => {
     setSearchParams({ page: page });
   }, [page]);
@@ -55,23 +72,38 @@ const ViewProducts = () => {
   }, [isSuccess]);
   // ----------------------- Action Icons -----------------------
 
-  const actionIcons =  employeeModeData ? [] : [
-    {
-      icon: () => <Edit className="text-blue-500 group-hover:text-blue-600" />,
-      tooltip: "Edit Product",
-      onClick: (item) => {
-        setProduct(item);
-        setOpenModal(true);
-      },
-    },
-    {
-      icon: (item) => (
-        <Delete className="text-red-500 group-hover:text-red-600" />
-      ),
-      tooltip: "Delete Product",
-      onClick: (item) => {},
-    },
-  ];
+  const actionIcons = employeeModeData
+    ? []
+    : [
+        {
+          icon: () => (
+            <Edit className="text-blue-500 group-hover:text-blue-600" />
+          ),
+          tooltip: "Edit Product",
+          onClick: (item) => {
+            setProduct(item);
+            setOpenModal(true);
+          },
+        },
+        {
+          icon: (item) => (
+            <Delete className="text-red-500 group-hover:text-red-600" />
+          ),
+          tooltip: "Delete Product",
+          onClick: (item) => {
+            setSelectedProduct(item);
+            openConfirmDialog(item);
+          },
+        },
+      ];
+
+  const deleteThisProduct = (item) => {
+    dispatch(deleteProduct(item._id)).then(res => {
+      dispatch(getAllProducts({ page: page || 1, limit: LIMIT, filters }));
+    });
+    setSelectedProduct(null);
+    closeConfirmDialog();
+  };
   return (
     <div className="px-6 md:px-10 pt-14 space-y-6">
       <div className="flex gap-4 justify-end">
@@ -102,7 +134,7 @@ const ViewProducts = () => {
               }))
             : [],
         }}
-        actions={actionIcons}
+        actions={userData.role === roles.ADMIN ? actionIcons : []}
         totalPages={totalPages}
         page={page}
         setPage={setPage}
@@ -118,6 +150,31 @@ const ViewProducts = () => {
           LIMIT={LIMIT}
         />
       )}
+
+      <Dialog
+        open={confirmDialog}
+        onClose={closeConfirmDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Delete Product?"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delte this product?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeConfirmDialog}>Disagree</Button>
+          <Button
+            onClick={() => {
+              deleteThisProduct(selectedProduct);
+            }}
+            autoFocus
+          >
+            Agree
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

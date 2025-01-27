@@ -9,6 +9,8 @@ import {
   getClientById,
   clientSignup,
   updateClient,
+  getAllClientsForDropdown,
+  updateClientPlan,
 } from "../actions/client";
 import { errorToast } from "../../utils/extra";
 
@@ -20,6 +22,7 @@ const initialState = {
   errorMessage: "",
   clientsData: [],
   singleClientData: null,
+  clientsDropdownData: [],
 };
 
 // ---------------------------------------------------------------------------------------
@@ -93,6 +96,27 @@ export const clientSlce = createSlice({
       .addCase(updateClient.rejected, (state, action) => {
         state.isUpdating = false;
         state.errorMessage = action.payload;
+        errorToast(action?.payload);
+      })
+      .addCase(getAllClientsForDropdown.fulfilled, (state, action) => {
+        state.clientsDropdownData = Array.isArray(action.payload)? action.payload : [];
+      })
+      .addCase(getAllClientsForDropdown.rejected, (state, action) => {
+        errorToast(action?.payload);
+      })
+      .addCase(updateClientPlan.pending, (state, action) => {
+        state.isUpdating = true;
+        state.isSuccess = false;
+      })
+      .addCase(updateClientPlan.fulfilled, (state, action) => {
+        state.isUpdating = false;
+        state.isSuccess = true;
+        toast.success(`Client Plan Updated Successfully`, {
+          position: "top-center",
+        });
+      })
+      .addCase(updateClientPlan.rejected, (state, action) => {
+        state.isUpdating = false;
         errorToast(action?.payload);
       });
   },

@@ -143,3 +143,15 @@ export const getUserDocuments = createAsyncThunk(
     }
   }
 );
+
+export const getSuperAdmin = createAsyncThunk(
+  "super-admin/fetchData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`users/super-admin`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

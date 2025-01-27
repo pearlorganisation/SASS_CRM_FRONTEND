@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { TextField, IconButton, Box } from "@mui/material";
 import { FaRegEdit, FaCheckSquare } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { setPageLimit } from "../features/slices/pageLimits";
 import useAddUserActivity from "../hooks/useAddUserActivity";
 
-const PageLimitEditor = ({ pageId = "defaultPage" }) => {
+const PageLimitEditor = ({ pageId = "defaultPage", setPage = () => {} }) => {
   const logUserActivity = useAddUserActivity();
   const dispatch = useDispatch();
   const limitFromRedux = useSelector((state) => state.pageLimits[pageId] || 10);
-  // console.log('PageLimitEditor -> Rendered')
 
   const [isEditing, setIsEditing] = useState(false);
   const [pageLimit, setPageLimitState] = useState(limitFromRedux);
@@ -18,42 +16,51 @@ const PageLimitEditor = ({ pageId = "defaultPage" }) => {
     setPageLimitState(limitFromRedux);
   }, [limitFromRedux]);
 
-  useEffect(() => {
-  }, []);
-
   const handleEditClick = () => {
     setIsEditing(true);
   };
 
   const handleSaveClick = () => {
-    dispatch(setPageLimit({ pageId, limit: pageLimit }));
+    // console.log("pageLimit", pageLimit);
+    const validLimit =
+      pageLimit === "" ? 10 : Math.max(1, Math.min(100, Number(pageLimit)));
+    setPageLimitState(validLimit);
+    dispatch(setPageLimit({ pageId, limit: validLimit }));
     logUserActivity({
       action: "savePageLimit",
-      details: `User Updated Page Limit For ${pageId}: ${pageLimit}`,
-    })
+      details: `User Updated Page Limit For ${pageId}: ${validLimit}`,
+    });
     setIsEditing(false);
+    setPage(1);
   };
 
   return (
-    <Box className="border rounded-md px-3 flex items-center gap-3 w-fit text-gray-600">
+    <div className="border rounded-md px-3 py-2 flex items-center gap-3 w-fit text-gray-600">
       {isEditing ? (
-        <TextField
+        <input
           type="number"
           value={pageLimit}
-          variant="standard"
-          size="small"
           onClick={(e) => e.target.select()}
           onKeyDown={(e) => {
+            if (["-", "e", "+","."].includes(e.key)) {
+              e.preventDefault();
+            }
             if (e.key === "Enter") {
               handleSaveClick();
             }
           }}
           onChange={(e) => {
-            const value = Math.max(1, Math.min(100, Number(e.target.value)));
-            setPageLimitState(value);
+            const value = e.target.value; // Allow empty string
+            if (
+              value === "" ||
+              (!isNaN(value) && Number(value) >= 0 && Number(value) <= 100)
+            ) {
+              setPageLimitState(value);
+            }
           }}
-          className="w-20"
-          inputProps={{ min: 1, max: 100 }}
+          className="w-20 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none "
+          min={1}
+          max={100}
         />
       ) : (
         <label className="text-sm font-medium">
@@ -62,25 +69,23 @@ const PageLimitEditor = ({ pageId = "defaultPage" }) => {
       )}
 
       {isEditing ? (
-        <IconButton
+        <button
           onClick={handleSaveClick}
-          color="success"
-          className="text-green-500"
+          className="text-green-500 hover:text-green-700"
           title="Save"
         >
-          <FaCheckSquare />
-        </IconButton>
+          <FaCheckSquare size={20} />
+        </button>
       ) : (
-        <IconButton
+        <button
           onClick={handleEditClick}
-          color="default"
-          className="text-gray-500"
+          className="text-gray-500 hover:text-gray-700"
           title="Edit"
         >
-          <FaRegEdit />
-        </IconButton>
+          <FaRegEdit size={20} />
+        </button>
       )}
-    </Box>
+    </div>
   );
 };
 

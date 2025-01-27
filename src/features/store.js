@@ -11,7 +11,7 @@ import sidebarLink from "./slices/sidebarLink";
 import assign from "./slices/assign";
 import globalData from "./slices/globalData";
 import userActivityReducer from "./slices/userActivity";
-import pabblyToken from "./slices/pabblyToken";
+import notification from "./slices/notification";
 import pricePlanReducer from "./slices/pricePlan";
 import clientReducer from './slices/client'
 import exportReducer from './slices/export-excel'
@@ -22,7 +22,9 @@ import filterPresetReducer from './slices/filter-preset'
 import tableReducer from './slices/tableSlice'
 import noticeBoardSlice from "./slices/noticeBoard";
 import reAssign from "./slices/reAssign.slice";
-import alarm from "./slices/alarm"
+import alarm from "./slices/alarm";
+import location from "./slices/location";
+import { razorpaySlice } from "./slices/razorpay";
 
 // Combine your individual reducers here
 const rootReducer = combineReducers({
@@ -34,7 +36,7 @@ const rootReducer = combineReducers({
   assign,
   globalData,
   userActivity: userActivityReducer,
-  pabblyToken,
+  notification,
   pricePlans: pricePlanReducer,
   client: clientReducer,
   modals: modalReducer,
@@ -45,7 +47,9 @@ const rootReducer = combineReducers({
   table: tableReducer,
   noticeBoard: noticeBoardSlice,
   reAssign,
-  alarm
+  alarm,
+  location,
+  razorpaySlice,
 });
 
 // Custom root reducer handling a clear action
@@ -63,7 +67,7 @@ const persistConfig = {
   key: "SaasCrmClientPanel",
   version: 1,
   storage,
-  whitelist: ["auth", "pabblyToken","pageLimits", "noticeBoard", "employee"],
+  whitelist: ["auth","pageLimits", "noticeBoard"],
   transforms: [
     encryptTransform({
       secretKey: `${import.meta.env.VITE_REACT_APP_REDUX_PERSIST_SECRET_KEY}`,
@@ -76,7 +80,7 @@ const persistConfig = {
 
 // Persisted root reducer
 const persistedReducer = persistReducer(persistConfig, rootReducerWithClear);
-
+console.log("persistedReducer", import.meta.env.VITE_REACT_APP_WORKING_ENVIRONMENT);
 // Configure and create the Redux store
 const store = configureStore({
   reducer: persistedReducer,

@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Toaster } from "sonner";
+import React, { Suspense, useEffect, useRef, useState } from "react";
+import { createBrowserRouter, Link, RouterProvider } from "react-router-dom";
+import { toast, Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 
 ///// pages /////
@@ -19,7 +19,6 @@ import {
   CreateEmployee,
   ViewSettings,
   ViewPlans,
-  SignUp,
   AddPlan,
   ViewSidebarLinks,
   CreateSidebarLink,
@@ -34,6 +33,18 @@ import {
   WebinarAttendees,
   NotesPage,
   AttendeeHistory,
+  CalendarPage,
+  AddOnsPage,
+  ViewEmployee,
+  LeadTypes,
+  EmployeeDashboard,
+  UpdateNoticeBoard,
+  NoticeBoard,
+  MyAddOns,
+  Notifications,
+  BillingHistory,
+  PlanOrder,
+  UpdateClientPlan,
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 import {
@@ -41,25 +52,29 @@ import {
   getCurrentUser,
   getUserSubscription,
 } from "./features/actions/auth";
-import UpdateNoticeBoard from "./pages/NoticeBoard/UpdateNoticeBoard";
-import NoticeBoard from "./pages/NoticeBoard/NoticeBoard";
 // import { getNoticeBoard } from "./features/actions/noticeBoard";
 import useRoles from "./hooks/useRoles";
 import useAddUserActivity from "./hooks/useAddUserActivity";
-import ViewEmployee from "./pages/Employees/ViewEmployee";
-import LeadTypes from "./pages/Settings/LeadType/ManageLeadTypes";
-import EmployeeDashboard from "./pages/Dashboard/EmployeeDashboard";
+
 import { socket } from "./socket";
 import TrapFocus from "@mui/material/Unstable_TrapFocus";
 import { Box, Button, Fade, Paper, Stack, Typography } from "@mui/material";
-import AddOnsPage from "./pages/Settings/Addons/Addons";
-import alarm from '/alarm.wav'
+
+import alarm from "/alarm.wav";
+import { setEmployeeModeId } from "./features/slices/employee";
+
+import { resetAlarmData } from "./features/slices/alarm";
+import { newNotification } from "./features/slices/notification";
+import { NotifActionType } from "./utils/extra";
+import { logout } from "./features/slices/auth";
+import Location from "./pages/Location/Location";
+import LocationRequests from "./pages/Location/LocationRequests";
+import LayoutFallback from "./components/Fallback/LayoutFallback";
 
 const App = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
-  // console.log("App -> render");
   const { userData, isUserLoggedIn, subscription } = useSelector(
     (state) => state.auth
   );
@@ -68,19 +83,19 @@ const App = () => {
 
   const [bannerOpen, setBannerOpen] = useState(false);
   const [bannerTitle, setBannerTitle] = useState("");
-
   const [bannerMsg, setBannerMsg] = useState("");
+  const [bannerData, setBannerData] = useState(null);
 
   const closeBanner = () => {
-    audioRef.current.pause()
-    audioRef.current.loop = false
-    audioRef.current.currentTime  = 0
+    audioRef.current.pause();
+    audioRef.current.loop = false;
+    audioRef.current.currentTime = 0;
     setBannerOpen(false);
   };
 
   const [isConnected, setIsConnected] = useState(socket.connected);
 
-  const audioRef = useRef(new Audio(alarm))
+  const audioRef = useRef(new Audio(alarm));
 
   useEffect(() => {
     function onConnect() {
@@ -96,31 +111,48 @@ const App = () => {
       audio.loop = true; // Enable looping
       audio.play().catch((err) => console.error("Audio play error:", err)); // Handle potential play errors
       setBannerOpen(true);
-      setBannerTitle(data.message)
+      setBannerTitle(data.message);
       setBannerMsg(data.deleteResult.note);
+      setBannerData(data);
+      dispatch(resetAlarmData());
+    }
+
+    function onNotification(data) {
+      // console.log(data);
+      dispatch(newNotification(data));
+      toast.info(data.title || "New Notification");
+      if (data.actionType === NotifActionType.ACCOUNT_DEACTIVATION) {
+        dispatch(logout());
+      }
     }
 
     function onReminderPlay(data) {
-      console.log(data);
+      // console.log(data);
     }
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
     socket.on("playAlarm", onAlarmPlay);
+    socket.on("notification", onNotification);
     socket.on("playReminder", onReminderPlay);
 
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
       socket.off("playAlarm", onAlarmPlay);
+      socket.off("notification", onNotification);
       socket.off("playReminder", onReminderPlay);
     };
   }, []);
 
   useEffect(() => {
-    if (isConnected) {
-      console.log("join emitted");
+    if (isConnected && userData) {
+      // console.log("join emitted");
       socket.emit("join", { user: userData._id });
+    }
+
+    if (!userData & isConnected) {
+      socket.disconnect();
     }
   }, [userData, isConnected]);
 
@@ -129,8 +161,10 @@ const App = () => {
   }
 
   useEffect(() => {
+    dispatch(setEmployeeModeId());
+
     if (isUserLoggedIn) {
-      console.log("connecting socket");
+      // console.log("connecting socket");
       socket.connect();
     }
 
@@ -160,7 +194,15 @@ const App = () => {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: isUserLoggedIn ? <Layout /> : <Login />,
+      element: isUserLoggedIn ? (
+        <Suspense fallback={<LayoutFallback/>}>
+          <Layout />
+        </Suspense>
+      ) : (
+        <Suspense fallback={<></>}>
+          <Login />
+        </Suspense>
+      ),
 
       children: [
         {
@@ -176,6 +218,7 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/webinarDetails/:id",
           element: (
@@ -184,26 +227,32 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/particularContact/notes",
           element: <NotesPage />,
         },
+
         {
           path: "/particularContact/attendee-history",
           element: <AttendeeHistory />,
         },
+
         {
           path: "/particularContact",
           element: <ViewParticularContact />,
         },
+
         {
           path: "/lead-type",
           element: <LeadTypes />,
         },
+
         {
           path: "/*",
           element: <ComingSoon />,
         },
+
         {
           path: "/employees",
           element: (
@@ -212,6 +261,7 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/employee/view/:id",
           element: (
@@ -220,6 +270,7 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/employee/edit/:id",
           element: (
@@ -228,6 +279,7 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/clients",
           element: (
@@ -236,6 +288,7 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/add-client",
           element: (
@@ -245,6 +298,15 @@ const App = () => {
           ),
         },
         {
+          path: "/client/plan/:id",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN"]}>
+              <UpdateClientPlan />
+            </RouteGuard>
+          ),
+        },
+
+        {
           path: "/view-client/:id",
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN"]}>
@@ -252,15 +314,30 @@ const App = () => {
             </RouteGuard>
           ),
         },
+
         {
           path: "/products",
           element: <ViewProducts />,
+        },
+        {
+          path: "/notifications/:userId",
+          element: <Notifications />,
         },
         {
           path: "/assignments",
           element: (
             <RouteGuard roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER"]}>
               <Assignments />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/calendar",
+          element: (
+            <RouteGuard
+              roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER", "ADMIN"]}
+            >
+              <CalendarPage />
             </RouteGuard>
           ),
         },
@@ -314,8 +391,16 @@ const App = () => {
         {
           path: "/addons/:id",
           element: (
-            <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
-              <AddOnsPage />
+            <RouteGuard roleNames={["ADMIN"]}>
+              <MyAddOns />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/billing-history",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <BillingHistory />
             </RouteGuard>
           ),
         },
@@ -328,14 +413,21 @@ const App = () => {
           ),
         },
         {
-          path: "/plans/addPlan", // TODO: Remove Accessibility after Creating Static Plans
+          path: "/plans/order",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN"]}>
+              <PlanOrder />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/plans/addPlan",
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN"]}>
               <AddPlan />
             </RouteGuard>
           ),
         },
-
         {
           path: "/sidebarLinks",
           element: (
@@ -404,6 +496,20 @@ const App = () => {
           path: "/notice-board",
           element: <NoticeBoard />,
         },
+
+        {
+          path: "/locations",
+          element: <Location />,
+        },
+
+        {
+          path: "/locations/requests",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
+              <LocationRequests />
+            </RouteGuard>
+          ),
+        },
       ],
     },
     {
@@ -432,20 +538,24 @@ const App = () => {
               right: 5,
               m: 0,
               p: 2,
-              color: '#ffffff',
+              color: "#ffffff",
               borderWidth: 0,
-              border:1,
-              borderColor: '#117195f0',
-              borderRadius: '10px',
-              width:400,
+              border: 1,
+              borderColor: "#117195f0",
+              borderRadius: "10px",
+              width: 400,
               minHeight: 150,
-              maxWidth:'100%',
-              background: '#23a7daee'
+              maxWidth: "100%",
+              background: "#23a7daee",
             }}
           >
             <Stack
               direction={{ xs: "column", sm: "row" }}
-              sx={{ justifyContent: "space-between", alignItems: "center", gap: 2 }}
+              sx={{
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: 2,
+              }}
             >
               <Box
                 sx={{
@@ -453,13 +563,24 @@ const App = () => {
                   alignSelf: { xs: "flex-start", sm: "center" },
                 }}
               >
-                <Typography sx={{ fontWeight: "bold" }}>{bannerTitle}</Typography>
-                <Typography variant="body2">{bannerMsg}</Typography>
+                {bannerData && (
+                  <>
+                    <Typography sx={{ fontWeight: "bold" }}>
+                      {bannerData.message}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>E-Mail:</strong> {bannerData.deleteResult.email}
+                    </Typography>
+                    <Typography variant="body2">
+                      <strong>Note:</strong> {bannerData.deleteResult.note}
+                    </Typography>
+                  </>
+                )}
               </Box>
               <Stack
                 direction={{
                   xs: "row-reverse",
-                  sm: "row",
+                  sm: "column",
                 }}
                 sx={{
                   gap: 2,
@@ -467,6 +588,15 @@ const App = () => {
                   alignSelf: { xs: "flex-end", sm: "center" },
                 }}
               >
+                {bannerData && (
+                  <a
+                    href={`/particularContact?email=${bannerData?.deleteResult?.email}&attendeeId=${bannerData?.deleteResult?.attendeeId}`}
+                  >
+                    <Button size="small" variant="contained">
+                      View Attendee
+                    </Button>
+                  </a>
+                )}
                 <Button size="small" onClick={closeBanner} variant="contained">
                   Stop Alarm
                 </Button>

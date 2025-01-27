@@ -15,6 +15,7 @@ import useRoles from "../../hooks/useRoles";
 import { MdDelete } from "react-icons/md";
 import { deleteAllData } from "../../features/actions/globalData";
 import { TbRecharging } from "react-icons/tb";
+import { FaRegMoneyBillAlt } from "react-icons/fa";
 
 // Configuration for the links
 
@@ -46,10 +47,16 @@ const ViewSettings = () => {
       allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
     },
     {
+      to: "/billing-history",
+      name: "Billing History",
+      icon: <FaRegMoneyBillAlt size={40} />,
+      allowedRoles: [roles.ADMIN],
+    },
+    {
       to: "/pabblyToken",
       name: "External API Token",
       icon: <PiLetterCirclePBold size={40} />,
-      allowedRoles: [roles.ADMIN],
+      allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
     },
     {
       to: "/settings/custom-status",
@@ -94,6 +101,7 @@ const ViewSettings = () => {
     <Box className="mt-10 text-center">
       <Typography variant="h4" className="font-bold">
         SETTINGS
+        
       </Typography>
       {/* Tailwind Grid Layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 my-10 md:mx-10">
