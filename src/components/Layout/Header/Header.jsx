@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { getRoleNameByID } from "../../../utils/roles";
@@ -9,11 +9,30 @@ import ComponentGuard from "../../AccessControl/ComponentGuard";
 import useRoles from "../../../hooks/useRoles";
 import NotificationBell from "../../Notification/NotificationBell";
 const Header = () => {
+  const [expiryDays, setExpiryDays] = useState();
   const dispatch = useDispatch();
   const roles = useRoles();
   const navigate = useNavigate(); // Initialize useNavigate for navigation
   const { userData, subscription } = useSelector((state) => state.auth);
   const { employeeModeData } = useSelector((state) => state.employee);
+
+  useEffect(() => {
+    if (subscription) {
+      const expiryDate = new Date(subscription.expiryDate);
+      expiryDate.setHours(0,0,0,0);
+
+      const currentDate = new Date();
+      currentDate.setHours(0,0,0,0);
+      
+
+      const diffTime = Math.abs(expiryDate - currentDate);
+      const diffDays = diffTime / (1000 * 3600 * 24);
+      console.log(diffDays)
+      if (diffDays <= 15) {
+        setExpiryDays(diffDays);
+      }
+    }
+  }, [subscription]);
 
   const handleProfileClick = () => {
     // Navigate to the profile page
@@ -64,39 +83,48 @@ const Header = () => {
             </Link>
           </div>
 
-
-
-          <ComponentGuard allowedRoles={[roles.ADMIN]} conditions={[employeeModeData ? true : false]}>
-          <div className="flex items-center gap-4 justify-between bg-gray-100 shadow-md py-1 px-3 rounded-md w-fit max-w-md">
-                {/* Employee Info */}
-                <div className="flex items-center space-x-4">
-                  <div className="text-sm">
-                    <p className="text-gray-600 font-medium">
-                      {employeeModeData?.userName}
-                    </p>
-                    <p className="text-gray-500">{employeeModeData?.role}</p>
-                  </div>
+          <ComponentGuard
+            allowedRoles={[roles.ADMIN]}
+            conditions={[employeeModeData ? true : false]}
+          >
+            <div className="flex items-center gap-4 justify-between bg-gray-100 shadow-md py-1 px-3 rounded-md w-fit max-w-md">
+              {/* Employee Info */}
+              <div className="flex items-center space-x-4">
+                <div className="text-sm">
+                  <p className="text-gray-600 font-medium">
+                    {employeeModeData?.userName}
+                  </p>
+                  <p className="text-gray-500">{employeeModeData?.role}</p>
                 </div>
-
-                {/* Exit Button */}
-                <button
-                  onClick={onExit}
-                  className="bg-red-500 text-white px-4 py-2 rounded font-medium text-sm"
-                >
-                  Exit
-                </button>
               </div>
-            </ComponentGuard>
 
-            <ComponentGuard allowedRoles={[roles.ADMIN]} conditions={[expiryDays ? true : false]}>
+              {/* Exit Button */}
+              <button
+                onClick={onExit}
+                className="bg-red-500 text-white px-4 py-2 rounded font-medium text-sm"
+              >
+                Exit
+              </button>
+            </div>
+          </ComponentGuard>
 
-              </ComponentGuard>
+          <ComponentGuard
+            allowedRoles={[roles.ADMIN]}
+            conditions={[expiryDays ? true : false]}
+          >
+            <Link
+              to="/plans"
+              className="text-red-500 hover:text-red-600 hover:underline"
+            >
+              Plan expiring in {expiryDays && expiryDays} days on{" "}
+              {subscription &&
+                new Date(subscription?.expiryDate).toDateString()}
+              , click to see plans.
+            </Link>
+          </ComponentGuard>
 
-
-            
           <div className="flex items-center">
             <NotificationBell userData={userData} roles={roles} />
-           
 
             <div
               className="flex items-center ms-3 cursor-pointer"

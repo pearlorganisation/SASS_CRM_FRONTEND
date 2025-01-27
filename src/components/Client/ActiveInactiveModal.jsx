@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import {
   Modal,
   Box,
@@ -14,10 +14,13 @@ import { updateClient } from "../../features/actions/client";
 import { resetClientState } from "../../features/slices/client";
 import { closeModal } from "../../features/slices/modalSlice";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { useNavigate } from "react-router-dom";
 
 const ActiveInactiveModal = ({ modalName }) => {
+  const navigate = useNavigate();
   const logUserActivity = useAddUserActivity();
   const { modalData: clientData } = useSelector((state) => state.modals);
+  console.log(clientData);
 
 
   const dispatch = useDispatch();
@@ -41,6 +44,12 @@ const ActiveInactiveModal = ({ modalName }) => {
       return;
     }
     if (isInputValid) {
+      if(clientData?.remainingDays <= 0 && !clientData.isActive) {
+        navigate(`/client/plan/${clientData?._id}`);
+
+        return;
+      }
+
       dispatch(
         updateClient({
           data: { statusChangeNote: note, isActive: !clientData.isActive },

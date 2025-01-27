@@ -69,3 +69,19 @@ export const getAllClientsForDropdown = createAsyncThunk(
     }
   }
 );
+
+export const updateClientPlan = createAsyncThunk(
+  "client/plan/update",
+  async ({   adminId="", planId="", durationType=""}, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`subscription/update`, {
+        adminId,
+        planId,
+        durationType
+      });
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
