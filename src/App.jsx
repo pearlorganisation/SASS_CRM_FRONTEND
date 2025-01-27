@@ -44,6 +44,7 @@ import {
   Notifications,
   BillingHistory,
   PlanOrder,
+  UpdateClientPlan,
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 import {
@@ -293,6 +294,14 @@ const App = () => {
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN"]}>
               <CreateClient />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/client/plan/:id",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN"]}>
+              <UpdateClientPlan />
             </RouteGuard>
           ),
         },

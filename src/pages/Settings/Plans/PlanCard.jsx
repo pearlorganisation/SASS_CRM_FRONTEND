@@ -49,7 +49,7 @@ const PlanCard = (props) => {
                 : import.meta.env.VITE_REACT_APP_API_BASE_URL_MAIN_PRODUCTION
             }/razorpay/payment-success?planId=${plan._id}&adminId=${
               userData?._id
-            }`, // Your success URL
+            }&durationType=${billingData?.durationType} `,
             theme: {
               color: "#F37254",
             },

@@ -65,14 +65,7 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
   }, []);
 
   const handleConfirmPlan = () => {
-    const billingData = {};
-    billingData["planDuration"] = durationConfig?.duration;
-    billingData["itemAmount"] = planData?.amount * monthMultiplier[selectedPlan];
-    billingData["durationType"] = selectedPlan;
-    billingData["discountAmount"] = discountAmount;
-    billingData["taxPercent"] = 18;
-    billingData["taxAmount"] = gst;
-    billingData["totalAmount"] = totalWithGST;
+    const billingData = { durationType: selectedPlan };
     onSuccess(billingData);
   };
 

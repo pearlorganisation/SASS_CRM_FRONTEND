@@ -54,12 +54,6 @@ function CreateClient() {
       }
       console.log(billingData);
       data["plan"] = selectedPlan;
-      data["planDuration"] = billingData.planDuration;
-      data["itemAmount"] = billingData.itemAmount;
-      data["taxPercent"] = billingData.taxPercent;
-      data["taxAmount"] = billingData.taxAmount;
-      data["discountAmount"] = billingData.discountAmount;
-      data["totalAmount"] = billingData.totalAmount;
       data["durationType"] = billingData.durationType;
       data["userName"] = data.clientUserName;
       dispatch(clientSignup(data)).then((res) => {

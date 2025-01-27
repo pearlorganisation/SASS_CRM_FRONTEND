@@ -10,6 +10,7 @@ import {
   clientSignup,
   updateClient,
   getAllClientsForDropdown,
+  updateClientPlan,
 } from "../actions/client";
 import { errorToast } from "../../utils/extra";
 
@@ -101,6 +102,21 @@ export const clientSlce = createSlice({
         state.clientsDropdownData = Array.isArray(action.payload)? action.payload : [];
       })
       .addCase(getAllClientsForDropdown.rejected, (state, action) => {
+        errorToast(action?.payload);
+      })
+      .addCase(updateClientPlan.pending, (state, action) => {
+        state.isUpdating = true;
+        state.isSuccess = false;
+      })
+      .addCase(updateClientPlan.fulfilled, (state, action) => {
+        state.isUpdating = false;
+        state.isSuccess = true;
+        toast.success(`Client Plan Updated Successfully`, {
+          position: "top-center",
+        });
+      })
+      .addCase(updateClientPlan.rejected, (state, action) => {
+        state.isUpdating = false;
         errorToast(action?.payload);
       });
   },
