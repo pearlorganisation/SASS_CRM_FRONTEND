@@ -126,7 +126,6 @@ const ViewParticularContact = () => {
 
     setAttendeeHistoryData((prev) => {
       const data = [...selectedAttendee[0]?.data];
-      // console.log(selectedAttendee[0]?.data);
       return data.filter((item, idx) => {
         let index = data.findIndex((item2) => {
           return item2.webinar[0].webinarName === item.webinar[0].webinarName;
@@ -139,6 +138,7 @@ const ViewParticularContact = () => {
         } else {
           return item;
         }
+
       });
     });
   }, [selectedAttendee]);
