@@ -29,6 +29,7 @@ function CreateClient() {
 
   const steps = ["Client Information", "Choose Plan"];
   const [activeStep, setActiveStep] = useState(0);
+  const [billingData, setBillingData] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showPassword, setShowPassword] = useState({
     password: false,
@@ -51,12 +52,15 @@ function CreateClient() {
         errorToast("Please select a plan");
         return;
       }
+      console.log(billingData);
       data["plan"] = selectedPlan;
-      data["planDuration"] = 30;
-      data["itemAmount"] = 1000;
-      data["taxPercent"] = 0;
-      data["taxAmount"] = 0;
-      data["totalAmount"] = 1000;
+      data["planDuration"] = billingData.planDuration;
+      data["itemAmount"] = billingData.itemAmount;
+      data["taxPercent"] = billingData.taxPercent;
+      data["taxAmount"] = billingData.taxAmount;
+      data["discountAmount"] = billingData.discountAmount;
+      data["totalAmount"] = billingData.totalAmount;
+      data["durationType"] = billingData.durationType;
       data["userName"] = data.clientUserName;
       dispatch(clientSignup(data)).then((res) => {
         if (res?.meta?.requestStatus === "fulfilled") {
@@ -245,7 +249,11 @@ function CreateClient() {
                       key={item._id}
                       isSelectVisible={true}
                       selectedPlan={selectedPlan}
-                      handlePlanSelection={(id) => setSelectedPlan(id)}
+                      handlePlanSelection={(id, billing) => {
+                        setSelectedPlan(id);
+                        console.log('--->', billing);
+                        setBillingData(billing);
+                      }}
                     />
                   </div>
                 ))}

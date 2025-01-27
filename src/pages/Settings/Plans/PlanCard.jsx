@@ -32,7 +32,7 @@ const PlanCard = (props) => {
     plan,
     isMenuVisible = false,
     isSelectVisible = false,
-    handlePlanSelection = (id) => {
+    handlePlanSelection = (id, billingData) => {
       dispatch(checkout({ plan: id })).then((res) => {
         if (res?.payload?.result) {
           const order = res?.payload?.result;
@@ -165,17 +165,17 @@ const PlanCard = (props) => {
         )}
       </ComponentGuard>
 
-      {durationModalOpen && selectedPlan !== plan?._id &&
+      {durationModalOpen &&
+        selectedPlan !== plan?._id &&
         createPortal(
           <Suspense fallback={<ModalFallback />}>
             {" "}
             <PlanSelectorModal
               onClose={() => setDurationModalOpen(false)}
               planData={plan}
-              onSuccess={(e) => {
-                console.log(e);
-                handlePlanSelection(plan?._id);
-              }}
+              onSuccess={(billingData) =>
+                handlePlanSelection(plan?._id, billingData)
+              }
               setModal={setDurationModalOpen}
             />
           </Suspense>,

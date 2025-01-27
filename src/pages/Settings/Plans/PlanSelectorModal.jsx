@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 
 const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
   const [selectedPlan, setSelectedPlan] = useState("monthly");
+  const [error, setError] = useState(null);
+
+  // Default month multipliers for plans
   const monthMultiplier = {
     monthly: 1,
     quarterly: 3,
@@ -9,14 +12,22 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
     yearly: 12,
   };
 
-  const { planDurationConfig = {}, name } = planData;
+  // Destructuring planData
+  const { planDurationConfig = {}, name = "Plan Name", amount = 0 } = planData;
 
-  const baseAmount = 500;
+  // Ensure planDurationConfig and name exist
+  if (!planDurationConfig || Object.keys(planDurationConfig).length === 0) {
+    throw new Error("Invalid plan configuration");
+  }
 
   const calculatePlanPrice = (planKey) => {
     const durationConfig = planDurationConfig[planKey];
-    if(!durationConfig) return 0;
-    const basePrice = baseAmount * monthMultiplier[planKey];
+    if (!durationConfig) {
+      setError("Selected plan configuration is missing.");
+      return 0;
+    }
+
+    const basePrice = amount * monthMultiplier[planKey];
 
     if (durationConfig.discountType === "flat") {
       return Math.max(basePrice - durationConfig.discountValue, 0);
@@ -31,17 +42,22 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
   };
 
   const totalAmount = calculatePlanPrice(selectedPlan);
-  const plan = planDurationConfig[selectedPlan];
+  const durationConfig = planDurationConfig[selectedPlan];
+
   const discountAmount =
-    plan.discountType === "flat"
-      ? plan.discountValue
-      : (baseAmount * monthMultiplier[selectedPlan] * plan.discountValue) / 100;
+    durationConfig.discountType === "flat"
+      ? durationConfig.discountValue
+      : (amount *
+          monthMultiplier[selectedPlan] *
+          durationConfig.discountValue) /
+        100;
+
   const subtotal = totalAmount;
   const gst = subtotal * 0.18; // 18% GST
   const totalWithGST = subtotal + gst;
 
   useEffect(() => {
-    document.body.style.overflow = true ? "hidden" : "auto";
+    document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = "auto";
       setModal(false);
@@ -50,10 +66,14 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
 
   const handleConfirmPlan = () => {
     const billingData = {};
-    billingData["planDuration"] = billingData["itemAmount"] = 1000;
-    billingData["taxPercent"] = 0;
-    billingData["taxAmount"] = 0;
-    billingData["totalAmount"] = 1000;
+    billingData["planDuration"] = durationConfig?.duration;
+    billingData["itemAmount"] = planData?.amount * monthMultiplier[selectedPlan];
+    billingData["durationType"] = selectedPlan;
+    billingData["discountAmount"] = discountAmount;
+    billingData["taxPercent"] = 18;
+    billingData["taxAmount"] = gst;
+    billingData["totalAmount"] = totalWithGST;
+    onSuccess(billingData);
   };
 
   return (
@@ -72,6 +92,9 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-80 overflow-y-auto">
           {Object.keys(planDurationConfig).map((key) => {
             const price = calculatePlanPrice(key);
+            const duration = planDurationConfig[key]?.duration;
+            const discountType = planDurationConfig[key]?.discountType;
+            const discountValue = planDurationConfig[key]?.discountValue;
 
             return (
               <div
@@ -85,10 +108,10 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
               >
                 <h3 className="text-lg font-semibold capitalize">{key}</h3>
                 <p className="text-sm text-gray-600">
-                  {planDurationConfig[key].duration} days ·{" "}
-                  {planDurationConfig[key].discountType === "flat"
-                    ? `Flat discount of ₹${planDurationConfig[key].discountValue}`
-                    : `Discount of ${planDurationConfig[key].discountValue}%`}
+                  {duration} days ·{" "}
+                  {discountType === "flat"
+                    ? `Flat discount of ₹${discountValue}`
+                    : `Discount of ${discountValue}%`}
                 </p>
                 <p className="text-sm font-bold text-blue-600">
                   ₹{price.toFixed(2)}
@@ -98,11 +121,12 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
           })}
         </div>
 
+        {/* Price breakdown */}
         <div className="mt-6 border-t pt-4">
           <div className="flex justify-between items-center">
             <p className="text-lg font-bold">Base Price:</p>
             <p className="text-lg font-semibold text-gray-800">
-              ₹{(baseAmount * monthMultiplier[selectedPlan]).toFixed(2)}
+              ₹{(amount * monthMultiplier[selectedPlan]).toFixed(2)}
             </p>
           </div>
           <div className="flex justify-between items-center mt-2">
@@ -131,6 +155,7 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
           </div>
         </div>
 
+        {/* Confirm Plan Button */}
         <button
           className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300"
           onClick={handleConfirmPlan}
