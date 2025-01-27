@@ -40,7 +40,7 @@ function CreateClient() {
     handleSubmit,
     formState: { errors },
     watch,
-    reset
+    reset,
   } = useForm();
 
   const onSubmit = (data) => {
@@ -57,6 +57,7 @@ function CreateClient() {
       data["taxPercent"] = 0;
       data["taxAmount"] = 0;
       data["totalAmount"] = 1000;
+      data["userName"] = data.clientUserName;
       dispatch(clientSignup(data)).then((res) => {
         if (res?.meta?.requestStatus === "fulfilled") {
           navigate("/clients", { replace: true });
@@ -109,9 +110,11 @@ function CreateClient() {
                 fullWidth
                 label="Username"
                 variant="outlined"
-                {...register("userName", { required: "Username is required" })}
-                error={!!errors.userName}
-                helperText={errors.userName?.message}
+                {...register("clientUserName", {
+                  required: "Username is required",
+                })}
+                error={!!errors.clientUserName}
+                helperText={errors.clientUserName?.message}
               />
               <TextField
                 fullWidth
@@ -139,14 +142,17 @@ function CreateClient() {
                   required: "Phone number is required",
                   pattern: {
                     value: /^\+\d{1,3}\d{9}$/,
-                    message: "10 Digit Phone number with Country Code is required, eg: +911234567890",
+                    message:
+                      "10 Digit Phone number with Country Code is required, eg: +911234567890",
                   },
                 })}
                 error={!!errors.phone}
                 helperText={errors.phone?.message}
               />
               <TextField
-                {...register("password", { required: "Password is required" })}
+                {...register("password", {
+                  required: "Password is required",
+                })}
                 label="Password"
                 type={showPassword.password ? "text" : "password"}
                 fullWidth
@@ -237,6 +243,7 @@ function CreateClient() {
                     <PlanCard
                       plan={item}
                       key={item._id}
+                      isSelectVisible={true}
                       selectedPlan={selectedPlan}
                       handlePlanSelection={(id) => setSelectedPlan(id)}
                     />

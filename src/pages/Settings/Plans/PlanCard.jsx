@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import {
   FaCheck,
   FaTimes,
@@ -17,6 +17,9 @@ import { copyToClipboard } from "../../../utils/extra";
 import { useDispatch, useSelector } from "react-redux";
 import { checkout } from "../../../features/actions/razorpay";
 import useRoles from "../../../hooks/useRoles";
+import ModalFallback from "../../../components/Fallback/ModalFallback";
+import { createPortal } from "react-dom";
+const PlanSelectorModal = lazy(() => import("./PlanSelectorModal"));
 
 const PlanCard = (props) => {
   const roles = useRoles();
@@ -24,9 +27,11 @@ const PlanCard = (props) => {
   const { userData } = useSelector((state) => state.auth);
   const [menuOpen, setMenuOpen] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [durationModalOpen, setDurationModalOpen] = useState(false);
   const {
     plan,
     isMenuVisible = false,
+    isSelectVisible = false,
     handlePlanSelection = (id) => {
       dispatch(checkout({ plan: id })).then((res) => {
         if (res?.payload?.result) {
@@ -136,7 +141,7 @@ const PlanCard = (props) => {
         </Button>
       </div>
 
-      <ComponentGuard allowedRoles={[roles.ADMIN]}>
+      <ComponentGuard allowedRoles={isSelectVisible ? [] : [roles.ADMIN]}>
         {currentPlan === plan?._id ? (
           <button
             className={`bg-green-600 w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
@@ -146,7 +151,7 @@ const PlanCard = (props) => {
           </button>
         ) : (
           <button
-            onClick={() => handlePlanSelection(plan?._id)}
+            onClick={() => setDurationModalOpen(true)}
             className={`${
               selectedPlan === plan?._id ? "bg-green-600" : "bg-blue-500"
             } w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
@@ -159,6 +164,23 @@ const PlanCard = (props) => {
           </button>
         )}
       </ComponentGuard>
+
+      {durationModalOpen && selectedPlan !== plan?._id &&
+        createPortal(
+          <Suspense fallback={<ModalFallback />}>
+            {" "}
+            <PlanSelectorModal
+              onClose={() => setDurationModalOpen(false)}
+              planData={plan}
+              onSuccess={(e) => {
+                console.log(e);
+                handlePlanSelection(plan?._id);
+              }}
+              setModal={setDurationModalOpen}
+            />
+          </Suspense>,
+          document.body
+        )}
     </div>
   );
 };
