@@ -126,25 +126,26 @@ const ViewParticularContact = () => {
 
     setAttendeeHistoryData((prev) => {
       const data = [...selectedAttendee[0]?.data];
-      return data?.filter((item) => {
-        const index = data.findIndex(
-          (item2) =>
-            item.webinar[0].webinarName === item2.webinar[0].webinarName
-        );
+      return data.filter((item, idx) => {
+        let index = data.findIndex((item2) => {
+          return item2.webinar[0].webinarName === item.webinar[0].webinarName;
+        });
 
-        if (index >= 0 && data[index].isAttended === true) {
-          data.splice(index, 1);
+        if (index >= 0 && index === idx && item.isAttended === true) {
           return item;
+        } else if (index >= 0 && index !== idx && item.isAttended === false) {
+          return;
         } else {
           return item;
         }
+
       });
     });
   }, [selectedAttendee]);
 
   useEffect(() => {
     console.log(attendeeHistoryData);
-  }, [setAttendeeHistoryData]);
+  }, [attendeeHistoryData]);
 
   useEffect(() => {
     if (!leadTypeData) return;
