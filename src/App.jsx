@@ -412,14 +412,13 @@ const App = () => {
           ),
         },
         {
-          path: "/plans/addPlan", // TODO: Remove Accessibility after Creating Static Plans
+          path: "/plans/addPlan",
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN"]}>
               <AddPlan />
             </RouteGuard>
           ),
         },
-
         {
           path: "/sidebarLinks",
           element: (
