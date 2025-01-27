@@ -63,7 +63,6 @@ const CreateEmployee = () => {
   };
 
   const onSubmit = (data) => {
-    console.log(userData);
     const newData = {
       ...data,
       validCallTime: isNaN(Number(data.validCallTime))
@@ -74,7 +73,6 @@ const CreateEmployee = () => {
         : Number(data.dailyContactLimit),
       adminId: userData?._id,
     };
-    console.log(newData);
     if (id) {
       dispatch(updateEmployee({ id, data: newData }));
     } else {

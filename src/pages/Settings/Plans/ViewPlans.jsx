@@ -73,42 +73,6 @@ const ViewPlans = () => {
             );
           })}
 
-        {/* <div className='border bg-white'>
-          <p className='text-center font-bold text-lg pt-6 sm:pt-8 '>Basic Plan</p>
-          <p className='flex justify-center items-end pt-3 sm:pt-4'><FaRupeeSign className='pb-1 text-gray-800' size={20} /><span className='text-4xl sm:text-5xl font-bold'>699 <span className='text-sm sm:text-base font-medium text-gray-500'>/mo</span></span></p>
-
-          <div className='text-gray-500 text-xs sm:text-sm font-medium py-6 sm:py-10'>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Cred sociale lobortis erat</p></div>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Vitae liam lobortis erat</p></div>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Consequat ted tempus</p></div>
-          </div>
-
-          <button className='border-2 cursor-pointer my-4 sm:my-6 border-gray-400 rounded-[5px] hover:border-gray-600 hover:text-gray-700 py-2 px-6 sm:px-10 font-bold text-gray-600 text-sm'>Buy Now</button>
-        </div>
-        <div className='border bg-white'>
-          <p className='text-center font-bold text-lg pt-6 sm:pt-8 '>Basic Plan</p>
-          <p className='flex justify-center items-end pt-3 sm:pt-4'><FaRupeeSign className='pb-1 text-gray-800' size={20} /><span className='text-4xl sm:text-5xl font-bold'>699 <span className='text-sm sm:text-base font-medium text-gray-500'>/mo</span></span></p>
-
-          <div className='text-gray-500 text-xs sm:text-sm font-medium py-6 sm:py-10'>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Cred sociale lobortis erat</p></div>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Vitae liam lobortis erat</p></div>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Consequat ted tempus</p></div>
-          </div>
-
-          <button className='border-2 cursor-pointer my-4 sm:my-6 border-gray-400 rounded-[5px] hover:border-gray-600 hover:text-gray-700 py-2 px-6 sm:px-10 font-bold text-gray-600 text-sm'>Buy Now</button>
-        </div>
-        <div className='border bg-white'>
-          <p className='text-center font-bold text-lg pt-6 sm:pt-8 '>Basic Plan</p>
-          <p className='flex justify-center items-end pt-3 sm:pt-4'><FaRupeeSign className='pb-1 text-gray-800' size={20} /><span className='text-4xl sm:text-5xl font-bold'>699 <span className='text-sm sm:text-base font-medium text-gray-500'>/mo</span></span></p>
-
-          <div className='text-gray-500 text-xs sm:text-sm font-medium py-6 sm:py-10'>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Cred sociale lobortis erat</p></div>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Vitae liam lobortis erat</p></div>
-            <div className='flex items-center pl-4 sm:pl-5 gap-2'><CiCircleCheck className='text-green-600' size={20} /><p>Consequat ted tempus</p></div>
-          </div>
-
-          <button className='border-2 cursor-pointer my-4 sm:my-6 border-gray-400 rounded-[5px] hover:border-gray-600 hover:text-gray-700 py-2 px-6 sm:px-10 font-bold text-gray-600 text-sm'>Buy Now</button>
-        </div> */}
       </div>
     </div>
   );
