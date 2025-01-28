@@ -2,7 +2,7 @@
 
 import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
-import { getLocations } from "../actions/location";
+import { getLocationRequests, getLocations } from "../actions/location";
 
 const initialState = {
   isLoading: false,
@@ -41,6 +41,20 @@ export const locationSlice = createSlice({
         successToast('Locations fetched.')   
       })
       .addCase(getLocations.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getLocationRequests.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(getLocationRequests.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.locationRequests = action.payload     
+        successToast('Locations Requests fetched.')   
+      })
+      .addCase(getLocationRequests.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       })

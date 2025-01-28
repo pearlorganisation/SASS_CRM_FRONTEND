@@ -53,7 +53,7 @@ const pricePlans = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.isSuccess = false;
-        errorToast("Error On Plan Creation!");
+        errorToast(action?.payload);
       })
 
       //get price plans
@@ -72,7 +72,7 @@ const pricePlans = createSlice({
       .addCase(getPricePlans.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        errorToast("Error On Getting Plan!");
+        errorToast(action?.payload);
       })
       .addCase(getPricePlan.pending, (state, action) => {
         state.isLoading = true;
@@ -88,7 +88,7 @@ const pricePlans = createSlice({
       .addCase(getPricePlan.rejected, (state, action) => {
         state.isLoading = false;
         state.errorMessage = action.payload;
-        errorToast("Error On Getting Plan!");
+        errorToast(action?.payload);
       })
 
       //update price plans
@@ -108,7 +108,7 @@ const pricePlans = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.isSuccess = false;
-        errorToast("Error On Updating Plan!");
+        errorToast(action?.payload);
       })
 
       //delete price plans
@@ -127,7 +127,7 @@ const pricePlans = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         state.isSuccess = false;
-        errorToast("Error On Deleting Plan!");
+        errorToast(action?.payload);
       })
       .addCase(createAddon.pending, (state, action) => {
         state.isLoading = true;
@@ -140,7 +140,7 @@ const pricePlans = createSlice({
       .addCase(createAddon.rejected, (state, action) => {
         state.isLoading = false;
         state.isSuccess = false;
-        errorToast("Error On Plan Creation!");
+        errorToast(action?.payload);
       })
       .addCase(getAddons.pending, (state, action) => {
         state.isLoading = true;
@@ -151,7 +151,7 @@ const pricePlans = createSlice({
       })
       .addCase(getAddons.rejected, (state, action) => {
         state.isLoading = false;
-        errorToast("Error On Plan Creation!");
+        errorToast(action?.payload);
       })
       .addCase(getClientAddons.pending, (state, action) => {
         state.isLoading = true;
@@ -162,7 +162,7 @@ const pricePlans = createSlice({
       })
       .addCase(getClientAddons.rejected, (state, action) => {
         state.isLoading = false;
-        errorToast("Error On Plan Creation!");
+        errorToast(action?.payload);
       })
       .addCase(getAdminBillingHistory.pending, (state, action) => {
         state.isLoading = true;
@@ -176,7 +176,7 @@ const pricePlans = createSlice({
       })
       .addCase(getAdminBillingHistory.rejected, (state, action) => {
         state.isLoading = false;
-        errorToast("Error On Plan Creation!");
+        errorToast(action?.payload);
       })
       .addCase(updatePlansOrder.pending, (state, action) => {
         state.isLoading = true;
@@ -189,7 +189,7 @@ const pricePlans = createSlice({
       })
       .addCase(updatePlansOrder.rejected, (state, action) => {
         state.isLoading = false;
-        errorToast("Error On Plan Order Update!");
+        errorToast(action?.payload);
       });
   },
 });

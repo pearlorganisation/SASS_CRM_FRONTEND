@@ -8,6 +8,8 @@ import {
   ToggleOn,
   ToggleOff,
   Dashboard,
+  CheckBox,
+  DisabledByDefault,
 } from "@mui/icons-material";
 // import ConfirmActionModal from "./modal/ConfirmActionModal";
 import {
@@ -21,6 +23,7 @@ import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import { getLocations } from "../../features/actions/location";
 import { locationTableColumns } from "../../utils/columnData";
 import ConfirmActionModal from "../Employees/modal/ConfirmActionModal";
+import RequestApprovalModal from "./Modal/RequestApprovalDisapprovalModal";
 // import ExportModal from "../../components/Export/ExportModal";
 
 const tableCellStyles = {
@@ -34,7 +37,7 @@ const Location = () => {
   // const activeInactiveModalName = "activeInactiveModal";
   //   const employeeExportModalName = "EmployeeExportModal";
   //   const employeeFilterModalName = "EmployeeFilterModal";
-  const tableHeader = "Locations Table";
+  const tableHeader = "Locations";
 
   // ----------------------- Constants -----------------------
   const navigate = useNavigate();
@@ -87,71 +90,51 @@ const Location = () => {
 
   // ------------------- Action Icons -------------------
   const actionIcons = [
-    ,
-    // {
-    //   icon: () => (
-    //     <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
-    //   ),
-    //   tooltip: "View Employee Info",
-    //   onClick: (item) => {
-    //     navigate(``);
-    //   },
-    //   readOnly: true,
-    // },
-    ...(userData?.isActive
+    ...(userData?.isActive &&
+    userData?.role === roles.SUPER_ADMIN
       ? [
           // {
-          //   icon: () => (
-          //     <Dashboard className="text-neutral-500 group-hover:text-neutral-600" />
+          //   icon: (item) => (
+          //     !item?.deactivated && (
+          //       <CheckBox
+          //         fontSize="large"
+          //         className="text-green-500 group-hover:text-green-600"
+          //       />
+          //     )
           //   ),
-          //   tooltip: "Visit Dashboard",
+          //   tooltip: "Checkbox",
           //   onClick: (item) => {
-          //     dispatch(setEmployeeModeId(item));
-          //     navigate("/employee/dashboard/" + item?._id);
+          //     !item?.deactivated && (
+          //       dispatch(
+          //         openModal({
+          //           modalName: "requestApprovalModal",
+          //           data: item,
+          //         })
+          //       )
+          //     )
           //   },
           // },
           // {
-          //   icon: () => (
-          //     <Edit className="text-blue-500 group-hover:text-blue-600" />
+          //   icon: (item) => (
+          //     !item?.deactivated && (
+          //       <DisabledByDefault
+          //         fontSize="large"
+          //         className="text-red-500 group-hover:text-red-600"
+          //       />
+          //     )
           //   ),
-          //   tooltip: "Edit Employee Data",
+          //   tooltip: "DisabledByDefault",
           //   onClick: (item) => {
-          //     navigate(`/employee/edit/${item?._id}`);
+          //     !item?.deactivated && (
+          //       dispatch(
+          //         openModal({
+          //           modalName: "requestDispprovalModal",
+          //           data: item,
+          //         })
+          //       )
+          //     )
           //   },
           // },
-          {
-            icon: (item) => (
-              <>
-                {console.log(
-                  userData?.role === roles.SUPER_ADMIN
-                    ? item?.isVerified
-                    : item?.isAdminVerified
-                )}
-                {userData?.role === roles.SUPER_ADMIN ? (
-                  item?.isVerified
-                ) : item?.isAdminVerified ? (
-                  <ToggleOn
-                    fontSize="large"
-                    className="text-green-500 group-hover:text-green-600"
-                  />
-                ) : (
-                  <ToggleOff
-                    fontSize="large"
-                    className="text-red-500 group-hover:text-red-600"
-                  />
-                )}
-              </>
-            ),
-            tooltip: "Toggle Status",
-            onClick: (item) => {
-              // dispatch(
-              //   openModal({
-              //     modalName: activeInactiveModalName,
-              //     data: item,
-              //   })
-              // );
-            },
-          },
         ]
       : []),
   ];
@@ -160,7 +143,19 @@ const Location = () => {
     <>
       <div className="pt-14 sm:px-5 px-2">
         {/* Add location Button */}
-        <div className="flex justify-end items-center pb-4">
+        <div className="flex justify-between gap-2 items-center pb-4">
+          <div className="flex gap-2">
+            <Button variant="outlined" onClick={() => navigate("/locations")}>
+              Locations
+            </Button>
+
+            <Button
+              variant="outlined"
+              onClick={() => navigate("/locations/requests")}
+            >
+              Requests
+            </Button>
+          </div>
           <ComponentGuard
             conditions={[userData?.isActive]}
             allowedRoles={[roles.SUPER_ADMIN, roles.ADMIN]}
@@ -191,7 +186,7 @@ const Location = () => {
         />
       </div>
 
-      {/* <ConfirmActionModal modalName={activeInactiveModalName} /> */}
+      <RequestApprovalModal modalName={"requestApprovalModal"} />
     </>
   );
 };
