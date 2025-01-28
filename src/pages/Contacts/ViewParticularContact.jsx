@@ -91,7 +91,6 @@ const ViewParticularContact = () => {
   }, []);
 
   useEffect(() => {
-    // console.log("attendeeLeadType in", attendeeLeadType);
     setSelectedOption(attendeeLeadType);
   }, [attendeeLeadType]);
 
@@ -138,7 +137,6 @@ const ViewParticularContact = () => {
         } else {
           return item;
         }
-
       });
     });
   }, [selectedAttendee]);
@@ -201,7 +199,20 @@ const ViewParticularContact = () => {
       label: phone,
       count: noteData.filter((note) => note.phone === phone).length,
     }));
-    setUniquePhonesCount(badgeCount);
+    const invalidPhones = noteData.filter((note) => {
+      if (typeof note.status === "string") {
+        const tempNote = note.status.toLowerCase().trim();
+        return tempNote === "wrong no" || tempNote === "invalid no";
+      }
+      return false;
+    });
+
+    setUniquePhonesCount(
+      badgeCount.map((item) => ({
+        ...item,
+        isInvalid: invalidPhones.some((note) => note.phone === item.label),
+      }))
+    );
   }, [noteData, uniquePhones]);
 
   useEffect(() => {
@@ -279,7 +290,7 @@ const ViewParticularContact = () => {
               <div className="flex gap-3">
                 {uniquePhonesCount.map((item, index) => (
                   <Badge key={index} badgeContent={item.count} color="primary">
-                    <Chip label={item.label} variant="outlined" />
+                    <Chip label={item.label} color={item.isInvalid ? "error" : undefined} variant="outlined" />
                   </Badge>
                 ))}
               </div>
@@ -301,7 +312,7 @@ const ViewParticularContact = () => {
                   noteData.map((item, index) => (
                     <NoteItem
                       key={index}
-                      index={index}
+                      index={noteData.length - index}
                       item={item}
                       setNoteModalData={setNoteModalData}
                     />

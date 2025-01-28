@@ -1,6 +1,7 @@
 import React from "react";
 import { formatDateAsNumber } from "../../utils/extra";
 import { useSelector } from "react-redux";
+import useRoles from "../../hooks/useRoles";
 
 const RawTable = ({
   tableData,
@@ -18,6 +19,8 @@ const RawTable = ({
   locations = null,
 }) => {
   const { isTablesMasked } = useSelector((state) => state.table);
+
+  const roles = useRoles();
 
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
@@ -148,18 +151,53 @@ const RawTable = ({
                         {row?.[column.key] ? "Active" : "Inactive"}
                       </span>
                     )}
+
+                    {column.type === "superAdminApproval" && (
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          row?.[column.key]
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {row?.[column.key] ? "Approved" : "Unapproved"}
+                      </span>
+                    )}
+
+                    {column.type === "adminApproval" && (
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          row?.[column.key]
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {row?.[column.key] ? "Approved" : "Unapproved"}
+                      </span>
+                    )}
                     {column.type === "Date" &&
                       (formatDateAsNumber(row?.[column.key]) ?? "N/A")}
                     {column.type === "Product" &&
                       (row?.[column.key][column?.subKey] ?? "N/A")}
-                      {
-                        row?.[column.key] && locations && console.log(locations.findIndex((item) => {
-                          return item.name === row?.[column.key]
-                        }))
-                      }
-                    {column.type === "Location" && ((row?.[column.key] && locations && locations.findIndex((item) => {
-                      return item.name === row?.[column.key]
-                    }) >= 0 ? row?.[column.key] : <span className="text-red-500">{row?.[column.key] ?? "N/A"}</span>))}
+                    {row?.[column.key] &&
+                      locations &&
+                      console.log(
+                        locations.findIndex((item) => {
+                          return item.name === row?.[column.key];
+                        })
+                      )}
+                    {column.type === "Location" &&
+                      (row?.[column.key] &&
+                      locations &&
+                      locations.findIndex((item) => {
+                        return item.name === row?.[column.key];
+                      }) >= 0 ? (
+                        row?.[column.key]
+                      ) : (
+                        <span className="text-red-500">
+                          {row?.[column.key] ?? "N/A"}
+                        </span>
+                      ))}
                     {column.type === "" &&
                       (row?.[column.key] !== undefined &&
                       row?.[column.key] !== null
@@ -186,7 +224,7 @@ const RawTable = ({
                           : true) ? (
                           <div key={index}>
                             <button
-                              disabled={action?.disabled ? true: false}
+                              disabled={action?.disabled ? true : false}
                               className="p-2 hover:bg-gray-100 rounded-full group"
                               onClick={() => action.onClick(row)}
                               title={action.tooltip}

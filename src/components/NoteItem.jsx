@@ -10,7 +10,7 @@ const NoteItem = ({ item, index, setNoteModalData }) => {
       {/* Header Section */}
       <div className="border-b px-4 py-1 bg-gray-100 rounded-t-lg">
         <div className="flex justify-between">
-          <div className="text-sm font-bold">Note {index + 1}</div>
+          <div className="text-sm font-bold">Note {index}</div>
           <p className="flex items-center gap-1 text-xs">
             <span className="text-gray-500">Date:</span>
             <span className="bg-blue-100 text-blue-800 px-2 rounded-md">
