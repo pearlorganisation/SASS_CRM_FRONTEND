@@ -8,6 +8,8 @@ import {
   ToggleOn,
   ToggleOff,
   Dashboard,
+  CheckBox,
+  DisabledByDefault,
 } from "@mui/icons-material";
 // import ConfirmActionModal from "./modal/ConfirmActionModal";
 import {
@@ -18,10 +20,9 @@ import { openModal } from "../../features/slices/modalSlice";
 import DataTable from "../../components/Table/DataTable";
 import useRoles from "../../hooks/useRoles";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
-import {
-  getLocationRequests,
-} from "../../features/actions/location";
+import { getLocationRequests } from "../../features/actions/location";
 import { locationTableColumns } from "../../utils/columnData";
+import RequestApprovalDisapprovalModal from "./Modal/RequestApprovalDisapprovalModal";
 // import ConfirmActionModal from "../Employees/modal/ConfirmActionModal";
 // import ExportModal from "../../components/Export/ExportModal";
 
@@ -32,11 +33,12 @@ const tableCellStyles = {
 };
 
 const LocationRequests = () => {
+  const [selectedModalName, setSelectedModalName] = useState(null);
   // ----------------------- ModalNames for Redux -----------------------
   // const activeInactiveModalName = "activeInactiveModal";
   //   const employeeExportModalName = "EmployeeExportModal";
   //   const employeeFilterModalName = "EmployeeFilterModal";
-  const tableHeader = "Location Requests Table";
+  const tableHeader = "Location Requests";
 
   // ----------------------- Constants -----------------------
   const navigate = useNavigate();
@@ -83,64 +85,69 @@ const LocationRequests = () => {
     setSearchParams({ page: page });
   }, [page]);
 
+  useEffect(() => {
+    console.log(userData?.role);
+    console.log(roles.isSuperAdmin(userData?.role));
+  }, [userData?.role]);
+
   // ------------------- Action Icons -------------------
   const actionIcons = [
-    {
-      icon: () => (
-        <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
-      ),
-      tooltip: "View Employee Info",
-      onClick: (item) => {
-        navigate(``);
-      },
-      readOnly: true,
-    },
-    ,
     ...(userData?.isActive
       ? [
           {
-            icon: () => (
-              <Dashboard className="text-neutral-500 group-hover:text-neutral-600" />
-            ),
-            tooltip: "Visit Dashboard",
+            icon: (item) =>
+              !item?.deactivated &&
+              (roles.isSuperAdmin(userData?.role)
+                ? !item?.isVerified
+                : !item?.isAdminVerified) && (
+                <CheckBox
+                  fontSize="large"
+                  className="text-green-500 group-hover:text-green-600"
+                />
+              ),
+            tooltip: "Checkbox",
             onClick: (item) => {
-              dispatch(setEmployeeModeId(item));
-              navigate("/employee/dashboard/" + item?._id);
+              if (
+                !item?.deactivated && roles.isSuperAdmin(userData.role)
+                  ? !item?.isVerified
+                  : !item?.isAdminVerified
+              ) {
+                setSelectedModalName("requestApprovalModal");
+                dispatch(
+                  openModal({
+                    modalName: "requestApprovalModal",
+                    data: item,
+                  })
+                );
+              }
             },
           },
           {
-            icon: () => (
-              <Edit className="text-blue-500 group-hover:text-blue-600" />
-            ),
-            tooltip: "Edit Employee Data",
+            icon: (item) =>
+              !item?.deactivated &&
+              (roles.isSuperAdmin(userData?.role)
+                ? !item?.isVerified
+                : !item?.isAdminVerified) && (
+                <DisabledByDefault
+                  fontSize="large"
+                  className="text-red-500 group-hover:text-red-600"
+                />
+              ),
+            tooltip: "DisabledByDefault",
             onClick: (item) => {
-              navigate(`/employee/edit/${item?._id}`);
-            },
-          },
-          {
-            icon: (item) => (
-              <>
-                {item?.isActive ? (
-                  <ToggleOff
-                    fontSize="large"
-                    className="text-red-500 group-hover:text-red-600"
-                  />
-                ) : (
-                  <ToggleOn
-                    fontSize="large"
-                    className="text-green-500 group-hover:text-green-600"
-                  />
-                )}
-              </>
-            ),
-            tooltip: "Toggle Status",
-            onClick: (item) => {
-              // dispatch(
-              //   openModal({
-              //     modalName: activeInactiveModalName,
-              //     data: item,
-              //   })
-              // );
+              if (
+                !item?.deactivated && roles.isSuperAdmin(userData.role)
+                  ? !item?.isVerified
+                  : !item?.isAdminVerified
+              ) {
+                setSelectedModalName("requestDisapprovalModal");
+                dispatch(
+                  openModal({
+                    modalName: "requestDisapprovalModal",
+                    data: item,
+                  })
+                );
+              }
             },
           },
         ]
@@ -151,7 +158,19 @@ const LocationRequests = () => {
     <>
       <div className="pt-14 sm:px-5 px-2">
         {/* Add location Button */}
-        <div className="flex justify-end items-center pb-4">
+        <div className="flex justify-between gap-2 items-center pb-4">
+          <div className="flex gap-2">
+            <Button variant="outlined" onClick={() => navigate("/locations")}>
+              Locations
+            </Button>
+
+            <Button
+              variant="outlined"
+              onClick={() => navigate("/locations/requests")}
+            >
+              Requests
+            </Button>
+          </div>
           <ComponentGuard
             conditions={[userData?.isActive]}
             allowedRoles={[roles.SUPER_ADMIN, roles.ADMIN]}
@@ -182,7 +201,7 @@ const LocationRequests = () => {
         />
       </div>
 
-      {/* <ConfirmActionModal modalName={activeInactiveModalName} /> */}
+      <RequestApprovalDisapprovalModal modalName={selectedModalName} />
     </>
   );
 };

@@ -51,6 +51,15 @@ const useRoles = () => {
     return employeeRoles.includes(roleName);
   };
 
+  const isAdmin = (roleId) => {
+    let roleName = "";
+    if (typeof roleId !== "string" || roleId.trim() === "") {
+      roleName = getRoleNameByID(role);
+    } else roleName = getRoleNameByID(roleId);
+    const employeeRoles = ["ADMIN"];
+    return employeeRoles.includes(roleName);
+  };
+
   const isSuperAdmin = (roleId) => {
     let roleName = "";
     if (typeof roleId !== "string" || roleId.trim() === "") {
@@ -72,6 +81,11 @@ const useRoles = () => {
         // Handle method calls like 'isEmployeeId'
         if (property === "isEmployeeId") {
           return isEmployeeId;
+        }
+
+        // Handle method calls like 'isAdmin'
+        if (property === "isAdmin") {
+          return isAdmin;
         }
 
         // Handle method calls like 'isSuperAdmin'

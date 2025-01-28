@@ -1,6 +1,7 @@
 import React from "react";
 import { formatDateAsNumber } from "../../utils/extra";
 import { useSelector } from "react-redux";
+import useRoles from "../../hooks/useRoles";
 
 const RawTable = ({
   tableData,
@@ -18,6 +19,8 @@ const RawTable = ({
   locations = null,
 }) => {
   const { isTablesMasked } = useSelector((state) => state.table);
+
+  const roles = useRoles();
 
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
@@ -146,6 +149,30 @@ const RawTable = ({
                         }`}
                       >
                         {row?.[column.key] ? "Active" : "Inactive"}
+                      </span>
+                    )}
+
+                    {column.type === "superAdminApproval" && (
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          row?.[column.key]
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {row?.[column.key] ? "Approved" : "Unapproved"}
+                      </span>
+                    )}
+
+                    {column.type === "adminApproval" && (
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          row?.[column.key]
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {row?.[column.key] ? "Approved" : "Unapproved"}
                       </span>
                     )}
                     {column.type === "Date" &&
