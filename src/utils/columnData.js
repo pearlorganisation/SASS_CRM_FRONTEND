@@ -78,7 +78,6 @@ export const locationTableColumns = [
     type: "adminApproval",
   },
   { header: "Employee", key: "employee", width: 20, type: "" },
-  { header: "Phone", key: "phone", width: 15, type: "" },
 ];
 
 export const webinarTableColumns = [
