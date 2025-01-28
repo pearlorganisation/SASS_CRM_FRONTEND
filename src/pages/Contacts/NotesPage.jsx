@@ -30,7 +30,7 @@ const NotesPage = () => {
                   noteData.map((item, index) => (
                     <NoteItem
                       key={index}
-                      index={index}
+                      index={noteData.length - index}
                       item={item}
                       setNoteModalData={setNoteModalData}
                     />

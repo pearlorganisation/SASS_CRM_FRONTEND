@@ -319,7 +319,14 @@ export default function AddPlan() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <FormInput
               name="name"
-              label="Plan Name"
+              label="Display Plan Name"
+              control={control}
+              required={true}
+              errorMessage="Plan name is required"
+            />
+            <FormInput
+              name="internalName"
+              label="Unique Plan Name"
               control={control}
               required={true}
               errorMessage="Plan name is required"

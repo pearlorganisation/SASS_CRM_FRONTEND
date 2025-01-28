@@ -66,6 +66,7 @@ const PlanCard = (props) => {
 
   const {
     name,
+    internalName,
     amount,
     planDuration,
     employeeCount,
@@ -106,6 +107,7 @@ const PlanCard = (props) => {
       {/* Card Content */}
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">{name}</h2>
+        <h2 className="text-xl font-semibold text-gray-600 mb-2">{internalName || name}</h2>
         <p className="text-4xl font-extrabold text-blue-600">
           {"\u20B9"}
           {amount}
