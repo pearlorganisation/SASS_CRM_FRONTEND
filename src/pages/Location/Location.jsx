@@ -34,7 +34,7 @@ const Location = () => {
   // const activeInactiveModalName = "activeInactiveModal";
   //   const employeeExportModalName = "EmployeeExportModal";
   //   const employeeFilterModalName = "EmployeeFilterModal";
-  const tableHeader = "Locations Table";
+  const tableHeader = "Locations";
 
   // ----------------------- Constants -----------------------
   const navigate = useNavigate();
@@ -160,7 +160,19 @@ const Location = () => {
     <>
       <div className="pt-14 sm:px-5 px-2">
         {/* Add location Button */}
-        <div className="flex justify-end items-center pb-4">
+        <div className="flex justify-between gap-2 items-center pb-4">
+          <div className="flex gap-2">
+            <Button variant="outlined" onClick={() => navigate("/locations")}>
+              Locations
+            </Button>
+
+            <Button
+              variant="outlined"
+              onClick={() => navigate("/locations/requests")}
+            >
+              Requests
+            </Button>
+          </div>
           <ComponentGuard
             conditions={[userData?.isActive]}
             allowedRoles={[roles.SUPER_ADMIN, roles.ADMIN]}

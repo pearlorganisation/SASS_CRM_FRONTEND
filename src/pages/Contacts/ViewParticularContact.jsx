@@ -91,7 +91,6 @@ const ViewParticularContact = () => {
   }, []);
 
   useEffect(() => {
-    // console.log("attendeeLeadType in", attendeeLeadType);
     setSelectedOption(attendeeLeadType);
   }, [attendeeLeadType]);
 

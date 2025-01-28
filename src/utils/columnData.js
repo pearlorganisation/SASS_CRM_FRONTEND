@@ -9,7 +9,12 @@ export const clientTableColumns = [
   { header: "Plan Expiry", key: "planExpiry", width: 20, type: "Date" },
   { header: "Plan Remaining Days", key: "remainingDays", width: 20, type: "" },
   { header: "Contacts Limit", key: "contactsLimit", width: 15, type: "" },
-  { header: "Used Contacts Count", key: "usedContactsCount", width: 15, type: "" },
+  {
+    header: "Used Contacts Count",
+    key: "usedContactsCount",
+    width: 15,
+    type: "",
+  },
   { header: "Employees Limit", key: "employeeLimit", width: 15, type: "" },
 
   { header: "Total Employees", key: "totalEmployees", width: 15, type: "" },
@@ -61,14 +66,17 @@ export const employeeTableColumns = [
   },
 ];
 
-
-
 export const locationTableColumns = [
   { header: "Name", key: "name", width: 50, type: "" },
   { header: "Previous Name", key: "previousName", width: 20, type: "" },
-  { header: "Is Verified", key: "isVerified", width: 10, type: "status" },
+  { header: "Is Verified", key: "isVerified", width: 10, type: "superAdminApproval" },
   { header: "Admin", key: "admin", width: 20, type: "" },
-  { header: "Is Admin Verified", key: "isAdminVerified", width: 10, type: "status" },
+  {
+    header: "Is Admin Verified",
+    key: "isAdminVerified",
+    width: 10,
+    type: "adminApproval",
+  },
   { header: "Employee", key: "employee", width: 20, type: "" },
   { header: "Phone", key: "phone", width: 15, type: "" },
 ];
@@ -109,13 +117,28 @@ export const pullbacksTableColumns = [
   { header: "Reason", key: "requestReason", width: 20, type: "" },
 ];
 
-
-
 export const enrollmentsColumn = [
   { header: "E-Mail", key: "attendee", width: 50, type: "" },
-  { header: "Product", key: "product", subKey: "name", width: 20, type: "Product" },
-  { header: "Level", key: "product", subKey: "level", width: 20, type: "Product" },
-  { header: "Price", key: "product", subKey: "price", width: 20, type: "Product" },
+  {
+    header: "Product",
+    key: "product",
+    subKey: "name",
+    width: 20,
+    type: "Product",
+  },
+  {
+    header: "Level",
+    key: "product",
+    subKey: "level",
+    width: 20,
+    type: "Product",
+  },
+  {
+    header: "Price",
+    key: "product",
+    subKey: "price",
+    width: 20,
+    type: "Product",
+  },
   { header: "Date", key: "createdAt", width: 20, type: "Date" },
-
 ];

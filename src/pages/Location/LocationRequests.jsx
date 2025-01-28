@@ -18,9 +18,7 @@ import { openModal } from "../../features/slices/modalSlice";
 import DataTable from "../../components/Table/DataTable";
 import useRoles from "../../hooks/useRoles";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
-import {
-  getLocationRequests,
-} from "../../features/actions/location";
+import { getLocationRequests } from "../../features/actions/location";
 import { locationTableColumns } from "../../utils/columnData";
 // import ConfirmActionModal from "../Employees/modal/ConfirmActionModal";
 // import ExportModal from "../../components/Export/ExportModal";
@@ -36,7 +34,7 @@ const LocationRequests = () => {
   // const activeInactiveModalName = "activeInactiveModal";
   //   const employeeExportModalName = "EmployeeExportModal";
   //   const employeeFilterModalName = "EmployeeFilterModal";
-  const tableHeader = "Location Requests Table";
+  const tableHeader = "Location Requests";
 
   // ----------------------- Constants -----------------------
   const navigate = useNavigate();
@@ -151,7 +149,19 @@ const LocationRequests = () => {
     <>
       <div className="pt-14 sm:px-5 px-2">
         {/* Add location Button */}
-        <div className="flex justify-end items-center pb-4">
+        <div className="flex justify-between gap-2 items-center pb-4">
+          <div className="flex gap-2">
+            <Button variant="outlined" onClick={() => navigate("/locations")}>
+              Locations
+            </Button>
+
+            <Button
+              variant="outlined"
+              onClick={() => navigate("/locations/requests")}
+            >
+              Requests
+            </Button>
+          </div>
           <ComponentGuard
             conditions={[userData?.isActive]}
             allowedRoles={[roles.SUPER_ADMIN, roles.ADMIN]}

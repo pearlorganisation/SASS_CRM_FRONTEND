@@ -26,7 +26,7 @@ export const getLocationRequests = createAsyncThunk(
   async ({ page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
     try {
       const response = await instance.get(
-        `/location/request`,
+        `/location/requests`,
         {
           params: { page, limit },
         }
