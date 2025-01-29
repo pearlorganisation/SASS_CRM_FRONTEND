@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { formatDateAsNumber } from "../../utils/extra";
 import { useSelector } from "react-redux";
 import useRoles from "../../hooks/useRoles";
@@ -255,4 +255,4 @@ const RawTable = ({
   );
 };
 
-export default RawTable;
+export default memo(RawTable);

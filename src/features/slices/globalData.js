@@ -26,7 +26,7 @@ const initialState = {
   isSuccess: false,
   customOptions: [],
   customOptionsForFilters: [],
-  isSidebarOpen: false,
+  isSidebarOpen: true,
   dashBoardCardsData: [],
   plansGraphData: [],
   usersGraphData: [],

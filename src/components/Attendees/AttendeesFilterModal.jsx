@@ -25,9 +25,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
 
   const { leadTypeData } = useSelector((state) => state.assign);
   const { subscription } = useSelector((state) => state.auth);
-  const { modals } = useSelector((state) => state.modals);
   const { customOptionsForFilters } = useSelector((state) => state.globalData);
-  const open = modals[modalName] ? true : false;
   const { control, handleSubmit, reset } = useForm();
 
   const [selectedOption, setSelectedOption] = useState("");
@@ -35,7 +33,10 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
 
   const onSubmit = (data) => {
+    if(selectedOption) data.leadType = selectedOption;
     const filterData = filterTruthyValues(data);
+    console.log(filterData);
+
     setFilters(filterData);
     dispatch(closeModal(modalName));
     logUserActivity({
@@ -46,6 +47,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   };
 
   const resetForm = () => {
+    setSelectedOption("");
     reset({
       email: "",
       firstName: "",
@@ -64,13 +66,12 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   };
 
   useEffect(() => {
-    if (open) {
-      dispatch(getCustomOptionsForFilters());
-      reset({
-        ...filters,
-      });
-    }
-  }, [open]);
+    dispatch(getCustomOptionsForFilters());
+    if(filters?.leadType) setSelectedOption(filters?.leadType);
+    reset({
+      ...filters,
+    });
+  }, []);
 
   useEffect(() => {
     if (!leadTypeData) return;
@@ -83,7 +84,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   }, [leadTypeData]);
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={true} onClose={onClose}>
       <Box className="bg-white p-6 rounded-md mx-auto mt-20 w-full max-w-2xl ">
         <Typography variant="h6" className="text-center mb-4">
           Attendees Filter
@@ -134,7 +135,6 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                   )}
                 />
               )}
-
 
               {tableConfig?.timeInSession?.filterable && (
                 <>
@@ -196,25 +196,23 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                         value={field.value || ""}
                       >
                         <MenuItem value="">All</MenuItem>
-                        {
-                          customOptionsForFilters.map((option) => (
-                            <MenuItem key={option.value} value={option.label}>
-                              {option.label}
-                            </MenuItem>
-                          ))
-                        }
+                        {customOptionsForFilters.map((option) => (
+                          <MenuItem key={option.value} value={option.label}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
                       </Select>
                     </FormControl>
                   )}
                 />
               )}
-              {/* {tableConfig?.leadType?.filterable && (
+              {tableConfig?.leadType?.filterable && (
                 <FormControl fullWidth>
                   <Select
                     labelId="lead-type-select-label"
                     value={selectedOption || ""}
-                   
                     className="shadow font-semibold"
+                    onChange={(e) => setSelectedOption(e.target.value)}
                     displayEmpty
                     renderValue={(selected) => {
                       if (!selected) {
@@ -265,7 +263,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                     ))}
                   </Select>
                 </FormControl>
-              )} */}
+              )}
             </div>
           </div>
 

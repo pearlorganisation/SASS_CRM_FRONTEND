@@ -3,7 +3,6 @@ import React from "react";
 const LoadingSkeleton = () => {
   return (
     <div className="flex h-screen bg-gray-100 animate-pulse">
-      {/* Sidebar Skeleton */}
 
       <div className="flex-1 flex flex-col">
         <header className="h-16 bg-gray-200 flex items-center px-6">
