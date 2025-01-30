@@ -67,9 +67,8 @@ import { resetAlarmData } from "./features/slices/alarm";
 import { newNotification } from "./features/slices/notification";
 import { NotifActionType } from "./utils/extra";
 import { logout } from "./features/slices/auth";
-import Location from "./pages/Location/Location";
-import LocationRequests from "./pages/Location/LocationRequests";
 import LayoutFallback from "./components/Fallback/LayoutFallback";
+import Locations from "./pages/Location/Location";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -499,14 +498,14 @@ const App = () => {
 
         {
           path: "/locations",
-          element: <Location />,
+          element: <Locations />,
         },
 
         {
           path: "/locations/requests",
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
-              <LocationRequests />
+              <Locations />
             </RouteGuard>
           ),
         },

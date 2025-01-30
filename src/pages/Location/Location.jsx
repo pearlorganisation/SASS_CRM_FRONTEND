@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@mui/material";
 import {
   Edit,
@@ -20,10 +20,14 @@ import { openModal } from "../../features/slices/modalSlice";
 import DataTable from "../../components/Table/DataTable";
 import useRoles from "../../hooks/useRoles";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
-import { getLocations } from "../../features/actions/location";
+import {
+  getLocationRequests,
+  getLocations,
+} from "../../features/actions/location";
 import { locationTableColumns } from "../../utils/columnData";
-import ConfirmActionModal from "../Employees/modal/ConfirmActionModal";
-import RequestApprovalModal from "./Modal/RequestApprovalDisapprovalModal";
+import RequestApprovalDisapprovalModal from "./Modal/RequestApprovalDisapprovalModal";
+import AddRequestLocation from "./Modal/AddRequestLocation";
+// import ConfirmActionModal from "../Employees/modal/ConfirmActionModal";
 // import ExportModal from "../../components/Export/ExportModal";
 
 const tableCellStyles = {
@@ -32,13 +36,19 @@ const tableCellStyles = {
   textWrap: "nowrap",
 };
 
-const Location = () => {
+const Locations = () => {
+  const [selectedModalName, setSelectedModalName] = useState(null);
+  const [addRequestModal, setAddRequestModal] = useState(false);
+  const location = useLocation();
   // ----------------------- ModalNames for Redux -----------------------
   // const activeInactiveModalName = "activeInactiveModal";
   //   const employeeExportModalName = "EmployeeExportModal";
   //   const employeeFilterModalName = "EmployeeFilterModal";
-  const tableHeader = "Locations";
-
+  if (location.pathname === "/locations/requests") {
+    var tableHeader = "Location Requests";
+  } else {
+    var tableHeader = "Locations";
+  }
   // ----------------------- Constants -----------------------
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -49,24 +59,29 @@ const Location = () => {
   const [page, setPage] = useState(searchParams.get("page") || 1);
 
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
-  const { locationsData, isLoading, isSuccess, totalPages } = useSelector(
-    (state) => state.location
-  );
+  const { locationsData, locationRequests, isLoading, isSuccess, totalPages } =
+    useSelector((state) => state.location);
   const { userData } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    dispatch(
-      getLocations({
-        page: page,
-        limit: LIMIT,
-        filters: filters,
-      })
-    );
+    if (location.pathname === "/locations/requests") {
+      dispatch(
+        getLocationRequests({
+          page: page,
+          limit: LIMIT,
+          filters: filters,
+        })
+      );
+    } else {
+      dispatch(
+        getLocations({
+          page: page,
+          limit: LIMIT,
+          filters: filters,
+        })
+      );
+    }
   }, [page, LIMIT, filters]);
-
-  // useEffect(() => {
-  //   console.log(locationsData);
-  // }, []);
 
   const navigateToAdd = () => navigate("/requestLocation");
 
@@ -88,53 +103,71 @@ const Location = () => {
     setSearchParams({ page: page });
   }, [page]);
 
+  // useEffect(() => {
+  //   console.log(userData?.role);
+  //   console.log(roles.isSuperAdmin(userData?.role));
+  // }, [userData?.role]);
+
   // ------------------- Action Icons -------------------
   const actionIcons = [
-    ...(userData?.isActive &&
-    userData?.role === roles.SUPER_ADMIN
+    ...(userData?.isActive && location.pathname === "/locations/requests"
       ? [
-          // {
-          //   icon: (item) => (
-          //     !item?.deactivated && (
-          //       <CheckBox
-          //         fontSize="large"
-          //         className="text-green-500 group-hover:text-green-600"
-          //       />
-          //     )
-          //   ),
-          //   tooltip: "Checkbox",
-          //   onClick: (item) => {
-          //     !item?.deactivated && (
-          //       dispatch(
-          //         openModal({
-          //           modalName: "requestApprovalModal",
-          //           data: item,
-          //         })
-          //       )
-          //     )
-          //   },
-          // },
-          // {
-          //   icon: (item) => (
-          //     !item?.deactivated && (
-          //       <DisabledByDefault
-          //         fontSize="large"
-          //         className="text-red-500 group-hover:text-red-600"
-          //       />
-          //     )
-          //   ),
-          //   tooltip: "DisabledByDefault",
-          //   onClick: (item) => {
-          //     !item?.deactivated && (
-          //       dispatch(
-          //         openModal({
-          //           modalName: "requestDispprovalModal",
-          //           data: item,
-          //         })
-          //       )
-          //     )
-          //   },
-          // },
+          {
+            icon: (item) =>
+              !item?.deactivated &&
+              (roles.isSuperAdmin(userData?.role)
+                ? !item?.isVerified
+                : !item?.isAdminVerified) && (
+                <CheckBox
+                  fontSize="large"
+                  className="text-green-500 group-hover:text-green-600"
+                />
+              ),
+            tooltip: "Checkbox",
+            onClick: (item) => {
+              if (
+                !item?.deactivated && roles.isSuperAdmin(userData.role)
+                  ? !item?.isVerified
+                  : !item?.isAdminVerified
+              ) {
+                setSelectedModalName("requestApprovalModal");
+                dispatch(
+                  openModal({
+                    modalName: "requestApprovalModal",
+                    data: item,
+                  })
+                );
+              }
+            },
+          },
+          {
+            icon: (item) =>
+              !item?.deactivated &&
+              (roles.isSuperAdmin(userData?.role)
+                ? !item?.isVerified
+                : !item?.isAdminVerified) && (
+                <DisabledByDefault
+                  fontSize="large"
+                  className="text-red-500 group-hover:text-red-600"
+                />
+              ),
+            tooltip: "DisabledByDefault",
+            onClick: (item) => {
+              if (
+                !item?.deactivated && roles.isSuperAdmin(userData.role)
+                  ? !item?.isVerified
+                  : !item?.isAdminVerified
+              ) {
+                setSelectedModalName("requestDisapprovalModal");
+                dispatch(
+                  openModal({
+                    modalName: "requestDisapprovalModal",
+                    data: item,
+                  })
+                );
+              }
+            },
+          },
         ]
       : []),
   ];
@@ -149,36 +182,44 @@ const Location = () => {
               Locations
             </Button>
 
-            <Button
-              variant="outlined"
-              onClick={() => navigate("/locations/requests")}
+            <ComponentGuard
+              conditions={[userData?.isActive]}
+              allowedRoles={[roles.SUPER_ADMIN, roles.ADMIN]}
             >
-              Requests
-            </Button>
+              <Button
+                variant="outlined"
+                onClick={() => navigate("/locations/requests")}
+              >
+                Requests
+              </Button>
+            </ComponentGuard>
           </div>
-          <ComponentGuard
+          {/* <ComponentGuard
             conditions={[userData?.isActive]}
             allowedRoles={[roles.SUPER_ADMIN, roles.ADMIN]}
-          >
-            <Button variant="contained" onClick={navigateToAdd}>
-              Add/Request Location
-            </Button>
-          </ComponentGuard>
+          > */}
+          <Button variant="contained" onClick={() =>  setAddRequestModal(() => !addRequestModal)}>
+            {roles.SUPER_ADMIN === userData.role ? "Add" : "Request"} Location
+          </Button>
+          {/* </ComponentGuard> */}
         </div>
 
         <DataTable
           tableHeader={tableHeader}
-          tableUniqueKey="locationTable"
+          tableUniqueKey="locationRequestsTable"
           filters={filters}
           setFilters={setFilters}
           tableData={{
             columns: locationTableColumns,
-            rows: locationsData || [],
+            rows:
+              location.pathname === "/locations/requests"
+                ? locationRequests
+                : locationsData || [],
           }}
           actions={actionIcons}
-          totalPages={totalPages}
-          page={page}
-          setPage={setPage}
+          // totalPages={totalPages}
+          // page={page}
+          // setPage={setPage}
           limit={LIMIT}
           //   filterModalName={}
           //   exportModalName={}
@@ -186,9 +227,12 @@ const Location = () => {
         />
       </div>
 
-      <RequestApprovalModal modalName={"requestApprovalModal"} />
+      <RequestApprovalDisapprovalModal modalName={selectedModalName} />
+      {addRequestModal && (
+        <AddRequestLocation setModal={setAddRequestModal}  />
+      )}
     </>
   );
 };
 
-export default Location;
+export default Locations;
