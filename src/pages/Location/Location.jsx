@@ -229,7 +229,7 @@ const Locations = () => {
 
       <RequestApprovalDisapprovalModal modalName={selectedModalName} />
       {addRequestModal && (
-        <AddRequestLocation setModal={setAddRequestModal}  />
+        <AddRequestLocation setModal={setAddRequestModal} title={userData?.role === roles.SUPER_ADMIN ? 'Add Location' : 'Request Location'}  />
       )}
     </>
   );

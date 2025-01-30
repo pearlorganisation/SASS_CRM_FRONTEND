@@ -1,24 +1,30 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { addEnrollment, getEnrollments } from "../../../features/actions/attendees";
+import {
+  addEnrollment,
+  getEnrollments,
+} from "../../../features/actions/attendees";
+import { addLocation, getLocations } from "../../../features/actions/location";
 
 const AddRequestLocation = ({ setModal, locationsData, title }) => {
-  
   const dispatch = useDispatch();
-  const { register, handleSubmit, formState: { errors },
-
-} = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       name: "",
+      previousName: locationsData?.previousName || null,
     },
   });
 
   const onSubmit = (data) => {
-    console.log(data)
-    dispatch(addEnrollment(data)).then(res => {
-      dispatch(getEnrollments({id: attendeeEmail}));
-      setModal(false)
+    console.log(data);
+    dispatch(addLocation(data)).then(() => {
+        dispatch(getLocations({ page: 1, limit: 100 }));
+        setModal(false)
     })
   };
 
@@ -28,19 +34,20 @@ const AddRequestLocation = ({ setModal, locationsData, title }) => {
         <h2 className="text-lg font-semibold text-center">{title}</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2">
           <div>
-            <label className="block text-sm font-medium pb-2">Location Name:</label>
+            <label className="block text-sm font-medium pb-2">
+              Location Name:
+            </label>
             <input
-            {...register("name")}
-            type="text"
-            placeholder="Enter Location Name"
-            className="rounded-lg border focus:border-teal-500 outline-none p-2 text-xl"
-          />
+              {...register("name")}
+              type="text"
+              placeholder="Enter Location Name"
+              className="rounded-lg border focus:border-teal-500 outline-none p-2 text-xl"
+            />
             {errors.name && (
               <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
             )}
           </div>
 
-        
           <button
             type="submit"
             className="w-full py-2 mt-4 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition duration-150"
