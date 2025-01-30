@@ -45,6 +45,12 @@ export const attendeeTableColumns = [
   { header: "Phone", key: "phone", width: 20, type: "" },
 ];
 
+export const groupedAttendeeTableColumns = [
+  { header: "Email", key: "_id", width: 50, type: "" },
+  { header: "Time in Session", key: "timeInSession", width: 20, type: "" },
+  { header: "Webinar Attended", key: "attendedWebinarCount", width: 20, type: "" },
+];
+
 export const employeeTableColumns = [
   { header: "Email", key: "email", width: 50, type: "" },
   { header: "User Name", key: "userName", width: 20, type: "" },

@@ -17,7 +17,11 @@ const initialState = {
 const exportSlice = createSlice({
   name: "export",
   initialState,
-  reducers: {},
+  reducers: {
+    resetExportSuccess: (state) => {
+      state.isSuccess = false;
+    },
+  },
   extraReducers: (builder) => {
     builder
       // signUp lifecycle methods
@@ -78,4 +82,4 @@ const exportSlice = createSlice({
 
 // ===========================================Exports==================================================
 export default exportSlice.reducer;
-export const {} = exportSlice.actions;
+export const {resetExportSuccess} = exportSlice.actions;

@@ -19,9 +19,9 @@ const PageLimitEditor = ({ pageId = "defaultPage", setPage = () => {} }) => {
   const handleEditClick = () => {
     setIsEditing(true);
   };
+    console.log("pageLimit ---> render");
 
   const handleSaveClick = () => {
-    // console.log("pageLimit", pageLimit);
     const validLimit =
       pageLimit === "" ? 10 : Math.max(1, Math.min(100, Number(pageLimit)));
     setPageLimitState(validLimit);
@@ -89,4 +89,4 @@ const PageLimitEditor = ({ pageId = "defaultPage", setPage = () => {} }) => {
   );
 };
 
-export default PageLimitEditor;
+export default React.memo(PageLimitEditor);

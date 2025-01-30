@@ -15,6 +15,7 @@ import {
   getWebinarEnrollments,
   updateAttendee,
   updateAttendeeLeadType,
+  fetchGroupedAttendees,
 } from "../actions/attendees";
 
 const initialState = {
@@ -29,6 +30,7 @@ const initialState = {
   errorMessage: "",
   tabValue: "preWebinar",
   attendeeLeadType: "",
+  pagination: {},
 };
 // ---------------------------------------------------------------------------------------
 
@@ -39,11 +41,13 @@ export const attendeeSlice = createSlice({
     clearSuccess(state) {
       state.isSuccess = false;
     },
+    clearAttendeeData(state) {
+      state.attendeeData = [];
+    },
     setTabValue(state, action) {
       state.tabValue = action.payload;
     },
     clearLeadType(state) {
-      console.log("clearLeadType");
       state.attendeeLeadType = "";
     },
   },
@@ -141,7 +145,6 @@ export const attendeeSlice = createSlice({
       })
       .addCase(getAttendeeLeadTypeByEmail.fulfilled, (state, action) => {
         state.isLoading = false;
-        console.log("action.payload?.leadType", action.payload?.leadType);
         state.attendeeLeadType = action.payload?.leadType || "";
       })
       .addCase(getAttendeeLeadTypeByEmail.rejected, (state, action) => {
@@ -209,6 +212,18 @@ export const attendeeSlice = createSlice({
       })
       .addCase(swapAttendeeFields.rejected, (state, action) => {
         errorToast(action?.payload);
+      })
+      .addCase(fetchGroupedAttendees.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchGroupedAttendees.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.attendeeData = action?.payload?.data || [];
+        state.pagination = action?.payload?.pagination || {};
+      })
+      .addCase(fetchGroupedAttendees.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
       });
   },
 });
@@ -216,7 +231,7 @@ export const attendeeSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { clearSuccess, setTabValue, clearLeadType } =
+export const { clearSuccess, setTabValue, clearLeadType, clearAttendeeData } =
   attendeeSlice.actions;
 export default attendeeSlice.reducer;
 

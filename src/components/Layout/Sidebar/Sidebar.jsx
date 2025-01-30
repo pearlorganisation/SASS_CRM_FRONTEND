@@ -30,7 +30,6 @@ const Sidebar = () => {
   const role = userData?.role || "";
   const { employeeModeData } = useSelector((state) => state.employee);
 
-
   const navItems = [
     {
       roles: [roles.SUPER_ADMIN],
@@ -132,8 +131,7 @@ const Sidebar = () => {
   };
 
   useEffect(() => {
-    if(userData)
-    dispatch(getAllSidebarLinks());
+    if (userData) dispatch(getAllSidebarLinks());
   }, []);
 
   useEffect(() => {
@@ -154,8 +152,8 @@ const Sidebar = () => {
   return (
     <div
       id="logo-sidebar"
-      className={`fixed top-0 left-0 w-64 h-screen z-10 pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 ${
-        isSidebarOpen ? "translate-x-0" : "sm:translate-x-0"
+      className={`fixed top-0 left-0 w-64 h-screen z-10 pt-20 transition-transform ease-in-out duration-700  -translate-x-full bg-white border-r border-gray-200 ${
+        isSidebarOpen ? "translate-x-0" : ""
       }`}
       aria-label="Sidebar"
     >
@@ -236,18 +234,17 @@ const Sidebar = () => {
           </li>
 
           {/* Settings Link */}
-        <ComponentGuard conditions={[employeeModeData ? false : true]}>
-        <li>
-            <Link
-              to="/settings"
-              className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
-            >
-              <IoSettings size={30} />
-              <span className="flex-1 ms-3 whitespace-nowrap">Settings</span>
-            </Link>
-          </li>
-        </ComponentGuard>
-          
+          <ComponentGuard conditions={[employeeModeData ? false : true]}>
+            <li>
+              <Link
+                to="/settings"
+                className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
+              >
+                <IoSettings size={30} />
+                <span className="flex-1 ms-3 whitespace-nowrap">Settings</span>
+              </Link>
+            </li>
+          </ComponentGuard>
 
           {/* Logout Button */}
           <li>

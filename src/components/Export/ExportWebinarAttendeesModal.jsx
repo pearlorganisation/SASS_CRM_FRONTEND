@@ -12,6 +12,7 @@ import { closeModal } from "../../features/slices/modalSlice";
 import { exportWebinarAttendeesExcel } from "../../features/actions/export-excel";
 import { ClipLoader } from "react-spinners";
 import { attendeeTableColumns } from "../../utils/columnData";
+import { resetExportSuccess } from "../../features/slices/export-excel";
 
 const ExportWebinarAttendeesModal = ({
   modalName,
@@ -20,13 +21,12 @@ const ExportWebinarAttendeesModal = ({
   webinarId="",
 }) => {
   const dispatch = useDispatch();
+  console.log('ExportWebinarAttendeesModal -> Render');
 
   const { subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
 
   const { isLoading, isSuccess } = useSelector((state) => state.export);
-  const modalState = useSelector((state) => state.modals.modals);
-  const open = modalState[modalName] ? true : false;
 
   const [limit, setLimit] = useState("");
   const [selectedColumns, setSelectedColumns] = useState([]);
@@ -56,10 +56,12 @@ const ExportWebinarAttendeesModal = ({
     );
     //
   };
+    console.log('isSuccess, assignSuccess, isSuccessReAssign', isSuccess);
 
   useEffect(() => {
     if (isSuccess) {
       handleClose();
+      dispatch(resetExportSuccess());
     }
   }, [isSuccess]);
 
@@ -72,7 +74,7 @@ const ExportWebinarAttendeesModal = ({
   }, [tableConfig]);
 
   return (
-    <Modal open={open} onClose={handleClose}>
+    <Modal open={true} onClose={handleClose}>
       <Box className="p-6 bg-white rounded-lg shadow-lg max-w-xl mx-5 sm:mx-auto mt-20">
         <h2 className="text-xl font-semibold mb-4">Export Excel Options</h2>
         <div className="mb-4">

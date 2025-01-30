@@ -59,8 +59,6 @@ export const getAttendees = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const currentTIme = new Date().getTime();
-      console.log("currentTIme", currentTIme);
       const response = await instance.post(
         `/attendees/webinar`,
         {
@@ -75,11 +73,24 @@ export const getAttendees = createAsyncThunk(
           params: { page, limit },
         }
       );
-      const responseTime = new Date().getTime();
-      console.log(
-        "responseTime - currentTIme",
-        responseTime - currentTIme,
-        response
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+//get Attendees
+export const fetchGroupedAttendees = createAsyncThunk(
+  "attendees/grouped/fetchData",
+  async ({ page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
+    try {
+      const response = await instance.post(
+        `/attendees/grouped`,
+        { filters , fieldName: "attendeeTableConfig", },
+        {
+          params: { page, limit },
+        }
       );
       return response?.data;
     } catch (e) {
@@ -198,7 +209,9 @@ export const swapAttendeeFields = createAsyncThunk(
         field2,
       });
       return {
-        data,field1, field2
+        data,
+        field1,
+        field2,
       };
     } catch (e) {
       return rejectWithValue(e);

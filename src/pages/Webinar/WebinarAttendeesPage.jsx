@@ -46,6 +46,14 @@ const WebinarAttendeesPage = (props) => {
   const exportExcelModalName = "ExportWebinarAttendeesExcel";
   const AttendeesFilterModalName = "AttendeesFilterModal";
 
+  const modalState = useSelector((state) => state.modals.modals);
+  const exportModalOpen = modalState[exportExcelModalName] ? true : false;
+  const AttendeesFilterModalOpen = modalState[AttendeesFilterModalName]
+    ? true
+    : false;
+
+  // ------------------------------------------------------------------
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -84,7 +92,9 @@ const WebinarAttendeesPage = (props) => {
     }
   }, [page, tabValue, LIMIT, filters, selected, selectedAssignmentType]);
 
+
   useEffect(() => {
+
     if (isSuccess || assignSuccess || isSuccessReAssign) {
       dispatch(
         getAttendees({
@@ -136,7 +146,7 @@ const WebinarAttendeesPage = (props) => {
       setSelected(label);
       setPage(1);
     };
-
+    console.log('render ===> WebinarAttendeesPage -> AttendeeDropdown');
     const handleAssignmentChange = (event) => {
       const label = event.target.value;
       setSelectedRows([]);
@@ -160,6 +170,7 @@ const WebinarAttendeesPage = (props) => {
             <MenuItem value="Pending">Pending</MenuItem>
           </Select>
         </FormControl>
+    
 
         <FormControl className="w-40 " variant="outlined">
           <InputLabel id="attendee-label">Assignment</InputLabel>
@@ -183,7 +194,7 @@ const WebinarAttendeesPage = (props) => {
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="webinarAttendeesTable"
-        ButtonGroup={AttendeeDropdown}
+        ButtonGroup={React.memo(AttendeeDropdown)}
         isSelectVisible={userData?.isActive}
         filters={filters}
         setFilters={setFilters}
@@ -212,17 +223,27 @@ const WebinarAttendeesPage = (props) => {
         isLeadType={true}
       />
 
-      <AttendeesFilterModal
-        modalName={AttendeesFilterModalName}
-        filters={filters}
-        setFilters={setFilters}
-      />
-      <ExportWebinarAttendeesModal
-        modalName={exportExcelModalName}
-        filters={filters}
-        webinarId={id}
-        isAttended={tabValue === "postWebinar" ? true : false}
-      />
+      {AttendeesFilterModalOpen && (
+        <Suspense fallback={<ModalFallback />}>
+          <AttendeesFilterModal
+            modalName={AttendeesFilterModalName}
+            filters={filters}
+            setFilters={setFilters}
+          />
+        </Suspense>
+      )}
+
+      {exportModalOpen && (
+        <Suspense fallback={<ModalFallback />}>
+          <ExportWebinarAttendeesModal
+            modalName={exportExcelModalName}
+            filters={filters}
+            webinarId={id}
+            isAttended={tabValue === "postWebinar" ? true : false}
+          />
+        </Suspense>
+      )}
+
       {isSwapOpen &&
         createPortal(
           <Suspense fallback={<ModalFallback />}>
