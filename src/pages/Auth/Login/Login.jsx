@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
 import { getGlobalData } from "../../../features/actions/globalData";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import ForgotPasswordModal from "../ForgotPassword/ForgotPassword";
 
 function Login() {
   const dispatch = useDispatch();
@@ -14,6 +15,7 @@ function Login() {
   const navigate = useNavigate();
   const { landingGlobalData } = useSelector((state) => state.globalData);
   const [isPasswordHidden, setPasswordHidden] = useState(false);
+  const [forgotModalOpen, setForgotModalOpen] = useState(false);
 
   const {
     register,
@@ -196,6 +198,18 @@ function Login() {
               {isLoading ? <ClipLoader color="#fff" size={20} /> : "Sign In"}
             </Button>
           </form>
+          {/* Forgot Password Link */}
+          <div className="text-center mt-4">
+            <button
+              onClick={() => setForgotModalOpen(true)}
+              className="text-sm text-blue-600 hover:text-blue-500 hover:underline"
+            >
+              Forgot your password?
+            </button>
+          </div>
+          {forgotModalOpen && (
+            <ForgotPasswordModal onClose={() => setForgotModalOpen(false)} />
+          )}
         </div>
       </div>
     </div>

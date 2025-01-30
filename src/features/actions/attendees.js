@@ -99,29 +99,6 @@ export const fetchGroupedAttendees = createAsyncThunk(
   }
 );
 
-//get All Attendees
-export const getAllAttendees = createAsyncThunk(
-  "allAttendees/fetchData",
-  async ({ page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
-    try {
-      const response = await instance.post(
-        `/attendees/webinar`,
-        {
-          filters,
-          fieldName: "attendeeTableConfig",
-          webinarId: "",
-          isAttended: true,
-        },
-        {
-          params: { page, limit },
-        }
-      );
-      return response?.data;
-    } catch (e) {
-      return rejectWithValue(e);
-    }
-  }
-);
 
 //Update Attendee
 export const updateAttendeeLeadType = createAsyncThunk(
