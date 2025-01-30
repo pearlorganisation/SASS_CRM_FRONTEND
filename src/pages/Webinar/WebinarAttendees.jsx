@@ -28,6 +28,7 @@ import DataTableFallback from "../../components/Fallback/DataTableFallback";
 import { fetchPullbackRequestCounts } from "../../features/actions/reAssign";
 import { socket } from "../../socket";
 import ModalFallback from "../../components/Fallback/ModalFallback";
+import ScrollControls from "../../components/ScrollControls";
 
 const WebinarAttendees = () => {
   const { id } = useParams();
@@ -134,34 +135,25 @@ const WebinarAttendees = () => {
   return (
     <div className="px-6 md:px-10 pt-10 space-y-6">
       {/* Tabs for Sales and Reminder */}
-      <div className="border-b border-gray-200">
-        <div className="flex justify-center space-x-4">
-          <button
-            onClick={() => handleTabChange(null, "preWebinar")}
-            className={`py-2 px-4 text-gray-600 ${
-              tabValueRef.current === "preWebinar" ? "border-b-2 border-neutral-900" : ""
-            }`}
-          >
-            Reminder
-          </button>
-          <button
-            onClick={() => handleTabChange(null, "postWebinar")}
-            className={`py-2 px-4 text-gray-600 ${
-              tabValueRef.current === "postWebinar" ? "border-b-2 border-neutral-900" : ""
-            }`}
-          >
-            Sales
-          </button>
-          <button
-            onClick={() => handleTabChange(null, "enrollments")}
-            className={`py-2 px-4 text-gray-600 ${
-              tabValueRef.current === "enrollments" ? "border-b-2 border-neutral-900" : ""
-            }`}
-          >
-            Enrollments
-          </button>
-        </div>
-      </div>
+      <Tabs
+        value={tabValueRef.current}
+        onChange={handleTabChange}
+        centered
+        className="border-b border-gray-200"
+        textColor="primary"
+        indicatorColor="primary"
+      >
+        <Tab label="Reminder" value="preWebinar" className="text-gray-600" />
+        <Tab label="Sales" value="postWebinar" className="text-gray-600" />
+        <Tab
+          label="Enrollments"
+          value="enrollments"
+          style={{
+            color: "gray",
+          }}
+        />
+
+      </Tabs>
 
       <div className="flex gap-4 justify-between flex-wrap items-center">
         <div className="flex gap-4">
@@ -328,6 +320,7 @@ const WebinarAttendees = () => {
           </Suspense>,
           document.body
         )}
+        <ScrollControls/>
     </div>
   );
 };

@@ -22,7 +22,7 @@ export const getPricePlans = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await instance.get(`plans`, {
-        withCredentials: true,
+        params: payload,
       });
       return response?.data;
     } catch (e) {
@@ -63,8 +63,8 @@ export const deletePricePlan = createAsyncThunk(
   "deletePricePlan",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.delete(`plans/${payload?._id}`, payload, {
-        withCredentials: true,
+      const response = await instance.delete(`plans/${payload?._id}`, {
+        params: { isActive: payload?.isActive },
       });
       return response?.data;
     } catch (e) {

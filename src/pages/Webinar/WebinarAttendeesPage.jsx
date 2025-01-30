@@ -58,9 +58,11 @@ const WebinarAttendeesPage = (props) => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
+  const { attendeeData, isLoading, pagination, isSuccess } = useSelector(
     (state) => state.attendee
   );
+  const { total = 0, totalPages = 1 } = pagination;
+
   const { isSuccess: isSuccessReAssign } = useSelector(
     (state) => state.reAssign
   );
@@ -89,12 +91,14 @@ const WebinarAttendeesPage = (props) => {
               : selectedAssignmentType,
         })
       );
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     }
   }, [page, tabValue, LIMIT, filters, selected, selectedAssignmentType]);
 
-
   useEffect(() => {
-
     if (isSuccess || assignSuccess || isSuccessReAssign) {
       dispatch(
         getAttendees({
@@ -114,6 +118,11 @@ const WebinarAttendeesPage = (props) => {
       dispatch(resetReAssignSuccess());
       dispatch(resetAssignSuccess());
       setSelectedRows([]);
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
     }
   }, [isSuccess, assignSuccess, isSuccessReAssign]);
 
@@ -146,7 +155,7 @@ const WebinarAttendeesPage = (props) => {
       setSelected(label);
       setPage(1);
     };
-    console.log('render ===> WebinarAttendeesPage -> AttendeeDropdown');
+    console.log("render ===> WebinarAttendeesPage -> AttendeeDropdown");
     const handleAssignmentChange = (event) => {
       const label = event.target.value;
       setSelectedRows([]);
@@ -170,7 +179,6 @@ const WebinarAttendeesPage = (props) => {
             <MenuItem value="Pending">Pending</MenuItem>
           </Select>
         </FormControl>
-    
 
         <FormControl className="w-40 " variant="outlined">
           <InputLabel id="attendee-label">Assignment</InputLabel>
@@ -205,6 +213,7 @@ const WebinarAttendeesPage = (props) => {
               : attendeeTableColumns.filter(
                   (item) => item.key !== "timeInSession"
                 ),
+          totalRecords: total,
           rows: attendeeData.map((row) => ({
             ...row,
             leadType: leadTypeData.find((lead) => lead._id === row?.leadType),

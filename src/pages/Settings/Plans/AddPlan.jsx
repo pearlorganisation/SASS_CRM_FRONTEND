@@ -284,6 +284,7 @@ export default function AddPlan() {
     if (isEditMode && singlePlanData) {
       reset({
         name: singlePlanData.name || "",
+        internalName: singlePlanData.internalName || "",
         amount: singlePlanData.amount || 0,
         planDuration: singlePlanData.planDuration || 0,
         employeeCount: singlePlanData.employeeCount || 0,
