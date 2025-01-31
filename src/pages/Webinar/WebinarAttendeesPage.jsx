@@ -249,6 +249,12 @@ const WebinarAttendeesPage = (props) => {
             filters={filters}
             webinarId={id}
             isAttended={tabValue === "postWebinar" ? true : false}
+            validCall={selected === "All" ? undefined : selected}
+            assignmentType={
+              selectedAssignmentType === "All"
+                ? undefined
+                : selectedAssignmentType
+            }
           />
         </Suspense>
       )}

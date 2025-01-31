@@ -286,8 +286,8 @@ const ViewParticularContact = () => {
             </div>
 
             <div className="border rounded-lg py-1 px-3 shadow-md flex">
-              <span className=" mr-3">Phone :</span>
-              <div className="flex gap-3">
+              <span className=" mr-3 whitespace-nowrap">Phone :</span>
+              <div className="flex gap-3 flex-wrap">
                 {uniquePhonesCount.map((item, index) => (
                   <Badge key={index} badgeContent={item.count} color="primary">
                     <Chip label={item.label} color={item.isInvalid ? "error" : undefined} variant="outlined" />

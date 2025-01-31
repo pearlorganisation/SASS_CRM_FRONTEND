@@ -17,11 +17,13 @@ import { resetExportSuccess } from "../../features/slices/export-excel";
 const ExportWebinarAttendeesModal = ({
   modalName,
   filters,
-  isAttended=true,
-  webinarId="",
+  isAttended,
+  webinarId,
+  validCall,
+  assignmentType,
 }) => {
   const dispatch = useDispatch();
-  console.log('ExportWebinarAttendeesModal -> Render');
+  console.log("ExportWebinarAttendeesModal -> Render");
 
   const { subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
@@ -47,16 +49,18 @@ const ExportWebinarAttendeesModal = ({
     // dispatch(exportClientExcel({ limit: limitValue, columns, filters }));
     dispatch(
       exportWebinarAttendeesExcel({
-        limit: limitValue,
+        limit: Number(limitValue) || 0,
         columns: selectedColumns,
         filters,
         isAttended,
         webinarId,
+        validCall,
+        assignmentType,
       })
     );
     //
   };
-    console.log('isSuccess, assignSuccess, isSuccessReAssign', isSuccess);
+  console.log("isSuccess, assignSuccess, isSuccessReAssign", isSuccess);
 
   useEffect(() => {
     if (isSuccess) {
@@ -66,9 +70,13 @@ const ExportWebinarAttendeesModal = ({
   }, [isSuccess]);
 
   useEffect(() => {
+    console.log(tableConfig);
     const filteredColumns = attendeeTableColumns.filter(
       (col) => col.key in tableConfig && tableConfig[col.key].downloadable
     );
+    if(tableConfig['leadType']?.downloadable){
+      filteredColumns.push({ header: "LeadType", key: "leadType", width: 20 },)
+    }
     setColumns(filteredColumns);
     setSelectedColumns(filteredColumns.map((col) => col.key));
   }, [tableConfig]);
@@ -82,9 +90,19 @@ const ExportWebinarAttendeesModal = ({
             label="Limit"
             variant="outlined"
             type="number"
+            placeholder="All"
             fullWidth
             value={limit}
-            onChange={(e) => setLimit(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value === "") {
+                setLimit(e.target.value);
+                return;
+              }
+              const value = Number(e.target.value);
+              if (!isNaN(value) && value > 0 && value <= 10000) {
+                setLimit(value);
+              }
+            }}
             onKeyDown={(e) => {
               const allowedKeys = [
                 "Backspace",
@@ -101,6 +119,7 @@ const ExportWebinarAttendeesModal = ({
                 e.preventDefault();
               }
             }}
+            InputLabelProps={{ shrink: true }}
           />
         </div>
         <div className="mb-4">

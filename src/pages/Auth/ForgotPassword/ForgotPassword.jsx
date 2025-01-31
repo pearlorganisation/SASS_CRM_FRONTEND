@@ -20,7 +20,7 @@ const ForgotPasswordModal = ({ onClose }) => {
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
     setGeneratedOtp(newOtp);
     console.log("Generated OTP:", newOtp);
-    dispatch(generateOTP({email}));
+    // dispatch(generateOTP({email}));
   };
 
   // Handle OTP send
