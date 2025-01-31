@@ -62,7 +62,6 @@ const pricePlans = createSlice({
         state.isLoading = true;
         state.isSuccess = false;
         state.isPlanUpdated = false;
-        state.isPlanDeleted = false;
         state.isSuccess = false;
       })
       .addCase(getPricePlans.fulfilled, (state, action) => {
@@ -119,14 +118,10 @@ const pricePlans = createSlice({
       .addCase(deletePricePlan.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.isPlanDeleted = true;
-        state.planData = action.payload;
-        toast.success("Plan Deleted Successfully!", { position: "top-center" });
+        successToast("Plan Deleted Successfully!");
       })
       .addCase(deletePricePlan.rejected, (state, action) => {
         state.isLoading = false;
-        state.errorMessage = action.payload;
-        state.isSuccess = false;
         errorToast(action?.payload);
       })
       .addCase(createAddon.pending, (state, action) => {

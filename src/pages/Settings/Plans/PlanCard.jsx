@@ -19,6 +19,7 @@ import { checkout } from "../../../features/actions/razorpay";
 import useRoles from "../../../hooks/useRoles";
 import ModalFallback from "../../../components/Fallback/ModalFallback";
 import { createPortal } from "react-dom";
+import { MdEdit, MdLogout, MdInfo } from "react-icons/md";
 const PlanSelectorModal = lazy(() => import("./PlanSelectorModal"));
 
 const PlanCard = (props) => {
@@ -62,12 +63,15 @@ const PlanCard = (props) => {
     },
     selectedPlan = null,
     currentPlan = null,
+    setModalData = () => {},
+    planType = "active",
   } = props;
 
   const {
     name,
     internalName,
     amount,
+    isActive,
     planDuration,
     employeeCount,
     contactLimit,
@@ -92,25 +96,42 @@ const PlanCard = (props) => {
             <FaEllipsisV />
           </button>
           {menuOpen && (
-            <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg w-40 z-10">
+            <div className="absolute right-0 mt-2 space-y-1 p-1 whitespace-nowrap bg-white border border-gray-200 rounded-md shadow-lg z-10">
               <Link to={`/plans/editPlan/${plan?._id}`} state={plan}>
-                <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <FaPencilAlt className="mr-2" />
-                  Edit
+                <button className="flex items-center gap-2 rounded-md shadow-sm w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 ">
+                  <MdEdit
+                    size={24}
+                    className="text-blue-500 group-hover:text-blue-600"
+                  />
+                  Edit Plan
                 </button>
               </Link>
+
+              <button
+                onClick={() => setModalData(plan)}
+                className="flex gap-2 items-center rounded-md shadow-sm w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 "
+              >
+                <MdLogout size={24} className="text-red-500" />
+                {planType === "active" ? "Deactivate" : "Activate"} Plan
+              </button>
             </div>
           )}
         </div>
       </ComponentGuard>
 
+      {!isActive && (
+        <div
+        title="Inactive Plan, Please contact Administrator."
+        className="absolute top-2 left-0 flex gap-2 bg-red-500 text-white text-xs px-3 py-1 rounded-r-md  items-center">
+          Inactive Plan <MdInfo />
+        </div>
+      )}
+
       {/* Card Content */}
-      <div className="text-center mb-6">
+      <div className="text-center mt-2 mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">{name}</h2>
 
-        <ComponentGuard
-          allowedRoles={[roles.SUPER_ADMIN]}
-        >
+        <ComponentGuard allowedRoles={[roles.SUPER_ADMIN]}>
           <h2 className="text-xl font-semibold text-gray-600 mb-2">
             {internalName || name}
           </h2>

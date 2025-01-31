@@ -15,9 +15,7 @@ import UserActivityTable from "../../components/Table/UserActivityTable";
 import DataTable from "../../components/Table/DataTable";
 import { attendeeTableColumns } from "../../utils/columnData";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
-import {
-  getAssignments,
-} from "../../features/actions/assign";
+import { getAssignments } from "../../features/actions/assign";
 import { Visibility } from "@mui/icons-material";
 import { AssignmentStatus } from "../../utils/extra";
 import { useLayoutEffect } from "react";
@@ -37,6 +35,8 @@ const ViewEmployee = () => {
   const { assignData, isLoading, isSuccess, totalPages, activityAssignMents } =
     useSelector((state) => state.assign);
   const { webinarData } = useSelector((state) => state.webinarContact);
+  const modalState = useSelector((state) => state.modals.modals);
+  const filterModalOpen = modalState[filterModalName] ? true : false;
 
   const [tabValue, setTabValue] = useState(
     searchParams.get("tabValue") || "assignments"
@@ -209,12 +209,13 @@ const ViewEmployee = () => {
             exportModalName={exportExcelModalName}
             isLoading={isLoading}
           />
-
-          <AttendeesFilterModal
-            modalName={filterModalName}
-            filters={filters}
-            setFilters={setFilters}
-          />
+          {filterModalOpen && (
+            <AttendeesFilterModal
+              modalName={filterModalName}
+              filters={filters}
+              setFilters={setFilters}
+            />
+          )}
         </div>
       )}
     </div>

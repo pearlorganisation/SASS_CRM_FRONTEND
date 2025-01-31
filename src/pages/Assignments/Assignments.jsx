@@ -50,6 +50,8 @@ const Assignments = () => {
 
   const { webinarData } = useSelector((state) => state.webinarContact);
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
+  const modalState = useSelector((state) => state.modals.modals);
+  const filterModalOpen = modalState[filterModalName] ? true : false;
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
@@ -308,11 +310,13 @@ const Assignments = () => {
         isLoading={isLoading}
       />
 
-      <AttendeesFilterModal
-        modalName={filterModalName}
-        filters={filters}
-        setFilters={setFilters}
-      />
+      {filterModalOpen && (
+        <AttendeesFilterModal
+          modalName={filterModalName}
+          filters={filters}
+          setFilters={setFilters}
+        />
+      )}
       {openReassignModal &&
         createPortal(
           <RequestReassignmentModal

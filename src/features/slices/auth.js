@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { deleteUserDocumet, getAllRoles, getCurrentUser, getSuperAdmin, getUserSubscription, logIn, signUp, updatePassword, updateUser } from "../actions/auth";
+import { deleteUserDocumet, generateOTP, getAllRoles, getCurrentUser, getSuperAdmin, getUserSubscription, logIn, signUp, updatePassword, updateUser } from "../actions/auth";
 import { toast } from "sonner";
 import { errorToast, successToast } from "../../utils/extra";
 import { socket } from "../../socket";
@@ -15,7 +15,8 @@ const initialState = {
   isRolesLoading: false,
   roles: [],
   subscription: null,
-  superAdminData:null
+  superAdminData:null,
+  isSomethingStillLoading:false
 };
 
 // -------------------------------------- Slices------------------------------------------------
@@ -148,7 +149,19 @@ const authSlice = createSlice({
       .addCase(getSuperAdmin.fulfilled, (state, action) => {
         state.superAdminData = action.payload || null;
       })
-
+      .addCase(generateOTP.pending, (state, action) => {
+        state.isSomethingStillLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(generateOTP.fulfilled, (state, action) => {
+        state.isSomethingStillLoading = false;
+        state.isSuccess = true;
+        successToast("OTP Generated Successfully");
+      })
+      .addCase(generateOTP.rejected, (state, action) => {
+        state.isSomethingStillLoading = false;
+        errorToast(action?.payload);
+      })
   },
 });
 

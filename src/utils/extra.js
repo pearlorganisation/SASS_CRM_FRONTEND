@@ -75,7 +75,7 @@ export const successToast = (message) => {
   // ) {
   //   errorMessage = message[0];
   // }
-toast.dismiss();
+  toast.dismiss();
   toast.success(successMessage, {
     position: "top-center",
     hideProgressBar: true,
@@ -104,7 +104,12 @@ export function filterTruthyValues(obj) {
         if (Object.keys(nestedFiltered).length > 0 || Array.isArray(value)) {
           filteredObj[key] = nestedFiltered;
         }
-      } else if (value !== undefined && value !== null && value !== false && value !== '') {
+      } else if (
+        value !== undefined &&
+        value !== null &&
+        value !== false &&
+        value !== ""
+      ) {
         filteredObj[key] = value;
       }
     }
@@ -112,7 +117,6 @@ export function filterTruthyValues(obj) {
 
   return filteredObj;
 }
-
 
 export const AssignmentStatus = {
   ACTIVE: "active",

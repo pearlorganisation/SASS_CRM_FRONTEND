@@ -7,7 +7,6 @@ import {
   addAttendees,
   addEnrollment,
   swapAttendeeFields,
-  getAllAttendees,
   getAttendee,
   getAttendeeLeadTypeByEmail,
   getAttendees,
@@ -96,7 +95,7 @@ export const attendeeSlice = createSlice({
       .addCase(getAttendees.fulfilled, (state, action) => {
         state.isLoading = false;
         state.attendeeData = action.payload?.result || [];
-        state.totalPages = action.payload?.totalPages || 1;
+        state.pagination = action.payload?.pagination || {};
       })
 
       .addCase(getAttendees.rejected, (state, action) => {
@@ -112,18 +111,6 @@ export const attendeeSlice = createSlice({
       })
 
       .addCase(getPullbacks.rejected, (state, action) => {
-        state.isLoading = false;
-        errorToast(action?.payload);
-      })
-      .addCase(getAllAttendees.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getAllAttendees.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.attendeeData = action.payload?.result || [];
-        state.totalPages = action.payload?.totalPages || 1;
-      })
-      .addCase(getAllAttendees.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       })

@@ -42,16 +42,12 @@ export const exportClientExcel = createAsyncThunk(
 
 export const exportWebinarAttendeesExcel = createAsyncThunk(
   "webinarAttendees/exportExcel",
-  async (
-    { limit = 100, columns = [], filters = {}, webinarId, isAttended = true },
-    { rejectWithValue, dispatch }
-  ) => {
+  async (payload = {}, { rejectWithValue, dispatch }) => {
     try {
       const response = await instance.post(
         `export-excel/webinar-attendees`,
-        { filters, columns, fieldName: "attendeeTableConfig", webinarId: webinarId },
+        { fieldName: "attendeeTableConfig", ...payload },
         {
-          params: { limit, isAttended },
           responseType: "blob", // Ensure you get the file as a binary Blob
         }
       );
@@ -62,7 +58,7 @@ export const exportWebinarAttendeesExcel = createAsyncThunk(
       link.href = url;
 
       // Set file name for download
-      link.setAttribute("download", "clients.xlsx");
+      link.setAttribute("download", "WebinarAttendees.xlsx");
 
       document.body.appendChild(link);
       link.click();
@@ -71,7 +67,9 @@ export const exportWebinarAttendeesExcel = createAsyncThunk(
       dispatch(
         addUserActivity({
           action: "export",
-          details: `User Exported the Attendees, limit: ${limit}`,
+          details: `User Exported the Attendees, limit: ${
+            !payload.limit ? "All" : payload.limit
+          }`,
         })
       );
 
