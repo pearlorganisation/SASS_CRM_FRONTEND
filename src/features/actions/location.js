@@ -31,16 +31,35 @@ export const getLocationRequests = createAsyncThunk(
   }
 );
 
-export const updateLocationStatus = createAsyncThunk(
-  "locations/updateStatus",
-  async ({ status }, { rejectWithValue }) => {
+export const approveLocation = createAsyncThunk(
+  "locations/approve",
+  async ({ id }, { rejectWithValue }) => {
     try {
-      const response = await instance.patch(`/location`, {
-        status,
-      });
+      const response = await instance.patch(`/location/approve/${id}`);
       return response?.data;
     } catch (e) {
       return rejectWithValue(e);
     }
   }
 );
+
+export const disapproveLocation = createAsyncThunk(
+  "locations/disapprove",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(`/location/disapprove/${id}`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const addLocation = createAsyncThunk("locations/add", async({name, previousName}, {rejectWithValue}) => {
+  try {
+    const response = await instance.post('/location', {name, previousName})
+    return response
+  } catch (error) {
+    return rejectWithValue(error)
+  }
+})
