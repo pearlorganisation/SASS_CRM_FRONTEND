@@ -75,15 +75,16 @@ export const employeeTableColumns = [
 export const locationTableColumns = [
   { header: "Name", key: "name", width: 50, type: "" },
   { header: "Previous Name", key: "previousName", width: 20, type: "" },
-  { header: "Is Verified", key: "isVerified", width: 10, type: "superAdminApproval" },
-  { header: "Admin", key: "admin", width: 20, type: "" },
+  { header: "Is Verified", key: "isVerified", width: 10, type: "superAdminApproval", title: "note" },
+  { header: "Admin", key: "adminEmail", width: 20, type: "" },
   {
     header: "Is Admin Verified",
     key: "isAdminVerified",
     width: 10,
     type: "adminApproval",
+    title: "adminNote"
   },
-  { header: "Employee", key: "employee", width: 20, type: "" },
+  { header: "Employee", key: "employeeEmail", width: 20, type: "" },
 ];
 
 export const webinarTableColumns = [

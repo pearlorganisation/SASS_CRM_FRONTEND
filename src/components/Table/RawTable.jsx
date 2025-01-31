@@ -128,18 +128,21 @@ const RawTable = ({
                   </td>
                 )}
                 {tableData?.columns?.map((column, index) => (
+                  
                   <td
+                  
                     key={index}
                     title={
-                      column.type === "" && row?.[column.key]
-                        ? row?.[column.key]
-                        : ""
+                      row?.[column.title]
+                        ? "testsssss"
+                        : row?.[column.key] ? row?.[column.key] : "N/A"
                     }
                     className={`px-4 py-2 text-gray-600 max-w-72 truncate ${
                       isRowClickable ? "cursor-pointer" : ""
                     }`}
                     onClick={() => rowClick(row)}
                   >
+                  
                     {column.type === "status" && (
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${
@@ -160,7 +163,11 @@ const RawTable = ({
                             : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {row?.[column.key] ? "Approved" : "Unapproved"}
+                        {row?.[column.key]
+                          ? "Approved"
+                          : row?.[column?.key2 || "deactivated"]
+                          ? "Rejected"
+                          : "Unapproved"}
                       </span>
                     )}
 
@@ -172,7 +179,11 @@ const RawTable = ({
                             : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {row?.[column.key] ? "Approved" : "Unapproved"}
+                        {row?.[column.key]
+                          ? "Approved"
+                          : row?.[column?.key2 || "deactivated"]
+                          ? "Rejected"
+                          : "Unapproved"}
                       </span>
                     )}
                     {column.type === "Date" &&
