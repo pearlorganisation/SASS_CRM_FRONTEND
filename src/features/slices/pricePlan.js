@@ -13,6 +13,7 @@ import {
 } from "../actions/pricePlan";
 import { toast } from "sonner";
 import { errorToast, successToast } from "../../utils/extra";
+import { checkout } from "../actions/razorpay";
 
 const initialState = {
   isLoading: false,
@@ -183,6 +184,18 @@ const pricePlans = createSlice({
         successToast("Plan Order Updated Successfully!");
       })
       .addCase(updatePlansOrder.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(checkout.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(checkout.fulfilled, (state, action) => {
+        state.isSuccess = true;
+        state.isLoading = false;
+      })
+      .addCase(checkout.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });

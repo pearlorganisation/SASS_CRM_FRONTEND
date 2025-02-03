@@ -4,10 +4,11 @@ import { instance } from "../../services/axiosInterceptor";
 
 export const checkout = createAsyncThunk(
   "checkout",
-  async ({ plan }, { rejectWithValue }) => {
+  async ({ plan, durationType }, { rejectWithValue }) => {
     try {
-      const response = await instance.post(`/razorpay/checkout`, { plan });
+      const response = await instance.post(`/razorpay/checkout`, { plan, durationType });
       return response?.data;
+
     } catch (e) {
       return rejectWithValue(e);
     }

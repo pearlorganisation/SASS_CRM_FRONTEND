@@ -19,7 +19,6 @@ const RawTable = ({
   locations = null,
 }) => {
   const { isTablesMasked } = useSelector((state) => state.table);
-
   const roles = useRoles();
 
   const handleCheckboxChange = (id) => {
@@ -36,13 +35,12 @@ const RawTable = ({
   };
 
   return (
-    <div className="overflow-x-auto shadow-md rounded-lg">
+    // Container for both horizontal and vertical scrolling with max-height.
+    <div className="shadow-md rounded-lg overflow-auto max-h-[80vh]">
       <table className="w-full text-sm">
-        <thead className="bg-gray-100">
-          <tr className="">
-            <th className=" py-6 font-normal text-sm whitespace-nowrap">
-              S.No
-            </th>
+        <thead className="bg-gray-100 sticky top-0 z-10">
+          <tr>
+            <th className="py-6 font-normal text-sm whitespace-nowrap">S.No</th>
             {isSelectVisible && (
               <th className="px-4 py-3">
                 <input
@@ -61,9 +59,8 @@ const RawTable = ({
                 {column.header}
               </th>
             ))}
-
             {Array.isArray(actions) && actions.length > 0 && (
-              <th className="px-4 py-3 text-gray-700 font-normal  text-sm sticky right-0 bg-gray-100 z-10">
+              <th className="px-4 py-3 text-gray-700 font-normal text-sm sticky right-0 bg-gray-100 z-10">
                 Actions
               </th>
             )}
@@ -73,11 +70,11 @@ const RawTable = ({
           {isLoading && tableData?.rows?.length > 0 ? (
             Array.from({ length: limit <= 10 ? limit : 10 }).map((_, index) => (
               <tr className="border" key={index}>
-                <td className=" flex justify-center px-4 py-4">
+                <td className="flex justify-center px-4 py-4">
                   <div className="h-4 w-8 bg-gray-200 animate-pulse rounded"></div>
                 </td>
-                {tableData?.columns?.map((_, index) => (
-                  <td key={index} className="px-4 py-2">
+                {tableData?.columns?.map((_, colIndex) => (
+                  <td key={colIndex} className="px-4 py-2">
                     <div className="h-4 bg-gray-200 animate-pulse rounded"></div>
                   </td>
                 ))}
@@ -91,7 +88,7 @@ const RawTable = ({
               <tr
                 key={row?._id}
                 className={`${
-                  isRowSelected(row?._id) ? "bg-blue-50 " : "bg-white"
+                  isRowSelected(row?._id) ? "bg-blue-50" : "bg-white"
                 } hover:bg-gray-50 border-b whitespace-nowrap`}
               >
                 <td
@@ -127,22 +124,21 @@ const RawTable = ({
                     />
                   </td>
                 )}
-                {tableData?.columns?.map((column, index) => (
-                  
+                {tableData?.columns?.map((column, colIndex) => (
                   <td
-                  
-                    key={index}
+                    key={colIndex}
                     title={
                       row?.[column.title]
                         ? "testsssss"
-                        : row?.[column.key] ? row?.[column.key] : "N/A"
+                        : row?.[column.key]
+                        ? row?.[column.key]
+                        : "N/A"
                     }
                     className={`px-4 py-2 text-gray-600 max-w-72 truncate ${
                       isRowClickable ? "cursor-pointer" : ""
                     }`}
                     onClick={() => rowClick(row)}
                   >
-                  
                     {column.type === "status" && (
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${
@@ -190,19 +186,12 @@ const RawTable = ({
                       (formatDateAsNumber(row?.[column.key]) ?? "N/A")}
                     {column.type === "Product" &&
                       (row?.[column.key][column?.subKey] ?? "N/A")}
-                    {row?.[column.key] &&
-                      locations &&
-                      console.log(
-                        locations.findIndex((item) => {
-                          return item.name === row?.[column.key];
-                        })
-                      )}
                     {column.type === "Location" &&
                       (row?.[column.key] &&
                       locations &&
-                      locations.findIndex((item) => {
-                        return item.name === row?.[column.key];
-                      }) >= 0 ? (
+                      locations.findIndex(
+                        (item) => item.name === row?.[column.key]
+                      ) >= 0 ? (
                         row?.[column.key]
                       ) : (
                         <span className="text-red-500">
@@ -226,14 +215,14 @@ const RawTable = ({
                   </td>
                 ))}
                 {Array.isArray(actions) && actions.length > 0 && (
-                  <td className="px-4 py-2 sticky right-0 bg-white z-10 border-l">
+                  <td className="px-4 py-2 sticky right-0 bg-white border-l">
                     <div className="flex gap-2">
-                      {actions.map((action, index) =>
+                      {actions.map((action, idx) =>
                         (action?.readOnly || userData?.isActive,
                         action?.hideCondition
                           ? action.hideCondition(row)
                           : true) ? (
-                          <div key={index}>
+                          <div key={idx}>
                             <button
                               disabled={action?.disabled ? true : false}
                               className="p-2 hover:bg-gray-100 rounded-full group"

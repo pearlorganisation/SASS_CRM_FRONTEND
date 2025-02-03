@@ -69,14 +69,14 @@ const DataTable = ({
           tableUniqueKey !== "viewAssignmentsTable" &&
           exportModalName !== "" && (
             <div className="flex justify-center items-center gap-4">
-              {tableData.totalRecords && (
+              {tableData.totalRecords ? (
                 <span className="font-semibold text-neutral-800">
                   Total Records:{" "}
                   <span className="text-indigo-500">
                     {tableData.totalRecords}
                   </span>
                 </span>
-              )}
+              ) : null}
 
               <IconButton
                 id="demo-positioned-button"

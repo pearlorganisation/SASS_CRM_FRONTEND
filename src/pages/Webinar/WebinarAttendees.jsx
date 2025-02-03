@@ -320,7 +320,7 @@ const WebinarAttendees = () => {
           </Suspense>,
           document.body
         )}
-        <ScrollControls/>
+        {/* <ScrollControls/> */}
     </div>
   );
 };

@@ -34,7 +34,7 @@ const PlanCard = (props) => {
     isMenuVisible = false,
     isSelectVisible = false,
     handlePlanSelection = (id, billingData) => {
-      dispatch(checkout({ plan: id })).then((res) => {
+      dispatch(checkout({ plan: id, durationType: billingData.durationType })).then((res) => {
         if (res?.payload?.result) {
           const order = res?.payload?.result;
           const plan = res?.payload?.planData;

@@ -97,12 +97,12 @@ export const webinarTableColumns = [
     type: "",
   },
   { header: "Total Attendees", key: "totalAttendees", width: 20, type: "" },
-  {
-    header: "Total Participants",
-    key: "totalParticipants",
-    width: 15,
-    type: "",
-  },
+  // {
+  //   header: "Total Participants",
+  //   key: "totalParticipants",
+  //   width: 15,
+  //   type: "",
+  // },
 ];
 
 export const productTableColumns = [
