@@ -143,7 +143,7 @@ const RawTable = ({
                     onClick={() => rowClick(row)}
                   >
                   
-                    {column.type === "status" && (
+                    {column.type === "  status" && (
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${
                           row?.[column.key]
