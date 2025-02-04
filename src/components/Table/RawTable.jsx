@@ -21,6 +21,7 @@ const RawTable = ({
   const { isTablesMasked } = useSelector((state) => state.table);
   const roles = useRoles();
 
+  console.log("RawTable -> Rendered");
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
@@ -35,7 +36,6 @@ const RawTable = ({
   };
 
   return (
-    // Container for both horizontal and vertical scrolling with max-height.
     <div className="shadow-md rounded-lg overflow-auto max-h-[80vh]">
       <table className="w-full text-sm">
         <thead className="bg-gray-100 sticky top-0 z-10">

@@ -144,7 +144,26 @@ const NotificationBell = ({ userData, roles }) => {
               className="border-b cursor-pointer">
                 <ListItemText
                   primary={notif?.title}
-                  secondary={notif?.message}
+                  secondary={
+                    <>
+                      {notif?.message}
+                      <div className="flex justify-end">
+
+                      <Typography 
+                        component="span" 
+                        display="block" 
+                        variant="caption"
+                        className="text-xs text-gray-500"
+                      >
+                        {new Date(notif?.createdAt).toLocaleDateString()} •{" "}
+                        {new Date(notif?.createdAt).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </Typography>
+                      </div>
+                    </>
+                  }
                 />
               </ListItem>
             ))}

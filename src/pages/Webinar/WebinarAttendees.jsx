@@ -28,7 +28,6 @@ import DataTableFallback from "../../components/Fallback/DataTableFallback";
 import { fetchPullbackRequestCounts } from "../../features/actions/reAssign";
 import { socket } from "../../socket";
 import ModalFallback from "../../components/Fallback/ModalFallback";
-import ScrollControls from "../../components/ScrollControls";
 
 const WebinarAttendees = () => {
   const { id } = useParams();
@@ -152,7 +151,6 @@ const WebinarAttendees = () => {
             color: "gray",
           }}
         />
-
       </Tabs>
 
       <div className="flex gap-4 justify-between flex-wrap items-center">
@@ -166,8 +164,7 @@ const WebinarAttendees = () => {
             {id}
           </Button>
 
-          {selectedRows.length > 0 &&
-            subTabValueRef.current === "attendees" &&
+          {subTabValueRef.current === "attendees" &&
             tabValueRef.current !== "enrollments" && (
               <Button onClick={() => setSwapOpen(true)} variant="contained">
                 Swap Columns
@@ -175,7 +172,7 @@ const WebinarAttendees = () => {
             )}
           {selectedRows.length > 0 &&
             (!(selectedAssignmentType === "All") ||
-            subTabValueRef.current !== "attendees") && (
+              subTabValueRef.current !== "attendees") && (
               <button
                 className=" px-4 py-2 text-white bg-blue-500 rounded-md"
                 onClick={() => {
@@ -251,33 +248,39 @@ const WebinarAttendees = () => {
         )}
       </div>
       <Suspense fallback={<DataTableFallback />}>
-        {subTabValueRef.current === "attendees" && tabValueRef.current !== "enrollments" && (
-          <WebinarAttendeesPage
-            userData={userData}
-            tabValue={tabValueRef.current}
-            page={page}
-            setPage={setPage}
-            isSwapOpen={isSwapOpen}
-            setSwapOpen={setSwapOpen}
-            subTabValue={subTabValueRef.current}
-            selectedRows={selectedRows}
-            setSelectedRows={setSelectedRows}
-            selectedAssignmentType={selectedAssignmentType}
-            setSelectedAssignmentType={setSelectedAssignmentType}
-          />
-        )}
-        {subTabValueRef.current !== "attendees" && tabValueRef.current !== "enrollments" && (
-          <Pullbacks
-            subTabValue={subTabValueRef.current}
-            page={page}
-            setPage={setPage}
-            tabValue={tabValueRef.current}
-            selectedRows={selectedRows}
-            setSelectedRows={setSelectedRows}
-          />
-        )}
+        {subTabValueRef.current === "attendees" &&
+          tabValueRef.current !== "enrollments" && (
+            <WebinarAttendeesPage
+              userData={userData}
+              tabValue={tabValueRef.current}
+              page={page}
+              setPage={setPage}
+              isSwapOpen={isSwapOpen}
+              setSwapOpen={setSwapOpen}
+              subTabValue={subTabValueRef.current}
+              selectedRows={selectedRows}
+              setSelectedRows={setSelectedRows}
+              selectedAssignmentType={selectedAssignmentType}
+              setSelectedAssignmentType={setSelectedAssignmentType}
+            />
+          )}
+        {subTabValueRef.current !== "attendees" &&
+          tabValueRef.current !== "enrollments" && (
+            <Pullbacks
+              subTabValue={subTabValueRef.current}
+              page={page}
+              setPage={setPage}
+              tabValue={tabValueRef.current}
+              selectedRows={selectedRows}
+              setSelectedRows={setSelectedRows}
+            />
+          )}
         {tabValueRef.current === "enrollments" && (
-          <Enrollments page={page} setPage={setPage} tabValue={tabValueRef.current} />
+          <Enrollments
+            page={page}
+            setPage={setPage}
+            tabValue={tabValueRef.current}
+          />
         )}
       </Suspense>
 
@@ -288,7 +291,8 @@ const WebinarAttendees = () => {
             webinarid={id}
             tabValue={tabValueRef.current}
             isPullbackVisible={
-              tabValueRef.current !== "enrollments" && subTabValueRef.current === "attendees"
+              tabValueRef.current !== "enrollments" &&
+              subTabValueRef.current === "attendees"
             }
             isAttendee={true}
             setReAssignModal={setReAssignModal}
@@ -320,7 +324,6 @@ const WebinarAttendees = () => {
           </Suspense>,
           document.body
         )}
-        {/* <ScrollControls/> */}
     </div>
   );
 };

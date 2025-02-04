@@ -1,11 +1,9 @@
-import React, { lazy, Suspense, useEffect, useState } from "react";
+import React, { lazy, Suspense, useState } from "react";
 import {
   FaCheck,
   FaTimes,
   FaUsers,
-  FaCalendarAlt,
   FaAddressBook,
-  FaPencilAlt,
   FaEllipsisV,
   FaToggleOn,
 } from "react-icons/fa";
@@ -34,7 +32,9 @@ const PlanCard = (props) => {
     isMenuVisible = false,
     isSelectVisible = false,
     handlePlanSelection = (id, billingData) => {
-      dispatch(checkout({ plan: id, durationType: billingData.durationType })).then((res) => {
+      dispatch(
+        checkout({ plan: id, durationType: billingData.durationType })
+      ).then((res) => {
         if (res?.payload?.result) {
           const order = res?.payload?.result;
           const plan = res?.payload?.planData;
@@ -80,6 +80,7 @@ const PlanCard = (props) => {
     purchaseHistory,
     employeeStatus,
     employeeActivity,
+    subscriptionCount,
   } = plan;
 
   return (
@@ -121,8 +122,9 @@ const PlanCard = (props) => {
 
       {!isActive && (
         <div
-        title="Inactive Plan, Please contact Administrator."
-        className="absolute top-2 left-0 flex gap-2 bg-red-500 text-white text-xs px-3 py-1 rounded-r-md  items-center">
+          title="Inactive Plan, Please contact Administrator."
+          className="absolute top-2 left-0 flex gap-2 bg-red-500 text-white text-xs px-3 py-1 rounded-r-md  items-center"
+        >
           Inactive Plan <MdInfo />
         </div>
       )}
@@ -135,6 +137,14 @@ const PlanCard = (props) => {
           <h2 className="text-xl font-semibold text-gray-600 mb-2">
             {internalName || name}
           </h2>
+          <div className="flex items-center gap-2 px-3 justify-center">
+            <span className="text-sm font-medium text-gray-500">
+              Subscribers
+            </span>
+            <span className="text-lg font-semibold text-gray-700">
+              {subscriptionCount}
+            </span>
+          </div>
         </ComponentGuard>
 
         <p className="text-4xl font-extrabold text-blue-600">

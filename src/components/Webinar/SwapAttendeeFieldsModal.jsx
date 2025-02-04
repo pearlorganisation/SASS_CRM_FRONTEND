@@ -1,15 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { toast } from "sonner";
 import { attendeeTableColumns } from "../../utils/columnData";
+import { useSelector } from "react-redux";
 
 const SwapAttendeeFieldsModal = ({ onClose, onSubmit }) => {
+  const { isSwapping, isSuccess } = useSelector((state) => state.attendee);
+
   const [field1, setField1] = useState(null);
   const [field2, setField2] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isSuccess) {
+      onClose();
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+
+    if (isSwapping) {
+      setIsLoading(true);
+    } else {
+      setField1(null);
+      setField2(null);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 200);
+    }
+
+  }, [isSwapping]);
 
   const customStyles = {
     menu: (provided) => ({
       ...provided,
+
       maxHeight: "150px",
       overflowY: "auto", // Ensure overflow is set to auto for scrolling
     }),
@@ -29,7 +54,6 @@ const SwapAttendeeFieldsModal = ({ onClose, onSubmit }) => {
   const handleSubmit = () => {
     if (field1 && field2) {
       onSubmit(field1.value, field2.value);
-      handleCancel(); // Close and reset form after submission
     } else {
       toast.dismiss();
       toast.error("Please select both fields.");
@@ -89,16 +113,18 @@ const SwapAttendeeFieldsModal = ({ onClose, onSubmit }) => {
 
         <div className="flex justify-end space-x-4">
           <button
+            disabled={isSwapping}
             className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
             onClick={handleCancel}
           >
             Cancel
           </button>
           <button
+            disabled={isSwapping || !field1 || !field2 || isLoading}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
             onClick={handleSubmit}
           >
-            Submit
+            {isSwapping || isLoading ? "Swapping..." : "Submit"}
           </button>
         </div>
       </div>

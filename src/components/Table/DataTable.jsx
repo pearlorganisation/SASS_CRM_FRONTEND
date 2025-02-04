@@ -1,4 +1,4 @@
-import React, { memo, Suspense, useState, lazy } from "react";
+import React, { memo, Suspense, useState, lazy, useRef, useEffect } from "react";
 import {
   Button,
   IconButton,
@@ -20,7 +20,8 @@ import RawTable from "./RawTable";
 const FilterPresetModal = lazy(() => import("../Filter/FilterPresetModal"));
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import ModalFallback from "../Fallback/ModalFallback";
-
+import { MdBookmark, MdFilterAlt, MdSort } from "react-icons/md";
+import SortModal from "../SortModal";
 const DataTable = ({
   tableHeader = "Table",
   tableUniqueKey = "id",
@@ -44,16 +45,20 @@ const DataTable = ({
   setSelectedRows = () => {},
   isLeadType = false,
   locations = null,
+  sortByOptions = [],
+  onSortApply = () => {},
+  sortBy = {},
 }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
-
   console.log("DataTable -> Rendered");
 
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [sortVisible, setSortVisible] = useState(false);
   const { userData } = useSelector((state) => state.auth);
   const open = Boolean(anchorEl);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -63,6 +68,7 @@ const DataTable = ({
 
   return (
     <div className="p-6 bg-gray-50 rounded-lg">
+
       <div className="flex gap-4 justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-700">{tableHeader}</h2>
         {userData?.isActive &&
@@ -121,33 +127,52 @@ const DataTable = ({
         {ButtonGroup && <ButtonGroup />}
         {userData?.isActive && filterModalName !== "" && (
           <div className="flex gap-4">
-            <Button
-              component="label"
-              color="secondary"
-              variant="outlined"
+            <button
               onClick={() => {
                 setIsPresetModalOpen(true);
               }}
-              startIcon={<BookmarkOutlinedIcon />}
+              className="border-purple-500 h-10 border text-md text-purple-500 px-4 rounded-md flex items-center gap-2 "
             >
+              <MdBookmark size={22} />
               Presets
-            </Button>
-
-            <Button
-              component="label"
-              variant="outlined"
+            </button>
+            <button
               onClick={() => {
                 dispatch(openModal(filterModalName));
               }}
-              startIcon={<FilterAltIcon />}
+              className="border-blue-500 h-10 border text-md text-blue-500 px-4 rounded-md flex items-center gap-2 "
             >
+              <MdFilterAlt size={22} />
               Filters
               {filters && Object.keys(filters)?.length > 0 && (
-                <span className="ml-3 px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
+                <span className=" px-2 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">
                   {Object.keys(filters).length}
                 </span>
               )}
-            </Button>
+            </button>
+
+            {sortByOptions.length > 0 && (
+              <div className="relative overflow-visible">
+                <button
+
+                  onClick={() => setSortVisible((prev) => !prev)}
+                  className="border-indigo-500 h-10 border text-md text-indigo-500 px-4 rounded-md flex items-center gap-2 "
+                >
+
+                  <MdSort size={22} />
+                  Sort
+                </button>
+                {sortVisible && (
+                  <SortModal
+                    sortByOptions={sortByOptions}
+                    onSortApply={onSortApply}
+                    setSortVisible={setSortVisible}
+                    sortBy={sortBy}
+                  />
+                )}
+              </div>
+
+            )}
           </div>
         )}
       </div>

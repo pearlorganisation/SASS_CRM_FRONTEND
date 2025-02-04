@@ -3,8 +3,10 @@ import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 
 export default function ScrollControls() {
   const [showButtons, setShowButtons] = useState(false);
+  console.log("ScrollControls mounted");
 
   useEffect(() => {
+    console.log("ScrollControls mounted");
     const handleScroll = () => {
       setShowButtons(window.scrollY > 50); // Show only when user scrolls
     };

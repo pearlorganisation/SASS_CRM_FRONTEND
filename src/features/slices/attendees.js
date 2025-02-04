@@ -30,6 +30,7 @@ const initialState = {
   tabValue: "preWebinar",
   attendeeLeadType: "",
   pagination: {},
+  isSwapping: false,
 };
 // ---------------------------------------------------------------------------------------
 
@@ -175,30 +176,17 @@ export const attendeeSlice = createSlice({
         errorToast(action?.payload);
       })
       .addCase(swapAttendeeFields.pending, (state) => {
+        state.isSwapping = true;
         state.isSuccess = false;
       })
+
       .addCase(swapAttendeeFields.fulfilled, (state, action) => {
-        const { data = [], field1 = "", field2 = "" } = action.payload;
-
-        if (field1 && field2) {
-          data.forEach((updatedAttendee) => {
-            const existingAttendee = state.attendeeData.find(
-              (attendee) => attendee._id === updatedAttendee._id
-            );
-
-            if (existingAttendee) {
-              if (field1 in existingAttendee && field1 in updatedAttendee) {
-                existingAttendee[field1] = updatedAttendee[field1];
-              }
-              if (field2 in existingAttendee && field2 in updatedAttendee) {
-                existingAttendee[field2] = updatedAttendee[field2];
-              }
-            }
-          });
-        }
+        state.isSwapping = false;
+        state.isSuccess = true;
       })
       .addCase(swapAttendeeFields.rejected, (state, action) => {
-        errorToast(action?.payload);
+        state.isSwapping = false;
+        errorToast(action?.payload);  
       })
       .addCase(fetchGroupedAttendees.pending, (state) => {
         state.isLoading = true;
