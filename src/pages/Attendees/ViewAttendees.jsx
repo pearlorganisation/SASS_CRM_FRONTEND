@@ -1,21 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchGroupedAttendees } from "../../features/actions/attendees";
 import {
-  attendeeTableColumns,
   groupedAttendeeTableColumns,
 } from "../../utils/columnData";
 import { MdVisibility } from "react-icons/md";
 import DataTable from "../../components/Table/DataTable";
-import { closeModal, openModal } from "../../features/slices/modalSlice";
-import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
-import ExportWebinarAttendeesModal from "../../components/Export/ExportWebinarAttendeesModal";
 import { getLeadType } from "../../features/actions/assign";
-import Dialog from "../../components/Dialog/Dialog";
 import GroupedAttendeeFilterModal from "./Modal/GroupedAttendeeFilterModal";
 import { createPortal } from "react-dom";
 import { clearAttendeeData } from "../../features/slices/attendees";
+
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -43,6 +39,19 @@ const WebinarAttendees = () => {
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
 
+  const sortByOptions = [
+    { value: "_id", label: "Email" },
+    { value: "attendedWebinarCount", label: "Attended Webinar Count" },
+    { value: "timeInSession", label: "Time in Session" }
+
+
+  ];
+
+  const [sortBy, setSortBy] = useState({
+    sortBy: sortByOptions[0].value,
+    sortOrder: "asc",
+  });
+
   const setDataFilters = (data) => {
     setFilters(data);
     setPage(1);
@@ -53,9 +62,9 @@ const WebinarAttendees = () => {
   }, [page]);
 
   useEffect(() => {
-    dispatch(fetchGroupedAttendees({ page, limit: LIMIT, filters }));
+    dispatch(fetchGroupedAttendees({ page, limit: LIMIT, filters, sort: sortBy }));
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [page, LIMIT, filters]);
+  }, [page, LIMIT, filters, sortBy]);
 
   useEffect(() => {
     dispatch(getLeadType());
@@ -107,6 +116,9 @@ const WebinarAttendees = () => {
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
         isLeadType={true}
+        sortByOptions={sortByOptions}
+        onSortApply={setSortBy}
+        sortBy={sortBy}
       />
       {/* <AttendeesFilterModal
         modalName={AttendeesFilterModalName}

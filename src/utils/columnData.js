@@ -35,6 +35,7 @@ export const clientTableColumns = [
 
 export const attendeeTableColumns = [
   { header: "Email", key: "email", width: 50, type: "" },
+  { header: "Phone", key: "phone", width: 20, type: "" },
   { header: "Assigned To", key: "isAssigned", width: 20, type: "" },
   { header: "First Name", key: "firstName", width: 20, type: "" },
   { header: "Last Name", key: "lastName", width: 20, type: "" },
@@ -42,7 +43,6 @@ export const attendeeTableColumns = [
   { header: "Time in Session", key: "timeInSession", width: 20, type: "" },
   { header: "Gender", key: "gender", width: 20, type: "" },
   { header: "Location", key: "location", width: 20, type: "Location" },
-  { header: "Phone", key: "phone", width: 20, type: "" },
 ];
 
 export const groupedAttendeeTableColumns = [
@@ -97,12 +97,12 @@ export const webinarTableColumns = [
     type: "",
   },
   { header: "Total Attendees", key: "totalAttendees", width: 20, type: "" },
-  {
-    header: "Total Participants",
-    key: "totalParticipants",
-    width: 15,
-    type: "",
-  },
+  // {
+  //   header: "Total Participants",
+  //   key: "totalParticipants",
+  //   width: 15,
+  //   type: "",
+  // },
 ];
 
 export const productTableColumns = [

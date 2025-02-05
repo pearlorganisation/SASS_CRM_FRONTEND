@@ -168,3 +168,18 @@ export const generateOTP = createAsyncThunk(
     }
   }
 );
+
+// Validate OTP
+export const validateOTP = createAsyncThunk(
+  "user/validate-otp",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.post(`auth/validate-otp`, payload);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+

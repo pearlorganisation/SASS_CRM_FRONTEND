@@ -6,6 +6,7 @@ import {
   getAddons,
   getAdminBillingHistory,
   getClientAddons,
+  getPlansForDropdown,
   getPricePlan,
   getPricePlans,
   updatePlansOrder,
@@ -13,6 +14,7 @@ import {
 } from "../actions/pricePlan";
 import { toast } from "sonner";
 import { errorToast, successToast } from "../../utils/extra";
+import { checkout } from "../actions/razorpay";
 
 const initialState = {
   isLoading: false,
@@ -25,7 +27,9 @@ const initialState = {
   addonsData: [],
   billingHistory: [],
   totalPages: 1,
+  plansForDropdown: [],
 };
+
 
 const pricePlans = createSlice({
   name: "PricePlans",
@@ -183,6 +187,29 @@ const pricePlans = createSlice({
         successToast("Plan Order Updated Successfully!");
       })
       .addCase(updatePlansOrder.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(checkout.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(checkout.fulfilled, (state, action) => {
+        state.isSuccess = true;
+        state.isLoading = false;
+      })
+      .addCase(checkout.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getPlansForDropdown.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getPlansForDropdown.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.plansForDropdown = action.payload;
+      })
+      .addCase(getPlansForDropdown.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });

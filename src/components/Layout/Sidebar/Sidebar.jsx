@@ -152,7 +152,7 @@ const Sidebar = () => {
   return (
     <div
       id="logo-sidebar"
-      className={`fixed top-0 left-0 w-64 h-screen z-10 pt-20 transition-transform ease-in-out duration-700  -translate-x-full bg-white border-r border-gray-200 ${
+      className={`fixed top-0 left-0 w-64 h-screen z-20 pt-20 transition-transform ease-in-out duration-700  -translate-x-full bg-white border-r border-gray-200 ${
         isSidebarOpen ? "translate-x-0" : ""
       }`}
       aria-label="Sidebar"

@@ -39,6 +39,8 @@ const ProfilePage = () => {
   const totalEmployeeLimit =
     (subscription?.employeeLimit ?? 0) +
     (subscription?.employeeLimitAddon ?? 0);
+  const usedContacts = subscription?.contactCount ?? 0;
+
 
   const [isDocumentOpen, setIsDocumentOpen] = useState(false);
   const [doc, setDoc] = useState(null);
@@ -119,6 +121,10 @@ const ProfilePage = () => {
                   <p className="mb-2">
                     <strong>Contact Limit:</strong> {totalContactLimit}
                   </p>
+                  <p className="mb-2">
+                    <strong>Contact Used:</strong> {usedContacts}
+                  </p>
+
 
                   <Box className="mt-3">
                     <Box
