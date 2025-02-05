@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Select, FormControl, InputLabel, MenuItem } from "@mui/material";
 import {
@@ -74,6 +74,20 @@ const WebinarAttendeesPage = (props) => {
   const [filters, setFilters] = useState({});
   const [selected, setSelected] = useState("All");
 
+  const sortByOptions = [
+    { value: "email", label: "Email" },
+    { value: "createdAt", label: "Created At" },
+    { value: "updatedAt", label: "Updated At" },
+    ...(tabValue === "postWebinar"
+      ? [{ value: "timeInSession", label: "Time in Session" }]
+      : []),
+  ];
+
+  const [sortBy, setSortBy] = useState({
+    sortBy: sortByOptions[0].value,
+    sortOrder: "asc",
+  });
+
   useEffect(() => {
     if (tabValue !== "enrollments" && subTabValue === "attendees") {
       setSelectedRows([]);
@@ -89,6 +103,7 @@ const WebinarAttendeesPage = (props) => {
             selectedAssignmentType === "All"
               ? undefined
               : selectedAssignmentType,
+          sort: sortBy,
         })
       );
       window.scrollTo({
@@ -96,7 +111,15 @@ const WebinarAttendeesPage = (props) => {
         behavior: "smooth",
       });
     }
-  }, [page, tabValue, LIMIT, filters, selected, selectedAssignmentType]);
+  }, [
+    page,
+    tabValue,
+    LIMIT,
+    filters,
+    selected,
+    selectedAssignmentType,
+    sortBy,
+  ]);
 
   useEffect(() => {
     if (isSuccess || assignSuccess || isSuccessReAssign) {
@@ -104,14 +127,15 @@ const WebinarAttendeesPage = (props) => {
         getAttendees({
           id,
           isAttended: tabValue === "postWebinar",
-          page: 1,
-          limit: LIMIT,
           filters,
           validCall: selected === "All" ? undefined : selected,
           assignmentType:
             selectedAssignmentType === "All"
               ? undefined
               : selectedAssignmentType,
+          sort: sortBy,
+          page: 1,
+          limit: LIMIT,
         })
       );
       dispatch(clearSuccess());
@@ -143,7 +167,17 @@ const WebinarAttendeesPage = (props) => {
 
   const handleColumnSwap = (field1, field2) => {
     dispatch(
-      swapAttendeeFields({ attendees: selectedRows, field1, field2 })
+      swapAttendeeFields({
+        attendees: selectedRows,
+        field1,
+        field2,
+        webinarId: id,
+        isAttended: tabValue === "postWebinar",
+        filters,
+        validCall: selected === "All" ? undefined : selected,
+        assignmentType:
+          selectedAssignmentType === "All" ? undefined : selectedAssignmentType,
+      })
     ).then((res) => {
       res?.meta?.requestStatus === "fulfilled" && setSelectedRows([]);
     });
@@ -230,6 +264,9 @@ const WebinarAttendeesPage = (props) => {
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
         isLeadType={true}
+        sortByOptions={sortByOptions}
+        onSortApply={setSortBy}
+        sortBy={sortBy}
       />
 
       {AttendeesFilterModalOpen && (

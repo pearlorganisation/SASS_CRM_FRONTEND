@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { resetPricePlanSuccess } from "../../../features/slices/pricePlan";
 
 const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
+  const dispatch = useDispatch();
   const [selectedPlan, setSelectedPlan] = useState("monthly");
+  const {isLoading , isSuccess} = useSelector((state) => state.pricePlans);
   const [error, setError] = useState(null);
 
   // Default month multipliers for plans
@@ -64,8 +68,15 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
     };
   }, []);
 
+  useEffect(() => {
+    if (isSuccess) {
+      onClose();
+      dispatch(resetPricePlanSuccess());
+    }
+  }, [isSuccess]);
+
   const handleConfirmPlan = () => {
-    const billingData = { durationType: selectedPlan };
+    const billingData = { durationType: selectedPlan, totalAmount: totalWithGST };
     onSuccess(billingData);
   };
 
@@ -152,8 +163,9 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
         <button
           className="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300"
           onClick={handleConfirmPlan}
+          disabled={isLoading}
         >
-          Confirm Plan
+          {isLoading ? "Confirming Plan..." : "Confirm Plan"}
         </button>
       </div>
     </div>

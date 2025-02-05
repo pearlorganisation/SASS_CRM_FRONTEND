@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { errorToast } from "../../../utils/extra";
 import { useDispatch, useSelector } from "react-redux";
-import { generateOTP } from "../../../features/actions/auth";
+import { generateOTP, validateOTP } from "../../../features/actions/auth";
+import { clearOTPGenerated } from "../../../features/slices/auth";
 
 const ForgotPasswordModal = ({ onClose }) => {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-    const {isSomethingStillLoading, isSuccess} = useSelector(state => state.auth);
+  const { isSomethingStillLoading, isSuccess, isOTPGenerated } = useSelector(
+    (state) => state.auth
+  );
 
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
@@ -15,48 +18,47 @@ const ForgotPasswordModal = ({ onClose }) => {
   const [resendTimer, setResendTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
 
-  // Generate OTP function
-  const generateOtp = () => {
-    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    setGeneratedOtp(newOtp);
-    console.log("Generated OTP:", newOtp);
-    // dispatch(generateOTP({email}));
-  };
-
-  // Handle OTP send
   const handleSendOtp = () => {
     if (!email.match(/^\S+@\S+\.\S+$/)) {
       errorToast("Please enter a valid email address.");
       return;
     }
-
-    generateOtp();
-    setStep(2);
-    setCanResend(false);
-    setResendTimer(60);
+    dispatch(generateOTP({ email }));
   };
 
   // Handle OTP verification
   const handleVerifyOtp = () => {
-    console.log(otp, generatedOtp, typeof otp, typeof generatedOtp);
-    if (otp === generatedOtp) {
-      successToast("OTP Verified!");
-      onClose();
-    } else {
-      errorToast("Invalid OTP. Please try again.");
-    }
+    dispatch(validateOTP({ email, otp }));
   };
 
   const handleResendOtp = () => {
     if (canResend) {
-      generateOtp();
       setCanResend(false);
       setResendTimer(60);
     }
   };
 
   useEffect(() => {
+    if (isOTPGenerated) {
+      setStep(2);
+      setCanResend(false);
+      setResendTimer(60);
+      dispatch(clearOTPGenerated());
+
+    }
+  }, [isOTPGenerated]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      onClose();
+      dispatch(clearOTPGenerated());
+    }
+  }, [isSuccess]);
+
+
+  useEffect(() => {
     if (step === 2 && resendTimer > 0) {
+
       const interval = setInterval(() => {
         setResendTimer((prev) => prev - 1);
       }, 1000);
@@ -70,11 +72,15 @@ const ForgotPasswordModal = ({ onClose }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-        <h2 className="text-xl font-semibold mb-4 text-center">Forgot Password</h2>
+        <h2 className="text-xl font-semibold mb-4 text-center">
+          Forgot Password
+        </h2>
 
         {step === 1 ? (
           <>
-            <label className="block text-sm font-medium mb-2">Enter your email</label>
+            <label className="block text-sm font-medium mb-2">
+              Enter your email
+            </label>
             <input
               type="email"
               className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -84,11 +90,13 @@ const ForgotPasswordModal = ({ onClose }) => {
             <button
               className="w-full mt-4 bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
               onClick={handleSendOtp}
+              disabled={isSomethingStillLoading}
             >
-              Send OTP
+              {isSomethingStillLoading ? "Sending OTP..." : "Send OTP"}
             </button>
           </>
         ) : (
+
           <>
             <label className="block text-sm font-medium mb-2">Enter OTP</label>
             <input
@@ -100,14 +108,18 @@ const ForgotPasswordModal = ({ onClose }) => {
             <button
               className="w-full mt-4 bg-green-600 text-white py-2 rounded hover:bg-green-700"
               onClick={handleVerifyOtp}
+              disabled={isSomethingStillLoading}
             >
-              Verify OTP
+              {isSomethingStillLoading ? "Verifying OTP..." : "Verify OTP"}
             </button>
+
 
             {/* Resend OTP Section */}
             <div className="mt-4 text-center">
               <button
-                className={`text-blue-600 ${!canResend && "opacity-50 cursor-not-allowed"}`}
+                className={`text-blue-600 ${
+                  !canResend && "opacity-50 cursor-not-allowed"
+                }`}
                 onClick={handleResendOtp}
                 disabled={!canResend}
               >

@@ -28,13 +28,12 @@ const FormInput = ({
           fullWidth
           type={type}
           value={type === "number" ? field.value ?? "" : field.value}
-          onChange={(e) =>
-          {
-            return field.onChange( // fix get 0 value - remove ' || "" '
-              type === "number" ? parseFloat(e.target.value) || "" : e.target.value
+          onChange={(e) => {
+            const parsed = parseFloat(e.target.value);
+            return field.onChange(
+              type === "number" ? (Number.isNaN(parsed) ? "" : parsed) : e.target.value
             );
-          }
-          }
+          }}
           error={!!fieldState?.error}
           helperText={fieldState?.error?.message}
         />

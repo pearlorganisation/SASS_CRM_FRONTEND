@@ -167,16 +167,13 @@ const BillingHistory = () => {
 
     doc.setFontSize(12);
 
-    const taxAmount = ((bill.amount * 18) / (100 + 18)).toFixed(2);
-    const cost = (bill.amount - taxAmount).toFixed(2);
-
     doc
       .setFont("Times New Roman", "normal")
       .text(description, 13, YAxis)
       .text("1", 130, YAxis, { align: "right" })
-      .text(`Rs.${cost}`, 170, YAxis, { align: "right" })
+      .text(`Rs.${bill.itemAmount}`, 170, YAxis, { align: "right" })
       .setFont("Times New Roman", "bold")
-      .text(`Rs.${cost}`, 200, YAxis, { align: "right" });
+      .text(`Rs.${bill.itemAmount}`, 200, YAxis, { align: "right" });
 
     YAxis += 5;
 
@@ -186,14 +183,25 @@ const BillingHistory = () => {
 
     doc
       .setFont("Times New Roman", "normal")
+      .text(`Discount`, 170, YAxis, { align: "right" })
+      .text(`Rs.${bill.discountAmount}`, 200, YAxis, { align: "right" });
+
+      YAxis += 4;
+
+      doc.line(150, YAxis, 200, YAxis);
+  
+      YAxis += 7;
+
+    doc
+      .setFont("Times New Roman", "normal")
       .text(`Sub Total`, 170, YAxis, { align: "right" })
-      .text(`Rs.${cost}`, 200, YAxis, { align: "right" });
+      .text(`Rs.${bill.itemAmount - bill.discountAmount}`, 200, YAxis, { align: "right" });
 
     YAxis += 7;
 
     doc
       .text(`IGST @ 18%`, 170, YAxis, { align: "right" })
-      .text(`Rs.${taxAmount}`, 200, YAxis, { align: "right" });
+      .text(`Rs.${bill.taxAmount}`, 200, YAxis, { align: "right" });
     YAxis += 4;
 
     doc.line(150, YAxis, 200, YAxis);

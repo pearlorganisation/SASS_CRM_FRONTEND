@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { checkoutAddon } from "../../../features/actions/razorpay";
 import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
 
-const AddonCard = ({ addon, id, roles, showAction = true }) => {
+const AddonCard = ({ addon, id, roles, showAction = true, showExpiryDate = false }) => {
   const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.auth);
 
@@ -50,9 +50,9 @@ const AddonCard = ({ addon, id, roles, showAction = true }) => {
       ) : null}
       <p className="text-gray-700">
         Price: {"\u20B9"}
-        {addon.addOnPrice}
+        {addon.addOnPrice} (+ 18% GST)
       </p>
-      {!id ? (
+      { showExpiryDate ? (
         <p className="text-gray-700">Validity: {addon.validityInDays} days</p>
       ) : (
         <p className="text-gray-700">
