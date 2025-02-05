@@ -33,10 +33,6 @@ const SuperAdminDashboard = () => {
   const dispatch = useDispatch();
   const { dashBoardCardsData } = useSelector((state) => state.globalData);
 
-  useEffect(() => {
-    console.log(dashBoardCardsData);
-  }, [dashBoardCardsData]);
-
   const cardData = [
     {
       label: "Accounts Created",
@@ -118,21 +114,20 @@ const SuperAdminDashboard = () => {
   ]);
 
   useEffect(() => {
-    if (startDate && endDate) {
-      dispatch(getDashboardCardsData({ startDate, endDate }));
-      dispatch(getDashboardPlansData({ startDate, endDate }));
-      dispatch(getDashboardUsersData({ startDate, endDate }));
-      dispatch(getDashboardRevenueData({ startDate, endDate }));
-    }
-  }, [startDate, endDate]);
-
-  useEffect(() => {
     const today = new Date();
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(today.getDate() - 7); // Subtract 7 days from today's date
 
     setStartDate(oneWeekAgo);
     setEndDate(today);
+
+    fetchData(oneWeekAgo, today);
+    if (oneWeekAgo && today) {
+      dispatch(getDashboardCardsData({ startDate: oneWeekAgo, endDate:today }));
+      dispatch(getDashboardPlansData({ startDate:oneWeekAgo, endDate:today }));
+      dispatch(getDashboardUsersData({ startDate:oneWeekAgo, endDate:today }));
+      dispatch(getDashboardRevenueData({ startDate:oneWeekAgo, endDate:today }));
+    }
   }, []);
 
   const handleToggleModal = () => setModalOpen(!modalOpen);
@@ -162,6 +157,15 @@ const SuperAdminDashboard = () => {
     setEndDate(date);
   };
 
+  const fetchData = () => {
+    if (startDate && endDate) {
+      dispatch(getDashboardCardsData({ startDate, endDate }));
+      dispatch(getDashboardPlansData({ startDate, endDate }));
+      dispatch(getDashboardUsersData({ startDate, endDate }));
+      dispatch(getDashboardRevenueData({ startDate, endDate }));
+    }
+  };
+
   return (
     <Box className="md:px-10 py-10">
       <Box className="flex justify-between">
@@ -187,6 +191,14 @@ const SuperAdminDashboard = () => {
               dateFormat="dd-MM-yyyy"
             />
           </Box>
+          <Button
+            className="h-fit"
+            variant="outlined"
+            color="secondary"
+            onClick={fetchData}
+          >
+            Find
+          </Button>
         </div>
         {/* Filter Button */}
         <Button

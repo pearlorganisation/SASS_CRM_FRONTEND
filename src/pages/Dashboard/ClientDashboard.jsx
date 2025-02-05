@@ -83,10 +83,9 @@ const ClientDashboard = () => {
     setStartDate(oneWeekAgo);
     setEndDate(today);
 
-    return () => {
-      dispatch(resetDashboardData());
-      console.log('returign')
-    }
+    fetchData(oneWeekAgo, today);
+
+    dispatch(getDashboardData({ startDate: oneWeekAgo, endDate: today }));
   }, []);
 
   const handleStartDateChange = (date) => {
