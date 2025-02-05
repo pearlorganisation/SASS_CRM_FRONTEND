@@ -31,6 +31,10 @@ const EmployeeDashboard = () => {
 
     setStartDate(oneWeekAgo);
     setEndDate(today);
+
+    fetchData(oneWeekAgo, today);
+
+    dispatch(getDashboardData({ oneWeekAgo, today, employeeId }));
   }, []);
 
   const handleStartDateChange = (date) => {
@@ -58,6 +62,12 @@ const EmployeeDashboard = () => {
     }
   }, [dashBoardCardsData]);
 
+  const fetchData = () => {
+    if (startDate && endDate) {
+      dispatch(getDashboardData({ startDate: oneWeekAgo, endDate: today, employeeId }));
+    }
+  };
+
   return (
     <Box className="md:px-10 py-10">
       <Box className="flex justify-between">
@@ -83,6 +93,14 @@ const EmployeeDashboard = () => {
               dateFormat="dd-MM-yyyy"
             />
           </Box>
+          <Button
+            className="h-fit"
+            variant="outlined"
+            color="secondary"
+            onClick={fetchData}
+          >
+            Find
+          </Button>
         </div>
         {/* Filter Button */}
         {/* <Button
