@@ -23,6 +23,7 @@ import {
 import { clearPreset } from "../../features/slices/filter-preset";
 import { errorToast } from "../../utils/extra";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const FilterPresetModal = ({
   setIsPresetModalOpen,
@@ -32,7 +33,9 @@ const FilterPresetModal = ({
 }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
-  // console.log('FilterPresetModal -> Rendered')
+
+  const { leadTypeData } = useSelector((state) => state.assign);
+  const { plansForDropdown } = useSelector((state) => state.pricePlans);
 
   const { filterPresets, isSuccess } = useSelector(
     (state) => state.filterPreset
@@ -79,7 +82,7 @@ const FilterPresetModal = ({
   };
 
   useEffect(() => {
-      dispatch(getFilterPreset(tableName));
+    dispatch(getFilterPreset(tableName));
   }, []);
 
   useEffect(() => {
@@ -126,23 +129,110 @@ const FilterPresetModal = ({
             <Typography variant="subtitle1" gutterBottom>
               Saved Presets
             </Typography>
-            <List>
+            <div className="space-y-2">
               {filterPresets.map((preset) => (
-                <ListItem
+                <div
                   key={preset._id}
-                  sx={{ bgcolor: "grey.100", borderRadius: "4px", mb: 1 }}
+                  className="flex justify-between items-center bg-gray-100 px-3 rounded-md"
                 >
-                  <ListItemText primary={preset.name} />
-                  <ListItemSecondaryAction>
-                    <Button
-                      size="small"
-                      startIcon={<CheckIcon />}
+                  <span className="text-gray-700">{preset.name}</span>
+
+                  <div className="flex items-center gap-2">
+                    <button
                       onClick={() => onApplyPreset(preset)}
+                      className="flex items-center gap-1 px-2 py-1 text-sm bg-blue-100 hover:bg-blue-200 rounded-md text-blue-800"
                     >
+                      <CheckIcon fontSize="small" />
                       Apply
-                    </Button>
-                    <IconButton
-                      edge="end"
+                    </button>
+
+                    <div className="relative inline-block group">
+                      <button className="text-blue-600 p-2 hover:bg-blue-100 rounded-full">
+                        <VisibilityIcon fontSize="small" />
+                      </button>
+                      <div
+                        className="invisible opacity-0 group-hover:visible group-hover:opacity-100 
+                                  transition-all duration-200 absolute left-1/2 -translate-x-1/2 
+                                  top-full mt-2 z-50 bg-white p-4 rounded-lg shadow-xl border 
+                                  border-gray-200 min-w-[200px] overflow-y-auto max-h-[200px]"
+                      >
+                        {Object.entries(preset.filters).map(([key, value]) => {
+                          const formattedKey = key
+                            .replace(/([A-Z])/g, " $1")
+                            .replace(/^./, (str) => str.toUpperCase());
+                          let displayValue = value;
+                          console.log("value", value);
+
+                          if (typeof value === "object" && value !== null) {
+                            const parts = [];
+                            if (value.$gte || value.$gte === 0) {
+                              const gteValue = value.$gte;
+                              if (isNaN(gteValue)) {
+                                const gteDate = new Date(gteValue);
+                                const gteDay = gteDate.getDate();
+                                const gteMonth = gteDate.getMonth() + 1;
+                                const gteYear = gteDate.getFullYear();
+
+                                parts.push(
+                                  `Min: ${gteDay}/${gteMonth}/${gteYear}`
+                                );
+                              } else {
+                                parts.push(`Min: ${gteValue}`);
+                              }
+                            }
+
+                            if (value.$lte || value.$lte === 0) {
+                              console.log("value.$lte", value.$lte);
+                              const lteValue = value.$lte;
+
+                              if (isNaN(lteValue)) {
+                                const lteDate = new Date(lteValue);
+                                const lteDay = lteDate.getDate();
+                                const lteMonth = lteDate.getMonth() + 1;
+
+                                const lteYear = lteDate.getFullYear();
+
+                                parts.push(
+                                  `Max: ${lteDay}/${lteMonth}/${lteYear}`
+                                );
+                              } else {
+                                parts.push(`Max: ${lteValue}`);
+                              }
+                            }
+                          console.log("plansForDropdown", parts);
+
+                            displayValue = parts.join(" - ");
+                          }
+
+                          if (key === "leadType") {
+                           
+                            displayValue =
+                              leadTypeData.find((lead) => lead._id === value)
+                                ?.label || "N/A";
+                          }
+                          if (key === "planName") {
+                            displayValue =
+                              plansForDropdown.find(
+                                (plan) => plan.value === value
+                              )?.label || "N/A";
+                          }
+
+                          return (
+                            <div
+                              key={key}
+                              className="text-sm mb-2 last:mb-0 break-keep"
+                            >
+                              <p className="font-semibold text-gray-700">
+                                {formattedKey}
+                              </p>
+                              <p className="text-gray-600">{displayValue}</p>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <button
                       onClick={() => {
                         dispatch(deleteFilterPreset(preset._id));
                         logUserActivity({
@@ -151,13 +241,14 @@ const FilterPresetModal = ({
                           detailItem: preset.name,
                         });
                       }}
+                      className="text-red-600 p-2 hover:bg-red-100 rounded-full"
                     >
-                      <DeleteIcon color="error" />
-                    </IconButton>
-                  </ListItemSecondaryAction>
-                </ListItem>
+                      <DeleteIcon fontSize="small" />
+                    </button>
+                  </div>
+                </div>
               ))}
-            </List>
+            </div>
           </>
         )}
 

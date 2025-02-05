@@ -6,6 +6,7 @@ import {
   getAddons,
   getAdminBillingHistory,
   getClientAddons,
+  getPlansForDropdown,
   getPricePlan,
   getPricePlans,
   updatePlansOrder,
@@ -26,7 +27,9 @@ const initialState = {
   addonsData: [],
   billingHistory: [],
   totalPages: 1,
+  plansForDropdown: [],
 };
+
 
 const pricePlans = createSlice({
   name: "PricePlans",
@@ -196,6 +199,17 @@ const pricePlans = createSlice({
         state.isLoading = false;
       })
       .addCase(checkout.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getPlansForDropdown.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getPlansForDropdown.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.plansForDropdown = action.payload;
+      })
+      .addCase(getPlansForDropdown.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });

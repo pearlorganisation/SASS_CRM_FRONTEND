@@ -78,7 +78,7 @@ export const getPricePlan = createAsyncThunk(
   "pricePlan/fetchById",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`plans/${id}`, {
+      const response = await instance.get(`plans/data/${id}`, {
         withCredentials: true,
       });
       return response?.data;
@@ -141,3 +141,15 @@ export const getAdminBillingHistory = createAsyncThunk(
     }
   }
 );
+
+export const getPlansForDropdown = createAsyncThunk(
+  "plans/dropdown",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`plans/dropdown`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);  
