@@ -1,4 +1,11 @@
-import React, { memo, Suspense, useState, lazy, useRef, useEffect } from "react";
+import React, {
+  memo,
+  Suspense,
+  useState,
+  lazy,
+  useRef,
+  useEffect,
+} from "react";
 import {
   Button,
   IconButton,
@@ -22,6 +29,10 @@ import useAddUserActivity from "../../hooks/useAddUserActivity";
 import ModalFallback from "../Fallback/ModalFallback";
 import { MdBookmark, MdFilterAlt, MdSort } from "react-icons/md";
 import SortModal from "../SortModal";
+
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+
 const DataTable = ({
   tableHeader = "Table",
   tableUniqueKey = "id",
@@ -53,6 +64,19 @@ const DataTable = ({
   const logUserActivity = useAddUserActivity();
   console.log("DataTable -> Rendered");
 
+  const tableRef = useRef(null); // Reference for full-screen mode
+  const [isFullScreen, setIsFullScreen] = useState(false);
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      tableRef.current?.requestFullscreen();
+      setIsFullScreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullScreen(false);
+    }
+  };
+
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [sortVisible, setSortVisible] = useState(false);
@@ -67,8 +91,11 @@ const DataTable = ({
   };
 
   return (
-    <div className="p-6 bg-gray-50 rounded-lg">
-
+    <div ref={tableRef} className="relative p-6 bg-gray-50 rounded-lg">
+      <button className="absolute right-5 top-2" onClick={toggleFullScreen}>
+        {" "}
+        {isFullScreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
+      </button>
       <div className="flex gap-4 justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-700">{tableHeader}</h2>
         {userData?.isActive &&
@@ -118,7 +145,6 @@ const DataTable = ({
           </MenuItem>
         </Menu>
       </div>
-
       <div
         className={`flex gap-4 ${
           ButtonGroup ? "justify-between flex-wrap" : "justify-end"
@@ -154,11 +180,9 @@ const DataTable = ({
             {sortByOptions.length > 0 && (
               <div className="relative overflow-visible">
                 <button
-
                   onClick={() => setSortVisible((prev) => !prev)}
                   className="border-indigo-500 h-10 border text-md text-indigo-500 px-4 rounded-md flex items-center gap-2 "
                 >
-
                   <MdSort size={22} />
                   Sort
                 </button>
@@ -171,7 +195,6 @@ const DataTable = ({
                   />
                 )}
               </div>
-
             )}
           </div>
         )}
