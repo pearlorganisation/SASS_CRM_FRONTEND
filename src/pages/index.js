@@ -53,7 +53,7 @@ const BillingHistory = lazy(() =>
 );
 const PlanOrder = lazy(() => import("./Settings/Plans/PlanOrder"));
 const UpdateClientPlan = lazy(() => import("./Clients/UpdateClientPlan"));
-
+const Revenue = lazy(() => import("./Revenue/Revenue"));
 export {
   CalendarPage,
   UpdateNoticeBoard,
@@ -94,5 +94,6 @@ export {
   Notifications,
   BillingHistory,
   PlanOrder,
-  UpdateClientPlan
-};
+  UpdateClientPlan,
+  Revenue,
+};  

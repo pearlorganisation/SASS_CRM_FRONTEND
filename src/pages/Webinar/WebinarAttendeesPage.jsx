@@ -106,10 +106,6 @@ const WebinarAttendeesPage = (props) => {
           sort: sortBy,
         })
       );
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
     }
   }, [
     page,
@@ -142,11 +138,6 @@ const WebinarAttendeesPage = (props) => {
       dispatch(resetReAssignSuccess());
       dispatch(resetAssignSuccess());
       setSelectedRows([]);
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth",
-      });
     }
   }, [isSuccess, assignSuccess, isSuccessReAssign]);
 

@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useEffect, useRef } from "react";
 import { formatDateAsNumber } from "../../utils/extra";
 import { useSelector } from "react-redux";
 import useRoles from "../../hooks/useRoles";
@@ -20,6 +20,7 @@ const RawTable = ({
 }) => {
   const { isTablesMasked } = useSelector((state) => state.table);
   const roles = useRoles();
+  const tableRef = useRef();
 
   console.log("RawTable -> Rendered");
   const handleCheckboxChange = (id) => {
@@ -35,8 +36,15 @@ const RawTable = ({
     setSelectedRows(checked ? tableData?.rows?.map((row) => row._id) : []);
   };
 
+  useEffect(() => {
+    if (isLoading && tableRef.current) {
+      tableRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [isLoading]);
+
   return (
-    <div className="shadow-md rounded-lg overflow-auto max-h-[80vh]">
+    <div ref={tableRef} className="shadow-md rounded-lg overflow-auto max-h-[80vh]">
+
       <table className="w-full text-sm">
         <thead className="bg-gray-100 sticky top-0 z-10">
           <tr>

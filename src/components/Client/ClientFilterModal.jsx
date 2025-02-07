@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Modal,
@@ -83,7 +83,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
               <Controller
                 name="planName"
                 control={control}
-                defaultValue="" // Ensure it's always controlled
+                defaultValue=""
                 render={({ field }) => (
                   <FormControl fullWidth>
                     <InputLabel id="plan-name-label">Plan Name</InputLabel>
@@ -91,7 +91,15 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                       {...field}
                       labelId="plan-name-label"
                       label="Plan Name"
-                      value={field.value || ""} // Ensure value is always controlled
+                      value={field.value || ""}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 200,
+                            overflow: "auto",
+                          },
+                        },
+                      }}
                     >
                       <MenuItem value="">All</MenuItem>
                       {plansForDropdown.map((plan) => (
@@ -99,6 +107,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                           {plan.label}
                         </MenuItem>
                       ))}
+
                     </Select>
                   </FormControl>
                 )}
