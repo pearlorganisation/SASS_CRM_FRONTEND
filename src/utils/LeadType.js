@@ -16,3 +16,21 @@ export const getColor = (option) => {
       return "white";
   }
 };
+
+export const formatCurrency = (amount) => {
+  if (typeof amount !== 'number') return '-';
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(amount);
+};
+
+export const formatDate = (date) => {
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};

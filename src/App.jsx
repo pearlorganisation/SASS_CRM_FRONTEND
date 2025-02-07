@@ -45,8 +45,10 @@ import {
   BillingHistory,
   PlanOrder,
   UpdateClientPlan,
+  Revenue,
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
+
 import {
   getAllRoles,
   getCurrentUser,
@@ -194,7 +196,7 @@ const App = () => {
     {
       path: "/",
       element: isUserLoggedIn ? (
-        <Suspense fallback={<LayoutFallback/>}>
+        <Suspense fallback={<LayoutFallback />}>
           <Layout />
         </Suspense>
       ) : (
@@ -245,6 +247,15 @@ const App = () => {
         {
           path: "/lead-type",
           element: <LeadTypes />,
+        },
+
+        {
+          path: "/revenue",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN"]}>
+              <Revenue />
+            </RouteGuard>
+          ),
         },
 
         {

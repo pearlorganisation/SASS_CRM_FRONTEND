@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { TbLayoutDashboardFilled } from "react-icons/tb";
+import { TbLayoutDashboardFilled, TbReceiptRupee } from "react-icons/tb";
 import { IoLogOut, IoPeople, IoSettings } from "react-icons/io5";
 import { HiUserGroup } from "react-icons/hi2";
 import { SiGooglemeet } from "react-icons/si";
@@ -39,6 +39,12 @@ const Sidebar = () => {
           label: "Clients",
           icon: <IoPeople size={30} />,
         },
+        {
+          path: "/revenue",
+          label: "Revenue",
+          icon: <TbReceiptRupee  size={30} />,
+        },
+
       ],
     },
     {

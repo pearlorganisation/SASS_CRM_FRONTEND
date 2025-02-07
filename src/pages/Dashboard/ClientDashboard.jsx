@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Card, Typography, Grid, Box, Divider } from "@mui/material";
+import { Card, Typography,Button, Grid, Box, Divider } from "@mui/material";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
 import { getDashboardData } from "../../features/actions/globalData";
 import { errorToast } from "../../utils/extra";
-import { resetDashboardData } from "../../features/slices/globalData";
+// import { resetDashboardData } from "../../features/slices/globalData";
 
 const ClientDashboard = () => {
   const dispatch = useDispatch();
@@ -30,21 +30,18 @@ const ClientDashboard = () => {
           }),
           webinars: item?.metrics[0]?.webinarGroup?.map((e) => {
             return {
-              label: e._id
-            }
+              label: e._id,
+            };
           }),
         };
 
-
-
-        if(row?.value){
-
+        if (row?.value) {
           row?.value?.unshift({
             label: "Total pending",
             value: item?.totalAssignments - item?.totalWorked,
             color: "primary",
           });
-          
+
           row.value.unshift({
             label: "Total Worked upon",
             value: item?.totalWorked,
@@ -58,15 +55,11 @@ const ClientDashboard = () => {
           });
         }
 
-
-
-        return row
+        return row;
       });
 
       setRows(rows);
     }
-
-
   }, [dashBoardCardsData]);
 
   useEffect(() => {
@@ -104,6 +97,12 @@ const ClientDashboard = () => {
     setEndDate(date);
   };
 
+  const fetchData = () => {
+    if (startDate && endDate) {
+      dispatch(getDashboardData({ startDate, endDate }));
+    }
+  };
+
   return (
     <Box className="md:px-10 py-10">
       <Box className="flex justify-between">
@@ -129,6 +128,14 @@ const ClientDashboard = () => {
               dateFormat="dd-MM-yyyy"
             />
           </Box>
+          <Button
+            className="h-fit"
+            variant="outlined"
+            color="secondary"
+            onClick={fetchData}
+          >
+            Find
+          </Button>
         </div>
         {/* Filter Button */}
         {/* <Button
@@ -148,12 +155,12 @@ const ClientDashboard = () => {
             <Grid item xs={12} md={12} lg={12} key={rowIndex}>
               {/* Parent Card */}
               <Card className="p-4 w-full">
-                
                 <Typography variant="h6" gutterBottom>
                   {row.label}
                 </Typography>
                 <Box className="mb-2 flex flex-wrap gap-2 justify-start">
-                  {Array.isArray(row.webinars) && row?.webinars?.length > 0 && (
+                  {Array.isArray(row.webinars) &&
+                    row?.webinars?.length > 0 &&
                     row.webinars.map((nested, nestedIndex) => (
                       <Box
                         key={nestedIndex}
@@ -165,14 +172,10 @@ const ClientDashboard = () => {
                             nested.color === "primary" ? "#f1f5fc" : "#fff",
                         }}
                       >
-                        <Typography variant="body1">
-                          {nested.label}
-                        </Typography>
+                        <Typography variant="body1">{nested.label}</Typography>
                       </Box>
-                    ))
-                  )}
-                  
-                 </Box>
+                    ))}
+                </Box>
                 <Divider />
                 <Box className="mt-4 flex gap-2 justify-start">
                   {/* Nested Cards */}

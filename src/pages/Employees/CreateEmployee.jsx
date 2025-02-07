@@ -208,6 +208,7 @@ const CreateEmployee = () => {
                 <FormInput
                   name="phone"
                   label="Phone Number"
+                  placeholder="+91 1234567890"
                   control={control}
                   validation={{
                     required: "Phone number is required",

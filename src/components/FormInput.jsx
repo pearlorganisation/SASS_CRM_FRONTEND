@@ -11,6 +11,7 @@ const FormInput = ({
   required = false,
   errorMessage = "This field is required",
   validation = {}, // Additional dynamic validation rules
+  placeholder=""
 }) => {
   return (
     <Controller
@@ -36,6 +37,7 @@ const FormInput = ({
           }}
           error={!!fieldState?.error}
           helperText={fieldState?.error?.message}
+          placeholder={placeholder}
         />
       )}
     />

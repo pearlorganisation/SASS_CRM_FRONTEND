@@ -129,6 +129,15 @@ const PlanCard = (props) => {
         </div>
       )}
 
+      {currentPlan === plan?._id && (
+        <div
+          title="Current Plan"
+          className="absolute top-2 right-0 flex gap-2 bg-green-500 text-white text-xs px-3 py-1 rounded-l-md  items-center"
+        >
+          Current Plan <MdInfo />
+        </div>
+      )}
+
       {/* Card Content */}
       <div className="text-center mt-2 mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">{name}</h2>
@@ -183,14 +192,7 @@ const PlanCard = (props) => {
       </div>
 
       <ComponentGuard allowedRoles={isSelectVisible ? [] : [roles.ADMIN]}>
-        {currentPlan === plan?._id ? (
-          <button
-            className={`bg-green-600 w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
-            disabled
-          >
-            Current Plan
-          </button>
-        ) : (
+        {isActive && (
           <button
             onClick={() => setDurationModalOpen(true)}
             className={`${
