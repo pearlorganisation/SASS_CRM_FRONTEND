@@ -295,6 +295,7 @@ const WebinarAttendeesPage = (props) => {
           <ExportWebinarAttendeesModal
             modalName={exportExcelModalName}
             filters={webinarAttendeesFilters}
+            sort={webinarAttendeesSortBy}
             webinarId={id}
             isAttended={tabValue === "postWebinar" ? true : false}
             validCall={selected === "All" ? undefined : selected}

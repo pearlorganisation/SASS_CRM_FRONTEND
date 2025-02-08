@@ -43,6 +43,8 @@ export const attendeeTableColumns = [
   { header: "Status", key: "status", width: 20, type: "" },
   { header: "Gender", key: "gender", width: 20, type: "" },
   { header: "Location", key: "location", width: 20, type: "Location" },
+  { header: "Source", key: "source", width: 20, type: "", default: "Import" },
+  { header: "Date", key: "createdAt", width: 20, type: "Date" },
 ];
 
 export const groupedAttendeeTableColumns = [

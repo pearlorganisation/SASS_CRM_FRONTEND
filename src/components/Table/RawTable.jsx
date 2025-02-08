@@ -219,7 +219,7 @@ const RawTable = ({
                           ].includes(column.key)
                           ? `${row[column.key].slice(0, 3)}***`
                           : row[column.key] ?? "N/A"
-                        : "N/A")}
+                        : column.default ?? "N/A")}
                   </td>
                 ))}
                 {Array.isArray(actions) && actions.length > 0 && (
