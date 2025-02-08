@@ -22,7 +22,7 @@ const RawTable = ({
   const roles = useRoles();
   const tableRef = useRef();
 
-  console.log("RawTable -> Rendered");
+  // console.log("RawTable -> Rendered");
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]

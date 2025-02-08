@@ -16,6 +16,7 @@ import WebinarFilterModal from "../../components/Filter/WebinarFilterModal";
 import ExportModal from "../../components/Export/ExportModal";
 import { exportWebinarExcel } from "../../features/actions/export-excel";
 import { toast } from "sonner";
+import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
 
 const Webinar = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -64,6 +65,10 @@ const Webinar = () => {
       dispatch(resetWebinarSuccess());
     }
   }, [isSuccess]);
+
+  useEffect(() => {
+    dispatch(setWebinarAttendeesFilters());
+  }, []);
 
   const handleRowClick = (id, webinarName) => {
     logUserActivity({

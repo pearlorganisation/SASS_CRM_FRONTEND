@@ -1,4 +1,10 @@
-import React, { lazy, Suspense, useEffect, useState } from "react";
+import React, {
+  lazy,
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Select, FormControl, InputLabel, MenuItem } from "@mui/material";
@@ -10,7 +16,11 @@ import {
   getAttendees,
   swapAttendeeFields,
 } from "../../features/actions/attendees";
-import { attendeeTableColumns } from "../../utils/columnData";
+import {
+  allAttendeesSortByOptions,
+  attendeeTableColumns,
+  webinarAttendeesSortByOptions,
+} from "../../utils/columnData";
 import { Visibility } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 const AttendeesFilterModal = lazy(() =>
@@ -26,6 +36,7 @@ const SwapAttendeeFieldsModal = lazy(() =>
 );
 import { createPortal } from "react-dom";
 import ModalFallback from "../../components/Fallback/ModalFallback";
+import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
 
 const WebinarAttendeesPage = (props) => {
   const {
@@ -71,25 +82,38 @@ const WebinarAttendeesPage = (props) => {
   );
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
 
-  const [filters, setFilters] = useState({});
   const [selected, setSelected] = useState("All");
 
-  const sortByOptions = [
-    { value: "email", label: "Email" },
-    { value: "createdAt", label: "Created At" },
-    { value: "updatedAt", label: "Updated At" },
-    ...(tabValue === "postWebinar"
-      ? [{ value: "timeInSession", label: "Time in Session" }]
-      : []),
-  ];
-
-  const [sortBy, setSortBy] = useState({
-    sortBy: sortByOptions[0].value,
-    sortOrder: "asc",
-  });
+  const { webinarAttendeesSortBy, webinarAttendeesFilters } = useSelector(
+    (state) => state.filters
+  );
 
   useEffect(() => {
-    if (tabValue !== "enrollments" && subTabValue === "attendees") {
+    if (
+      tabValue === "preWebinar" &&
+      webinarAttendeesSortBy?.sortBy === "timeInSession"
+    ) {
+      dispatch(
+        setWebinarAttendeesFilters({
+          filters: webinarAttendeesFilters,
+          sortBy: {
+            sortBy: webinarAttendeesSortByOptions[0].value,
+            sortOrder: "asc",
+          },
+        })
+      );
+    }
+  }, [tabValue, webinarAttendeesSortBy, webinarAttendeesFilters]);
+
+  useEffect(() => {
+    if (
+      tabValue !== "enrollments" &&
+      subTabValue === "attendees" &&
+      !(
+        tabValue === "preWebinar" &&
+        webinarAttendeesSortBy?.sortBy === "timeInSession"
+      )
+    ) {
       setSelectedRows([]);
       dispatch(
         getAttendees({
@@ -97,13 +121,13 @@ const WebinarAttendeesPage = (props) => {
           isAttended: tabValue === "postWebinar",
           page,
           limit: LIMIT,
-          filters,
+          filters: webinarAttendeesFilters,
           validCall: selected === "All" ? undefined : selected,
           assignmentType:
             selectedAssignmentType === "All"
               ? undefined
               : selectedAssignmentType,
-          sort: sortBy,
+          sort: webinarAttendeesSortBy,
         })
       );
     }
@@ -111,10 +135,10 @@ const WebinarAttendeesPage = (props) => {
     page,
     tabValue,
     LIMIT,
-    filters,
+    webinarAttendeesFilters,
     selected,
     selectedAssignmentType,
-    sortBy,
+    webinarAttendeesSortBy,
   ]);
 
   useEffect(() => {
@@ -123,13 +147,13 @@ const WebinarAttendeesPage = (props) => {
         getAttendees({
           id,
           isAttended: tabValue === "postWebinar",
-          filters,
+          filters: webinarAttendeesFilters,
           validCall: selected === "All" ? undefined : selected,
           assignmentType:
             selectedAssignmentType === "All"
               ? undefined
               : selectedAssignmentType,
-          sort: sortBy,
+          sort: webinarAttendeesSortBy,
           page: 1,
           limit: LIMIT,
         })
@@ -164,7 +188,7 @@ const WebinarAttendeesPage = (props) => {
         field2,
         webinarId: id,
         isAttended: tabValue === "postWebinar",
-        filters,
+        filters: webinarAttendeesFilters,
         validCall: selected === "All" ? undefined : selected,
         assignmentType:
           selectedAssignmentType === "All" ? undefined : selectedAssignmentType,
@@ -180,7 +204,7 @@ const WebinarAttendeesPage = (props) => {
       setSelected(label);
       setPage(1);
     };
-    console.log("render ===> WebinarAttendeesPage -> AttendeeDropdown");
+    // console.log("render ===> WebinarAttendeesPage -> AttendeeDropdown");
     const handleAssignmentChange = (event) => {
       const label = event.target.value;
       setSelectedRows([]);
@@ -229,8 +253,6 @@ const WebinarAttendeesPage = (props) => {
         tableUniqueKey="webinarAttendeesTable"
         ButtonGroup={React.memo(AttendeeDropdown)}
         isSelectVisible={userData?.isActive}
-        filters={filters}
-        setFilters={setFilters}
         tableData={{
           columns:
             tabValue === "postWebinar"
@@ -255,17 +277,15 @@ const WebinarAttendeesPage = (props) => {
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
         isLeadType={true}
-        sortByOptions={sortByOptions}
-        onSortApply={setSortBy}
-        sortBy={sortBy}
+        filters={webinarAttendeesFilters}
       />
 
       {AttendeesFilterModalOpen && (
         <Suspense fallback={<ModalFallback />}>
           <AttendeesFilterModal
             modalName={AttendeesFilterModalName}
-            filters={filters}
-            setFilters={setFilters}
+            setPage={setPage}
+            tabValue={tabValue}
           />
         </Suspense>
       )}
@@ -274,7 +294,7 @@ const WebinarAttendeesPage = (props) => {
         <Suspense fallback={<ModalFallback />}>
           <ExportWebinarAttendeesModal
             modalName={exportExcelModalName}
-            filters={filters}
+            filters={webinarAttendeesFilters}
             webinarId={id}
             isAttended={tabValue === "postWebinar" ? true : false}
             validCall={selected === "All" ? undefined : selected}

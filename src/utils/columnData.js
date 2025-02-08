@@ -148,3 +148,17 @@ export const enrollmentsColumn = [
   },
   { header: "Date", key: "createdAt", width: 20, type: "Date" },
 ];
+
+
+export const allAttendeesSortByOptions = [
+  { value: "_id", label: "Email" },
+  { value: "attendedWebinarCount", label: "Attended Webinar Count" },
+  { value: "timeInSession", label: "Time in Session" },
+];
+
+export const webinarAttendeesSortByOptions = [
+  { value: "email", label: "Email" },
+  { value: "createdAt", label: "Created At" },
+  { value: "updatedAt", label: "Updated At" },
+  { value: "timeInSession", label: "Time in Session" }
+];
