@@ -4,26 +4,36 @@ import { closeModal } from "../../../features/slices/modalSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { filterTruthyValues } from "../../../utils/extra";
 import Select from "react-select";
+import { setAllAttendeesFilters } from "../../../features/slices/filters.slice";
+import { allAttendeesSortByOptions } from "../../../utils/columnData";
 
-const GroupedAttendeeFilterModal = ({
-  modalName,
-  filters = {},
-  setFilters = () => {},
-}) => {
+const GroupedAttendeeFilterModal = ({ modalName, setPage }) => {
   const dispatch = useDispatch();
   const { control, handleSubmit, reset } = useForm();
 
   const { leadTypeData } = useSelector((state) => state.assign);
   const { subscription } = useSelector((state) => state.auth);
-
-  const [selectedOption, setSelectedOption] = useState("");
+  const { allAttendeesFilters, allAttendeesSortBy } = useSelector(
+    (state) => state.filters
+  );
+  const [sortBy, setSortBy] = useState(
+    allAttendeesSortBy || {
+      sortBy: allAttendeesSortByOptions[0].value,
+      sortOrder: "asc",
+    }
+  );
   const [leadTypeOptions, setLeadTypeOptions] = useState([]);
 
   const onSubmit = (data) => {
-    if(data?.leadType?.value)
-      data.leadType = data.leadType.value;
+    if (data?.leadType?.value) data.leadType = data.leadType.value;
     const filterData = filterTruthyValues(data);
-    setFilters(filterData);
+    dispatch(
+      setAllAttendeesFilters({
+        filters: filterData,
+        sortBy: sortBy,
+      })
+    );
+    setPage(1);
     onClose();
   };
 
@@ -52,8 +62,10 @@ const GroupedAttendeeFilterModal = ({
       "timeInSession.$lte": "",
       "attendedWebinarCount.$gte": "",
       "attendedWebinarCount.$lte": "",
-      ...filters,
-      leadType: filters.leadType ? leadTypeData.find((item) => item._id === filters.leadType) : "",
+      ...allAttendeesFilters,
+      leadType: allAttendeesFilters.leadType
+        ? leadTypeData.find((item) => item._id === allAttendeesFilters.leadType)
+        : "",
     });
     return () => {
       document.body.style.overflow = "auto";
@@ -73,7 +85,7 @@ const GroupedAttendeeFilterModal = ({
   return (
     <div className="absolute z-50 inset-0 backdrop-blur-sm bg-black/30 flex justify-center items-center">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b flex justify-between border-gray-200">
           <h2 className="text-lg font-semibold">Attendee Filters</h2>
         </div>
 
@@ -209,13 +221,11 @@ const GroupedAttendeeFilterModal = ({
                       placeholder="Lead Type"
                       getOptionLabel={(e) => (
                         <div className="flex items-center gap-5">
-
                           <div
                             style={{ backgroundColor: e.color }}
                             className="w-10 h-5 rounded-sm mr-2"
                           ></div>
                           {e.label}
-
                         </div>
                       )}
                     />
@@ -226,27 +236,69 @@ const GroupedAttendeeFilterModal = ({
           </form>
         </div>
 
-        <div className="p-4 border-t border-gray-200 flex justify-between space-x-2">
-          <button
-            onClick={resetForm}
-            className="px-4 py-1 text-md font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            Reset
-          </button>
+        <div className="p-4 border-t border-gray-200 space-y-4">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">
+                Sort By
+              </label>
+              <select
+                value={sortBy.sortBy}
+                onChange={(e) =>
+                  setSortBy((prev) => ({
+                    ...prev,
+                    sortBy: e.target.value,
+                  }))
+                }
+                className="border rounded-md p-2 text-sm"
+              >
+                {allAttendeesSortByOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="flex space-x-2">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">Order</label>
+              <select
+                value={sortBy.sortOrder}
+                onChange={(e) =>
+                  setSortBy((prev) => ({
+                    ...prev,
+                    sortOrder: e.target.value,
+                  }))
+                }
+                className="border rounded-md p-2 text-sm"
+              >
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </div>
+          </div>
+          <div className="flex justify-between space-x-2">
             <button
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-indigo-700 border border-indigo-500 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit(onSubmit)}
+              onClick={resetForm}
               className="px-4 py-1 text-md font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              Apply Filters
+              Reset
             </button>
+
+            <div className="flex space-x-2">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 text-sm font-medium text-indigo-700 border border-indigo-500 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit(onSubmit)}
+                className="px-4 py-1 text-md font-medium bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary"
+              >
+                Apply Filters
+              </button>
+            </div>
           </div>
         </div>
       </div>

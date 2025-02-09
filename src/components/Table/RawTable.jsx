@@ -22,7 +22,7 @@ const RawTable = ({
   const roles = useRoles();
   const tableRef = useRef();
 
-  console.log("RawTable -> Rendered");
+  // console.log("RawTable -> Rendered");
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
@@ -219,7 +219,7 @@ const RawTable = ({
                           ].includes(column.key)
                           ? `${row[column.key].slice(0, 3)}***`
                           : row[column.key] ?? "N/A"
-                        : "N/A")}
+                        : column.default ?? "N/A")}
                   </td>
                 ))}
                 {Array.isArray(actions) && actions.length > 0 && (

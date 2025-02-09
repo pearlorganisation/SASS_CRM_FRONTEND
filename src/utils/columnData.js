@@ -43,6 +43,8 @@ export const attendeeTableColumns = [
   { header: "Status", key: "status", width: 20, type: "" },
   { header: "Gender", key: "gender", width: 20, type: "" },
   { header: "Location", key: "location", width: 20, type: "Location" },
+  { header: "Source", key: "source", width: 20, type: "", default: "Import" },
+  { header: "Date", key: "createdAt", width: 20, type: "Date" },
 ];
 
 export const groupedAttendeeTableColumns = [
@@ -147,4 +149,18 @@ export const enrollmentsColumn = [
     type: "Product",
   },
   { header: "Date", key: "createdAt", width: 20, type: "Date" },
+];
+
+
+export const allAttendeesSortByOptions = [
+  { value: "_id", label: "Email" },
+  { value: "attendedWebinarCount", label: "Attended Webinar Count" },
+  { value: "timeInSession", label: "Time in Session" },
+];
+
+export const webinarAttendeesSortByOptions = [
+  { value: "email", label: "Email" },
+  { value: "createdAt", label: "Created At" },
+  { value: "updatedAt", label: "Updated At" },
+  { value: "timeInSession", label: "Time in Session" }
 ];

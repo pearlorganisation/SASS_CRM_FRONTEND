@@ -25,6 +25,7 @@ import reAssign from "./slices/reAssign.slice";
 import alarm from "./slices/alarm";
 import location from "./slices/location";
 import { razorpaySlice } from "./slices/razorpay";
+import filters from "./slices/filters.slice";
 
 // Combine your individual reducers here
 const rootReducer = combineReducers({
@@ -50,6 +51,7 @@ const rootReducer = combineReducers({
   alarm,
   location,
   razorpaySlice,
+  filters
 });
 
 // Custom root reducer handling a clear action
@@ -67,7 +69,7 @@ const persistConfig = {
   key: "SaasCrmClientPanel",
   version: 1,
   storage,
-  whitelist: ["auth","pageLimits", "noticeBoard"],
+  whitelist: ["auth","pageLimits", "noticeBoard", "filters"],
   transforms: [
     encryptTransform({
       secretKey: `${import.meta.env.VITE_REACT_APP_REDUX_PERSIST_SECRET_KEY}`,

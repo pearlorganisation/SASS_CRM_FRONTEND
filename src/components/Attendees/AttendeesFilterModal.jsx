@@ -18,8 +18,10 @@ import FormInput from "../FormInput";
 import { filterTruthyValues } from "../../utils/extra";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { getCustomOptionsForFilters } from "../../features/actions/globalData";
+import { webinarAttendeesSortByOptions } from "../../utils/columnData";
+import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
 
-const FilterModal = ({ modalName, setFilters, filters }) => {
+const FilterModal = ({ modalName, setPage, tabValue }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
 
@@ -27,17 +29,30 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   const { subscription } = useSelector((state) => state.auth);
   const { customOptionsForFilters } = useSelector((state) => state.globalData);
   const { control, handleSubmit, reset } = useForm();
+  const { webinarAttendeesSortBy, webinarAttendeesFilters } = useSelector(
+    (state) => state.filters
+  );
+  const [sortBy, setSortBy] = useState(
+    webinarAttendeesSortBy || {
+      sortBy: webinarAttendeesSortByOptions[0].value,
+      sortOrder: "asc",
+    }
+  );
 
   const [selectedOption, setSelectedOption] = useState("");
   const [leadTypeOptions, setLeadTypeOptions] = useState([]);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
 
   const onSubmit = (data) => {
-    if(selectedOption) data.leadType = selectedOption;
+    if (selectedOption) data.leadType = selectedOption;
     const filterData = filterTruthyValues(data);
-    console.log(filterData);
-
-    setFilters(filterData);
+    setPage(1);
+    dispatch(
+      setWebinarAttendeesFilters({
+        filters: filterData,
+        sortBy: sortBy,
+      })
+    );
     dispatch(closeModal(modalName));
     logUserActivity({
       action: "filter",
@@ -67,9 +82,10 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
 
   useEffect(() => {
     dispatch(getCustomOptionsForFilters());
-    if(filters?.leadType) setSelectedOption(filters?.leadType);
+    if (webinarAttendeesFilters?.leadType)
+      setSelectedOption(webinarAttendeesFilters?.leadType);
     reset({
-      ...filters,
+      ...webinarAttendeesFilters,
     });
   }, []);
 
@@ -85,7 +101,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
 
   return (
     <Modal open={true} onClose={onClose}>
-      <Box className="bg-white p-6 rounded-md mx-auto mt-20 w-full max-w-2xl ">
+      <Box className="bg-white p-6 rounded-md mx-auto mt-10 w-full max-w-2xl ">
         <Typography variant="h6" className="text-center mb-4">
           Attendees Filter
         </Typography>
@@ -268,17 +284,69 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-between">
-            <Button variant="contained" color="primary" onClick={resetForm}>
-              Reset
-            </Button>
-            <div className="flex gap-2">
-              <Button onClick={onClose} variant="outlined" color="secondary">
-                Cancel
+          <div className="p-4 border-t border-gray-200 space-y-4">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Sort By
+                </label>
+                <select
+                  value={sortBy.sortBy}
+                  onChange={(e) =>
+                    setSortBy((prev) => ({
+                      ...prev,
+                      sortBy: e.target.value,
+                    }))
+                  }
+                  className="border rounded-md p-2 text-sm"
+                >
+                  {webinarAttendeesSortByOptions
+                    .filter(
+                      (option) =>
+                        !(
+                          option.value === "timeInSession" &&
+                          tabValue === "preWebinar"
+                        )
+                    )
+                    .map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Order
+                </label>
+                <select
+                  value={sortBy.sortOrder}
+                  onChange={(e) =>
+                    setSortBy((prev) => ({
+                      ...prev,
+                      sortOrder: e.target.value,
+                    }))
+                  }
+                  className="border rounded-md p-2 text-sm"
+                >
+                  <option value="asc">Ascending</option>
+                  <option value="desc">Descending</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-between space-x-2">
+              <Button variant="contained" color="primary" onClick={resetForm}>
+                Reset
               </Button>
-              <Button type="submit" variant="contained" color="primary">
-                Apply Filters
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={onClose} variant="outlined" color="secondary">
+                  Cancel
+                </Button>
+                <Button type="submit" variant="contained" color="primary">
+                  Apply Filters
+                </Button>
+              </div>
             </div>
           </div>
         </form>

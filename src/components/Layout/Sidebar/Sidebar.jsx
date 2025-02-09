@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { TbLayoutDashboardFilled, TbReceiptRupee } from "react-icons/tb";
 import { IoLogOut, IoPeople, IoSettings } from "react-icons/io5";
 import { HiUserGroup } from "react-icons/hi2";
@@ -19,8 +19,11 @@ import { FaCalendarAlt } from "react-icons/fa";
 import ComponentGuard from "../../AccessControl/ComponentGuard";
 const Sidebar = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
+  const [searchParams, setSearchParams] = useSearchParams();
+
 
   const { isUpdated } = useSelector((state) => state.noticeBoard);
   const { sidebarLinkData } = useSelector((state) => state.sidebarLink);
@@ -112,6 +115,34 @@ const Sidebar = () => {
     },
   ];
 
+  
+  // useEffect(() => {
+  //   const handlePopState = (event) => {
+  //     const currentPath = window.location.pathname;
+  //     const referrer = document.referrer;
+  //     console.log(referrer);
+
+  //     console.log(referrer.includes(window.location.host));
+  //     // Check if coming from external page
+  //     if (referrer.includes(window.location.host)) {
+  //     navigate(-1);
+  //       return;
+  //     }
+
+  //     // Check if previous state was same route
+  //     if (event.state?.route === currentPath) {
+  //       // Go back further in history
+  //       window.history.go(-2);
+  //     }
+  //   };
+
+  //   window.addEventListener('popstate', handlePopState);
+    
+  //   return () => {
+  //     window.removeEventListener('popstate', handlePopState);
+  //   };
+  // }, [navigate]);
+
   const handleLogout = () => {
     dispatch(logout());
     logUserActivity({
@@ -119,6 +150,16 @@ const Sidebar = () => {
       details: "User logged out successfully",
     });
   };
+
+  // const handleParamUpdate = (newParams) => {
+  //   const searchParams = new URLSearchParams(newParams);
+  //   window.history.replaceState(
+  //     { route: window.location.pathname }, 
+  //     '', 
+  //     `?${searchParams.toString()}`
+  //   );
+  //   setSearchParams(searchParams);
+  // };
 
   const toggleImportantLinks = () => {
     setShowImportantLinks((prev) => !prev);

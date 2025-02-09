@@ -21,9 +21,11 @@ const ExportWebinarAttendeesModal = ({
   webinarId,
   validCall,
   assignmentType,
+  sort,
 }) => {
   const dispatch = useDispatch();
   console.log("ExportWebinarAttendeesModal -> Render");
+
 
   const { subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
@@ -56,8 +58,10 @@ const ExportWebinarAttendeesModal = ({
         webinarId,
         validCall,
         assignmentType,
+        sort,
       })
     );
+
     //
   };
   console.log("isSuccess, assignSuccess, isSuccessReAssign", isSuccess);
