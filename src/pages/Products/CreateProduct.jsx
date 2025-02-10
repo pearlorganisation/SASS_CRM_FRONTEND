@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { addProduct } from "../../features/actions/product";
@@ -13,6 +13,7 @@ import {
   InputLabel,
 } from "@mui/material";
 import FormInput from "../../components/FormInput";
+import productLevelService from "../../services/productLevelService";
 
 const CreateProduct = () => {
   const {
@@ -23,9 +24,12 @@ const CreateProduct = () => {
   } = useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { productData, isSuccess, isLoading } = useSelector((state) => state.product);
+  const { productData, isSuccess, isLoading } = useSelector(
+    (state) => state.product
+  );
   const { userData } = useSelector((state) => state.auth);
   const { webinarData } = useSelector((state) => state.webinarContact);
+  const [productLevelData, setProductLevelData] = useState([]);
 
   const onSubmit = (data) => {
     const newData = { ...data };
@@ -41,6 +45,11 @@ const CreateProduct = () => {
 
   useEffect(() => {
     // dispatch(getAllWebinars(1));
+    productLevelService.getProductLevels().then((res) => {
+      if (res.success) {
+        setProductLevelData(res.data);
+      }
+    });
   }, []);
 
   return (
@@ -145,9 +154,12 @@ const CreateProduct = () => {
                       <MenuItem value="" disabled>
                         Select a level
                       </MenuItem>
-                      <MenuItem value={1}>L1</MenuItem>
-                      <MenuItem value={2}>L2</MenuItem>
-                      <MenuItem value={3}>L3</MenuItem>
+                      {productLevelData.map((item) => (
+                        <MenuItem key={item._id} value={item.level}>
+                          {item.label}
+                        </MenuItem>
+                      ))}
+
                     </Select>
                   )}
                 />

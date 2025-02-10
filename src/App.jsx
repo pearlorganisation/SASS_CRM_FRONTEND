@@ -46,6 +46,7 @@ import {
   PlanOrder,
   UpdateClientPlan,
   Revenue,
+  ProductLevel,
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 
@@ -261,6 +262,15 @@ const App = () => {
         {
           path: "/*",
           element: <ComingSoon />,
+        },
+
+        {
+          path: "/product-level",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <ProductLevel />
+            </RouteGuard>
+          ),
         },
 
         {

@@ -18,6 +18,7 @@ import { ClipLoader } from "react-spinners";
 import { getAllEmployees } from "../../features/actions/employee";
 import useRoles from "../../hooks/useRoles";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { getAllProductsByAdminId } from "../../features/actions/product";
 
 const CreateWebinar = ({ modalName }) => {
   const dispatch = useDispatch();
@@ -29,7 +30,8 @@ const CreateWebinar = ({ modalName }) => {
 
   const { employeeData } = useSelector((state) => state.employee);
   const { userData } = useSelector((state) => state.auth);
-
+  const { productDropdownData } = useSelector((state) => state.product);
+  console.log(productDropdownData, "productDropdownData");
   const {
     register,
     handleSubmit,
@@ -40,6 +42,7 @@ const CreateWebinar = ({ modalName }) => {
 
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [options, setOptions] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Dummy employee data
   const employeeOptions = [
@@ -58,8 +61,13 @@ const CreateWebinar = ({ modalName }) => {
   useEffect(() => {
     if (open) {
       dispatch(
-        getAllEmployees({ page: 1, limit: 100, filters: { isActive: "active" } })
+        getAllEmployees({
+          page: 1,
+          limit: 100,
+          filters: { isActive: "active" },
+        })
       );
+      dispatch(getAllProductsByAdminId());
     }
   }, [open]);
 
@@ -180,8 +188,32 @@ const CreateWebinar = ({ modalName }) => {
                 aria-label="Assign Employees"
               />
             </div>
+
+            {/* Product Selection */}
+            <div>
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Assign Product
+              </label>
+              <Select
+                options={
+                  productDropdownData?.map((product) => ({
+                    value: product._id,
+                    label: product.name,
+                  })) || []
+                }
+                value={selectedProduct}
+                onChange={setSelectedProduct}
+                placeholder="Select product"
+                menuPortalTarget={document.body}
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                }}
+                aria-label="Assign Product"
+              />
+            </div>
           </div>
         </DialogContent>
+
         <DialogActions>
           <Button onClick={handleClose} variant="outlined" color="secondary">
             Cancel

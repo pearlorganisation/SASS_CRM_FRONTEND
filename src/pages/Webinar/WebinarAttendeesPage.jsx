@@ -37,6 +37,8 @@ const SwapAttendeeFieldsModal = lazy(() =>
 import { createPortal } from "react-dom";
 import ModalFallback from "../../components/Fallback/ModalFallback";
 import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
+import { NotifActionType } from "../../utils/extra";
+import { socket } from "../../socket";
 
 const WebinarAttendeesPage = (props) => {
   const {
@@ -165,6 +167,50 @@ const WebinarAttendeesPage = (props) => {
     }
   }, [isSuccess, assignSuccess, isSuccessReAssign]);
 
+  useEffect(() => {
+    function onNotification(data) {
+      if (data.actionType === NotifActionType.ATTENDEE_REGISTRATION) {
+        if (
+          tabValue !== "enrollments" &&
+          subTabValue === "attendees" &&
+          !(
+            tabValue === "preWebinar" &&
+            webinarAttendeesSortBy?.sortBy === "timeInSession"
+          )
+        ) {
+          setSelectedRows([]);
+          dispatch(
+            getAttendees({
+              id,
+              isAttended: tabValue === "postWebinar",
+              page,
+              limit: LIMIT,
+              filters: webinarAttendeesFilters,
+              validCall: selected === "All" ? undefined : selected,
+              assignmentType:
+                selectedAssignmentType === "All"
+                  ? undefined
+                  : selectedAssignmentType,
+              sort: webinarAttendeesSortBy,
+            })
+          );
+        }
+      }
+    }
+    socket.on("notification", onNotification);
+    return () => {
+      socket.off("notification", onNotification);
+    };
+  }, [
+    page,
+    tabValue,
+    LIMIT,
+    webinarAttendeesFilters,
+    selected,
+    selectedAssignmentType,
+    webinarAttendeesSortBy,
+  ]);
+
   const actionIcons = [
     {
       icon: () => (
@@ -253,9 +299,11 @@ const WebinarAttendeesPage = (props) => {
         tableUniqueKey="webinarAttendeesTable"
         ButtonGroup={React.memo(AttendeeDropdown)}
         isSelectVisible={userData?.isActive}
+        sortByOrder={webinarAttendeesSortBy?.sortOrder}
         tableData={{
           columns:
             tabValue === "postWebinar"
+
               ? attendeeTableColumns
               : attendeeTableColumns.filter(
                   (item) => item.key !== "timeInSession"

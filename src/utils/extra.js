@@ -43,6 +43,36 @@ export const formatDateAsNumber = (dateStr) => {
   return `${day}/${month}/${year}`;
 };
 
+export const formatDateAsNumberWithTime = (dateStr) => {
+  if (!dateStr) return "-";
+  const date = new Date(dateStr);
+
+  // Check if the date is valid
+  if (isNaN(date.getTime())) {
+    return "-";
+  }
+
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is zero-based, so we add 1
+  const day = String(date.getDate()).padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year} ${date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}`;
+};
+
+export const formatPhoneNumber = (phoneNumber) => {
+  if (!phoneNumber) return "";
+  if (phoneNumber.includes("E")) {
+    return Number(phoneNumber).toFixed(0);
+  }
+  const cleanedPhoneNumber = phoneNumber.toString().replace(/[^0-9]/g, "");
+  if (cleanedPhoneNumber.length === 12)
+    return cleanedPhoneNumber.slice(2);
+  return cleanedPhoneNumber;
+};
+
 export const errorToast = (message) => {
   let errorMessage = "";
   errorMessage = typeof message === "string" ? message : "Something went wrong";
@@ -132,6 +162,7 @@ export const NotifActionType = {
   USER_ACTIVITY: "user_activity",
   WEBINAR_ASSIGNMENT: "webinar_assignment",
   ACCOUNT_DEACTIVATION: "account_deactivation",
+  ATTENDEE_REGISTRATION: "attendee_registration",
 };
 
 export const copyToClipboard = (id, name) => {

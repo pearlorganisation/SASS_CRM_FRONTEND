@@ -1,5 +1,9 @@
 import React, { memo, useEffect, useRef } from "react";
-import { formatDateAsNumber } from "../../utils/extra";
+import {
+  formatDate,
+  formatDateAsNumber,
+  formatDateAsNumberWithTime,
+} from "../../utils/extra";
 import { useSelector } from "react-redux";
 import useRoles from "../../hooks/useRoles";
 
@@ -17,6 +21,7 @@ const RawTable = ({
   isLeadType = false,
   userData,
   locations = null,
+  sortByOrder = "asc",
 }) => {
   const { isTablesMasked } = useSelector((state) => state.table);
   const roles = useRoles();
@@ -43,8 +48,10 @@ const RawTable = ({
   }, [isLoading]);
 
   return (
-    <div ref={tableRef} className="shadow-md rounded-lg overflow-auto max-h-[80vh]">
-
+    <div
+      ref={tableRef}
+      className="shadow-md rounded-lg overflow-auto max-h-[80vh]"
+    >
       <table className="w-full text-sm">
         <thead className="bg-gray-100 sticky top-0 z-10">
           <tr>
@@ -119,14 +126,18 @@ const RawTable = ({
                         }}
                       ></div>
                     )}
-                    {(page - 1) * limit + index + 1}
+                    {sortByOrder === "asc"
+                      ? (page - 1) * limit + index + 1
+                      : tableData?.totalRecords - ((page - 1) * limit + index)}
                   </div>
                 </td>
+
+
                 {isSelectVisible && (
                   <td className="px-4 py-2">
                     <input
                       type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300"
+                      className="h-4 w-4 rounded border-gray-300 "
                       checked={isRowSelected(row?._id)}
                       onChange={() => handleCheckboxChange(row?._id)}
                     />
@@ -136,14 +147,20 @@ const RawTable = ({
                   <td
                     key={colIndex}
                     title={
-                      row?.[column.title]
+                      column.type === "Date"
+                        ? formatDateAsNumberWithTime(row?.[column.key]) ?? "N/A"
+                        : row?.[column.title]
                         ? "testsssss"
                         : row?.[column.key]
                         ? row?.[column.key]
                         : "N/A"
                     }
                     className={`px-4 py-2 text-gray-600 max-w-72 truncate ${
-                      isRowClickable ? "cursor-pointer" : ""
+                      isRowClickable
+                        ? "cursor-pointer"
+                        : column.key === "firstName"
+                        ? "capitalize"
+                        : ""
                     }`}
                     onClick={() => rowClick(row)}
                   >
@@ -191,7 +208,7 @@ const RawTable = ({
                       </span>
                     )}
                     {column.type === "Date" &&
-                      (formatDateAsNumber(row?.[column.key]) ?? "N/A")}
+                      (formatDateAsNumberWithTime(row?.[column.key]) ?? "N/A")}
                     {column.type === "Product" &&
                       (row?.[column.key][column?.subKey] ?? "N/A")}
                     {column.type === "Location" &&

@@ -56,9 +56,7 @@ const DataTable = ({
   setSelectedRows = () => {},
   isLeadType = false,
   locations = null,
-  sortByOptions = [],
-  onSortApply = () => {},
-  sortBy = {},
+  sortByOrder = "asc",
 }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
@@ -197,8 +195,10 @@ const DataTable = ({
           isRowClickable={isRowClickable}
           isLeadType={isLeadType}
           locations={locations}
+          sortByOrder={sortByOrder}
         />
       </div>
+
       {tableData?.rows?.length > 0 && (
         <div className="flex gap-4 md:flex-row flex-col flex-wrap items-center justify-between py-4">
           <Pagination
