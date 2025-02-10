@@ -1,4 +1,5 @@
 import React, { useEffect, useState, lazy, Suspense, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Pullbacks = lazy(() => import("./Pullbacks"));
 const Enrollments = lazy(() => import("./Enrollments"));
@@ -33,6 +34,7 @@ const WebinarAttendees = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
+  const navigate = useNavigate();
 
   const { userData } = useSelector((state) => state.auth);
   const { reAssignCounts } = useSelector((state) => state.reAssign);

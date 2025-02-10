@@ -62,7 +62,7 @@ const DataTable = ({
 }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
-  console.log("DataTable -> Rendered");
+  // console.log("DataTable -> Rendered");
 
   const tableRef = useRef(null); // Reference for full-screen mode
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -79,7 +79,6 @@ const DataTable = ({
 
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [sortVisible, setSortVisible] = useState(false);
   const { userData } = useSelector((state) => state.auth);
   const open = Boolean(anchorEl);
 
@@ -176,26 +175,6 @@ const DataTable = ({
                 </span>
               )}
             </button>
-
-            {sortByOptions.length > 0 && (
-              <div className="relative overflow-visible">
-                <button
-                  onClick={() => setSortVisible((prev) => !prev)}
-                  className="border-indigo-500 h-10 border text-md text-indigo-500 px-4 rounded-md flex items-center gap-2 "
-                >
-                  <MdSort size={22} />
-                  Sort
-                </button>
-                {sortVisible && (
-                  <SortModal
-                    sortByOptions={sortByOptions}
-                    onSortApply={onSortApply}
-                    setSortVisible={setSortVisible}
-                    sortBy={sortBy}
-                  />
-                )}
-              </div>
-            )}
           </div>
         )}
       </div>
