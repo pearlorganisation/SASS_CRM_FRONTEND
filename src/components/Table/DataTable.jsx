@@ -1,11 +1,4 @@
-import React, {
-  memo,
-  Suspense,
-  useState,
-  lazy,
-  useRef,
-  useEffect,
-} from "react";
+import React, { memo, Suspense, useState, lazy, useEffect } from "react";
 import {
   Button,
   IconButton,
@@ -17,9 +10,9 @@ import {
   Chip,
 } from "@mui/material";
 import PageLimitEditor from "../PageLimitEditor";
-import BookmarkOutlinedIcon from "@mui/icons-material/BookmarkOutlined";
+// import BookmarkOutlinedIcon from "@mui/icons-material/BookmarkOutlined";
 import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
+// import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { openModal } from "../../features/slices/modalSlice";
@@ -28,10 +21,7 @@ const FilterPresetModal = lazy(() => import("../Filter/FilterPresetModal"));
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import ModalFallback from "../Fallback/ModalFallback";
 import { MdBookmark, MdFilterAlt, MdSort } from "react-icons/md";
-import SortModal from "../SortModal";
-
-import FullscreenIcon from "@mui/icons-material/Fullscreen";
-import FullscreenExitIcon from "@mui/icons-material/FullscreenExit";
+// import SortModal from "../SortModal";
 
 const DataTable = ({
   tableHeader = "Table",
@@ -62,19 +52,6 @@ const DataTable = ({
   const logUserActivity = useAddUserActivity();
   // console.log("DataTable -> Rendered");
 
-  const tableRef = useRef(null); // Reference for full-screen mode
-  const [isFullScreen, setIsFullScreen] = useState(false);
-
-  const toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-      tableRef.current?.requestFullscreen();
-      setIsFullScreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullScreen(false);
-    }
-  };
-
   const [isPresetModalOpen, setIsPresetModalOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const { userData } = useSelector((state) => state.auth);
@@ -88,37 +65,9 @@ const DataTable = ({
   };
 
   return (
-    <div ref={tableRef} className="relative p-6 bg-gray-50 rounded-lg">
-      <button className="absolute right-5 top-2" onClick={toggleFullScreen}>
-        {" "}
-        {isFullScreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
-      </button>
+    <div className="p-6 bg-gray-50 rounded-lg">
       <div className="flex gap-4 justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-700">{tableHeader}</h2>
-        {userData?.isActive &&
-          tableUniqueKey !== "viewAssignmentsTable" &&
-          exportModalName !== "" && (
-            <div className="flex justify-center items-center gap-4">
-              {tableData.totalRecords ? (
-                <span className="font-semibold text-neutral-800">
-                  Total Records:{" "}
-                  <span className="text-indigo-500">
-                    {tableData.totalRecords}
-                  </span>
-                </span>
-              ) : null}
-
-              <IconButton
-                id="demo-positioned-button"
-                aria-controls={open ? "demo-positioned-menu" : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? "true" : undefined}
-                onClick={handleClick}
-              >
-                <MoreVertOutlinedIcon />
-              </IconButton>
-            </div>
-          )}
 
         <Menu
           id="demo-positioned-menu"
@@ -128,12 +77,14 @@ const DataTable = ({
           onClose={handleClose}
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          disablePortal
         >
           <MenuItem
             onClick={() => {
-              dispatch(openModal(exportModalName));
+              dispatch(openModal({ modalName: exportModalName }));
               handleClose();
             }}
+            
           >
             <ListItemIcon>
               <DownloadOutlinedIcon color="success" fontSize="small" />
@@ -173,6 +124,30 @@ const DataTable = ({
                 </span>
               )}
             </button>
+            {userData?.isActive &&
+              tableUniqueKey !== "viewAssignmentsTable" &&
+              exportModalName !== "" && (
+                <div className="flex justify-center items-center gap-4">
+                  {tableData.totalRecords ? (
+                    <span className="font-semibold text-neutral-800">
+                      Total Records:{" "}
+                      <span className="text-indigo-500">
+                        {tableData.totalRecords}
+                      </span>
+                    </span>
+                  ) : null}
+
+                  <IconButton
+                    id="demo-positioned-button"
+                    aria-controls={open ? "demo-positioned-menu" : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? "true" : undefined}
+                    onClick={handleClick}
+                  >
+                    <MoreVertOutlinedIcon />
+                  </IconButton>
+                </div>
+              )}
           </div>
         )}
       </div>

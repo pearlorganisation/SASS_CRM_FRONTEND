@@ -167,7 +167,7 @@ const ReAssignmentModal = ({
   }, [reassignLoading]);
 
   return (
-    <Modal open={true} onClose={handleCancel}>
+    <Modal open={true} onClose={handleCancel} disablePortal>
       <Box
         className="bg-white rounded-lg shadow-lg p-6 max-w-lg mx-auto mt-20"
         sx={{ outline: "none" }}

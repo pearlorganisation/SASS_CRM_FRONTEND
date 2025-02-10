@@ -93,7 +93,7 @@ const FilterPresetModal = ({
   }, [isSuccess]);
 
   return (
-    <Modal open={true} onClose={onClose}>
+    <Modal open={true} onClose={onClose} disablePortal>
       <Box className="p-4 max-w-full w-96 sm:max-w-xl sm:w-full  bg-gray-50 rounded-lg shadow-xl absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
         <Typography variant="h6" component="h2" gutterBottom>
           Filter Presets

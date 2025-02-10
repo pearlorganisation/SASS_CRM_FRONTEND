@@ -7,13 +7,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../features/slices/modalSlice";
 import FormInput from "../FormInput";
 import { filterTruthyValues } from "../../utils/extra";
-import useAddUserActivity from '../../hooks/useAddUserActivity'
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
 const FilterModal = ({ modalName, setFilters, filters }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
 
   const { modals } = useSelector((state) => state.modals);
+
   const open = modals[modalName] ? true : false;
   const { control, handleSubmit, register, reset } = useForm();
 
@@ -23,8 +24,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
     logUserActivity({
       action: "filter",
       type: "to Table",
-      detailItem: 'Webinars',
-    })
+      detailItem: "Webinars",
+    });
     dispatch(closeModal(modalName));
   };
 
@@ -51,8 +52,11 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
     }
   }, [open]);
 
+
+
+
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} disablePortal>
       <Box className="bg-white p-6 rounded-md mx-auto mt-20 w-full max-w-2xl ">
         <Typography variant="h6" className="text-center mb-4">
           Webinar Filters
