@@ -128,7 +128,7 @@ const CreateWebinar = ({ modalName }) => {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" disablePortal>
       <DialogTitle>{modalData ? "Edit Webinar" : "Create Webinar"}</DialogTitle>
       <form onSubmit={handleSubmit(submitForm)}>
         <DialogContent>

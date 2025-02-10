@@ -160,6 +160,7 @@ const LeadTypesForm = () => {
           open={isModalOpen}
           onClose={closeModal}
           aria-labelledby="add-update-leadtype-modal"
+          disablePortal
         >
           <Box className="p-6 bg-white rounded-lg shadow-md space-y-6 w-full max-w-md mx-auto mt-20">
             <h3 className="text-xl font-bold text-gray-700">

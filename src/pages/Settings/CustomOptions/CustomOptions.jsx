@@ -135,6 +135,7 @@ const CustomOptions = () => {
         open={showModal}
         onClose={handleModalToggle}
         className="flex items-center justify-center"
+        disablePortal
       >
         <div className="bg-white p-6 rounded shadow-lg w-80">
           <h2 className="text-xl font-semibold mb-4">Add {pageTitle} Option</h2>
@@ -185,6 +186,7 @@ const CustomOptions = () => {
         open={showDeleteModal}
         onClose={handleDeleteModalToggle}
         className="flex items-center justify-center"
+        disablePortal
       >
         <div className="bg-white p-6 rounded shadow-lg w-96">
           <Typography className="text-lg font-medium mb-4">

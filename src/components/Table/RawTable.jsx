@@ -18,6 +18,7 @@ const RawTable = ({
   userData,
   locations = null,
 }) => {
+  // console.log('table data', tableData)
   const { isTablesMasked } = useSelector((state) => state.table);
   const roles = useRoles();
   const tableRef = useRef();
@@ -42,9 +43,15 @@ const RawTable = ({
     }
   }, [isLoading]);
 
-  return (
-    <div ref={tableRef} className="shadow-md rounded-lg overflow-auto max-h-[80vh]">
+  useEffect(() => {
+    console.log(locations, "locations");
+  }, [locations]);
 
+  return (
+    <div
+      ref={tableRef}
+      className="shadow-md rounded-lg overflow-auto max-h-[80vh]"
+    >
       <table className="w-full text-sm">
         <thead className="bg-gray-100 sticky top-0 z-10">
           <tr>

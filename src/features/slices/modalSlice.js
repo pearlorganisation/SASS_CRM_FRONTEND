@@ -11,13 +11,13 @@ const modalSlice = createSlice({
   reducers: {
     openModal: (state, action) => {
       console.log("open modal ----> ", action.payload);
-      if (typeof action.payload === "string") {
+        if (typeof action.payload === "string") {
         state.modalData = null;
         state.modals[action.payload] = true;
       } else {
         const modalName = action.payload?.modalName;
         const data = action.payload?.data;
-        
+
         if (data) {
           state.modalData = data;
         }

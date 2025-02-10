@@ -82,7 +82,7 @@ const ActiveInactiveModal = ({ modalName }) => {
   };
 
   return (
-    <Modal open={true} onClose={onClose}>
+    <Modal open={true} onClose={onClose} disablePortal>
       <Box
         className="relative w-full max-w-lg mx-auto mt-20 bg-white rounded-lg shadow-lg p-6"
       >
