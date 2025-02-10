@@ -98,13 +98,14 @@ export const webinarTableColumns = [
     width: 10,
     type: "",
   },
-  { header: "Total Attendees", key: "totalAttendees", width: 20, type: "" },
   {
     header: "Total Participants",
     key: "totalParticipants",
     width: 15,
     type: "",
   },
+  { header: "Total Attendees", key: "totalAttendees", width: 20, type: "" },
+  { header: "Total Un Attended", key: "totalUnAttended", width: 20, type: "" },
 ];
 
 export const productTableColumns = [
@@ -160,7 +161,6 @@ export const allAttendeesSortByOptions = [
 
 export const webinarAttendeesSortByOptions = [
   { value: "email", label: "Email" },
-  { value: "createdAt", label: "Created At" },
-  { value: "updatedAt", label: "Updated At" },
+  { value: "createdAt", label: "Date" },
   { value: "timeInSession", label: "Time in Session" }
 ];

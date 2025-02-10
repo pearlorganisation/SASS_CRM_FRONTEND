@@ -36,6 +36,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
       totalRegistrations: null,
       totalParticipants: null,
       totalAttendees: null,
+      totalUnAttended: null,
     });
   };
 
@@ -77,8 +78,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -89,8 +90,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -101,8 +102,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -113,8 +114,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -125,8 +126,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -137,8 +138,35 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
+                  },
+                }}
+              />
+
+              <FormInput
+                name="totalUnAttended.$gte"
+                label="Total Un Attended (Min)"
+                control={control}
+                type="number"
+
+                validation={{
+                  min: {
+                    value: 0,
+                    message: "Value must be at least 0",
+                  },
+                }}
+              />
+              <FormInput
+                name="totalUnAttended.$lte"
+                label="Total Un Attended (Max)"
+                control={control}
+                type="number"
+
+                validation={{
+                  min: {
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />

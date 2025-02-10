@@ -89,8 +89,7 @@ export const productSlice = createSlice({
       .addCase(getAllProductsByAdminId.fulfilled, (state, action) => {
         state.isLoading = false;
         state.errorMessage = "";
-        state.productDropdownData = action.payload?.data;
-        successToast(action?.payload);
+        state.productDropdownData = action.payload;
       })
       .addCase(getAllProductsByAdminId.rejected, (state, action) => {
         state.isLoading = false;

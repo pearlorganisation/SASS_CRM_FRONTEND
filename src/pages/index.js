@@ -54,12 +54,15 @@ const BillingHistory = lazy(() =>
 const PlanOrder = lazy(() => import("./Settings/Plans/PlanOrder"));
 const UpdateClientPlan = lazy(() => import("./Clients/UpdateClientPlan"));
 const Revenue = lazy(() => import("./Revenue/Revenue"));
+const ProductLevel = lazy(() => import("./Products/ProductLevel"));
+
 export {
   CalendarPage,
   UpdateNoticeBoard,
   NoticeBoard,
   AddOnsPage,
   ViewEmployee,
+
   LeadTypes,
   EmployeeDashboard,
   AttendeeHistory,
@@ -96,4 +99,5 @@ export {
   PlanOrder,
   UpdateClientPlan,
   Revenue,
-};  
+  ProductLevel,
+};
