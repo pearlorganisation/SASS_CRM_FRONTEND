@@ -65,7 +65,7 @@ export default function ConfirmActionModal({ modalName }) {
   }, [isSuccess]);
 
   return (
-    <Modal open={open} onClose={handleClose} closeAfterTransition>
+    <Modal open={open} onClose={handleClose} closeAfterTransition disablePortal>
       <Fade in={open}>
         <Box className="relative w-full max-w-md bg-white rounded-md shadow-lg p-6 mx-auto mt-20">
           {/* Header */}

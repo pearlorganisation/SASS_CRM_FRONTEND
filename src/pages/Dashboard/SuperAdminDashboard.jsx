@@ -229,7 +229,7 @@ const SuperAdminDashboard = () => {
         <RevenueByDateChart />
       </Box>
       {/* Modal for Card Selection */}
-      <Modal open={modalOpen} onClose={handleToggleModal}>
+      <Modal open={modalOpen} onClose={handleToggleModal} disablePortal>
         <Box className="bg-white rounded-lg shadow-lg p-6 w-[400px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <Typography variant="h6" gutterBottom>
             Select Cards to Display
