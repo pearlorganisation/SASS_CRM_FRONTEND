@@ -42,6 +42,7 @@ import { getLocations } from "../../features/actions/location";
 import { NotifActionType } from "../../utils/extra";
 import { socket } from "../../socket";
 
+
 const WebinarAttendeesPage = (props) => {
   const {
     tabValue,
