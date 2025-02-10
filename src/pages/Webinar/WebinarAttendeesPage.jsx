@@ -37,6 +37,8 @@ const SwapAttendeeFieldsModal = lazy(() =>
 import { createPortal } from "react-dom";
 import ModalFallback from "../../components/Fallback/ModalFallback";
 import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
+import FullScreen from "../../components/FullScreen";
+import { getLocations } from "../../features/actions/location";
 
 const WebinarAttendeesPage = (props) => {
   const {
@@ -68,6 +70,8 @@ const WebinarAttendeesPage = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
+
+  const { locationsData } = useSelector((state) => state.location);
 
   const { attendeeData, isLoading, pagination, isSuccess } = useSelector(
     (state) => state.attendee
@@ -246,8 +250,18 @@ const WebinarAttendeesPage = (props) => {
       </div>
     );
   };
+
+  useEffect(() => {
+    dispatch(
+      getLocations({
+        page: 1,
+        limit: 1000,
+        filters: undefined,
+      })
+    );
+  }, []);
   return (
-    <>
+    <FullScreen>
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="webinarAttendeesTable"
@@ -278,6 +292,7 @@ const WebinarAttendeesPage = (props) => {
         isLoading={isLoading}
         isLeadType={true}
         filters={webinarAttendeesFilters}
+        locations={locationsData}
       />
 
       {AttendeesFilterModalOpen && (
@@ -318,7 +333,7 @@ const WebinarAttendeesPage = (props) => {
           </Suspense>,
           document.body
         )}
-    </>
+    </FullScreen>
   );
 };
 

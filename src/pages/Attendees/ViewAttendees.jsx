@@ -9,6 +9,7 @@ import { getLeadType } from "../../features/actions/assign";
 import GroupedAttendeeFilterModal from "./Modal/GroupedAttendeeFilterModal";
 import { createPortal } from "react-dom";
 import { clearAttendeeData } from "../../features/slices/attendees";
+import FullScreen from "../../components/FullScreen";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -19,13 +20,16 @@ const WebinarAttendees = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+
   const { leadTypeData } = useSelector((state) => state.assign);
   const { attendeeData, isLoading, pagination } = useSelector(
     (state) => state.attendee
   );
   const { total, totalPages } = pagination;
 
-  const { allAttendeesFilters, allAttendeesSortBy } = useSelector((state) => state.filters);
+  const { allAttendeesFilters, allAttendeesSortBy } = useSelector(
+    (state) => state.filters
+  );
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const modalState = useSelector((state) => state.modals.modals);
   const exportModalOpen = modalState[exportExcelModalName] ? true : false;
@@ -52,10 +56,11 @@ const WebinarAttendees = () => {
   }, [page, LIMIT, allAttendeesSortBy, allAttendeesFilters]);
 
   useEffect(() => {
+   
     dispatch(getLeadType());
 
     return () => {
-      dispatch(clearAttendeeData()); 
+      dispatch(clearAttendeeData());
     };
   }, []);
 
@@ -79,36 +84,38 @@ const WebinarAttendees = () => {
   ];
   return (
     <div className="px-6 md:px-10 pt-14 space-y-6">
-      <DataTable
-        tableHeader={tableHeader}
-        tableUniqueKey="ViewAttendeesTable"
-        tableData={{
-          columns: groupedAttendeeTableColumns,
-          totalRecords: total,
-          rows: attendeeData.map((row) => ({
-            ...row,
-            leadType: leadTypeData.find((lead) => lead._id === row?.leadType),
-          })),
-        }}
-        filters={allAttendeesFilters}
-        actions={actionIcons}
-        totalPages={totalPages}
-        page={page}
-        setPage={setPage}
-        limit={LIMIT}
-        filterModalName={AttendeesFilterModalName}
-        exportModalName={exportExcelModalName}
-        isLoading={isLoading}
-        isLeadType={true}
-      />
-      {AttendeesFilterModalOpen &&
-        createPortal(
-          <GroupedAttendeeFilterModal
-            setPage={setPage}
-            modalName={AttendeesFilterModalName}
-          />,
-          document.body
-        )}
+      <FullScreen>
+        <DataTable
+          tableHeader={tableHeader}
+          tableUniqueKey="ViewAttendeesTable"
+          tableData={{
+            columns: groupedAttendeeTableColumns,
+            totalRecords: total,
+            rows: attendeeData.map((row) => ({
+              ...row,
+              leadType: leadTypeData.find((lead) => lead._id === row?.leadType),
+            })),
+          }}
+          filters={allAttendeesFilters}
+          actions={actionIcons}
+          totalPages={totalPages}
+          page={page}
+          setPage={setPage}
+          limit={LIMIT}
+          filterModalName={AttendeesFilterModalName}
+          exportModalName={exportExcelModalName}
+          isLoading={isLoading}
+          isLeadType={true}
+        />
+        {AttendeesFilterModalOpen &&
+          createPortal(
+            <GroupedAttendeeFilterModal
+              setPage={setPage}
+              modalName={AttendeesFilterModalName}
+            />,
+            document.body
+          )}
+      </FullScreen>
     </div>
   );
 };

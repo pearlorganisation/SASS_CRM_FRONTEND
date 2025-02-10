@@ -30,12 +30,14 @@ import { fetchPullbackRequestCounts } from "../../features/actions/reAssign";
 import { socket } from "../../socket";
 import ModalFallback from "../../components/Fallback/ModalFallback";
 
+
 const WebinarAttendees = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
   const navigate = useNavigate();
 
+  
   const { userData } = useSelector((state) => state.auth);
   const { reAssignCounts } = useSelector((state) => state.reAssign);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -82,6 +84,9 @@ const WebinarAttendees = () => {
   useEffect(() => {
     dispatch(getLeadType());
     dispatch(getAllEmployees({}));
+
+   
+
   }, []);
 
   function fetchCounts() {
