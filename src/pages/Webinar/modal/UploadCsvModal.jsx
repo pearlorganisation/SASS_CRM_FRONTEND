@@ -9,6 +9,7 @@ import { useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { clearSuccess } from "../../../features/slices/attendees";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
+import { formatPhoneNumber } from "../../../utils/extra";
 
 const UploadCsvModal = ({ tabValue, setModal, update }) => {
   const logUserActivity = useAddUserActivity();
@@ -131,11 +132,7 @@ const UploadCsvModal = ({ tabValue, setModal, update }) => {
               email: item[emailField],
               firstName: item[firstNameField],
               lastName: item[lastNameField],
-              phone: item[phoneNumberField]
-                ? item[phoneNumberField].includes("E")
-                  ? Number(item[phoneNumberField]).toFixed(0)
-                  : item[phoneNumberField].toString().replace(/[^0-9]/g, "")
-                : "",
+              phone: formatPhoneNumber(item[phoneNumberField]),
               location: item[locationField],
               gender: item[genderField],
               totalTimeInSession: parseInt(item[sessionMinutesField], 10) || 0,
@@ -155,11 +152,7 @@ const UploadCsvModal = ({ tabValue, setModal, update }) => {
               email: item[emailField],
               firstName: item[firstNameField],
               lastName: item[lastNameField],
-              phone: item[phoneNumberField]
-                ? item[phoneNumberField].includes("E")
-                  ? Number(item[phoneNumberField]).toFixed(0)
-                  : item[phoneNumberField].toString().replace(/[^0-9]/g, "")
-                : "",
+              phone: formatPhoneNumber(item[phoneNumberField]),
               location: item[locationField],
               gender: item[genderField],
               totalTimeInSession: parseInt(item[sessionMinutesField], 10) || 0,

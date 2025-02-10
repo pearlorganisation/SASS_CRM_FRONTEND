@@ -284,56 +284,98 @@ const FilterModal = ({ modalName, setPage, tabValue }) => {
           </div>
 
           {/* Buttons */}
-          <div className="p-4 border-t border-gray-200 space-y-4">
+          <div className="p-4 border-t border-gray-200 space-y-2">
+            <p className="text-sm font-medium">Sort By</p>
             <div className="grid grid-cols-2 gap-2">
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Sort By
-                </label>
-                <select
-                  value={sortBy.sortBy}
+              <FormControl fullWidth>
+
+                <Select
+                  labelId="sort-by-select-label"
+                  value={sortBy.sortBy || ""}
+                  className="shadow font-semibold h-10"
                   onChange={(e) =>
                     setSortBy((prev) => ({
                       ...prev,
                       sortBy: e.target.value,
                     }))
                   }
-                  className="border rounded-md p-2 text-sm"
-                >
-                  {webinarAttendeesSortByOptions
-                    .filter(
-                      (option) =>
-                        !(
-                          option.value === "timeInSession" &&
-                          tabValue === "preWebinar"
-                        )
-                    )
-                    .map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                </select>
-              </div>
+                  displayEmpty
+                  renderValue={(selected) => {
+                    if (!selected) {
+                      return (
+                        <span style={{ color: "#888" }}>Select Sort By</span> // Placeholder style
+                      );
+                    }
+                    const selectedOption = webinarAttendeesSortByOptions.find(
+                      (option) => option.value === selected
+                    );
 
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium text-gray-700">
-                  Order
-                </label>
-                <select
-                  value={sortBy.sortOrder}
+                    return (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <span>{selectedOption?.label}</span>
+                      </div>
+                    );
+                  }}
+                >
+                  {webinarAttendeesSortByOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      <ListItemText primary={option.label} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <Select
+                  labelId="sort-order-select-label"
+                  value={sortBy.sortOrder || ""}
+                  className="shadow font-semibold h-10"
                   onChange={(e) =>
                     setSortBy((prev) => ({
                       ...prev,
                       sortOrder: e.target.value,
                     }))
                   }
-                  className="border rounded-md p-2 text-sm"
+
+
+                  displayEmpty
+                  renderValue={(selected) => {
+                    if (!selected) {
+                      return (
+                        <span style={{ color: "#888" }}>Select Order</span> // Placeholder style
+                      );
+                    }
+                    const selectedOption = ["asc", "desc"].find(
+                      (option) => option === selected
+                    );
+
+                    return (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <span className="capitalize">{selectedOption}</span>
+                      </div>
+
+                    );
+                  }}
                 >
-                  <option value="asc">Ascending</option>
-                  <option value="desc">Descending</option>
-                </select>
-              </div>
+                  {["asc", "desc"].map((option) => (
+                    <MenuItem key={option} value={option}>
+                      <ListItemText className="capitalize" primary={option} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </div>
             <div className="flex justify-between space-x-2">
               <Button variant="contained" color="primary" onClick={resetForm}>
