@@ -54,7 +54,6 @@ const Webinar = () => {
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
 
-  const tableRef = useRef(null);
 
   useEffect(() => {
     setSearchParams({ page: page });
@@ -139,7 +138,7 @@ const Webinar = () => {
           </Button>
         </ComponentGuard>
       </div>
-      <FullScreen myRef={tableRef}>
+      <FullScreen>
         <DataTable
           tableHeader={tableHeader}
           tableUniqueKey="webinarTable"

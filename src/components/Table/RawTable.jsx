@@ -23,6 +23,7 @@ const RawTable = ({
   locations = null,
   sortByOrder = "asc",
 }) => {
+  // console.log('table data', tableData)
   const { isTablesMasked } = useSelector((state) => state.table);
   const roles = useRoles();
   const tableRef = useRef();
@@ -46,6 +47,10 @@ const RawTable = ({
       tableRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [isLoading]);
+
+  useEffect(() => {
+    console.log(locations, "locations");
+  }, [locations]);
 
   return (
     <div

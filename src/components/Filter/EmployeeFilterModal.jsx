@@ -64,7 +64,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   }, [open]);
 
   return (
-    <Modal open={open} onClose={onClose} disablePortal disablePortal>
+    <Modal open={open} onClose={onClose} disablePortal>
       <Box className="bg-white p-6 rounded-md mx-auto mt-20 w-full max-w-2xl ">
         <Typography variant="h6" className="text-center mb-4">
           Employee Filters

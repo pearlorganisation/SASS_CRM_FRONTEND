@@ -24,7 +24,7 @@ const FullScreen = ({ children }) => {
       className="relative h-full w-full space-y-10  bg-white p-6 rounded-lg"
     >
       <div className="absolute top-0 left-0 w-full h-full">
-        <button className="absolute right-2 top-1" onClick={toggleFullScreen}>
+        <button className="absolute right-5 top-2" onClick={toggleFullScreen}>
           {" "}
           {isFullScreen ? <FullscreenExitIcon fontSize="large"  /> : <FullscreenIcon fontSize="large" />}
         </button>
