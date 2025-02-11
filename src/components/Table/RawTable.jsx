@@ -146,15 +146,15 @@ const RawTable = ({
                 {tableData?.columns?.map((column, colIndex) => (
                   <td
                     key={colIndex}
-                    title={
-                      column.type === "Date"
-                        ? formatDateAsNumberWithTime(row?.[column.key]) ?? "N/A"
-                        : row?.[column.title]
-                        ? "testsssss"
-                        : row?.[column.key]
-                        ? row?.[column.key]
-                        : "N/A"
-                    }
+                    // title={
+                    //   column.type === "Date"
+                    //     ? formatDateAsNumberWithTime(row?.[column.key]) ?? "N/A"
+                    //     : row?.[column.title]
+                    //     ? "testsssss"
+                    //     : row?.[column.key]
+                    //     ? row?.[column.key]
+                    //     : "N/A"
+                    // }
                     className={`px-4 py-2 text-gray-600 max-w-72 truncate ${
                       isRowClickable
                         ? "cursor-pointer"

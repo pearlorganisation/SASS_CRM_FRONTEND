@@ -6,12 +6,12 @@ import {
   updateProduct,
 } from "../../../features/actions/product";
 
-const EditProductModal = ({ setModal, product, page, LIMIT }) => {
+const EditProductModal = ({ setModal, product, page, LIMIT, productLevelData }) => {
   const dispatch = useDispatch();
-
-  const { selectedAttendee, isLoading } = useSelector(
-    (state) => state.attendee
-  );
+  const productLevel = productLevelData.find(
+    (item) => item.label === product?.level
+  )?.level;
+  console.log(productLevel);
 
 
   const {
@@ -21,9 +21,9 @@ const EditProductModal = ({ setModal, product, page, LIMIT }) => {
   } = useForm({
     defaultValues: {
       name: product?.name || "",
-      level: product?.level ? Number(product?.level?.split("")[1]) : "",
       price: product?.price || "",
       description: product?.description || "",
+      level: productLevel ?? "",
     },
   });
 
@@ -33,6 +33,7 @@ const EditProductModal = ({ setModal, product, page, LIMIT }) => {
     console.log(data);
     dispatch(updateProduct(data)).then((res) => {
       dispatch(getAllProducts({ page, limit: LIMIT }));
+      setModal(null);
     });
   };
 
@@ -85,12 +86,11 @@ const EditProductModal = ({ setModal, product, page, LIMIT }) => {
               <option value="" disabled>
                 Select Level
               </option>
-
-              <option value={1}>L1</option>
-
-              <option value={2}>L2</option>
-
-              <option value={3}>L3</option>
+              {productLevelData.map((item) => (
+                <option key={item.level} value={item.level}>
+                  {item.label}
+                </option>
+              ))}
             </select>
             {errors.product && (
               <p className="text-red-500 text-sm mt-1">

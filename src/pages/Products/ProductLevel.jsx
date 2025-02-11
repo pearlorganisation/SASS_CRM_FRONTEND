@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  TextField,
   Button,
-  InputAdornment,
   Modal,
   Box,
   Table,
@@ -12,13 +10,14 @@ import {
   TableBody,
   IconButton,
 } from "@mui/material";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Delete from "../../components/ConfirmDeleteModal";
 import productLevelService from "../../services/productLevelService";
 import { successToast } from "../../utils/extra";
+import FormInput from "../../components/FormInput";
 const LeadTypesForm = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setModalOpen] = useState(false);
@@ -42,13 +41,11 @@ const LeadTypesForm = () => {
       color: "#000000",
     },
   });
-  const [isId, setisId] = useState();
   const [deleteModal, setdeleteModal] = useState(false);
 
   const openModal = (data = null) => {
-    const lastLevel = productLevelData.length;
     setEditData(data);
-    reset(data || { label: "", level: lastLevel });
+    reset(data || { label: "", level: "" });
     setModalOpen(true);
   };
 
@@ -160,27 +157,19 @@ const LeadTypesForm = () => {
               {editData ? "Update Product Level" : "Add Product Level"}
             </h3>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="flex gap-5 items-center">
-                <span className="font-bold">Level : </span>
-                <span>{watch("level")}</span>
-              </div>
+              <FormInput
+                name="level"
+                control={control}
+                type="number"
+                validation={{ required: "Level is required", min: 0 }}
+                placeholder="Enter level"
+              />
 
-              {/* Label Input */}
-              <Controller
+              <FormInput
                 name="label"
                 control={control}
-                rules={{ required: "Label is required" }}
-                render={({ field, fieldState }) => (
-                  <TextField
-                    fullWidth
-                    label="Label"
-                    variant="outlined"
-                    {...field}
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                    placeholder="Enter label"
-                  />
-                )}
+                validation={{ required: "Label is required" }}
+                placeholder="Enter label"
               />
 
               {/* Submit Button */}

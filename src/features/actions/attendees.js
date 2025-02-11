@@ -134,7 +134,7 @@ export const getWebinarEnrollments = createAsyncThunk(
   "enrollments/webinar",
   async ({ id, page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/enrollments/${id}`, {
+      const response = await instance.get(`/enrollments/webinar/${id}`, {
         params: { page, limit },
       });
       return response?.data;

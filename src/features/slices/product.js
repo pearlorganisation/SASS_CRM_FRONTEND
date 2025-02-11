@@ -9,6 +9,8 @@ import {
   deleteProduct,
   getAllProducts,
   getAllProductsByAdminId,
+  getProductLevelCounts,
+  getEnrollmentsByProductLevel,
   updateProduct,
 } from "../actions/product";
 import { errorToast, successToast } from "../../utils/extra";
@@ -20,6 +22,8 @@ const initialState = {
   productDropdownData: [],
   totalPages: 1,
   errorMessage: "",
+  productLevelCounts: [],
+  enrollmentsByProductLevel: [],
 };
 
 // ---------------------------------------------------------------------------------------
@@ -28,6 +32,9 @@ export const productSlice = createSlice({
   name: "product",
   initialState,
   reducers: {
+    clearEnrollmentsByProductLevel: (state) => {
+      state.enrollmentsByProductLevel = [];
+    },
     resetProductState: (state) => {
       state.isLoading = false;
       state.isSuccess = false;
@@ -110,6 +117,30 @@ export const productSlice = createSlice({
         state.isLoading = false;
         state.errorMessage = action.payload;
         errorToast(action?.payload);
+      })
+
+      .addCase(getProductLevelCounts.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getProductLevelCounts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.productLevelCounts = action.payload;
+      })
+      .addCase(getProductLevelCounts.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+
+      .addCase(getEnrollmentsByProductLevel.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getEnrollmentsByProductLevel.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.enrollmentsByProductLevel = action.payload;
+      })
+      .addCase(getEnrollmentsByProductLevel.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
       });
   },
 });
@@ -117,7 +148,7 @@ export const productSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { resetProductState } = productSlice.actions;
+export const { resetProductState, clearEnrollmentsByProductLevel } = productSlice.actions;
 export default productSlice.reducer;
 
 // ================================================== THE END ==================================================

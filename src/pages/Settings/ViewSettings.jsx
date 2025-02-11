@@ -16,7 +16,7 @@ import { MdDelete } from "react-icons/md";
 import { deleteAllData } from "../../features/actions/globalData";
 import { TbRecharging } from "react-icons/tb";
 import { FaRegMoneyBillAlt } from "react-icons/fa";
-
+import { AiOutlineProduct } from "react-icons/ai";
 // Configuration for the links
 
 const ViewSettings = () => {
@@ -69,6 +69,12 @@ const ViewSettings = () => {
       to: "/lead-type",
       name: "Lead Types",
       icon: <MdLeaderboard size={40} />,
+      allowedRoles: [roles.ADMIN],
+    },
+    {
+      to: "/product-level",
+      name: "Product Level",
+      icon: <AiOutlineProduct size={40} />,
       allowedRoles: [roles.ADMIN],
     },
     {
