@@ -27,8 +27,10 @@ const AddEnrollmentModal = ({ setModal, attendeeEmail, webinarData }) => {
     data["attendee"] = attendeeEmail;
     console.log(data)
     dispatch(addEnrollment(data)).then(res => {
-      dispatch(getEnrollments({id: attendeeEmail}));
-      setModal(false)
+      if(res.meta.requestStatus === "fulfilled"){
+        dispatch(getProductLevelCounts(attendeeEmail));
+        setModal(false)
+      }
     })
   };
 

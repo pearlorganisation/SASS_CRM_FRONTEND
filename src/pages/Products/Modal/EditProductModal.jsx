@@ -1,29 +1,39 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllProducts,
   updateProduct,
 } from "../../../features/actions/product";
+import tagsService from "../../../services/tagsService";
+import { Usecase } from "../../../utils/extra";
 
-const EditProductModal = ({ setModal, product, page, LIMIT, productLevelData }) => {
+const EditProductModal = ({
+  setModal,
+  product,
+  page,
+  LIMIT,
+  productLevelData,
+}) => {
   const dispatch = useDispatch();
   const productLevel = productLevelData.find(
     (item) => item.label === product?.level
   )?.level;
-  console.log(productLevel);
+  console.log(product.tag);
 
-
+  const [tagData, setTagData] = useState([]);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
+
     defaultValues: {
       name: product?.name || "",
       price: product?.price || "",
       description: product?.description || "",
       level: productLevel ?? "",
+      tag: product?.tag || "",
     },
   });
 
@@ -32,10 +42,17 @@ const EditProductModal = ({ setModal, product, page, LIMIT, productLevelData }) 
     data["level"] = Number(data.level);
     console.log(data);
     dispatch(updateProduct(data)).then((res) => {
-      dispatch(getAllProducts({ page, limit: LIMIT }));
       setModal(null);
     });
   };
+
+  useEffect(() => {
+    tagsService.getTags({ usecase: Usecase.PRODUCT_TAGGING }).then((res) => {
+      if (res.success) {
+        setTagData(res.data);
+      }
+    });
+  }, []);
 
   return (
     <div className="fixed top-0 left-0 z-[9999] flex h-screen w-screen items-center justify-center bg-slate-300/20 backdrop-blur-sm">
@@ -97,6 +114,25 @@ const EditProductModal = ({ setModal, product, page, LIMIT, productLevelData }) 
                 {errors.product.message}
               </p>
             )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Tag</label>
+            <select
+              {...register("tag")}
+              className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 focus:border-teal-500 focus:outline-none"
+            >
+              <option value="">None</option>
+              {tagData.map((item) => (
+                <option 
+                  key={item._id} 
+                  value={item.name}
+                  selected={product?.tag === item.name}
+                >
+                  {item.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <button

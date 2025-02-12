@@ -166,6 +166,19 @@ export const NotifActionType = {
   ATTENDEE_REGISTRATION: "attendee_registration",
 };
 
+export const DateFormat = {
+  DD_MM_YYYY: "dd-mm-yyyy",
+  MM_DD_YYYY: "mm-dd-yyyy",
+  YYYY_MM_DD: "yyyy-mm-dd",
+};
+
+export const Usecase = {
+  EMPLOYEE_ASSIGNMENT: "employee_assignment",
+  PAYMENT_SUCCESS: "payment_success",
+  PAYMENT_FAILURE: "payment_failure",
+  PRODUCT_TAGGING: "product",
+};
+
 export const copyToClipboard = (id, name) => {
   navigator.clipboard.writeText(id).then(
     () => {

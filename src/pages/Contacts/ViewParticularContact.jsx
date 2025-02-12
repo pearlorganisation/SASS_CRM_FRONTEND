@@ -11,7 +11,6 @@ import NoteItem from "../../components/NoteItem";
 import {
   getAttendee,
   getAttendeeLeadTypeByEmail,
-  getEnrollments,
   updateAttendee,
   updateAttendeeLeadType,
 } from "../../features/actions/attendees";
@@ -143,10 +142,6 @@ const ViewParticularContact = () => {
   }, [selectedAttendee]);
 
   useEffect(() => {
-    console.log(attendeeHistoryData);
-  }, [attendeeHistoryData]);
-
-  useEffect(() => {
     if (!leadTypeData) return;
     const options = leadTypeData.map((item) => ({
       value: item._id,
@@ -216,9 +211,6 @@ const ViewParticularContact = () => {
     );
   }, [noteData, uniquePhones]);
 
-  useEffect(() => {
-    dispatch(getEnrollments({ id: email }));
-  }, [email]);
 
   const cancelMyAlarm = (id) => {
     dispatch(cancelAlarm({ id }));

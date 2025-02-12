@@ -15,7 +15,7 @@ import useRoles from "../../hooks/useRoles";
 import { MdDelete } from "react-icons/md";
 import { deleteAllData } from "../../features/actions/globalData";
 import { TbRecharging } from "react-icons/tb";
-import { FaRegMoneyBillAlt } from "react-icons/fa";
+import { FaRegMoneyBillAlt, FaTags  } from "react-icons/fa";
 import { AiOutlineProduct } from "react-icons/ai";
 // Configuration for the links
 
@@ -45,6 +45,12 @@ const ViewSettings = () => {
       name: "Addons",
       icon: <TbRecharging size={40} />,
       allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
+    },
+    {
+      to: "/tags",
+      name: "Tags",
+      icon: <FaTags size={35} />,
+      allowedRoles: [roles.ADMIN],
     },
     {
       to: "/billing-history",

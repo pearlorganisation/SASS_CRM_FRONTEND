@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { clearEnrollmentsByProductLevel } from '../../features/slices/product';
-import { formatDateAsNumberWithTime } from '../../utils/extra';
+import { formatDateAsNumber, formatDateAsNumberWithTime } from '../../utils/extra';
+import { formatCurrency } from '../../utils/LeadType';
 
 const EnrollmentsTableModal = ({ setModal }) => {
     const dispatch = useDispatch();
@@ -39,8 +40,8 @@ const EnrollmentsTableModal = ({ setModal }) => {
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Level</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Webinar</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Webinar Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Webinar Date</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Enrolled</th>
                   </tr>
@@ -52,13 +53,13 @@ const EnrollmentsTableModal = ({ setModal }) => {
                       <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{enrollment.productLevel}</td>
                       <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">{enrollment.webinarName}</td>
                       <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-                        {formatDateAsNumberWithTime(enrollment.webinarDate)}
+                        {formatDateAsNumber(enrollment.webinarDate)}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-                        ${enrollment.productPrice}
+                        {formatCurrency(enrollment.productPrice)}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-                        {new Date(enrollment.enrollmentDate).toLocaleDateString()}
+                        {formatDateAsNumberWithTime(enrollment.enrollmentDate)}
                       </td>
                     </tr>
                   ))}

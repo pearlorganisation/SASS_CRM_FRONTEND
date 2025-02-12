@@ -117,6 +117,12 @@ export const productTableColumns = [
     width: 10,
     type: "",
   },
+  {
+    header: "Tag",
+    key: "tag",
+    width: 10,
+    type: "",
+  },
   { header: "Description", key: "description", width: 20, type: "" },
 ];
 
