@@ -43,6 +43,7 @@ const ViewProducts = () => {
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
   const [productLevelObj, setProductLevelObj] = useState({});
+  const [productLevelData, setProductLevelData] = useState([]);
 
   const [product, setProduct] = useState(null);
   const [openModal, setOpenModal] = useState(false);
@@ -76,6 +77,7 @@ const ViewProducts = () => {
   useEffect(() => {
     productLevelService.getProductLevels().then((res) => {
       if (res.success) {
+        setProductLevelData(res.data);
         const obj = {};
         res.data.forEach((item) => {
           obj[item.level] = item.label;
@@ -164,6 +166,7 @@ const ViewProducts = () => {
           setModal={setOpenModal}
           page={page}
           LIMIT={LIMIT}
+          productLevelData={productLevelData}
         />
       )}
 

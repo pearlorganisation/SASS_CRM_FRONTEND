@@ -44,14 +44,6 @@ const CreateWebinar = ({ modalName }) => {
   const [options, setOptions] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Dummy employee data
-  const employeeOptions = [
-    { value: "john_doe", label: "John Doe" },
-    { value: "jane_smith", label: "Jane Smith" },
-    { value: "alice_johnson", label: "Alice Johnson" },
-    { value: "bob_brown", label: "Bob Brown" },
-  ];
-
   useEffect(() => {
     if (isSuccess) {
       handleClose();
@@ -98,12 +90,24 @@ const CreateWebinar = ({ modalName }) => {
             modalData?.assignedEmployees?.includes(option.value)
         ) || []
       );
+      const product = productDropdownData?.find(
+        (product) => product.name === modalData?.productName
+      );
+      setSelectedProduct(
+        product
+          ? {
+              value: product?._id,
+              label: product?.name,
+            }
+          : null
+      );
     } else {
       reset({
         webinarName: "",
         webinarDate: "",
       });
       setSelectedEmployees([]);
+      setSelectedProduct(null);
     }
   }, [modalData, open]);
 
@@ -111,6 +115,7 @@ const CreateWebinar = ({ modalName }) => {
     const payload = {
       ...data,
       assignedEmployees: selectedEmployees.map((e) => e.value),
+      productId: selectedProduct?.value,
     };
 
     logUserActivity({
@@ -136,7 +141,13 @@ const CreateWebinar = ({ modalName }) => {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" disablePortal>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="sm"
+      disablePortal
+    >
       <DialogTitle>{modalData ? "Edit Webinar" : "Create Webinar"}</DialogTitle>
       <form onSubmit={handleSubmit(submitForm)}>
         <DialogContent>
@@ -198,11 +209,12 @@ const CreateWebinar = ({ modalName }) => {
                 options={
                   productDropdownData?.map((product) => ({
                     value: product._id,
-                    label: product.name,
+                    label: `${product.name} | Level - ${product.level}`,
                   })) || []
                 }
                 value={selectedProduct}
                 onChange={setSelectedProduct}
+                isClearable={true}
                 placeholder="Select product"
                 menuPortalTarget={document.body}
                 styles={{

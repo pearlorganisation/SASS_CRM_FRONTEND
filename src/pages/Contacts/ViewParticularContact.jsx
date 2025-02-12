@@ -11,7 +11,6 @@ import NoteItem from "../../components/NoteItem";
 import {
   getAttendee,
   getAttendeeLeadTypeByEmail,
-  getEnrollments,
   updateAttendee,
   updateAttendeeLeadType,
 } from "../../features/actions/attendees";
@@ -41,6 +40,7 @@ import { useNavigate } from "react-router-dom";
 import AddEnrollmentModal from "./Modal/AddEnrollmentModal";
 import { cancelAlarm, getAttendeeAlarm } from "../../features/actions/alarm";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
+import ProductLevelTable from "./ProductLevelTable";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -142,10 +142,6 @@ const ViewParticularContact = () => {
   }, [selectedAttendee]);
 
   useEffect(() => {
-    console.log(attendeeHistoryData);
-  }, [attendeeHistoryData]);
-
-  useEffect(() => {
     if (!leadTypeData) return;
     const options = leadTypeData.map((item) => ({
       value: item._id,
@@ -215,9 +211,6 @@ const ViewParticularContact = () => {
     );
   }, [noteData, uniquePhones]);
 
-  useEffect(() => {
-    dispatch(getEnrollments({ id: email }));
-  }, [email]);
 
   const cancelMyAlarm = (id) => {
     dispatch(cancelAlarm({ id }));
@@ -547,8 +540,9 @@ const ViewParticularContact = () => {
                 No record found
               </div>
             ) : (
-              <div className="p-2 bg-neutral-100 rounded-lg shadow-md">
-                <div className=" items-center px-3 text-neutral-800  flex justify-between">
+              <div className="p-6 bg-white rounded-lg shadow-md">
+
+                <div className=" mb-2 items-center px-3 text-neutral-800  flex justify-between">
                   <span className="font-semibold text-xl  ">
                     Enrollments History
                   </span>
@@ -568,7 +562,7 @@ const ViewParticularContact = () => {
                     </Add>
                   </ComponentGuard>
                 </div>
-                <table className="w-full table-auto text-sm text-left ">
+                {/* <table className="w-full table-auto text-sm text-left ">
                   <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
                     <tr>
                       <th className="py-3 px-1">S No.</th>
@@ -577,7 +571,6 @@ const ViewParticularContact = () => {
                       <th className="py-3 px-1">Product Name</th>
                       <th className="py-3  text-center">Price</th>
                       <th className="py-3 px-1">Level</th>
-                      {/* <th className="py-3 px-1">Action</th> */}
                     </tr>
                   </thead>
 
@@ -621,18 +614,14 @@ const ViewParticularContact = () => {
                               {item?.product && item?.product?.level}
                             </td>
 
-                            {/* <td className="px-3 py-4 h-full">
-                              <FaRegEdit
-                                onClick={() => setEditModalData(item)}
-                                className="text-xl cursor-pointer"
-                              />
-                            </td> */}
                           </tr>
                         );
                       })
                     )}
                   </tbody>
-                </table>
+                </table> */}
+
+                <ProductLevelTable email={email} />
               </div>
             )}
           </div>

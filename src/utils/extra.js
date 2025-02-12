@@ -59,6 +59,7 @@ export const formatDateAsNumberWithTime = (dateStr) => {
   return `${day}/${month}/${year} ${date.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
+    second: "2-digit",
   })}`;
 };
 
@@ -163,6 +164,19 @@ export const NotifActionType = {
   WEBINAR_ASSIGNMENT: "webinar_assignment",
   ACCOUNT_DEACTIVATION: "account_deactivation",
   ATTENDEE_REGISTRATION: "attendee_registration",
+};
+
+export const DateFormat = {
+  DD_MM_YYYY: "dd-mm-yyyy",
+  MM_DD_YYYY: "mm-dd-yyyy",
+  YYYY_MM_DD: "yyyy-mm-dd",
+};
+
+export const Usecase = {
+  EMPLOYEE_ASSIGNMENT: "employee_assignment",
+  PAYMENT_SUCCESS: "payment_success",
+  PAYMENT_FAILURE: "payment_failure",
+  PRODUCT_TAGGING: "product",
 };
 
 export const copyToClipboard = (id, name) => {

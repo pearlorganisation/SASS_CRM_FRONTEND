@@ -1,29 +1,39 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getAllProducts,
   updateProduct,
 } from "../../../features/actions/product";
+import tagsService from "../../../services/tagsService";
+import { Usecase } from "../../../utils/extra";
 
-const EditProductModal = ({ setModal, product, page, LIMIT }) => {
+const EditProductModal = ({
+  setModal,
+  product,
+  page,
+  LIMIT,
+  productLevelData,
+}) => {
   const dispatch = useDispatch();
+  const productLevel = productLevelData.find(
+    (item) => item.label === product?.level
+  )?.level;
+  console.log(product.tag);
 
-  const { selectedAttendee, isLoading } = useSelector(
-    (state) => state.attendee
-  );
-
-
+  const [tagData, setTagData] = useState([]);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm({
+
     defaultValues: {
       name: product?.name || "",
-      level: product?.level ? Number(product?.level?.split("")[1]) : "",
       price: product?.price || "",
       description: product?.description || "",
+      level: productLevel ?? "",
+      tag: product?.tag || "",
     },
   });
 
@@ -32,9 +42,17 @@ const EditProductModal = ({ setModal, product, page, LIMIT }) => {
     data["level"] = Number(data.level);
     console.log(data);
     dispatch(updateProduct(data)).then((res) => {
-      dispatch(getAllProducts({ page, limit: LIMIT }));
+      setModal(null);
     });
   };
+
+  useEffect(() => {
+    tagsService.getTags({ usecase: Usecase.PRODUCT_TAGGING }).then((res) => {
+      if (res.success) {
+        setTagData(res.data);
+      }
+    });
+  }, []);
 
   return (
     <div className="fixed top-0 left-0 z-[9999] flex h-screen w-screen items-center justify-center bg-slate-300/20 backdrop-blur-sm">
@@ -85,18 +103,36 @@ const EditProductModal = ({ setModal, product, page, LIMIT }) => {
               <option value="" disabled>
                 Select Level
               </option>
-
-              <option value={1}>L1</option>
-
-              <option value={2}>L2</option>
-
-              <option value={3}>L3</option>
+              {productLevelData.map((item) => (
+                <option key={item.level} value={item.level}>
+                  {item.label}
+                </option>
+              ))}
             </select>
             {errors.product && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.product.message}
               </p>
             )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium">Tag</label>
+            <select
+              {...register("tag")}
+              className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 focus:border-teal-500 focus:outline-none"
+            >
+              <option value="">None</option>
+              {tagData.map((item) => (
+                <option 
+                  key={item._id} 
+                  value={item.name}
+                  selected={product?.tag === item.name}
+                >
+                  {item.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <button

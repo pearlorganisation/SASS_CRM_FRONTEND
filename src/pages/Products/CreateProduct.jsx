@@ -14,14 +14,19 @@ import {
 } from "@mui/material";
 import FormInput from "../../components/FormInput";
 import productLevelService from "../../services/productLevelService";
-
+import tagsService from "../../services/tagsService";
+import { Usecase } from "../../utils/extra";
 const CreateProduct = () => {
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      tag: "",
+    },
+  });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { productData, isSuccess, isLoading } = useSelector(
@@ -30,6 +35,7 @@ const CreateProduct = () => {
   const { userData } = useSelector((state) => state.auth);
   const { webinarData } = useSelector((state) => state.webinarContact);
   const [productLevelData, setProductLevelData] = useState([]);
+  const [tagData, setTagData] = useState([]);
 
   const onSubmit = (data) => {
     const newData = { ...data };
@@ -48,6 +54,11 @@ const CreateProduct = () => {
     productLevelService.getProductLevels().then((res) => {
       if (res.success) {
         setProductLevelData(res.data);
+      }
+    });
+    tagsService.getTags({ usecase: Usecase.PRODUCT_TAGGING }).then((res) => {
+      if (res.success) {
+        setTagData(res.data);
       }
     });
   }, []);
@@ -142,7 +153,6 @@ const CreateProduct = () => {
             </div> */}
 
             {/* Product Level */}
-            <div>
               <FormControl fullWidth variant="outlined" error={!!errors.level}>
                 <InputLabel>Product Level</InputLabel>
                 <Controller
@@ -159,7 +169,6 @@ const CreateProduct = () => {
                           {item.label}
                         </MenuItem>
                       ))}
-
                     </Select>
                   )}
                 />
@@ -169,7 +178,26 @@ const CreateProduct = () => {
                   </p>
                 )}
               </FormControl>
-            </div>
+              <FormControl fullWidth variant="outlined">
+                <InputLabel>Tag</InputLabel>
+                <Controller
+                  name="tag"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <Select {...field} label="Tag">
+                      <MenuItem value="" disabled>
+                        Select a tag
+                      </MenuItem>
+                      {tagData.map((item) => (
+                        <MenuItem key={item._id} value={item.name}>
+                          {item.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  )}
+                />
+              </FormControl>
 
             {/* Description */}
             <div className="sm:col-span-2">

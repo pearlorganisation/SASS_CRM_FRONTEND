@@ -1,5 +1,10 @@
 import React, { Suspense, useEffect, useRef, useState } from "react";
-import { createBrowserRouter, Link, RouterProvider, useNavigate } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Link,
+  RouterProvider,
+  useNavigate,
+} from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -47,6 +52,7 @@ import {
   UpdateClientPlan,
   Revenue,
   ProductLevel,
+  ManageTags,
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 
@@ -527,6 +533,14 @@ const App = () => {
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
               <Locations />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/tags",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <ManageTags />
             </RouteGuard>
           ),
         },

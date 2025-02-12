@@ -66,12 +66,8 @@ export const createAttendeeProduct = createAsyncThunk(
     } catch (e) {
       return rejectWithValue(e);
     }
-
-    
   }
-  
 );
-
 
 export const deleteProduct = createAsyncThunk(
   "attendeeProduct/delete",
@@ -82,9 +78,36 @@ export const deleteProduct = createAsyncThunk(
     } catch (e) {
       return rejectWithValue(e);
     }
-
-    
   }
-  
 );
 
+export const getProductLevelCounts = createAsyncThunk(
+  "product/level/counts",
+  async (email, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.get(`/enrollments/product-level-counts`, {
+        params: { email },
+      });
+      return data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
+export const getEnrollmentsByProductLevel = createAsyncThunk(
+  "enrollments/product-level",
+  async ({ email, productLevel }, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.get(
+        `/enrollments/product-level-enrollments`,
+        {
+          params: { email, productLevel },
+        }
+      );
+      return data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
