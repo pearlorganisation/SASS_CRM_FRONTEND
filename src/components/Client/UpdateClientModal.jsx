@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import {
   Dialog,
   DialogActions,
@@ -12,6 +12,7 @@ import {
   Box,
   InputAdornment,
   IconButton,
+  MenuItem,
 } from "@mui/material";
 import { updateClient } from "../../features/actions/client";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,12 +21,11 @@ import { ClipLoader } from "react-spinners";
 import { closeModal } from "../../features/slices/modalSlice";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { DateFormat } from "../../utils/extra";
 
 const UpdateClientModal = ({ modalName }) => {
   const logUserActivity = useAddUserActivity();
-  const {  modalData: defaultUserInfo } = useSelector(
-    (state) => state.modals
-  );
+  const { modalData: defaultUserInfo } = useSelector((state) => state.modals);
 
   const dispatch = useDispatch();
   const { isUpdating, isSuccess } = useSelector((state) => state.client);
@@ -36,8 +36,13 @@ const UpdateClientModal = ({ modalName }) => {
     handleSubmit,
     reset,
     watch,
+    control,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      dateFormat: DateFormat.DD_MM_YYYY
+    }
+  });
 
   const [showPassword, setShowPassword] = useState({
     newPassword: false,
@@ -45,12 +50,14 @@ const UpdateClientModal = ({ modalName }) => {
   });
 
   useEffect(() => {
+    console.log(defaultUserInfo);
     reset({
       userName: defaultUserInfo?.userName,
       email: defaultUserInfo?.email,
       phone: defaultUserInfo?.phone,
       companyName: defaultUserInfo?.companyName,
       _id: defaultUserInfo?._id,
+      dateFormat: defaultUserInfo?.dateFormat,
     });
   }, [defaultUserInfo]);
 
@@ -61,6 +68,7 @@ const UpdateClientModal = ({ modalName }) => {
       payload.email = data.email;
       payload.phone = data.phone;
       payload.companyName = data.companyName;
+      payload.dateFormat = data.dateFormat;
     } else {
       payload.password = data.newPassword;
     }
@@ -161,7 +169,8 @@ const UpdateClientModal = ({ modalName }) => {
                   required: "Phone number is required.",
                   pattern: {
                     value: /^\+\d{1,3}\d{9}$/,
-                    message: "10 Digit Phone number with Country Code is required, eg: +911234567890",
+                    message:
+                      "10 Digit Phone number with Country Code is required, eg: +911234567890",
                   },
                 })}
                 label="Phone"
@@ -182,6 +191,27 @@ const UpdateClientModal = ({ modalName }) => {
                 fullWidth
                 error={!!errors.companyName}
                 helperText={errors.companyName?.message}
+              />
+
+              <Controller
+                name="dateFormat"
+                control={control}
+                rules={{ required: "Date Format is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    select
+                    label="Date Format"
+                    variant="outlined"
+                    error={!!errors.dateFormat}
+                    helperText={errors.dateFormat?.message}
+                  >
+                    <MenuItem value={DateFormat.MM_DD_YYYY}>MM-DD-YYYY</MenuItem>
+                    <MenuItem value={DateFormat.DD_MM_YYYY}>DD-MM-YYYY</MenuItem>
+                    <MenuItem value={DateFormat.YYYY_MM_DD}>YYYY-MM-DD</MenuItem>
+                  </TextField>
+                )}
               />
             </Box>
           )}

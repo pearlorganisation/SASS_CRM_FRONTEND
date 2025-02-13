@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
 import ModalFallback from "../../components/Fallback/ModalFallback";
 import FullScreen from "../../components/FullScreen";
+import { DateFormat } from "../../utils/extra";
 
 const Webinar = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -38,6 +39,7 @@ const Webinar = () => {
     (state) => state.webinarContact
   );
   const { userData } = useSelector((state) => state.auth);
+  const dateFormat = userData?.dateFormat || DateFormat.DD_MM_YYYY;
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [id, setId] = useState();
@@ -176,6 +178,7 @@ const Webinar = () => {
             filters={filters}
             setFilters={setFilters}
             modalName={filterModalName}
+            dateFormat={dateFormat}
           />
         </Suspense>
 

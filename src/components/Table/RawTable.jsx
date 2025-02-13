@@ -1,11 +1,8 @@
 import React, { memo, useEffect, useRef } from "react";
 import {
-  formatDate,
-  formatDateAsNumber,
   formatDateAsNumberWithTime,
 } from "../../utils/extra";
 import { useSelector } from "react-redux";
-import useRoles from "../../hooks/useRoles";
 
 const RawTable = ({
   tableData,
@@ -25,7 +22,6 @@ const RawTable = ({
 }) => {
   // console.log('table data', tableData)
   const { isTablesMasked } = useSelector((state) => state.table);
-  const roles = useRoles();
   const tableRef = useRef();
 
   // console.log("RawTable -> Rendered");
@@ -47,10 +43,6 @@ const RawTable = ({
       tableRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [isLoading]);
-
-  useEffect(() => {
-    console.log(locations, "locations");
-  }, [locations]);
 
   return (
     <div

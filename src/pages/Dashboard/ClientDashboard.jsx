@@ -5,13 +5,17 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
 import { getDashboardData } from "../../features/actions/globalData";
-import { errorToast } from "../../utils/extra";
+import { DateFormat, errorToast } from "../../utils/extra";
 // import { resetDashboardData } from "../../features/slices/globalData";
 
 const ClientDashboard = () => {
   const dispatch = useDispatch();
   const { dashBoardCardsData } = useSelector((state) => state.globalData);
   const [rows, setRows] = useState([]);
+  const {userData} = useSelector((state) => state.auth);
+  const dateFormat = userData?.dateFormat || DateFormat.DD_MM_YYYY;
+
+  console.log(dateFormat);
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -115,7 +119,11 @@ const ClientDashboard = () => {
               selected={startDate}
               onChange={handleStartDateChange}
               placeholderText="Select start date"
-              dateFormat="dd-MM-yyyy"
+              dateFormat={dateFormat}
+              showYearDropdown
+              maxDate={new Date()}
+              showMonthDropdown
+              dropdownMode="select"
             />
           </Box>
           <Box display="flex" gap={2} alignItems="center">
@@ -125,7 +133,11 @@ const ClientDashboard = () => {
               selected={endDate}
               onChange={handleEndDateChange}
               placeholderText="Select end date"
-              dateFormat="dd-MM-yyyy"
+              dateFormat={dateFormat}
+              maxDate={new Date()}
+              showYearDropdown
+              showMonthDropdown
+              dropdownMode="select"
             />
           </Box>
           <Button

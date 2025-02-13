@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { getAttendeeAlarm, setAlarm } from "../../../features/actions/alarm";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-const ViewTimerModal = ({ setModal, email, attendeeId }) => {
+const ViewTimerModal = ({ setModal, email, attendeeId, dateFormat }) => {
   const {
     control,
     register,
@@ -12,16 +14,17 @@ const ViewTimerModal = ({ setModal, email, attendeeId }) => {
     formState: { errors },
   } = useForm();
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const [date, setDate] = useState(new Date());
 
   const onSubmit = (data) => {
-    data['email'] = email
-    data['attendeeId'] = attendeeId
-    data['date'] = new Date(data['date']).toISOString()
+    data["email"] = email;
+    data["attendeeId"] = attendeeId;
+    data["date"] = date.toISOString();
     dispatch(setAlarm(data)).then(() => {
-      dispatch(getAttendeeAlarm({email}))
-    })
-    setModal(false)
+      dispatch(getAttendeeAlarm({ email }));
+    });
+    setModal(false);
   };
 
   return (
@@ -34,17 +37,17 @@ const ViewTimerModal = ({ setModal, email, attendeeId }) => {
     >
       {/*    <!-- Modal --> */}
       <div
-        className="relative h-auto max-w-full  flex-col gap-6 overflow-hidden rounded bg-white p-6 shadow-xl "
+        className="relative h-auto max-w-full  flex-col gap-6  rounded bg-white p-6 shadow-xl "
         id="modal"
         role="document"
       >
-             <button
-              onClick={() => setModal(false)}
-              className="absolute right-2 top-2 w-8 h-8 rounded-full hover:bg-green-500 hover:text-white transition duration-300"
-              aria-label="close dialog"
-            >
-            X
-            </button>
+        <button
+          onClick={() => setModal(false)}
+          className="absolute right-2 top-2 w-8 h-8 rounded-full hover:bg-green-500 hover:text-white transition duration-300"
+          aria-label="close dialog"
+        >
+          X
+        </button>
         <div className="flex gap-5">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className=" rounded-lg p-5 bg-slate-50 w-full">
@@ -63,14 +66,18 @@ const ViewTimerModal = ({ setModal, email, attendeeId }) => {
                         <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
                       </svg>
                     </div>
-                    <input
-                      {...register("date", { required: true })}
-                      id="datepicker-format"
-                      datepicker
-                      datepicker-format="mm-dd-yyyy"
-                      type="datetime-local"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dateTime-picker"
-                      placeholder="Select date"
+
+                    <DatePicker
+                      className="border w-full p-2 rounded-lg"
+                      selected={date}
+                      onChange={(date) => setDate(date)}
+                      placeholderText="Select start date"
+                      dateFormat={`${dateFormat} hh:mm aa`}
+                      showYearDropdown
+                      showMonthDropdown
+                      dropdownMode="select"
+                      timeInputLabel="Time:"
+                      showTimeInput
                     />
                   </div>
                 </div>
@@ -94,7 +101,6 @@ const ViewTimerModal = ({ setModal, email, attendeeId }) => {
               </button>
             </div>
           </form>
-
         </div>
       </div>
     </div>
