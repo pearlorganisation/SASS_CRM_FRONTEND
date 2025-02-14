@@ -1,13 +1,20 @@
-import { useEffect, useState } from "react";
+import { lazy, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { logIn } from "../../../features/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
-import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import TextField from "@mui/material/TextField";
+
+
 import { getGlobalData } from "../../../features/actions/globalData";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import ForgotPasswordModal from "../ForgotPassword/ForgotPassword";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+const ForgotPasswordModal = lazy(() => import("../ForgotPassword/ForgotPassword"));
+import TailwindLoader from "../../../components/TailwindLoader";
+import ModalFallback from "../../../components/Fallback/ModalFallback";
 
 function Login() {
   const dispatch = useDispatch();
@@ -180,7 +187,7 @@ function Login() {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton onClick={togglePasswordVisibility}>
-                      {isPasswordHidden ? <VisibilityOff /> : <Visibility />}
+                      {isPasswordHidden ? <VisibilityOffIcon /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -195,7 +202,7 @@ function Login() {
               color="primary"
               disabled={isLoading}
             >
-              {isLoading ? <ClipLoader color="#fff" size={20} /> : "Sign In"}
+              {isLoading ? <TailwindLoader size={6} /> : "Sign In"}
             </Button>
           </form>
           {/* Forgot Password Link */}
@@ -208,7 +215,9 @@ function Login() {
             </button>
           </div>
           {forgotModalOpen && (
-            <ForgotPasswordModal onClose={() => setForgotModalOpen(false)} />
+            <Suspense fallback={<ModalFallback/>}>
+              <ForgotPasswordModal onClose={() => setForgotModalOpen(false)} />
+            </Suspense>
           )}
         </div>
       </div>

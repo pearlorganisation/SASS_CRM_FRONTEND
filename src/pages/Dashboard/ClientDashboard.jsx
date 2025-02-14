@@ -15,8 +15,6 @@ const ClientDashboard = () => {
   const {userData} = useSelector((state) => state.auth);
   const dateFormat = userData?.dateFormat || DateFormat.DD_MM_YYYY;
 
-  console.log(dateFormat);
-
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 

@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useRef, useState } from "react";
+import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   createBrowserRouter,
   Link,
@@ -67,7 +67,12 @@ import useAddUserActivity from "./hooks/useAddUserActivity";
 
 import { socket } from "./socket";
 import TrapFocus from "@mui/material/Unstable_TrapFocus";
-import { Box, Button, Fade, Paper, Stack, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Fade from "@mui/material/Fade";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 
 import alarm from "/alarm.wav";
 import { setEmployeeModeId } from "./features/slices/employee";
@@ -77,7 +82,7 @@ import { newNotification } from "./features/slices/notification";
 import { NotifActionType } from "./utils/extra";
 import { logout } from "./features/slices/auth";
 import LayoutFallback from "./components/Fallback/LayoutFallback";
-import Locations from "./pages/Location/Location";
+const Locations = lazy(() => import("./pages/Location/Location"));
 
 const App = () => {
   const dispatch = useDispatch();
@@ -525,14 +530,20 @@ const App = () => {
 
         {
           path: "/locations",
-          element: <Locations />,
+          element: (
+            <Suspense fallback={<></>}>
+              <Locations />
+            </Suspense>
+          ),
         },
 
         {
           path: "/locations/requests",
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
-              <Locations />
+              <Suspense fallback={<></>}>
+                <Locations />
+              </Suspense>
             </RouteGuard>
           ),
         },

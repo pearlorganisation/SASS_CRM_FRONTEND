@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import {
-  Box,
-  Button,
-  Collapse,
-  IconButton,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+
 import EditIcon from "@mui/icons-material/Edit";
 import PasswordUpdateForm from "../../components/Profile/PasswordUpdateForm";
 import EditUserForm from "../../components/Profile/EditUserForm";
@@ -24,7 +19,7 @@ import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import useRoles from "../../hooks/useRoles";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import ConfirmDeleteModal from "../../components/ConfirmDeleteModal";
-import { formatDate, formatDateAsNumber } from "../../utils/extra";
+import { DateFormat, formatDateAsNumber } from "../../utils/extra";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
@@ -35,6 +30,8 @@ const ProfilePage = () => {
   const { isLoading, userData, isSuccess, subscription } = useSelector(
     (state) => state.auth
   );
+
+  const dateFormat = userData?.dateFormat || DateFormat.DD_MM_YYYY;
   const totalContactLimit =
     (subscription?.contactLimit ?? 0) + (subscription?.contactLimitAddon ?? 0);
   const totalEmployeeLimit =
@@ -112,6 +109,9 @@ const ProfilePage = () => {
                 <p className="mb-2">
                   <strong>Company:</strong> {userData?.companyName || "N/A"}
                 </p>
+                <p className="mb-2">
+                  <strong>Date Format:</strong> {dateFormat?.toUpperCase().replaceAll("-", "/")}
+                </p>
                 <ComponentGuard allowedRoles={[roles.ADMIN]}>
                   <p className="mb-2">
                     <strong>GST Number:</strong> {userData?.gst || "N/A"}
@@ -143,7 +143,6 @@ const ProfilePage = () => {
                                 {doc?.originalname}
                               </Typography>
 
-                              <Tooltip title="Delete" arrow>
                                 <button
                                   onClick={() => {
                                     setDoc(doc);
@@ -153,7 +152,6 @@ const ProfilePage = () => {
                                 >
                                   <Delete />
                                 </button>
-                              </Tooltip>
                             </div>
                           ))
                         : null}

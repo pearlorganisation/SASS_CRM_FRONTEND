@@ -1,16 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
-import {
-  IconButton,
-  Badge,
-  Box,
-  Typography,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-} from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useDispatch, useSelector } from "react-redux";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import {
   getUserNotifications,
   resetUnseenCount,
@@ -103,80 +93,67 @@ const NotificationBell = ({ userData, roles }) => {
 
   return (
     <div className="sm:relative">
-      <IconButton ref={bellRef} onClick={handleBellClick}>
-        <Badge
-          badgeContent={unseenCount}
-          color="error"
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-        >
-          <NotificationsIcon />
-        </Badge>
-      </IconButton>
+      <button 
+        ref={bellRef} 
+        onClick={handleBellClick}
+        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+      >
+        <div className="relative">
+          <NotificationsIcon className="text-gray-600" />
+          {unseenCount > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+              {unseenCount}
+            </span>
+          )}
+        </div>
+      </button>
 
       {isOpen && (
-        <Box
+        <div
           ref={dropdownRef}
-          className="absolute right-0 mt-2 w-96 p-4 bg-white shadow-lg rounded-lg border border-gray-200"
-          sx={{ maxHeight: "400px", overflowY: "auto" }}
+          className="absolute right-0 mt-2 w-96 bg-white shadow-lg rounded-lg border border-gray-200 max-h-[400px] overflow-y-auto"
         >
-          <div className="flex justify-between">
-            <Typography variant="h6" className="font-bold mb-2">
-              Notifications
-            </Typography>
-            <div
-              onClick={() => {
-                navigate(`/notifications/${userData?._id}`)
-                setIsOpen(false);
-              }}
-              className="text-gray-500 cursor-pointer hover:text-gray-900 hover:underline"
-            >
-              View All
+          <div className="p-4">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-bold">Notifications</h3>
+              <button
+                onClick={() => {
+                  navigate(`/notifications/${userData?._id}`);
+                  setIsOpen(false);
+                }}
+                className="text-gray-500 hover:text-gray-900 hover:underline"
+              >
+                View All
+              </button>
+            </div>
+            <hr className="my-2 border-gray-200" />
+            <div className="divide-y">
+              {notifications.map((notif) => (
+                <div 
+                  key={notif._id}
+                  onClick={() => handleClick(notif)}
+                  className="p-3 hover:bg-gray-50 cursor-pointer"
+                >
+                  <div className="font-medium">{notif?.title}</div>
+                  <p className="text-gray-600 text-sm">{notif?.message}</p>
+                  <div className="text-xs text-gray-500 text-right mt-1">
+                    {new Date(notif?.createdAt).toLocaleDateString()} •{" "}
+                    {new Date(notif?.createdAt).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
+                </div>
+              ))}
+
+              {notifications.length === 0 && (
+                <div className="p-4 text-center text-gray-700">
+                  No notifications found
+                </div>
+              )}
             </div>
           </div>
-          <Divider />
-          <List>
-            {notifications.map((notif) => (
-              <ListItem key={notif._id} 
-              onClick={() => handleClick(notif)}
-              className="border-b cursor-pointer">
-                <ListItemText
-                  primary={notif?.title}
-                  secondary={
-                    <>
-                      {notif?.message}
-                      <div className="flex justify-end">
-
-                      <Typography 
-                        component="span" 
-                        display="block" 
-                        variant="caption"
-                        className="text-xs text-gray-500"
-                      >
-                        {new Date(notif?.createdAt).toLocaleDateString()} •{" "}
-                        {new Date(notif?.createdAt).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </Typography>
-                      </div>
-                    </>
-                  }
-                />
-              </ListItem>
-            ))}
-
-            {notifications.length === 0 && (
-              <div className="flex justify-center items-center">
-                <p className="text-lg font-semibold text-gray-700">
-                  No notifications found
-                </p>
-              </div>
-            )}
-          </List>
-        </Box>
+        </div>
       )}
     </div>
   );
