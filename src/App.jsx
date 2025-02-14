@@ -1,9 +1,8 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   createBrowserRouter,
-  Link,
   RouterProvider,
-  useNavigate,
+  Navigate,
 } from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
@@ -53,6 +52,7 @@ import {
   Revenue,
   ProductLevel,
   ManageTags,
+  Locations
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 
@@ -82,7 +82,6 @@ import { newNotification } from "./features/slices/notification";
 import { NotifActionType } from "./utils/extra";
 import { logout } from "./features/slices/auth";
 import LayoutFallback from "./components/Fallback/LayoutFallback";
-const Locations = lazy(() => import("./pages/Location/Location"));
 
 const App = () => {
   const dispatch = useDispatch();
@@ -202,8 +201,6 @@ const App = () => {
     dispatch(getCurrentUser());
   }, []);
 
-  // dispatch(clearLoadingAndData())
-
   const router = createBrowserRouter([
     {
       path: "/",
@@ -212,11 +209,8 @@ const App = () => {
           <Layout />
         </Suspense>
       ) : (
-        <Suspense fallback={<></>}>
-          <Login />
-        </Suspense>
+        <Navigate to="/login" replace />
       ),
-
       children: [
         {
           path: "/",
@@ -530,20 +524,14 @@ const App = () => {
 
         {
           path: "/locations",
-          element: (
-            <Suspense fallback={<></>}>
-              <Locations />
-            </Suspense>
-          ),
+          element: <Locations />,
         },
 
         {
           path: "/locations/requests",
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
-              <Suspense fallback={<></>}>
-                <Locations />
-              </Suspense>
+              <Locations />
             </RouteGuard>
           ),
         },
@@ -556,6 +544,10 @@ const App = () => {
           ),
         },
       ],
+    },
+    {
+      path: "/login",
+      element: !isUserLoggedIn ?<Suspense fallback={<></>}> <Login /></Suspense> : <Navigate to="/" replace />,
     },
     {
       path: "*",

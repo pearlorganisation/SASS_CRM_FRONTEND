@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { logIn } from "../../../features/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +18,7 @@ import ModalFallback from "../../../components/Fallback/ModalFallback";
 
 function Login() {
   const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.auth);
+  const { isLoading, isUserLoggedIn } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const { landingGlobalData } = useSelector((state) => state.globalData);
   const [isPasswordHidden, setPasswordHidden] = useState(false);
@@ -39,14 +39,14 @@ function Login() {
   };
 
   useEffect(() => {
-    if (window.location.pathname !== "/") {
-      navigate("/", { replace: true });
-    }
-  }, [navigate]);
-
-  useEffect(() => {
     dispatch(getGlobalData());
   }, []);
+
+  useEffect(() => {
+    if (isUserLoggedIn) {
+      navigate("/", { replace: true });
+    }
+  }, [isUserLoggedIn, navigate]);
 
   function getFileURL(filename = "", destination = "") {
     const baseUrl =

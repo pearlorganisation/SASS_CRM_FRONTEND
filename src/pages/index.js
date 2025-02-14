@@ -56,6 +56,7 @@ const UpdateClientPlan = lazy(() => import("./Clients/UpdateClientPlan"));
 const Revenue = lazy(() => import("./Revenue/Revenue"));
 const ProductLevel = lazy(() => import("./Products/ProductLevel"));
 const ManageTags = lazy(() => import("./Settings/Tags/ManageTags"));
+const Locations = lazy(() => import("./Location/Location"));
 
 export {
   CalendarPage,
@@ -102,4 +103,5 @@ export {
   Revenue,
   ProductLevel,
   ManageTags,
+  Locations,
 };
