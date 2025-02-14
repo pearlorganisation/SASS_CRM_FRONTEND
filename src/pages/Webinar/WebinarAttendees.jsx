@@ -1,4 +1,5 @@
-import React, { useEffect, useState, lazy, Suspense } from "react";
+import React, { useEffect, useState, lazy, Suspense, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Pullbacks = lazy(() => import("./Pullbacks"));
 const Enrollments = lazy(() => import("./Enrollments"));
@@ -10,25 +11,35 @@ import { Button, Tabs, Tab } from "@mui/material";
 import { createPortal } from "react-dom";
 import { AttachFile, ContentCopy } from "@mui/icons-material";
 import { getLeadType } from "../../features/actions/assign";
-import { AssignmentStatus, copyToClipboard, NotifActionType } from "../../utils/extra";
+import {
+  AssignmentStatus,
+  copyToClipboard,
+  NotifActionType,
+} from "../../utils/extra";
 import { getAllEmployees } from "../../features/actions/employee";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
-import EmployeeAssignModal from "../Attendees/Modal/EmployeeAssignModal";
-import ReAssignmentModal from "../../components/Webinar/ReAssignmentModal";
-import UpdateCsvXslxModal from "./modal/UpdateCsvXslxModal";
+const EmployeeAssignModal = lazy(() =>
+  import("../Attendees/Modal/EmployeeAssignModal")
+);
+const ReAssignmentModal = lazy(() =>
+  import("../../components/Webinar/ReAssignmentModal")
+);
+const UpdateCsvXslxModal = lazy(() => import("./modal/UpdateCsvXslxModal"));
 import DataTableFallback from "../../components/Fallback/DataTableFallback";
 import { fetchPullbackRequestCounts } from "../../features/actions/reAssign";
 import { socket } from "../../socket";
+import ModalFallback from "../../components/Fallback/ModalFallback";
+
 
 const WebinarAttendees = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
+  const navigate = useNavigate();
 
+  
   const { userData } = useSelector((state) => state.auth);
   const { reAssignCounts } = useSelector((state) => state.reAssign);
-  console.log(reAssignCounts);
-
   const [selectedRows, setSelectedRows] = useState([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [showModal, setShowModal] = useState(false);
@@ -39,53 +50,52 @@ const WebinarAttendees = () => {
   const [reAssignModal, setReAssignModal] = useState(false);
   const webinarName = searchParams.get("webinarName");
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
-  const [tabValue, setTabValue] = useState(
-    searchParams.get("tabValue") || "preWebinar"
-  );
-  const [subTabValue, setSubTabValue] = useState(
-    searchParams.get("subTabValue") || "attendees"
-  );
+  const tabValueRef = useRef(searchParams.get("tabValue") || "preWebinar");
+  const subTabValueRef = useRef(searchParams.get("subTabValue") || "attendees");
 
   useEffect(() => {
     setSearchParams({
       page: page,
       webinarName: webinarName,
-      tabValue: tabValue,
-      subTabValue: subTabValue,
+      tabValue: tabValueRef.current,
+      subTabValue: subTabValueRef.current,
     });
   }, [page]);
 
   useEffect(() => {
     setSearchParams({
-      tabValue: tabValue,
+      tabValue: tabValueRef.current,
       page: 1,
       webinarName: webinarName,
-      subTabValue: subTabValue,
+      subTabValue: subTabValueRef.current,
     });
     fetchCounts();
-  }, [tabValue]);
+  }, [tabValueRef.current]);
 
   useEffect(() => {
     setSearchParams({
-      tabValue: tabValue,
+      tabValue: tabValueRef.current,
       page: 1,
       webinarName: webinarName,
-      subTabValue: subTabValue,
+      subTabValue: subTabValueRef.current,
     });
-  }, [subTabValue]);
+  }, [subTabValueRef.current]);
 
   useEffect(() => {
     dispatch(getLeadType());
     dispatch(getAllEmployees({}));
+
+   
+
   }, []);
 
   function fetchCounts() {
-    if (tabValue !== "enrollments") {
+    if (tabValueRef.current !== "enrollments") {
       dispatch(
         fetchPullbackRequestCounts({
           webinarId: id,
           status: "active",
-          recordType: tabValue,
+          recordType: tabValueRef.current,
         })
       );
     }
@@ -101,11 +111,11 @@ const WebinarAttendees = () => {
     return () => {
       socket.off("notification", onNotification);
     };
-  }, [tabValue, id]);
+  }, [tabValueRef.current, id]);
 
   // Tabs change handler
   const handleTabChange = (_, newValue) => {
-    setTabValue(newValue);
+    tabValueRef.current = newValue;
     setPage(1);
     setSelectedRows([]);
     logUserActivity({
@@ -116,7 +126,7 @@ const WebinarAttendees = () => {
   };
 
   const handleSubTabChange = (_, newValue) => {
-    setSubTabValue(newValue);
+    subTabValueRef.current = newValue;
     setSelectedRows([]);
     setPage(1);
     // logUserActivity({
@@ -132,7 +142,7 @@ const WebinarAttendees = () => {
     <div className="px-6 md:px-10 pt-10 space-y-6">
       {/* Tabs for Sales and Reminder */}
       <Tabs
-        value={tabValue}
+        value={tabValueRef.current}
         onChange={handleTabChange}
         centered
         className="border-b border-gray-200"
@@ -145,12 +155,9 @@ const WebinarAttendees = () => {
           label="Enrollments"
           value="enrollments"
           style={{
-            // border: "1px solid red",
             color: "gray",
           }}
         />
-
-        {/* <Tab label="UnAttended" value="unattended" className="text-gray-600" /> */}
       </Tabs>
 
       <div className="flex gap-4 justify-between flex-wrap items-center">
@@ -164,21 +171,20 @@ const WebinarAttendees = () => {
             {id}
           </Button>
 
-          {selectedRows.length > 0 &&
-            subTabValue === "attendees" &&
-            tabValue !== "enrollments" && (
+          {subTabValueRef.current === "attendees" &&
+            tabValueRef.current !== "enrollments" && (
               <Button onClick={() => setSwapOpen(true)} variant="contained">
                 Swap Columns
               </Button>
             )}
           {selectedRows.length > 0 &&
             (!(selectedAssignmentType === "All") ||
-              subTabValue !== "attendees") && (
+              subTabValueRef.current !== "attendees") && (
               <button
                 className=" px-4 py-2 text-white bg-blue-500 rounded-md"
                 onClick={() => {
                   if (
-                    subTabValue === "attendees" &&
+                    subTabValueRef.current === "attendees" &&
                     selectedAssignmentType === "Not Assigned"
                   ) {
                     setAssignModal(true);
@@ -188,15 +194,15 @@ const WebinarAttendees = () => {
                 }}
                 variant="contained"
               >
-                {subTabValue === "attendees" &&
+                {subTabValueRef.current === "attendees" &&
                 selectedAssignmentType === "Not Assigned"
                   ? "Assign"
                   : "Re-Assign"}
               </button>
             )}
           {userData?.isActive &&
-            tabValue !== "enrollments" &&
-            subTabValue === "attendees" &&
+            tabValueRef.current !== "enrollments" &&
+            subTabValueRef.current === "attendees" &&
             selectedRows.length === 0 && (
               <Button
                 onClick={() => setShowModal((prev) => !prev)}
@@ -208,9 +214,9 @@ const WebinarAttendees = () => {
             )}
         </div>
 
-        {tabValue !== "enrollments" && (
+        {tabValueRef.current !== "enrollments" && (
           <Tabs
-            value={subTabValue}
+            value={subTabValueRef.current}
             onChange={handleSubTabChange}
             centered
             className="border-b border-gray-200"
@@ -249,67 +255,80 @@ const WebinarAttendees = () => {
         )}
       </div>
       <Suspense fallback={<DataTableFallback />}>
-        {subTabValue === "attendees" && tabValue !== "enrollments" && (
-          <WebinarAttendeesPage
-            userData={userData}
-            tabValue={tabValue}
+        {subTabValueRef.current === "attendees" &&
+          tabValueRef.current !== "enrollments" && (
+            <WebinarAttendeesPage
+              userData={userData}
+              tabValue={tabValueRef.current}
+              page={page}
+              setPage={setPage}
+              isSwapOpen={isSwapOpen}
+              setSwapOpen={setSwapOpen}
+              subTabValue={subTabValueRef.current}
+              selectedRows={selectedRows}
+              setSelectedRows={setSelectedRows}
+              selectedAssignmentType={selectedAssignmentType}
+              setSelectedAssignmentType={setSelectedAssignmentType}
+            />
+          )}
+        {subTabValueRef.current !== "attendees" &&
+          tabValueRef.current !== "enrollments" && (
+            <Pullbacks
+              subTabValue={subTabValueRef.current}
+              page={page}
+              setPage={setPage}
+              tabValue={tabValueRef.current}
+              selectedRows={selectedRows}
+              setSelectedRows={setSelectedRows}
+            />
+          )}
+        {tabValueRef.current === "enrollments" && (
+          <Enrollments
             page={page}
             setPage={setPage}
-            isSwapOpen={isSwapOpen}
-            setSwapOpen={setSwapOpen}
-            subTabValue={subTabValue}
-            selectedRows={selectedRows}
-            setSelectedRows={setSelectedRows}
-            selectedAssignmentType={selectedAssignmentType}
-            setSelectedAssignmentType={setSelectedAssignmentType}
+            tabValue={tabValueRef.current}
           />
-        )}
-        {subTabValue !== "attendees" && tabValue !== "enrollments" && (
-          <Pullbacks
-            subTabValue={subTabValue}
-            page={page}
-            setPage={setPage}
-            tabValue={tabValue}
-            selectedRows={selectedRows}
-            setSelectedRows={setSelectedRows}
-          />
-        )}
-        {tabValue === "enrollments" && (
-          <Enrollments page={page} setPage={setPage} tabValue={tabValue} />
         )}
       </Suspense>
 
       {reAssignModal && (
-        <ReAssignmentModal
-          selectedRows={selectedRows}
-          webinarid={id}
-          tabValue={tabValue}
-          isPullbackVisible={
-            tabValue !== "enrollments" && subTabValue === "attendees"
-          }
-          isAttendee={true}
-          setReAssignModal={setReAssignModal}
-        />
+        <Suspense fallback={<ModalFallback />}>
+          <ReAssignmentModal
+            selectedRows={selectedRows}
+            webinarid={id}
+            tabValue={tabValueRef.current}
+            isPullbackVisible={
+              tabValueRef.current !== "enrollments" &&
+              subTabValueRef.current === "attendees"
+            }
+            isAttendee={true}
+            setReAssignModal={setReAssignModal}
+          />
+        </Suspense>
       )}
 
       {assignModal &&
         createPortal(
-          <EmployeeAssignModal
-            tabValue={tabValue}
-            selectedRows={selectedRows}
-            setAssignModal={setAssignModal}
-            webinarId={id}
-          />,
+          <Suspense fallback={<ModalFallback />}>
+            <EmployeeAssignModal
+              tabValue={tabValueRef.current}
+              selectedRows={selectedRows}
+              setAssignModal={setAssignModal}
+              webinarId={id}
+            />
+          </Suspense>,
           document.body
         )}
 
       {showModal &&
         createPortal(
-          <UpdateCsvXslxModal
-            tabValue={tabValue}
-            setModal={setShowModal}
-            csvId={id}
-          />,
+          <Suspense fallback={<ModalFallback />}>
+            <UpdateCsvXslxModal
+              tabValue={tabValueRef.current}
+              setModal={setShowModal}
+              csvId={id}
+            />
+          </Suspense>,
           document.body
         )}
     </div>

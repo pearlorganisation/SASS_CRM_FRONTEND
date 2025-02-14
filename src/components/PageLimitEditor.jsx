@@ -19,11 +19,11 @@ const PageLimitEditor = ({ pageId = "defaultPage", setPage = () => {} }) => {
   const handleEditClick = () => {
     setIsEditing(true);
   };
+    console.log("pageLimit ---> render");
 
   const handleSaveClick = () => {
-    // console.log("pageLimit", pageLimit);
     const validLimit =
-      pageLimit === "" ? 10 : Math.max(1, Math.min(100, Number(pageLimit)));
+      pageLimit === "" ? 10 : Math.max(1, Math.min(1000, Number(pageLimit)));
     setPageLimitState(validLimit);
     dispatch(setPageLimit({ pageId, limit: validLimit }));
     logUserActivity({
@@ -53,14 +53,14 @@ const PageLimitEditor = ({ pageId = "defaultPage", setPage = () => {} }) => {
             const value = e.target.value; // Allow empty string
             if (
               value === "" ||
-              (!isNaN(value) && Number(value) >= 0 && Number(value) <= 100)
+              (!isNaN(value) && Number(value) >= 0 && Number(value) <= 1000)
             ) {
               setPageLimitState(value);
             }
           }}
           className="w-20 border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none "
           min={1}
-          max={100}
+          max={1000}
         />
       ) : (
         <label className="text-sm font-medium">
@@ -89,4 +89,4 @@ const PageLimitEditor = ({ pageId = "defaultPage", setPage = () => {} }) => {
   );
 };
 
-export default PageLimitEditor;
+export default React.memo(PageLimitEditor);

@@ -66,7 +66,7 @@ const ExportClientExcelModal = ({ modalName, filters }) => {
   }, [isSuccess]);
 
   return (
-    <Modal open={true} onClose={handleClose}>
+    <Modal open={true} onClose={handleClose} disablePortal>
       <Box className="p-6 bg-white rounded-lg shadow-lg max-w-xl mx-5 sm:mx-auto mt-20">
         <h2 className="text-xl font-semibold mb-4">Export Excel Options</h2>
         <div className="mb-4">

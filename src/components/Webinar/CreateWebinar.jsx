@@ -18,6 +18,8 @@ import { ClipLoader } from "react-spinners";
 import { getAllEmployees } from "../../features/actions/employee";
 import useRoles from "../../hooks/useRoles";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
+import { getAllProductsByAdminId } from "../../features/actions/product";
+import { DateFormat } from "../../utils/extra";
 
 const CreateWebinar = ({ modalName }) => {
   const dispatch = useDispatch();
@@ -29,7 +31,9 @@ const CreateWebinar = ({ modalName }) => {
 
   const { employeeData } = useSelector((state) => state.employee);
   const { userData } = useSelector((state) => state.auth);
-
+  const dateFormat = userData?.dateFormat || DateFormat.DD_MM_YYYY;
+  const { productDropdownData } = useSelector((state) => state.product);
+  console.log(productDropdownData, "productDropdownData");
   const {
     register,
     handleSubmit,
@@ -40,14 +44,7 @@ const CreateWebinar = ({ modalName }) => {
 
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [options, setOptions] = useState([]);
-
-  // Dummy employee data
-  const employeeOptions = [
-    { value: "john_doe", label: "John Doe" },
-    { value: "jane_smith", label: "Jane Smith" },
-    { value: "alice_johnson", label: "Alice Johnson" },
-    { value: "bob_brown", label: "Bob Brown" },
-  ];
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     if (isSuccess) {
@@ -58,8 +55,13 @@ const CreateWebinar = ({ modalName }) => {
   useEffect(() => {
     if (open) {
       dispatch(
-        getAllEmployees({ page: 1, limit: 100, filters: { isActive: "active" } })
+        getAllEmployees({
+          page: 1,
+          limit: 100,
+          filters: { isActive: "active" },
+        })
       );
+      dispatch(getAllProductsByAdminId());
     }
   }, [open]);
 
@@ -90,12 +92,24 @@ const CreateWebinar = ({ modalName }) => {
             modalData?.assignedEmployees?.includes(option.value)
         ) || []
       );
+      const product = productDropdownData?.find(
+        (product) => product.name === modalData?.productName
+      );
+      setSelectedProduct(
+        product
+          ? {
+              value: product?._id,
+              label: product?.name,
+            }
+          : null
+      );
     } else {
       reset({
         webinarName: "",
         webinarDate: "",
       });
       setSelectedEmployees([]);
+      setSelectedProduct(null);
     }
   }, [modalData, open]);
 
@@ -103,6 +117,7 @@ const CreateWebinar = ({ modalName }) => {
     const payload = {
       ...data,
       assignedEmployees: selectedEmployees.map((e) => e.value),
+      productId: selectedProduct?.value,
     };
 
     logUserActivity({
@@ -128,7 +143,13 @@ const CreateWebinar = ({ modalName }) => {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      fullWidth
+      maxWidth="sm"
+      disablePortal
+    >
       <DialogTitle>{modalData ? "Edit Webinar" : "Create Webinar"}</DialogTitle>
       <form onSubmit={handleSubmit(submitForm)}>
         <DialogContent>
@@ -146,14 +167,19 @@ const CreateWebinar = ({ modalName }) => {
               helperText={errors.webinarName?.message}
             />
 
+
             {/* Webinar Date */}
             <TextField
+            
               label="Webinar Date"
               type="date"
               fullWidth
               variant="outlined"
               InputLabelProps={{
                 shrink: true,
+              }}
+              inputProps={{
+                placeholder: dateFormat,  
               }}
               {...register("webinarDate", {
                 required: "Webinar Date is required",
@@ -180,8 +206,33 @@ const CreateWebinar = ({ modalName }) => {
                 aria-label="Assign Employees"
               />
             </div>
+
+            {/* Product Selection */}
+            <div>
+              <label className="block mb-2 text-sm font-medium text-gray-700">
+                Assign Product
+              </label>
+              <Select
+                options={
+                  productDropdownData?.map((product) => ({
+                    value: product._id,
+                    label: `${product.name} | Level - ${product.level}`,
+                  })) || []
+                }
+                value={selectedProduct}
+                onChange={setSelectedProduct}
+                isClearable={true}
+                placeholder="Select product"
+                menuPortalTarget={document.body}
+                styles={{
+                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                }}
+                aria-label="Assign Product"
+              />
+            </div>
           </div>
         </DialogContent>
+
         <DialogActions>
           <Button onClick={handleClose} variant="outlined" color="secondary">
             Cancel

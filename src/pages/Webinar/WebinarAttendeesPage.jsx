@@ -1,5 +1,11 @@
-import React, { lazy, Suspense, useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import React, {
+  lazy,
+  Suspense,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Select, FormControl, InputLabel, MenuItem } from "@mui/material";
 import {
@@ -10,7 +16,11 @@ import {
   getAttendees,
   swapAttendeeFields,
 } from "../../features/actions/attendees";
-import { attendeeTableColumns } from "../../utils/columnData";
+import {
+  allAttendeesSortByOptions,
+  attendeeTableColumns,
+  webinarAttendeesSortByOptions,
+} from "../../utils/columnData";
 import { Visibility } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
 const AttendeesFilterModal = lazy(() =>
@@ -26,6 +36,12 @@ const SwapAttendeeFieldsModal = lazy(() =>
 );
 import { createPortal } from "react-dom";
 import ModalFallback from "../../components/Fallback/ModalFallback";
+import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
+import FullScreen from "../../components/FullScreen";
+import { getLocations } from "../../features/actions/location";
+import { NotifActionType } from "../../utils/extra";
+import { socket } from "../../socket";
+
 
 const WebinarAttendeesPage = (props) => {
   const {
@@ -46,13 +62,25 @@ const WebinarAttendeesPage = (props) => {
   const exportExcelModalName = "ExportWebinarAttendeesExcel";
   const AttendeesFilterModalName = "AttendeesFilterModal";
 
+  const modalState = useSelector((state) => state.modals.modals);
+  const exportModalOpen = modalState[exportExcelModalName] ? true : false;
+  const AttendeesFilterModalOpen = modalState[AttendeesFilterModalName]
+    ? true
+    : false;
+
+  // ------------------------------------------------------------------
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const { attendeeData, isLoading, isSuccess, totalPages } = useSelector(
+  const { locationsData } = useSelector((state) => state.location);
+
+  const { attendeeData, isLoading, pagination, isSuccess } = useSelector(
     (state) => state.attendee
   );
+  const { total = 0, totalPages = 1 } = pagination;
+
   const { isSuccess: isSuccessReAssign } = useSelector(
     (state) => state.reAssign
   );
@@ -61,11 +89,38 @@ const WebinarAttendeesPage = (props) => {
   );
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
 
-  const [filters, setFilters] = useState({});
   const [selected, setSelected] = useState("All");
 
+  const { webinarAttendeesSortBy, webinarAttendeesFilters } = useSelector(
+    (state) => state.filters
+  );
+
   useEffect(() => {
-    if (tabValue !== "enrollments" && subTabValue === "attendees") {
+    if (
+      tabValue === "preWebinar" &&
+      webinarAttendeesSortBy?.sortBy === "timeInSession"
+    ) {
+      dispatch(
+        setWebinarAttendeesFilters({
+          filters: webinarAttendeesFilters,
+          sortBy: {
+            sortBy: webinarAttendeesSortByOptions[0].value,
+            sortOrder: "asc",
+          },
+        })
+      );
+    }
+  }, [tabValue, webinarAttendeesSortBy, webinarAttendeesFilters]);
+
+  useEffect(() => {
+    if (
+      tabValue !== "enrollments" &&
+      subTabValue === "attendees" &&
+      !(
+        tabValue === "preWebinar" &&
+        webinarAttendeesSortBy?.sortBy === "timeInSession"
+      )
+    ) {
       setSelectedRows([]);
       dispatch(
         getAttendees({
@@ -73,16 +128,25 @@ const WebinarAttendeesPage = (props) => {
           isAttended: tabValue === "postWebinar",
           page,
           limit: LIMIT,
-          filters,
+          filters: webinarAttendeesFilters,
           validCall: selected === "All" ? undefined : selected,
           assignmentType:
             selectedAssignmentType === "All"
               ? undefined
               : selectedAssignmentType,
+          sort: webinarAttendeesSortBy,
         })
       );
     }
-  }, [page, tabValue, LIMIT, filters, selected, selectedAssignmentType]);
+  }, [
+    page,
+    tabValue,
+    LIMIT,
+    webinarAttendeesFilters,
+    selected,
+    selectedAssignmentType,
+    webinarAttendeesSortBy,
+  ]);
 
   useEffect(() => {
     if (isSuccess || assignSuccess || isSuccessReAssign) {
@@ -90,14 +154,15 @@ const WebinarAttendeesPage = (props) => {
         getAttendees({
           id,
           isAttended: tabValue === "postWebinar",
-          page: 1,
-          limit: LIMIT,
-          filters,
+          filters: webinarAttendeesFilters,
           validCall: selected === "All" ? undefined : selected,
           assignmentType:
             selectedAssignmentType === "All"
               ? undefined
               : selectedAssignmentType,
+          sort: webinarAttendeesSortBy,
+          page: 1,
+          limit: LIMIT,
         })
       );
       dispatch(clearSuccess());
@@ -106,6 +171,50 @@ const WebinarAttendeesPage = (props) => {
       setSelectedRows([]);
     }
   }, [isSuccess, assignSuccess, isSuccessReAssign]);
+
+  useEffect(() => {
+    function onNotification(data) {
+      if (data.actionType === NotifActionType.ATTENDEE_REGISTRATION) {
+        if (
+          tabValue !== "enrollments" &&
+          subTabValue === "attendees" &&
+          !(
+            tabValue === "preWebinar" &&
+            webinarAttendeesSortBy?.sortBy === "timeInSession"
+          )
+        ) {
+          setSelectedRows([]);
+          dispatch(
+            getAttendees({
+              id,
+              isAttended: tabValue === "postWebinar",
+              page,
+              limit: LIMIT,
+              filters: webinarAttendeesFilters,
+              validCall: selected === "All" ? undefined : selected,
+              assignmentType:
+                selectedAssignmentType === "All"
+                  ? undefined
+                  : selectedAssignmentType,
+              sort: webinarAttendeesSortBy,
+            })
+          );
+        }
+      }
+    }
+    socket.on("notification", onNotification);
+    return () => {
+      socket.off("notification", onNotification);
+    };
+  }, [
+    page,
+    tabValue,
+    LIMIT,
+    webinarAttendeesFilters,
+    selected,
+    selectedAssignmentType,
+    webinarAttendeesSortBy,
+  ]);
 
   const actionIcons = [
     {
@@ -124,7 +233,17 @@ const WebinarAttendeesPage = (props) => {
 
   const handleColumnSwap = (field1, field2) => {
     dispatch(
-      swapAttendeeFields({ attendees: selectedRows, field1, field2 })
+      swapAttendeeFields({
+        attendees: selectedRows,
+        field1,
+        field2,
+        webinarId: id,
+        isAttended: tabValue === "postWebinar",
+        filters: webinarAttendeesFilters,
+        validCall: selected === "All" ? undefined : selected,
+        assignmentType:
+          selectedAssignmentType === "All" ? undefined : selectedAssignmentType,
+      })
     ).then((res) => {
       res?.meta?.requestStatus === "fulfilled" && setSelectedRows([]);
     });
@@ -136,7 +255,7 @@ const WebinarAttendeesPage = (props) => {
       setSelected(label);
       setPage(1);
     };
-
+    // console.log("render ===> WebinarAttendeesPage -> AttendeeDropdown");
     const handleAssignmentChange = (event) => {
       const label = event.target.value;
       setSelectedRows([]);
@@ -178,22 +297,33 @@ const WebinarAttendeesPage = (props) => {
       </div>
     );
   };
+
+  useEffect(() => {
+    dispatch(
+      getLocations({
+        page: 1,
+        limit: 1000,
+        filters: undefined,
+      })
+    );
+  }, []);
   return (
-    <>
+    <FullScreen>
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="webinarAttendeesTable"
-        ButtonGroup={AttendeeDropdown}
+        ButtonGroup={React.memo(AttendeeDropdown)}
         isSelectVisible={userData?.isActive}
-        filters={filters}
-        setFilters={setFilters}
+        sortByOrder={webinarAttendeesSortBy?.sortOrder}
         tableData={{
           columns:
             tabValue === "postWebinar"
+
               ? attendeeTableColumns
               : attendeeTableColumns.filter(
                   (item) => item.key !== "timeInSession"
                 ),
+          totalRecords: total,
           rows: attendeeData.map((row) => ({
             ...row,
             leadType: leadTypeData.find((lead) => lead._id === row?.leadType),
@@ -210,19 +340,38 @@ const WebinarAttendeesPage = (props) => {
         exportModalName={exportExcelModalName}
         isLoading={isLoading}
         isLeadType={true}
+        filters={webinarAttendeesFilters}
+        locations={locationsData}
       />
 
-      <AttendeesFilterModal
-        modalName={AttendeesFilterModalName}
-        filters={filters}
-        setFilters={setFilters}
-      />
-      <ExportWebinarAttendeesModal
-        modalName={exportExcelModalName}
-        filters={filters}
-        webinarId={id}
-        isAttended={tabValue === "postWebinar" ? true : false}
-      />
+      {AttendeesFilterModalOpen && (
+        <Suspense fallback={<ModalFallback />}>
+          <AttendeesFilterModal
+            modalName={AttendeesFilterModalName}
+            setPage={setPage}
+            tabValue={tabValue}
+          />
+        </Suspense>
+      )}
+
+      {exportModalOpen && (
+        <Suspense fallback={<ModalFallback />}>
+          <ExportWebinarAttendeesModal
+            modalName={exportExcelModalName}
+            filters={webinarAttendeesFilters}
+            sort={webinarAttendeesSortBy}
+            webinarId={id}
+            isAttended={tabValue === "postWebinar" ? true : false}
+            validCall={selected === "All" ? undefined : selected}
+            assignmentType={
+              selectedAssignmentType === "All"
+                ? undefined
+                : selectedAssignmentType
+            }
+          />
+        </Suspense>
+      )}
+
       {isSwapOpen &&
         createPortal(
           <Suspense fallback={<ModalFallback />}>
@@ -233,7 +382,7 @@ const WebinarAttendeesPage = (props) => {
           </Suspense>,
           document.body
         )}
-    </>
+    </FullScreen>
   );
 };
 

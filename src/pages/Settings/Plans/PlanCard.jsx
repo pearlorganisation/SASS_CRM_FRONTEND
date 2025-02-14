@@ -1,11 +1,9 @@
-import React, { lazy, Suspense, useEffect, useState } from "react";
+import React, { lazy, Suspense, useState } from "react";
 import {
   FaCheck,
   FaTimes,
   FaUsers,
-  FaCalendarAlt,
   FaAddressBook,
-  FaPencilAlt,
   FaEllipsisV,
   FaToggleOn,
 } from "react-icons/fa";
@@ -19,6 +17,7 @@ import { checkout } from "../../../features/actions/razorpay";
 import useRoles from "../../../hooks/useRoles";
 import ModalFallback from "../../../components/Fallback/ModalFallback";
 import { createPortal } from "react-dom";
+import { MdEdit, MdLogout, MdInfo } from "react-icons/md";
 const PlanSelectorModal = lazy(() => import("./PlanSelectorModal"));
 
 const PlanCard = (props) => {
@@ -33,7 +32,9 @@ const PlanCard = (props) => {
     isMenuVisible = false,
     isSelectVisible = false,
     handlePlanSelection = (id, billingData) => {
-      dispatch(checkout({ plan: id })).then((res) => {
+      dispatch(
+        checkout({ plan: id, durationType: billingData.durationType })
+      ).then((res) => {
         if (res?.payload?.result) {
           const order = res?.payload?.result;
           const plan = res?.payload?.planData;
@@ -62,12 +63,15 @@ const PlanCard = (props) => {
     },
     selectedPlan = null,
     currentPlan = null,
+    setModalData = () => {},
+    planType = "active",
   } = props;
 
   const {
     name,
     internalName,
     amount,
+    isActive,
     planDuration,
     employeeCount,
     contactLimit,
@@ -76,6 +80,7 @@ const PlanCard = (props) => {
     purchaseHistory,
     employeeStatus,
     employeeActivity,
+    subscriptionCount,
   } = plan;
 
   return (
@@ -92,22 +97,65 @@ const PlanCard = (props) => {
             <FaEllipsisV />
           </button>
           {menuOpen && (
-            <div className="absolute right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg w-40 z-10">
+            <div className="absolute right-0 mt-2 space-y-1 p-1 whitespace-nowrap bg-white border border-gray-200 rounded-md shadow-lg z-10">
               <Link to={`/plans/editPlan/${plan?._id}`} state={plan}>
-                <button className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                  <FaPencilAlt className="mr-2" />
-                  Edit
+                <button className="flex items-center gap-2 rounded-md shadow-sm w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 ">
+                  <MdEdit
+                    size={24}
+                    className="text-blue-500 group-hover:text-blue-600"
+                  />
+                  Edit Plan
                 </button>
               </Link>
+
+              <button
+                onClick={() => setModalData(plan)}
+                className="flex gap-2 items-center rounded-md shadow-sm w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-200 "
+              >
+                <MdLogout size={24} className="text-red-500" />
+                {planType === "active" ? "Deactivate" : "Activate"} Plan
+              </button>
             </div>
           )}
         </div>
       </ComponentGuard>
 
+      {!isActive && (
+        <div
+          title="Inactive Plan, Please contact Administrator."
+          className="absolute top-2 left-0 flex gap-2 bg-red-500 text-white text-xs px-3 py-1 rounded-r-md  items-center"
+        >
+          Inactive Plan <MdInfo />
+        </div>
+      )}
+
+      {currentPlan === plan?._id && (
+        <div
+          title="Current Plan"
+          className="absolute top-2 right-0 flex gap-2 bg-green-500 text-white text-xs px-3 py-1 rounded-l-md  items-center"
+        >
+          Current Plan <MdInfo />
+        </div>
+      )}
+
       {/* Card Content */}
-      <div className="text-center mb-6">
+      <div className="text-center mt-2 mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">{name}</h2>
-        <h2 className="text-xl font-semibold text-gray-600 mb-2">{internalName || name}</h2>
+
+        <ComponentGuard allowedRoles={[roles.SUPER_ADMIN]}>
+          <h2 className="text-xl font-semibold text-gray-600 mb-2">
+            {internalName || name}
+          </h2>
+          <div className="flex items-center gap-2 px-3 justify-center">
+            <span className="text-sm font-medium text-gray-500">
+              Subscribers
+            </span>
+            <span className="text-lg font-semibold text-gray-700">
+              {subscriptionCount}
+            </span>
+          </div>
+        </ComponentGuard>
+
         <p className="text-4xl font-extrabold text-blue-600">
           {"\u20B9"}
           {amount}
@@ -144,14 +192,7 @@ const PlanCard = (props) => {
       </div>
 
       <ComponentGuard allowedRoles={isSelectVisible ? [] : [roles.ADMIN]}>
-        {currentPlan === plan?._id ? (
-          <button
-            className={`bg-green-600 w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
-            disabled
-          >
-            Current Plan
-          </button>
-        ) : (
+        {isActive && (
           <button
             onClick={() => setDurationModalOpen(true)}
             className={`${

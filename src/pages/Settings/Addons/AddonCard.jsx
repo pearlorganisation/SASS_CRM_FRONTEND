@@ -1,8 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import { checkoutAddon } from "../../../features/actions/razorpay";
 import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
+import { formatDateAsNumber } from "../../../utils/extra";
 
-const AddonCard = ({ addon, id, roles, showAction = true }) => {
+const AddonCard = ({ addon, id, roles, showAction = true, showExpiryDate = false }) => {
   const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.auth);
 
@@ -50,14 +51,14 @@ const AddonCard = ({ addon, id, roles, showAction = true }) => {
       ) : null}
       <p className="text-gray-700">
         Price: {"\u20B9"}
-        {addon.addOnPrice}
+        {addon.addOnPrice} (+ 18% GST)
       </p>
-      {!id ? (
+      { showExpiryDate ? (
         <p className="text-gray-700">Validity: {addon.validityInDays} days</p>
       ) : (
         <p className="text-gray-700">
           Expiry Date:{" "}
-          {addon.expiryDate ? addon.expiryDate.split("T")[0] : "N/A"}
+          {addon.expiryDate ? formatDateAsNumber(addon.expiryDate) : "N/A"}
         </p>
       )}
       <ComponentGuard allowedRoles={[roles.ADMIN]}>

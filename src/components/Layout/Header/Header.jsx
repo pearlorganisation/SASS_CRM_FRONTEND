@@ -27,7 +27,6 @@ const Header = () => {
 
       const diffTime = Math.abs(expiryDate - currentDate);
       const diffDays = diffTime / (1000 * 3600 * 24);
-      console.log(diffDays)
       if (diffDays <= 15) {
         setExpiryDays(diffDays);
       }
@@ -55,7 +54,7 @@ const Header = () => {
               aria-controls="logo-sidebar"
               onClick={() => dispatch(toggleSidebar())}
               type="button"
-              className="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+              className="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
               <span className="sr-only">Open sidebar</span>
               <svg

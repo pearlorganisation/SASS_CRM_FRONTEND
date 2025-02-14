@@ -3,10 +3,11 @@ import { FiDownload } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { jsPDF } from "jspdf";
 import { getAdminBillingHistory } from "../../../features/actions/pricePlan";
-import { Pagination } from "@mui/material";
+import Pagination  from "@mui/material/Pagination";
 import PageLimitEditor from "../../../components/PageLimitEditor";
 import { getSuperAdmin } from "../../../features/actions/auth";
 import { toast } from "sonner";
+import { formatDateAsNumber } from "../../../utils/extra";
 
 const BillingHistory = () => {
   const dispatch = useDispatch();
@@ -167,16 +168,13 @@ const BillingHistory = () => {
 
     doc.setFontSize(12);
 
-    const taxAmount = ((bill.amount * 18) / (100 + 18)).toFixed(2);
-    const cost = (bill.amount - taxAmount).toFixed(2);
-
     doc
       .setFont("Times New Roman", "normal")
       .text(description, 13, YAxis)
       .text("1", 130, YAxis, { align: "right" })
-      .text(`Rs.${cost}`, 170, YAxis, { align: "right" })
+      .text(`Rs.${bill.itemAmount}`, 170, YAxis, { align: "right" })
       .setFont("Times New Roman", "bold")
-      .text(`Rs.${cost}`, 200, YAxis, { align: "right" });
+      .text(`Rs.${bill.itemAmount}`, 200, YAxis, { align: "right" });
 
     YAxis += 5;
 
@@ -186,14 +184,25 @@ const BillingHistory = () => {
 
     doc
       .setFont("Times New Roman", "normal")
+      .text(`Discount`, 170, YAxis, { align: "right" })
+      .text(`Rs.${bill.discountAmount}`, 200, YAxis, { align: "right" });
+
+      YAxis += 4;
+
+      doc.line(150, YAxis, 200, YAxis);
+  
+      YAxis += 7;
+
+    doc
+      .setFont("Times New Roman", "normal")
       .text(`Sub Total`, 170, YAxis, { align: "right" })
-      .text(`Rs.${cost}`, 200, YAxis, { align: "right" });
+      .text(`Rs.${bill.itemAmount - bill.discountAmount}`, 200, YAxis, { align: "right" });
 
     YAxis += 7;
 
     doc
       .text(`IGST @ 18%`, 170, YAxis, { align: "right" })
-      .text(`Rs.${taxAmount}`, 200, YAxis, { align: "right" });
+      .text(`Rs.${bill.taxAmount}`, 200, YAxis, { align: "right" });
     YAxis += 4;
 
     doc.line(150, YAxis, 200, YAxis);
@@ -231,7 +240,7 @@ const BillingHistory = () => {
               {billingHistory.map((bill) => (
                 <tr key={bill._id} className="text-center">
                   <td className="py-2 px-4 border-b">
-                    {new Date(bill?.date).toLocaleDateString()}
+                    {formatDateAsNumber(bill?.date)}
                   </td>
                   <td className="py-2 px-4 border-b">
                     {"\u20B9"}

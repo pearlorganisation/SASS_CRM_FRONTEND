@@ -7,7 +7,6 @@ import {
   addAttendees,
   addEnrollment,
   swapAttendeeFields,
-  getAllAttendees,
   getAttendee,
   getAttendeeLeadTypeByEmail,
   getAttendees,
@@ -15,6 +14,7 @@ import {
   getWebinarEnrollments,
   updateAttendee,
   updateAttendeeLeadType,
+  fetchGroupedAttendees,
 } from "../actions/attendees";
 
 const initialState = {
@@ -29,6 +29,8 @@ const initialState = {
   errorMessage: "",
   tabValue: "preWebinar",
   attendeeLeadType: "",
+  pagination: {},
+  isSwapping: false,
 };
 // ---------------------------------------------------------------------------------------
 
@@ -39,11 +41,13 @@ export const attendeeSlice = createSlice({
     clearSuccess(state) {
       state.isSuccess = false;
     },
+    clearAttendeeData(state) {
+      state.attendeeData = [];
+    },
     setTabValue(state, action) {
       state.tabValue = action.payload;
     },
     clearLeadType(state) {
-      console.log("clearLeadType");
       state.attendeeLeadType = "";
     },
   },
@@ -92,7 +96,7 @@ export const attendeeSlice = createSlice({
       .addCase(getAttendees.fulfilled, (state, action) => {
         state.isLoading = false;
         state.attendeeData = action.payload?.result || [];
-        state.totalPages = action.payload?.totalPages || 1;
+        state.pagination = action.payload?.pagination || {};
       })
 
       .addCase(getAttendees.rejected, (state, action) => {
@@ -108,18 +112,6 @@ export const attendeeSlice = createSlice({
       })
 
       .addCase(getPullbacks.rejected, (state, action) => {
-        state.isLoading = false;
-        errorToast(action?.payload);
-      })
-      .addCase(getAllAttendees.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getAllAttendees.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.attendeeData = action.payload?.result || [];
-        state.totalPages = action.payload?.totalPages || 1;
-      })
-      .addCase(getAllAttendees.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       })
@@ -141,7 +133,6 @@ export const attendeeSlice = createSlice({
       })
       .addCase(getAttendeeLeadTypeByEmail.fulfilled, (state, action) => {
         state.isLoading = false;
-        console.log("action.payload?.leadType", action.payload?.leadType);
         state.attendeeLeadType = action.payload?.leadType || "";
       })
       .addCase(getAttendeeLeadTypeByEmail.rejected, (state, action) => {
@@ -185,29 +176,28 @@ export const attendeeSlice = createSlice({
         errorToast(action?.payload);
       })
       .addCase(swapAttendeeFields.pending, (state) => {
+        state.isSwapping = true;
         state.isSuccess = false;
       })
+
       .addCase(swapAttendeeFields.fulfilled, (state, action) => {
-        const { data = [], field1 = "", field2 = "" } = action.payload;
-
-        if (field1 && field2) {
-          data.forEach((updatedAttendee) => {
-            const existingAttendee = state.attendeeData.find(
-              (attendee) => attendee._id === updatedAttendee._id
-            );
-
-            if (existingAttendee) {
-              if (field1 in existingAttendee && field1 in updatedAttendee) {
-                existingAttendee[field1] = updatedAttendee[field1];
-              }
-              if (field2 in existingAttendee && field2 in updatedAttendee) {
-                existingAttendee[field2] = updatedAttendee[field2];
-              }
-            }
-          });
-        }
+        state.isSwapping = false;
+        state.isSuccess = true;
       })
       .addCase(swapAttendeeFields.rejected, (state, action) => {
+        state.isSwapping = false;
+        errorToast(action?.payload);  
+      })
+      .addCase(fetchGroupedAttendees.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchGroupedAttendees.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.attendeeData = action?.payload?.data || [];
+        state.pagination = action?.payload?.pagination || {};
+      })
+      .addCase(fetchGroupedAttendees.rejected, (state, action) => {
+        state.isLoading = false;
         errorToast(action?.payload);
       });
   },
@@ -216,7 +206,7 @@ export const attendeeSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { clearSuccess, setTabValue, clearLeadType } =
+export const { clearSuccess, setTabValue, clearLeadType, clearAttendeeData } =
   attendeeSlice.actions;
 export default attendeeSlice.reducer;
 

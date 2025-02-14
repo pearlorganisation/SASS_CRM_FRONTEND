@@ -60,6 +60,7 @@ function AttendeeTable({ control, setValue, watch }) {
             {[
               { header: "Lead Type", key: "leadType", width: 20, type: "" },
               ...attendeeTableColumns,
+              { header: "Webinar Attended", key: "attendedWebinarCount", width: 20, type: "" },
             ].map(({ key, header }) => (
               <TableRow key={key}>
                 <TableCell sx={tableCellStyles}>{header}</TableCell>
@@ -245,6 +246,7 @@ export default function AddPlan() {
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
+    console.log(data);
     const payload = filterTruthyValues(data);
 
     if (planType === "custom") {
@@ -262,6 +264,7 @@ export default function AddPlan() {
     }
 
     payload['planDurationConfig'] = planDurationConfig;
+    console.log(payload);
     dispatch(isEditMode ? updatePricePlans(payload) : addPricePlans(payload));
   };
 
@@ -281,6 +284,7 @@ export default function AddPlan() {
     if (isEditMode && singlePlanData) {
       reset({
         name: singlePlanData.name || "",
+        internalName: singlePlanData.internalName || "",
         amount: singlePlanData.amount || 0,
         planDuration: singlePlanData.planDuration || 0,
         employeeCount: singlePlanData.employeeCount || 0,

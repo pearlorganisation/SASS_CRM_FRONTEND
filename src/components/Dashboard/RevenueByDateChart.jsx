@@ -10,7 +10,6 @@ import {
   LinearScale,
   PointElement,
 } from "chart.js";
-import moment from "moment";
 import { Card, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
 

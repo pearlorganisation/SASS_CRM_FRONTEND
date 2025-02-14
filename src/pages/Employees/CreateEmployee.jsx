@@ -208,12 +208,14 @@ const CreateEmployee = () => {
                 <FormInput
                   name="phone"
                   label="Phone Number"
+                  placeholder="+91 1234567890"
                   control={control}
                   validation={{
                     required: "Phone number is required",
                     pattern: {
                       value: /^\+\d{1,3}\d{9}$/,
-                      message: "10 Digit Phone number with Country Code is required, eg: +911234567890",
+                      message:
+                        "10 Digit Phone number with Country Code is required, eg: +911234567890",
                     },
                   }}
                 />
@@ -268,74 +270,70 @@ const CreateEmployee = () => {
               )}
             </div>
 
-            {!id ? (
-              <div className="sm:grid sm:grid-cols-2 sm:gap-6">
-                {/* Password */}
-                <div className="w-full">
-                  <TextField
-                    {...register("password", {
-                      required: "Password is required",
-                    })}
-                    label="Password"
-                    type={showPassword.password ? "text" : "password"}
-                    fullWidth
-                    variant="outlined"
-                    error={!!errors.password}
-                    helperText={errors.password?.message}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            onClick={() => togglePasswordVisibility("password")}
-                          >
-                            {showPassword.password ? (
-                              <VisibilityOff />
-                            ) : (
-                              <Visibility />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </div>
-
-                {/* Confirm Password */}
-                <div className="w-full">
-                  <TextField
-                    {...register("confirmPassword", {
-                      required: "Please confirm your password",
-                      validate: (value) =>
-                        value === watch("password") || "Passwords do not match",
-                    })}
-                    label="Confirm Password"
-                    type={showPassword.confirmPassword ? "text" : "password"}
-                    fullWidth
-                    error={!!errors.confirmPassword}
-                    helperText={errors.confirmPassword?.message}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            onClick={() =>
-                              togglePasswordVisibility("confirmPassword")
-                            }
-                          >
-                            {showPassword.confirmPassword ? (
-                              <VisibilityOff />
-                            ) : (
-                              <Visibility />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </div>
+            <div className="sm:grid sm:grid-cols-2 sm:gap-6">
+              {/* Password */}
+              <div className="w-full">
+                <TextField
+                  {...register("password", {
+                    required: id ? false : "Password is required",
+                  })}
+                  label="Password"
+                  type={showPassword.password ? "text" : "password"}
+                  fullWidth
+                  variant="outlined"
+                  error={!!errors.password}
+                  helperText={errors.password?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => togglePasswordVisibility("password")}
+                        >
+                          {showPassword.password ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
               </div>
-            ) : (
-              <></>
-            )}
+
+              {/* Confirm Password */}
+              <div className="w-full">
+                <TextField
+                  {...register("confirmPassword", {
+                    required: id ? false : "Please confirm your password",
+                    validate: (value) =>
+                      value === watch("password") || "Passwords do not match",
+                  })}
+                  label="Confirm Password"
+                  type={showPassword.confirmPassword ? "text" : "password"}
+                  fullWidth
+                  error={!!errors.confirmPassword}
+                  helperText={errors.confirmPassword?.message}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() =>
+                            togglePasswordVisibility("confirmPassword")
+                          }
+                        >
+                          {showPassword.confirmPassword ? (
+                            <VisibilityOff />
+                          ) : (
+                            <Visibility />
+                          )}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </div>
+            </div>
 
             {!id && (
               <div className="sm:grid sm:grid-cols-2 sm:gap-6">

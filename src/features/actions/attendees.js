@@ -55,12 +55,11 @@ export const getAttendees = createAsyncThunk(
       filters = {},
       validCall,
       assignmentType,
+      sort,
     },
     { rejectWithValue }
   ) => {
     try {
-      const currentTIme = new Date().getTime();
-      console.log("currentTIme", currentTIme);
       const response = await instance.post(
         `/attendees/webinar`,
         {
@@ -70,16 +69,11 @@ export const getAttendees = createAsyncThunk(
           isAttended,
           validCall,
           assignmentType,
+          sort,
         },
         {
           params: { page, limit },
         }
-      );
-      const responseTime = new Date().getTime();
-      console.log(
-        "responseTime - currentTIme",
-        responseTime - currentTIme,
-        response
       );
       return response?.data;
     } catch (e) {
@@ -88,19 +82,14 @@ export const getAttendees = createAsyncThunk(
   }
 );
 
-//get All Attendees
-export const getAllAttendees = createAsyncThunk(
-  "allAttendees/fetchData",
-  async ({ page = 1, limit = 10, filters = {} }, { rejectWithValue }) => {
+//get Attendees
+export const fetchGroupedAttendees = createAsyncThunk(
+  "attendees/grouped/fetchData",
+  async ({ page = 1, limit = 10, filters = {}, sort }, { rejectWithValue }) => {
     try {
       const response = await instance.post(
-        `/attendees/webinar`,
-        {
-          filters,
-          fieldName: "attendeeTableConfig",
-          webinarId: "",
-          isAttended: true,
-        },
+        `/attendees/grouped`,
+        { filters, fieldName: "attendeeTableConfig", sort },
         {
           params: { page, limit },
         }
@@ -145,7 +134,7 @@ export const getWebinarEnrollments = createAsyncThunk(
   "enrollments/webinar",
   async ({ id, page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`/enrollments/${id}`, {
+      const response = await instance.get(`/enrollments/webinar/${id}`, {
         params: { page, limit },
       });
       return response?.data;
@@ -190,15 +179,12 @@ export const addEnrollment = createAsyncThunk(
 //swap Attendee Fields
 export const swapAttendeeFields = createAsyncThunk(
   "attendee/swap",
-  async ({ attendees = [], field1 = "", field2 = "" }, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const { data } = await instance.put(`/attendees/swap`, {
-        attendees,
-        field1,
-        field2,
-      });
+      const { data } = await instance.put(`/attendees/swap`, payload);
       return {
-        data,field1, field2
+        data,
+        ...payload,
       };
     } catch (e) {
       return rejectWithValue(e);

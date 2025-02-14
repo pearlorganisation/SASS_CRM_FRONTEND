@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { roles } from "../../utils/roles";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import { RiMoneyRupeeCircleLine } from "react-icons/ri";
 import { PiLetterCirclePBold } from "react-icons/pi";
@@ -15,8 +14,8 @@ import useRoles from "../../hooks/useRoles";
 import { MdDelete } from "react-icons/md";
 import { deleteAllData } from "../../features/actions/globalData";
 import { TbRecharging } from "react-icons/tb";
-import { FaRegMoneyBillAlt } from "react-icons/fa";
-
+import { FaRegMoneyBillAlt, FaTags  } from "react-icons/fa";
+import { AiOutlineProduct } from "react-icons/ai";
 // Configuration for the links
 
 const ViewSettings = () => {
@@ -47,6 +46,12 @@ const ViewSettings = () => {
       allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
     },
     {
+      to: "/tags",
+      name: "Tags",
+      icon: <FaTags size={35} />,
+      allowedRoles: [roles.ADMIN],
+    },
+    {
       to: "/billing-history",
       name: "Billing History",
       icon: <FaRegMoneyBillAlt size={40} />,
@@ -69,6 +74,12 @@ const ViewSettings = () => {
       to: "/lead-type",
       name: "Lead Types",
       icon: <MdLeaderboard size={40} />,
+      allowedRoles: [roles.ADMIN],
+    },
+    {
+      to: "/product-level",
+      name: "Product Level",
+      icon: <AiOutlineProduct size={40} />,
       allowedRoles: [roles.ADMIN],
     },
     {

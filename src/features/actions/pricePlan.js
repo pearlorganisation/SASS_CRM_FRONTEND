@@ -22,7 +22,7 @@ export const getPricePlans = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const response = await instance.get(`plans`, {
-        withCredentials: true,
+        params: payload,
       });
       return response?.data;
     } catch (e) {
@@ -63,8 +63,8 @@ export const deletePricePlan = createAsyncThunk(
   "deletePricePlan",
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await instance.delete(`plans/${payload?._id}`, payload, {
-        withCredentials: true,
+      const response = await instance.delete(`plans/${payload?._id}`, {
+        params: { isActive: payload?.isActive },
       });
       return response?.data;
     } catch (e) {
@@ -78,7 +78,7 @@ export const getPricePlan = createAsyncThunk(
   "pricePlan/fetchById",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`plans/${id}`, {
+      const response = await instance.get(`plans/data/${id}`, {
         withCredentials: true,
       });
       return response?.data;
@@ -141,3 +141,15 @@ export const getAdminBillingHistory = createAsyncThunk(
     }
   }
 );
+
+export const getPlansForDropdown = createAsyncThunk(
+  "plans/dropdown",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`plans/dropdown`);
+      return response?.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);  

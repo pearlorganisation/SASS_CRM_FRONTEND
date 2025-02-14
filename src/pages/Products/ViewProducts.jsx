@@ -18,6 +18,7 @@ import { resetProductState } from "../../features/slices/product";
 import useRoles from "../../hooks/useRoles";
 import { deleteProduct, getAllProducts } from "../../features/actions/product";
 import EditProductModal from "./Modal/EditProductModal";
+import productLevelService from "../../services/productLevelService";
 
 const ViewProducts = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -41,6 +42,8 @@ const ViewProducts = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
+  const [productLevelObj, setProductLevelObj] = useState({});
+  const [productLevelData, setProductLevelData] = useState([]);
 
   const [product, setProduct] = useState(null);
   const [openModal, setOpenModal] = useState(false);
@@ -70,6 +73,20 @@ const ViewProducts = () => {
       dispatch(resetProductState());
     }
   }, [isSuccess]);
+
+  useEffect(() => {
+    productLevelService.getProductLevels().then((res) => {
+      if (res.success) {
+        setProductLevelData(res.data);
+        const obj = {};
+        res.data.forEach((item) => {
+          obj[item.level] = item.label;
+        });
+        setProductLevelObj(obj);
+      }
+    });
+  }, []);
+
   // ----------------------- Action Icons -----------------------
 
   const actionIcons = employeeModeData
@@ -98,7 +115,7 @@ const ViewProducts = () => {
       ];
 
   const deleteThisProduct = (item) => {
-    dispatch(deleteProduct(item._id)).then(res => {
+    dispatch(deleteProduct(item._id)).then((res) => {
       dispatch(getAllProducts({ page: page || 1, limit: LIMIT, filters }));
     });
     setSelectedProduct(null);
@@ -130,7 +147,8 @@ const ViewProducts = () => {
           rows: Array.isArray(productData)
             ? productData.map((item) => ({
                 ...item,
-                level: `L${item.level}`,
+                level: productLevelObj[item.level] || `L${item.level}`,
+
               }))
             : [],
         }}
@@ -148,6 +166,7 @@ const ViewProducts = () => {
           setModal={setOpenModal}
           page={page}
           LIMIT={LIMIT}
+          productLevelData={productLevelData}
         />
       )}
 

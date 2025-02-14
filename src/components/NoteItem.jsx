@@ -41,6 +41,15 @@ const NoteItem = ({ item, index, setNoteModalData }) => {
             </span>
           </p>
         </div>
+        <div className="flex text-xs justify-between">
+          <p className=" flex items-center gap-1">
+            <span className="font-semibold text-gray-600">Phone Number:</span>
+            <span className="bg-purple-100 text-indigo-800 px-2 rounded-md">
+              {item?.phone}
+            </span>
+
+          </p>
+        </div>
       </div>
 
       {/* Note Content */}

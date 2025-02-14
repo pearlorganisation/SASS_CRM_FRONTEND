@@ -8,8 +8,10 @@ import persistStore from "redux-persist/es/persistStore";
 import { injectStore } from "./services/axiosInterceptor";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+import { injectStoreInDateFormat } from "./utils/extra";
 
 injectStore(store);
+injectStoreInDateFormat(store);
 let persistor = persistStore(store);
 
 ReactDOM.createRoot(document.getElementById("root")).render(

@@ -11,7 +11,6 @@ import NoteItem from "../../components/NoteItem";
 import {
   getAttendee,
   getAttendeeLeadTypeByEmail,
-  getEnrollments,
   updateAttendee,
   updateAttendeeLeadType,
 } from "../../features/actions/attendees";
@@ -41,6 +40,8 @@ import { useNavigate } from "react-router-dom";
 import AddEnrollmentModal from "./Modal/AddEnrollmentModal";
 import { cancelAlarm, getAttendeeAlarm } from "../../features/actions/alarm";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
+import ProductLevelTable from "./ProductLevelTable";
+import { DateFormat, formatDateAsNumber } from "../../utils/extra";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -63,6 +64,7 @@ const ViewParticularContact = () => {
     (state) => state.webinarContact
   );
   const { userData } = useSelector((state) => state.auth);
+  const dateFormat = userData?.dateFormat || DateFormat.MM_DD_YYYY;
   const { selectedAttendee, attendeeLeadType, attendeeEnrollments } =
     useSelector((state) => state.attendee);
 
@@ -142,10 +144,6 @@ const ViewParticularContact = () => {
   }, [selectedAttendee]);
 
   useEffect(() => {
-    console.log(attendeeHistoryData);
-  }, [attendeeHistoryData]);
-
-  useEffect(() => {
     if (!leadTypeData) return;
     const options = leadTypeData.map((item) => ({
       value: item._id,
@@ -215,9 +213,6 @@ const ViewParticularContact = () => {
     );
   }, [noteData, uniquePhones]);
 
-  useEffect(() => {
-    dispatch(getEnrollments({ id: email }));
-  }, [email]);
 
   const cancelMyAlarm = (id) => {
     dispatch(cancelAlarm({ id }));
@@ -286,8 +281,8 @@ const ViewParticularContact = () => {
             </div>
 
             <div className="border rounded-lg py-1 px-3 shadow-md flex">
-              <span className=" mr-3">Phone :</span>
-              <div className="flex gap-3">
+              <span className=" mr-3 whitespace-nowrap">Phone :</span>
+              <div className="flex gap-3 flex-wrap">
                 {uniquePhonesCount.map((item, index) => (
                   <Badge key={index} badgeContent={item.count} color="primary">
                     <Chip label={item.label} color={item.isInvalid ? "error" : undefined} variant="outlined" />
@@ -512,9 +507,7 @@ const ViewParticularContact = () => {
                                 <td className="px-3 py-4 whitespace-nowrap">
                                   {Array.isArray(item?.webinar) &&
                                   item.webinar.length > 0
-                                    ? new Date(
-                                        item?.webinar[0].webinarDate
-                                      ).toDateString()
+                                    ? formatDateAsNumber(item?.webinar[0].webinarDate)
                                     : "-"}
                                 </td>
                                 <ComponentGuard
@@ -547,8 +540,9 @@ const ViewParticularContact = () => {
                 No record found
               </div>
             ) : (
-              <div className="p-2 bg-neutral-100 rounded-lg shadow-md">
-                <div className=" items-center px-3 text-neutral-800  flex justify-between">
+              <div className="p-6 bg-white rounded-lg shadow-md">
+
+                <div className=" mb-2 items-center px-3 text-neutral-800  flex justify-between">
                   <span className="font-semibold text-xl  ">
                     Enrollments History
                   </span>
@@ -568,7 +562,7 @@ const ViewParticularContact = () => {
                     </Add>
                   </ComponentGuard>
                 </div>
-                <table className="w-full table-auto text-sm text-left ">
+                {/* <table className="w-full table-auto text-sm text-left ">
                   <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
                     <tr>
                       <th className="py-3 px-1">S No.</th>
@@ -577,7 +571,6 @@ const ViewParticularContact = () => {
                       <th className="py-3 px-1">Product Name</th>
                       <th className="py-3  text-center">Price</th>
                       <th className="py-3 px-1">Level</th>
-                      {/* <th className="py-3 px-1">Action</th> */}
                     </tr>
                   </thead>
 
@@ -621,18 +614,14 @@ const ViewParticularContact = () => {
                               {item?.product && item?.product?.level}
                             </td>
 
-                            {/* <td className="px-3 py-4 h-full">
-                              <FaRegEdit
-                                onClick={() => setEditModalData(item)}
-                                className="text-xl cursor-pointer"
-                              />
-                            </td> */}
                           </tr>
                         );
                       })
                     )}
                   </tbody>
-                </table>
+                </table> */}
+
+                <ProductLevelTable email={email} />
               </div>
             )}
           </div>
@@ -648,6 +637,7 @@ const ViewParticularContact = () => {
         <ViewTimerModal
           setModal={setShowTimerModal}
           email={email}
+          dateFormat={dateFormat}
           attendeeId={attendeeId}
         />
       )}

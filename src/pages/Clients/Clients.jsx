@@ -22,6 +22,7 @@ import { Button } from "@mui/material";
 import ClientCard from "../../components/Client/ClientCard";
 import { MdVisibility, MdEdit, MdLogout } from "react-icons/md";
 import ModalFallback from "../../components/Fallback/ModalFallback";
+import { getPlansForDropdown } from "../../features/actions/pricePlan";
 
 const Clients = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -123,8 +124,13 @@ const Clients = () => {
     setSearchParams({ page: page });
   }, [page]);
 
+  useEffect(() => {
+    dispatch(getPlansForDropdown());
+  }, []);
+
   return (
     <div className="w-full pt-14 sm:px-5">
+
       <div className="flex justify-end mb-5">
         <button
           className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 transition"
@@ -177,10 +183,14 @@ const Clients = () => {
       {openClientFilterModal && (
         <Suspense fallback={<ModalFallback />}>
           <ClientFilterModal
-            setFilters={setFilters}
+            setFilters={(filters) => {
+              setFilters(filters);
+              setPage(1);
+            }}
             filters={filters}
             modalName={clientFilterModalName}
           />
+
         </Suspense>
       )}
     </div>

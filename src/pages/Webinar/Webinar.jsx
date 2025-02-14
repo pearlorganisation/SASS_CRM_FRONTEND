@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@mui/material";
@@ -12,10 +12,16 @@ import DeleteModal from "../../components/Webinar/delete";
 import { getAllWebinars } from "../../features/actions/webinarContact";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { resetWebinarSuccess } from "../../features/slices/webinarContact";
-import WebinarFilterModal from "../../components/Filter/WebinarFilterModal";
+const WebinarFilterModal = lazy(() =>
+  import("../../components/Filter/WebinarFilterModal")
+);
 import ExportModal from "../../components/Export/ExportModal";
 import { exportWebinarExcel } from "../../features/actions/export-excel";
 import { toast } from "sonner";
+import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
+import ModalFallback from "../../components/Fallback/ModalFallback";
+import FullScreen from "../../components/FullScreen";
+import { DateFormat } from "../../utils/extra";
 
 const Webinar = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -33,6 +39,7 @@ const Webinar = () => {
     (state) => state.webinarContact
   );
   const { userData } = useSelector((state) => state.auth);
+  const dateFormat = userData?.dateFormat || DateFormat.DD_MM_YYYY;
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [id, setId] = useState();
@@ -49,6 +56,7 @@ const Webinar = () => {
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
 
+
   useEffect(() => {
     setSearchParams({ page: page });
   }, [page]);
@@ -64,6 +72,10 @@ const Webinar = () => {
       dispatch(resetWebinarSuccess());
     }
   }, [isSuccess]);
+
+  useEffect(() => {
+    dispatch(setWebinarAttendeesFilters());
+  }, []);
 
   const handleRowClick = (id, webinarName) => {
     logUserActivity({
@@ -91,7 +103,7 @@ const Webinar = () => {
       ? [
           {
             icon: () => (
-              <Edit className="text-blue-500 group-hover:text-blue-600" />
+              <Edit className="text-blue-500 group-hover:text-blue-600"  />
             ),
             tooltip: "Edit Attendee",
             onClick: (item) => {
@@ -108,7 +120,7 @@ const Webinar = () => {
               <Delete className="text-red-500 group-hover:text-red-600" />
             ),
             tooltip: "Delete Attendee",
-            hideCondition: (item) => item?.totalParticipants <= 0,
+            hideCondition: (item) => item?.totalParticipants <= 0 && item?.totalRegistrations <= 0,
             onClick: (item) => {
               handleDeleteModal(item?._id, item?.webinarName);
             },
@@ -128,52 +140,56 @@ const Webinar = () => {
           </Button>
         </ComponentGuard>
       </div>
-
-      <DataTable
-        tableHeader={tableHeader}
-        tableUniqueKey="webinarTable"
-        filters={filters}
-        setFilters={setFilters}
-        tableData={{
-          columns: webinarTableColumns,
-          rows: webinarData,
-        }}
-        actions={actionIcons}
-        totalPages={totalPages}
-        page={page}
-        setPage={setPage}
-        limit={LIMIT}
-        filterModalName={filterModalName}
-        exportModalName={exportModalName}
-        isLoading={isLoading}
-        rowClick={(row) => {
-          handleRowClick(row?._id, row.webinarName);
-        }}
-        isRowClickable={true}
-      />
-
-      {showDeleteModal && (
-        <DeleteModal
-          setModal={setShowDeleteModal}
-          webinarName={webinarName}
-          id={id}
+      <FullScreen>
+        <DataTable
+          tableHeader={tableHeader}
+          tableUniqueKey="webinarTable"
+          filters={filters}
+          setFilters={setFilters}
+          tableData={{
+            columns: webinarTableColumns,
+            rows: webinarData,
+          }}
+          actions={actionIcons}
+          totalPages={totalPages}
+          page={page}
+          setPage={setPage}
+          limit={LIMIT}
+          filterModalName={filterModalName}
+          exportModalName={exportModalName}
+          isLoading={isLoading}
+          rowClick={(row) => {
+            handleRowClick(row?._id, row.webinarName);
+          }}
+          isRowClickable={true}
         />
-      )}
+        {showDeleteModal && (
+          <DeleteModal
+            setModal={setShowDeleteModal}
+            webinarName={webinarName}
+            id={id}
+          />
+        )}
 
-      <CreateWebinar modalName={createWebinarModalName} />
-      <WebinarFilterModal
-        filters={filters}
-        setFilters={setFilters}
-        modalName={filterModalName}
-      />
+        <CreateWebinar modalName={createWebinarModalName} />
 
-      <ExportModal
-        modalName={exportModalName}
-        defaultColumns={webinarTableColumns}
-        handleExport={({ limit, columns }) => {
-          dispatch(exportWebinarExcel({ limit, columns, filters }));
-        }}
-      />
+        <Suspense fallback={<ModalFallback />}>
+          <WebinarFilterModal
+            filters={filters}
+            setFilters={setFilters}
+            modalName={filterModalName}
+            dateFormat={dateFormat}
+          />
+        </Suspense>
+
+        <ExportModal
+          modalName={exportModalName}
+          defaultColumns={webinarTableColumns}
+          handleExport={({ limit, columns }) => {
+            dispatch(exportWebinarExcel({ limit, columns, filters }));
+          }}
+        />
+      </FullScreen>
     </div>
   );
 };

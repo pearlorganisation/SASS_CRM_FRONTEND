@@ -17,7 +17,7 @@ import {
 import { clientSignup } from "../../features/actions/client";
 import { getPricePlans } from "../../features/actions/pricePlan";
 import PlanCard from "../Settings/Plans/PlanCard";
-import { errorToast } from "../../utils/extra";
+import { errorToast, DateFormat } from "../../utils/extra";
 import { useNavigate } from "react-router-dom";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
@@ -47,6 +47,7 @@ function CreateClient() {
   const onSubmit = (data) => {
     if (activeStep === 0) {
       setActiveStep(1);
+      console.log(data);
     } else {
       if (!selectedPlan) {
         errorToast("Please select a plan");
@@ -147,6 +148,24 @@ function CreateClient() {
                 error={!!errors.phone}
                 helperText={errors.phone?.message}
               />
+
+              <TextField
+                fullWidth
+                select
+                label="Date Format"
+                defaultValue={DateFormat.DD_MM_YYYY }
+                variant="outlined"
+                {...register("dateFormat", {
+                  required: "Date Format is required",
+                })}
+                error={!!errors.dateFormat}
+                helperText={errors.dateFormat?.message}
+              >
+                <MenuItem value={DateFormat.MM_DD_YYYY}>MM-DD-YYYY</MenuItem>
+                <MenuItem value={DateFormat.DD_MM_YYYY}>DD-MM-YYYY</MenuItem>
+                <MenuItem value={DateFormat.YYYY_MM_DD}>YYYY-MM-DD</MenuItem>
+              </TextField>
+
               <TextField
                 {...register("password", {
                   required: "Password is required",
@@ -245,7 +264,7 @@ function CreateClient() {
                       selectedPlan={selectedPlan}
                       handlePlanSelection={(id, billing) => {
                         setSelectedPlan(id);
-                        console.log('--->', billing);
+                        console.log("--->", billing);
                         setBillingData(billing);
                       }}
                     />

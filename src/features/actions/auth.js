@@ -130,7 +130,7 @@ export const getUserDocuments = createAsyncThunk(
       const link = document.createElement("a");
       link.href = url;
 
-      link.download = filename || 'downloaded_file';
+      link.download = filename || "downloaded_file";
 
       document.body.appendChild(link);
       link.click();
@@ -155,3 +155,31 @@ export const getSuperAdmin = createAsyncThunk(
     }
   }
 );
+
+//Forgot Password
+export const generateOTP = createAsyncThunk(
+  "user/forgot-password",
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      const response = await instance.post(`auth/forgot-password/${email}`);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+// Validate OTP
+export const validateOTP = createAsyncThunk(
+  "user/validate-otp",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.post(`auth/validate-otp`, payload);
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+

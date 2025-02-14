@@ -1,5 +1,9 @@
-import React, { Suspense, useEffect, useRef, useState } from "react";
-import { createBrowserRouter, Link, RouterProvider } from "react-router-dom";
+import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  Navigate,
+} from "react-router-dom";
 import { toast, Toaster } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -45,8 +49,13 @@ import {
   BillingHistory,
   PlanOrder,
   UpdateClientPlan,
+  Revenue,
+  ProductLevel,
+  ManageTags,
+  Locations
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
+
 import {
   getAllRoles,
   getCurrentUser,
@@ -58,7 +67,12 @@ import useAddUserActivity from "./hooks/useAddUserActivity";
 
 import { socket } from "./socket";
 import TrapFocus from "@mui/material/Unstable_TrapFocus";
-import { Box, Button, Fade, Paper, Stack, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Fade from "@mui/material/Fade";
+import Paper from "@mui/material/Paper";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 
 import alarm from "/alarm.wav";
 import { setEmployeeModeId } from "./features/slices/employee";
@@ -67,8 +81,6 @@ import { resetAlarmData } from "./features/slices/alarm";
 import { newNotification } from "./features/slices/notification";
 import { NotifActionType } from "./utils/extra";
 import { logout } from "./features/slices/auth";
-import Location from "./pages/Location/Location";
-import LocationRequests from "./pages/Location/LocationRequests";
 import LayoutFallback from "./components/Fallback/LayoutFallback";
 
 const App = () => {
@@ -189,21 +201,16 @@ const App = () => {
     dispatch(getCurrentUser());
   }, []);
 
-  // dispatch(clearLoadingAndData())
-
   const router = createBrowserRouter([
     {
       path: "/",
       element: isUserLoggedIn ? (
-        <Suspense fallback={<LayoutFallback/>}>
+        <Suspense fallback={<LayoutFallback />}>
           <Layout />
         </Suspense>
       ) : (
-        <Suspense fallback={<></>}>
-          <Login />
-        </Suspense>
+        <Navigate to="/login" replace />
       ),
-
       children: [
         {
           path: "/",
@@ -249,8 +256,26 @@ const App = () => {
         },
 
         {
+          path: "/revenue",
+          element: (
+            <RouteGuard roleNames={["SUPER_ADMIN"]}>
+              <Revenue />
+            </RouteGuard>
+          ),
+        },
+
+        {
           path: "/*",
           element: <ComingSoon />,
+        },
+
+        {
+          path: "/product-level",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <ProductLevel />
+            </RouteGuard>
+          ),
         },
 
         {
@@ -499,18 +524,30 @@ const App = () => {
 
         {
           path: "/locations",
-          element: <Location />,
+          element: <Locations />,
         },
 
         {
           path: "/locations/requests",
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN", "ADMIN"]}>
-              <LocationRequests />
+              <Locations />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/tags",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <ManageTags />
             </RouteGuard>
           ),
         },
       ],
+    },
+    {
+      path: "/login",
+      element: !isUserLoggedIn ?<Suspense fallback={<></>}> <Login /></Suspense> : <Navigate to="/" replace />,
     },
     {
       path: "*",

@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import {
-  Box,
-  Button,
-  Collapse,
-  IconButton,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+
 import EditIcon from "@mui/icons-material/Edit";
 import PasswordUpdateForm from "../../components/Profile/PasswordUpdateForm";
 import EditUserForm from "../../components/Profile/EditUserForm";
@@ -24,6 +19,7 @@ import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import useRoles from "../../hooks/useRoles";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import ConfirmDeleteModal from "../../components/ConfirmDeleteModal";
+import { DateFormat, formatDateAsNumber } from "../../utils/extra";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
@@ -34,11 +30,14 @@ const ProfilePage = () => {
   const { isLoading, userData, isSuccess, subscription } = useSelector(
     (state) => state.auth
   );
+
+  const dateFormat = userData?.dateFormat || DateFormat.DD_MM_YYYY;
   const totalContactLimit =
     (subscription?.contactLimit ?? 0) + (subscription?.contactLimitAddon ?? 0);
   const totalEmployeeLimit =
     (subscription?.employeeLimit ?? 0) +
     (subscription?.employeeLimitAddon ?? 0);
+  const usedContacts = subscription?.contactCount ?? 0;
 
   const [isDocumentOpen, setIsDocumentOpen] = useState(false);
   const [doc, setDoc] = useState(null);
@@ -85,10 +84,11 @@ const ProfilePage = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8">
-        <div className="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* User Info Card */}
-          <div className="bg-white shadow-md w-full rounded-lg p-6 relative">
+      <div className="min-h-screen bg-gray-100 flex pt-14 justify-center p-8">
+        <div className="w-full h-fit max-w-4xl grid grid-cols-1 gap-6">
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+           {/* User Info Section */}
+           <div className="bg-white shadow-md w-full rounded-lg p-6 relative">
             {!isEditingInfo ? (
               <div>
                 <div className="flex justify-end">
@@ -109,15 +109,12 @@ const ProfilePage = () => {
                 <p className="mb-2">
                   <strong>Company:</strong> {userData?.companyName || "N/A"}
                 </p>
+                <p className="mb-2">
+                  <strong>Date Format:</strong> {dateFormat?.toUpperCase().replaceAll("-", "/")}
+                </p>
                 <ComponentGuard allowedRoles={[roles.ADMIN]}>
                   <p className="mb-2">
                     <strong>GST Number:</strong> {userData?.gst || "N/A"}
-                  </p>
-                  <p className="mb-2">
-                    <strong>Employee Limit:</strong> {totalEmployeeLimit}
-                  </p>
-                  <p className="mb-2">
-                    <strong>Contact Limit:</strong> {totalContactLimit}
                   </p>
 
                   <Box className="mt-3">
@@ -146,7 +143,6 @@ const ProfilePage = () => {
                                 {doc?.originalname}
                               </Typography>
 
-                              <Tooltip title="Delete" arrow>
                                 <button
                                   onClick={() => {
                                     setDoc(doc);
@@ -156,7 +152,6 @@ const ProfilePage = () => {
                                 >
                                   <Delete />
                                 </button>
-                              </Tooltip>
                             </div>
                           ))
                         : null}
@@ -169,8 +164,65 @@ const ProfilePage = () => {
             )}
           </div>
 
-          {/* Password Update Card */}
           <PasswordUpdateForm />
+         </div>
+
+ {/* Subscription Details Section */}
+ <ComponentGuard allowedRoles={[roles.ADMIN]}>
+            <div className="bg-white shadow-lg rounded-lg p-6 w-full">
+              <h2 className="text-2xl font-semibold mb-4">
+                Subscription Details
+              </h2>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <DetailItem
+                  label="Plan Name"
+                  value={subscription?.plan?.name || "N/A"}
+                />
+                <DetailItem label="Contacts Used" value={usedContacts} />
+                
+                <DetailItem
+                  label="Base Contact Limit"
+                  value={subscription?.contactLimit || 0}
+                />
+                <DetailItem
+                  label="Contact Addons"
+                  value={subscription?.contactLimitAddon || 0}
+                />
+                <DetailItem
+                  label="Total Contact Limit"
+                  value={totalContactLimit}
+                />
+                <DetailItem
+                  label="Base Employee Limit"
+                  value={subscription?.employeeLimit || 0}
+                />
+                <DetailItem
+                  label="Start Date"
+                  value={formatDateAsNumber(subscription?.startDate)}
+                />
+                <DetailItem
+                  label="Plan Expiry Date"
+                  value={formatDateAsNumber(subscription?.expiryDate)}
+                />
+                <DetailItem
+                  label="Employee Addons"
+                  value={subscription?.employeeLimitAddon || 0}
+                />
+                <DetailItem
+                  label="Total Employee Limit"
+                  value={totalEmployeeLimit}
+                />
+                
+                <DetailItem
+                  label="Toggle Limit"
+                  value={subscription?.toggleLimit || 0}
+                />
+              </div>
+            </div>
+          </ComponentGuard>
+          {/* Password Update Section */}
+
+         
         </div>
       </div>
       {deletemodal && (
@@ -185,3 +237,9 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+
+const DetailItem = ({ label, value }) => (
+  <p className="flex justify-between bg-gray-100 p-2 rounded-md">
+    <strong>{label}:</strong> <span>{value}</span>
+  </p>
+);

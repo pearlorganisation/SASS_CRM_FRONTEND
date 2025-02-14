@@ -18,25 +18,41 @@ import FormInput from "../FormInput";
 import { filterTruthyValues } from "../../utils/extra";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { getCustomOptionsForFilters } from "../../features/actions/globalData";
+import { webinarAttendeesSortByOptions } from "../../utils/columnData";
+import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
 
-const FilterModal = ({ modalName, setFilters, filters }) => {
+const FilterModal = ({ modalName, setPage, tabValue }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
 
   const { leadTypeData } = useSelector((state) => state.assign);
   const { subscription } = useSelector((state) => state.auth);
-  const { modals } = useSelector((state) => state.modals);
   const { customOptionsForFilters } = useSelector((state) => state.globalData);
-  const open = modals[modalName] ? true : false;
   const { control, handleSubmit, reset } = useForm();
+  const { webinarAttendeesSortBy, webinarAttendeesFilters } = useSelector(
+    (state) => state.filters
+  );
+  const [sortBy, setSortBy] = useState(
+    webinarAttendeesSortBy || {
+      sortBy: webinarAttendeesSortByOptions[0].value,
+      sortOrder: "asc",
+    }
+  );
 
   const [selectedOption, setSelectedOption] = useState("");
   const [leadTypeOptions, setLeadTypeOptions] = useState([]);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
 
   const onSubmit = (data) => {
+    if (selectedOption) data.leadType = selectedOption;
     const filterData = filterTruthyValues(data);
-    setFilters(filterData);
+    setPage(1);
+    dispatch(
+      setWebinarAttendeesFilters({
+        filters: filterData,
+        sortBy: sortBy,
+      })
+    );
     dispatch(closeModal(modalName));
     logUserActivity({
       action: "filter",
@@ -46,6 +62,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   };
 
   const resetForm = () => {
+    setSelectedOption("");
     reset({
       email: "",
       firstName: "",
@@ -64,13 +81,13 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   };
 
   useEffect(() => {
-    if (open) {
-      dispatch(getCustomOptionsForFilters());
-      reset({
-        ...filters,
-      });
-    }
-  }, [open]);
+    dispatch(getCustomOptionsForFilters());
+    if (webinarAttendeesFilters?.leadType)
+      setSelectedOption(webinarAttendeesFilters?.leadType);
+    reset({
+      ...webinarAttendeesFilters,
+    });
+  }, []);
 
   useEffect(() => {
     if (!leadTypeData) return;
@@ -83,8 +100,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   }, [leadTypeData]);
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box className="bg-white p-6 rounded-md mx-auto mt-20 w-full max-w-2xl ">
+    <Modal open={true} onClose={onClose} disablePortal>
+      <Box className="bg-white p-6 rounded-md mx-auto mt-10 w-full max-w-2xl ">
         <Typography variant="h6" className="text-center mb-4">
           Attendees Filter
         </Typography>
@@ -134,7 +151,6 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                   )}
                 />
               )}
-
 
               {tableConfig?.timeInSession?.filterable && (
                 <>
@@ -196,25 +212,23 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                         value={field.value || ""}
                       >
                         <MenuItem value="">All</MenuItem>
-                        {
-                          customOptionsForFilters.map((option) => (
-                            <MenuItem key={option.value} value={option.label}>
-                              {option.label}
-                            </MenuItem>
-                          ))
-                        }
+                        {customOptionsForFilters.map((option) => (
+                          <MenuItem key={option.value} value={option.label}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
                       </Select>
                     </FormControl>
                   )}
                 />
               )}
-              {/* {tableConfig?.leadType?.filterable && (
+              {tableConfig?.leadType?.filterable && (
                 <FormControl fullWidth>
                   <Select
                     labelId="lead-type-select-label"
                     value={selectedOption || ""}
-                   
                     className="shadow font-semibold"
+                    onChange={(e) => setSelectedOption(e.target.value)}
                     displayEmpty
                     renderValue={(selected) => {
                       if (!selected) {
@@ -265,22 +279,116 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                     ))}
                   </Select>
                 </FormControl>
-              )} */}
+              )}
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-between">
-            <Button variant="contained" color="primary" onClick={resetForm}>
-              Reset
-            </Button>
-            <div className="flex gap-2">
-              <Button onClick={onClose} variant="outlined" color="secondary">
-                Cancel
+          <div className="p-4 border-t border-gray-200 space-y-2">
+            <p className="text-sm font-medium">Sort By</p>
+            <div className="grid grid-cols-2 gap-2">
+              <FormControl fullWidth>
+
+                <Select
+                  labelId="sort-by-select-label"
+                  value={sortBy.sortBy || ""}
+                  className="shadow font-semibold h-10"
+                  onChange={(e) =>
+                    setSortBy((prev) => ({
+                      ...prev,
+                      sortBy: e.target.value,
+                    }))
+                  }
+                  displayEmpty
+                  renderValue={(selected) => {
+                    if (!selected) {
+                      return (
+                        <span style={{ color: "#888" }}>Select Sort By</span> // Placeholder style
+                      );
+                    }
+                    const selectedOption = webinarAttendeesSortByOptions.find(
+                      (option) => option.value === selected
+                    );
+
+                    return (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <span>{selectedOption?.label}</span>
+                      </div>
+                    );
+                  }}
+                >
+                  {webinarAttendeesSortByOptions.map((option) => (
+                    <MenuItem key={option.value} value={option.value}>
+                      <ListItemText primary={option.label} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <Select
+                  labelId="sort-order-select-label"
+                  value={sortBy.sortOrder || ""}
+                  className="shadow font-semibold h-10"
+                  onChange={(e) =>
+                    setSortBy((prev) => ({
+                      ...prev,
+                      sortOrder: e.target.value,
+                    }))
+                  }
+
+
+                  displayEmpty
+                  renderValue={(selected) => {
+                    if (!selected) {
+                      return (
+                        <span style={{ color: "#888" }}>Select Order</span> // Placeholder style
+                      );
+                    }
+                    const selectedOption = ["asc", "desc"].find(
+                      (option) => option === selected
+                    );
+
+                    return (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <span className="capitalize">{selectedOption}</span>
+                      </div>
+
+                    );
+                  }}
+                >
+                  {["asc", "desc"].map((option) => (
+                    <MenuItem key={option} value={option}>
+                      <ListItemText className="capitalize" primary={option} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
+            <div className="flex justify-between space-x-2">
+              <Button variant="contained" color="primary" onClick={resetForm}>
+                Reset
               </Button>
-              <Button type="submit" variant="contained" color="primary">
-                Apply Filters
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={onClose} variant="outlined" color="secondary">
+                  Cancel
+                </Button>
+                <Button type="submit" variant="contained" color="primary">
+                  Apply Filters
+                </Button>
+              </div>
             </div>
           </div>
         </form>

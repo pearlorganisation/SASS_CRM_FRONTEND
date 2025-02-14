@@ -1,24 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Tab,
-  Tabs,
-} from "@mui/material";
+
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
+
 import { getUserActivity } from "../../features/actions/userActivity";
 import { useDispatch, useSelector } from "react-redux";
 import UserActivityTable from "../../components/Table/UserActivityTable";
 import DataTable from "../../components/Table/DataTable";
 import { attendeeTableColumns } from "../../utils/columnData";
 import AttendeesFilterModal from "../../components/Attendees/AttendeesFilterModal";
-import {
-  getAssignments,
-} from "../../features/actions/assign";
-import { Visibility } from "@mui/icons-material";
+import { getAssignments } from "../../features/actions/assign";
+import Visibility from "@mui/icons-material/Visibility";
 import { AssignmentStatus } from "../../utils/extra";
 import { useLayoutEffect } from "react";
 import { getEmployeeWebinars } from "../../features/actions/webinarContact";
@@ -32,18 +30,24 @@ const ViewEmployee = () => {
   const { id } = useParams();
   const logUserActivity = useAddUserActivity();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const { assignData, isLoading, isSuccess, totalPages, activityAssignMents } =
+  
+  const { webinarAttendeesSortBy, webinarAttendeesFilters } = useSelector(
+    (state) => state.filters
+  );
+  const { assignData, isLoading, isSuccess, totalPages } =
     useSelector((state) => state.assign);
   const { webinarData } = useSelector((state) => state.webinarContact);
+  const modalState = useSelector((state) => state.modals.modals);
+  const filterModalOpen = modalState[filterModalName] ? true : false;
 
   const [tabValue, setTabValue] = useState(
     searchParams.get("tabValue") || "assignments"
   );
   const LIMIT = useSelector((state) => state.pageLimits[tabValue] || 10);
   const [page, setPage] = useState(searchParams.get("page") || 1);
-  const [filters, setFilters] = useState({});
   const [currentWebinar, setCurrentWebinar] = useState(
     searchParams.get("webinarId") || ""
   );
@@ -62,7 +66,7 @@ const ViewEmployee = () => {
           id,
           page,
           limit: LIMIT,
-          filters,
+          filters: webinarAttendeesFilters,
           webinarId: currentWebinar,
           assignmentStatus: AssignmentStatus.ACTIVE,
           validCall: "Worked",
@@ -74,13 +78,13 @@ const ViewEmployee = () => {
           id,
           page,
           limit: LIMIT,
-          filters,
+          filters: webinarAttendeesFilters,
           assignmentStatus: AssignmentStatus.ACTIVE,
           validCall: "Pending",
           webinarId: currentWebinar ? currentWebinar : undefined,
         })
       );
-  }, [page, LIMIT, filters, tabValue, currentWebinar]);
+  }, [page, LIMIT, tabValue, webinarAttendeesFilters, currentWebinar]);
 
   useLayoutEffect(() => {
     dispatch(getEmployeeWebinars({ employeeId: id }));
@@ -113,7 +117,9 @@ const ViewEmployee = () => {
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
-        console.log(`Viewing details for row with id: ${item?._id}`);
+        navigate(
+          `/particularContact?email=${item?.email}&attendeeId=${item?._id}`
+        );
       },
     },
   ];
@@ -190,8 +196,6 @@ const ViewEmployee = () => {
             ButtonGroup={WebinarDropdown}
             tableUniqueKey="viewAssignmentsTable"
             // isSelectVisible={true}
-            filters={filters}
-            setFilters={setFilters}
             tableData={{
               columns: attendeeTableColumns.filter(
                 (column) => column.header !== "Assigned To"
@@ -209,12 +213,13 @@ const ViewEmployee = () => {
             exportModalName={exportExcelModalName}
             isLoading={isLoading}
           />
+          {filterModalOpen && (
+            <AttendeesFilterModal
+              modalName={filterModalName}
+              setPage={setPage}
 
-          <AttendeesFilterModal
-            modalName={filterModalName}
-            filters={filters}
-            setFilters={setFilters}
-          />
+            />
+          )}
         </div>
       )}
     </div>

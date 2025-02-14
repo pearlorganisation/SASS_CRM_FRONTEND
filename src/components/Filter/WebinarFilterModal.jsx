@@ -7,13 +7,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../features/slices/modalSlice";
 import FormInput from "../FormInput";
 import { filterTruthyValues } from "../../utils/extra";
-import useAddUserActivity from '../../hooks/useAddUserActivity'
+import useAddUserActivity from "../../hooks/useAddUserActivity";
 
-const FilterModal = ({ modalName, setFilters, filters }) => {
+const FilterModal = ({ modalName, setFilters, filters, dateFormat }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
 
   const { modals } = useSelector((state) => state.modals);
+
   const open = modals[modalName] ? true : false;
   const { control, handleSubmit, register, reset } = useForm();
 
@@ -23,8 +24,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
     logUserActivity({
       action: "filter",
       type: "to Table",
-      detailItem: 'Webinars',
-    })
+      detailItem: "Webinars",
+    });
     dispatch(closeModal(modalName));
   };
 
@@ -35,6 +36,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
       totalRegistrations: null,
       totalParticipants: null,
       totalAttendees: null,
+      totalUnAttended: null,
     });
   };
 
@@ -50,8 +52,11 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
     }
   }, [open]);
 
+
+
+
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal open={open} onClose={onClose} disablePortal>
       <Box className="bg-white p-6 rounded-md mx-auto mt-20 w-full max-w-2xl ">
         <Typography variant="h6" className="text-center mb-4">
           Webinar Filters
@@ -73,8 +78,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -85,8 +90,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -97,8 +102,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -109,8 +114,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -121,8 +126,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -133,8 +138,35 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
+                  },
+                }}
+              />
+
+              <FormInput
+                name="totalUnAttended.$gte"
+                label="Total Un Attended (Min)"
+                control={control}
+                type="number"
+
+                validation={{
+                  min: {
+                    value: 0,
+                    message: "Value must be at least 0",
+                  },
+                }}
+              />
+              <FormInput
+                name="totalUnAttended.$lte"
+                label="Total Un Attended (Max)"
+                control={control}
+                type="number"
+
+                validation={{
+                  min: {
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -152,6 +184,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                       onChange={(date) => field.onChange(date)}
                       className="border p-4 w-full rounded flex-1"
                       placeholderText="Webinar Date (From)"
+                      dateFormat={dateFormat}
                     />
                   )}
                 />
@@ -166,6 +199,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                       onChange={(date) => field.onChange(date)}
                       className="border p-4 w-full rounded"
                       placeholderText="Webinar Date (To)"
+                      dateFormat={dateFormat}
                     />
                   )}
                 />

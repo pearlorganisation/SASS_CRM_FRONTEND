@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { deleteUserDocumet, getAllRoles, getCurrentUser, getSuperAdmin, getUserSubscription, logIn, signUp, updatePassword, updateUser } from "../actions/auth";
+import { deleteUserDocumet, generateOTP, getAllRoles, getCurrentUser, getSuperAdmin, getUserSubscription, logIn, signUp, updatePassword, updateUser, validateOTP } from "../actions/auth";
 import { toast } from "sonner";
 import { errorToast, successToast } from "../../utils/extra";
 import { socket } from "../../socket";
@@ -12,10 +12,12 @@ const initialState = {
   isUserLoggedIn: false,
   userData: null,
   isSuccess: false,
+  isOTPGenerated: false,
   isRolesLoading: false,
   roles: [],
   subscription: null,
-  superAdminData:null
+  superAdminData:null,
+  isSomethingStillLoading:false
 };
 
 // -------------------------------------- Slices------------------------------------------------
@@ -31,6 +33,10 @@ const authSlice = createSlice({
     },
     clearLoadingAndData: (state) => {
       (state.isLoading = false), (state.userData = null);
+    },
+    clearOTPGenerated: (state) => {
+      state.isOTPGenerated = false;
+      state.isSuccess = false;
     },
   },
   extraReducers: (builder) => {
@@ -148,10 +154,37 @@ const authSlice = createSlice({
       .addCase(getSuperAdmin.fulfilled, (state, action) => {
         state.superAdminData = action.payload || null;
       })
-
+      .addCase(generateOTP.pending, (state, action) => {
+        state.isSomethingStillLoading = true;
+        state.isOTPGenerated = false;
+      })
+      .addCase(generateOTP.fulfilled, (state, action) => {
+        state.isSomethingStillLoading = false;
+        state.isOTPGenerated = true;
+        successToast("OTP Generated Successfully");
+      })
+      .addCase(generateOTP.rejected, (state, action) => {
+        state.isSomethingStillLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(validateOTP.pending, (state, action) => {
+        state.isSomethingStillLoading = true;
+        state.isSuccess = false;
+      })
+      
+      .addCase(validateOTP.fulfilled, (state, action) => {
+        state.isSomethingStillLoading = false;
+        state.isSuccess = true;
+        successToast("OTP Validated Successfully! A new password has been sent to your email. Please check your mail and reset your password.");
+      })
+      .addCase(validateOTP.rejected, (state, action) => {
+        state.isSomethingStillLoading = false;
+        errorToast(action?.payload);
+      })
   },
 });
 
+
 // ===========================================Exports==================================================
 export default authSlice.reducer;
-export const { logout, clearLoadingAndData } = authSlice.actions;
+export const { logout, clearLoadingAndData, clearOTPGenerated } = authSlice.actions;

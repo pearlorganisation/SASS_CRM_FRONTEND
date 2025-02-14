@@ -6,6 +6,7 @@ import PageLimitEditor from "../../components/PageLimitEditor";
 import { Pagination } from "@mui/material";
 import { NotifActionType } from "../../utils/extra";
 import useRoles from "../../hooks/useRoles";
+import ScrollControls from "../../components/ScrollControls";
 
 const Notifications = () => {
   const dispatch = useDispatch();
@@ -87,13 +88,13 @@ const Notifications = () => {
             >
               {/* Notif?ication Type */}
               <div
-                className={`text-sm font-medium ${
+                className={`text-sm font-medium capitalize ${
                   notif?.actionType === "warning"
                     ? "text-yellow-600"
                     : "text-green-600"
                 }`}
               >
-                {notif?.actionType}
+                { notif?.actionType ? notif.actionType.split("_").join(" ") : "Unknown"}
               </div>
 
               {/* Title */}
@@ -137,7 +138,10 @@ const Notifications = () => {
             <PageLimitEditor setPage={setPage} pageId={"notificationsPage"} />
           </div>
         )}
-      </div>
+        <ScrollControls/>
+        </div>
+
+      
     </div>
   );
 };

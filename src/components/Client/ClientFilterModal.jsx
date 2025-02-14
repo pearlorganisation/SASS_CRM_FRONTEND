@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Modal,
@@ -16,11 +16,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../features/slices/modalSlice";
 import FormInput from "../FormInput";
 import { filterTruthyValues } from "../../utils/extra";
+import { getPlansForDropdown } from "../../features/actions/pricePlan";
 
 const FilterModal = ({ modalName, setFilters, filters }) => {
   // console.log("filter modal render");
   const dispatch = useDispatch();
   const { control, handleSubmit, register, reset } = useForm();
+  const { plansForDropdown } = useSelector((state) => state.pricePlans);
 
   const onSubmit = (data) => {
     const filterData = filterTruthyValues(data);
@@ -40,6 +42,9 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
       planStartDate: null,
       planExpiry: null,
       contactsLimit: null,
+      employeeLimit: null,
+      usedContactsCount: null,
+      remainingDays: null,
       totalEmployees: null,
       employeeSalesCount: null,
       employeeReminderCount: null,
@@ -51,16 +56,15 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
   };
 
   useEffect(() => {
-    if (filters.isActive) {
-      reset({
-        ...filters,
-        isActive: filters.isActive,
-      });
-    }
+    console.log("filters", filters);
+    reset({
+      ...filters,
+      isActive: filters.isActive,
+    });
   }, []);
 
   return (
-    <Modal open={true} onClose={onClose}>
+    <Modal open={true} onClose={onClose} disablePortal>
       <Box className="bg-white p-6 rounded-md mx-auto mt-20 w-full max-w-2xl ">
         <Typography variant="h6" className="text-center mb-4">
           Client Filters
@@ -68,35 +72,46 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="max-h-[65dvh] overflow-y-auto space-y-4 p-4 border rounded-lg">
             <div className="grid grid-cols-2 gap-4">
-              <FormInput
-                name="email"
-                label="Email"
-                control={control}
-                validation={{
-                  pattern: {
-                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-                    message: "Enter a valid email address",
-                  },
-                }}
-              />
+              <FormInput name="email" label="Email" control={control} />
               <FormInput
                 name="companyName"
                 label="Company Name"
                 control={control}
               />
               <FormInput name="userName" label="User Name" control={control} />
-              <FormInput
-                name="phone"
-                label="Phone"
+              <FormInput name="phone" label="Phone" control={control} />
+              <Controller
+                name="planName"
                 control={control}
-                validation={{
-                  pattern: {
-                    value: /^[0-9]{10}$/, // Only 10 numeric characters
-                    message: "Phone number must be 10 digits",
-                  },
-                }}
+                defaultValue=""
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel id="plan-name-label">Plan Name</InputLabel>
+                    <Select
+                      {...field}
+                      labelId="plan-name-label"
+                      label="Plan Name"
+                      value={field.value || ""}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            maxHeight: 200,
+                            overflow: "auto",
+                          },
+                        },
+                      }}
+                    >
+                      <MenuItem value="">All</MenuItem>
+                      {plansForDropdown.map((plan) => (
+                        <MenuItem key={plan.value} value={plan.value}>
+                          {plan.label}
+                        </MenuItem>
+                      ))}
+
+                    </Select>
+                  </FormControl>
+                )}
               />
-              <FormInput name="planName" label="Plan Name" control={control} />
               {/* Select dropdown for Active/Inactive */}
               <Controller
                 name="isActive"
@@ -120,6 +135,57 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                   </FormControl>
                 )}
               />
+
+              <FormInput
+                name="remainingDays.$gte"
+                label="Remaining Days (Min)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 0,
+                    message: "Value must be at least 0",
+                  },
+                }}
+              />
+              <FormInput
+                name="remainingDays.$lte"
+                label="Remaining Days (Max)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 0,
+                    message: "Value must be at least 0",
+                  },
+                }}
+              />
+
+              <FormInput
+                name="usedContactsCount.$gte"
+                label="Used Contacts Count (Min)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 0,
+                    message: "Value must be at least 0",
+                  },
+                }}
+              />
+              <FormInput
+                name="usedContactsCount.$lte"
+                label="Used Contacts Count (Max)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 0,
+                    message: "Value must be at least 0",
+                  },
+                }}
+              />
+
               <FormInput
                 name="contactsLimit.$gte"
                 label="Contacts Limit (Min)"
@@ -127,8 +193,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -139,11 +205,36 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
+              <FormInput
+                name="employeeLimit.$gte"
+                label="Employee Limit (Min)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 0,
+                    message: "Value must be at least 0",
+                  },
+                }}
+              />
+              <FormInput
+                name="employeeLimit.$lte"
+                label="Employee Limit (Max)"
+                control={control}
+                type="number"
+                validation={{
+                  min: {
+                    value: 0,
+                    message: "Value must be at least 0",
+                  },
+                }}
+              />
+
               <FormInput
                 name="totalEmployees.$gte"
                 label="Total Employees (Min)"
@@ -151,8 +242,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -163,8 +254,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -175,8 +266,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -187,8 +278,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -199,8 +290,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -211,8 +302,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -224,8 +315,8 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
@@ -236,37 +327,11 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                 type="number"
                 validation={{
                   min: {
-                    value: 1,
-                    message: "Value must be at least 1",
+                    value: 0,
+                    message: "Value must be at least 0",
                   },
                 }}
               />
-              {/* <FormInput
-                name="contactsCountStart"
-                label="Contacts Count (Min)"
-                control={control}
-                type="number"
-                validation={{
-                min: {
-                  value: 1,
-                  message: "Value must be at least 1",
-                },
-              }}
-
-              />
-              <FormInput
-                name="contactsCountEnd"
-                label="Contacts Count (Max)"
-                control={control}
-                type="number"
-                validation={{
-                min: {
-                  value: 1,
-                  message: "Value must be at least 1",
-                },
-              }}
-
-              /> */}
             </div>
 
             {/* Date Pickers */}

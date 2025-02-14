@@ -12,6 +12,11 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../../features/slices/modalSlice";
+import {
+  approveLocation,
+  disapproveLocation,
+  getLocationRequests,
+} from "../../../features/actions/location";
 // import { updateEmployeeStatus } from "../../../features/actions/employee";
 // import useAddUserActivity from "../../../hooks/useAddUserActivity";
 
@@ -36,18 +41,15 @@ export default function RequestApprovalDisapprovalModal({ modalName }) {
       return;
     }
     if (isInputValid) {
-      //   dispatch(
-      //     updateEmployeeStatus({
-      //       id: modalData?._id,
-      //       isActive: !modalData?.isActive,
-      //     })
-      //   );
-      //   logUserActivity({
-      //     action: !modalData?.isActive ? "activate" : "deactivate",
-      //     details: `User ${
-      //       !modalData?.isActive ? "activated" : "deactivated"
-      //     } the Employee with Email: ${modalData?.email}`,
-      //   });
+      if (modalName === "requestApprovalModal") {
+        dispatch(approveLocation({ id: modalData?._id })).then(() => {
+          dispatch(getLocationRequests({ page: 1, limit: 100 }));
+        });
+      } else {
+        dispatch(disapproveLocation({ id: modalData?._id })).then(() => {
+          dispatch(getLocationRequests({ page: 1, limit: 100 }));
+        });
+      }
     }
   };
 
@@ -63,13 +65,14 @@ export default function RequestApprovalDisapprovalModal({ modalName }) {
   }, [isSuccess]);
 
   return (
-    <Modal open={open} onClose={handleClose} closeAfterTransition>
+    <Modal open={open} onClose={handleClose} closeAfterTransition disablePortal>
       <Fade in={open}>
         <Box className="relative w-full max-w-md bg-white rounded-md shadow-lg p-6 mx-auto mt-20">
           {/* Header */}
           <div className="flex justify-between items-center border-b pb-2 mb-4">
             <Typography variant="h6" className="font-semibold">
-              {modalName === "requestApprovalModal" ? "Approve" : "Disapprove"} Location.
+              {modalName === "requestApprovalModal" ? "Approve" : "Disapprove"}{" "}
+              Location.
             </Typography>
             <IconButton
               onClick={handleClose}
@@ -93,8 +96,7 @@ export default function RequestApprovalDisapprovalModal({ modalName }) {
 
           {/* Confirmation Message */}
           <Typography variant="body1" className="text-center mb-6">
-            
-            Entering Location name to submit: <strong>{modalData?.name}</strong> 
+            Entering Location name to submit: <strong>{modalData?.name}</strong>
           </Typography>
 
           {/* Input Field */}

@@ -1,19 +1,28 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { logIn } from "../../../features/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
-import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import TextField from "@mui/material/TextField";
+
+
 import { getGlobalData } from "../../../features/actions/globalData";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+const ForgotPasswordModal = lazy(() => import("../ForgotPassword/ForgotPassword"));
+import TailwindLoader from "../../../components/TailwindLoader";
+import ModalFallback from "../../../components/Fallback/ModalFallback";
 
 function Login() {
   const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.auth);
+  const { isLoading, isUserLoggedIn } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const { landingGlobalData } = useSelector((state) => state.globalData);
   const [isPasswordHidden, setPasswordHidden] = useState(false);
+  const [forgotModalOpen, setForgotModalOpen] = useState(false);
 
   const {
     register,
@@ -30,14 +39,14 @@ function Login() {
   };
 
   useEffect(() => {
-    if (window.location.pathname !== "/") {
-      navigate("/", { replace: true });
-    }
-  }, [navigate]);
-
-  useEffect(() => {
     dispatch(getGlobalData());
   }, []);
+
+  useEffect(() => {
+    if (isUserLoggedIn) {
+      navigate("/", { replace: true });
+    }
+  }, [isUserLoggedIn, navigate]);
 
   function getFileURL(filename = "", destination = "") {
     const baseUrl =
@@ -178,7 +187,7 @@ function Login() {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton onClick={togglePasswordVisibility}>
-                      {isPasswordHidden ? <VisibilityOff /> : <Visibility />}
+                      {isPasswordHidden ? <VisibilityOffIcon /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -193,9 +202,23 @@ function Login() {
               color="primary"
               disabled={isLoading}
             >
-              {isLoading ? <ClipLoader color="#fff" size={20} /> : "Sign In"}
+              {isLoading ? <TailwindLoader size={6} /> : "Sign In"}
             </Button>
           </form>
+          {/* Forgot Password Link */}
+          <div className="text-center mt-4">
+            <button
+              onClick={() => setForgotModalOpen(true)}
+              className="text-sm text-blue-600 hover:text-blue-500 hover:underline"
+            >
+              Forgot your password?
+            </button>
+          </div>
+          {forgotModalOpen && (
+            <Suspense fallback={<ModalFallback/>}>
+              <ForgotPasswordModal onClose={() => setForgotModalOpen(false)} />
+            </Suspense>
+          )}
         </div>
       </div>
     </div>

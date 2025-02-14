@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { TbLayoutDashboardFilled } from "react-icons/tb";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { TbLayoutDashboardFilled, TbReceiptRupee } from "react-icons/tb";
 import { IoLogOut, IoPeople, IoSettings } from "react-icons/io5";
 import { HiUserGroup } from "react-icons/hi2";
 import { SiGooglemeet } from "react-icons/si";
@@ -19,8 +19,11 @@ import { FaCalendarAlt } from "react-icons/fa";
 import ComponentGuard from "../../AccessControl/ComponentGuard";
 const Sidebar = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
+  const [searchParams, setSearchParams] = useSearchParams();
+
 
   const { isUpdated } = useSelector((state) => state.noticeBoard);
   const { sidebarLinkData } = useSelector((state) => state.sidebarLink);
@@ -29,7 +32,6 @@ const Sidebar = () => {
   const [showImportantLinks, setShowImportantLinks] = useState(false); // toggle state for sub-links
   const role = userData?.role || "";
   const { employeeModeData } = useSelector((state) => state.employee);
-
 
   const navItems = [
     {
@@ -40,6 +42,12 @@ const Sidebar = () => {
           label: "Clients",
           icon: <IoPeople size={30} />,
         },
+        {
+          path: "/revenue",
+          label: "Revenue",
+          icon: <TbReceiptRupee  size={30} />,
+        },
+
       ],
     },
     {
@@ -107,6 +115,34 @@ const Sidebar = () => {
     },
   ];
 
+  
+  // useEffect(() => {
+  //   const handlePopState = (event) => {
+  //     const currentPath = window.location.pathname;
+  //     const referrer = document.referrer;
+  //     console.log(referrer);
+
+  //     console.log(referrer.includes(window.location.host));
+  //     // Check if coming from external page
+  //     if (referrer.includes(window.location.host)) {
+  //     navigate(-1);
+  //       return;
+  //     }
+
+  //     // Check if previous state was same route
+  //     if (event.state?.route === currentPath) {
+  //       // Go back further in history
+  //       window.history.go(-2);
+  //     }
+  //   };
+
+  //   window.addEventListener('popstate', handlePopState);
+    
+  //   return () => {
+  //     window.removeEventListener('popstate', handlePopState);
+  //   };
+  // }, [navigate]);
+
   const handleLogout = () => {
     dispatch(logout());
     logUserActivity({
@@ -114,6 +150,16 @@ const Sidebar = () => {
       details: "User logged out successfully",
     });
   };
+
+  // const handleParamUpdate = (newParams) => {
+  //   const searchParams = new URLSearchParams(newParams);
+  //   window.history.replaceState(
+  //     { route: window.location.pathname }, 
+  //     '', 
+  //     `?${searchParams.toString()}`
+  //   );
+  //   setSearchParams(searchParams);
+  // };
 
   const toggleImportantLinks = () => {
     setShowImportantLinks((prev) => !prev);
@@ -132,8 +178,7 @@ const Sidebar = () => {
   };
 
   useEffect(() => {
-    if(userData)
-    dispatch(getAllSidebarLinks());
+    if (userData) dispatch(getAllSidebarLinks());
   }, []);
 
   useEffect(() => {
@@ -154,8 +199,8 @@ const Sidebar = () => {
   return (
     <div
       id="logo-sidebar"
-      className={`fixed top-0 left-0 w-64 h-screen z-10 pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 ${
-        isSidebarOpen ? "translate-x-0" : "sm:translate-x-0"
+      className={`fixed top-0 left-0 w-64 h-screen z-20 pt-20 transition-transform ease-in-out duration-700  -translate-x-full bg-white border-r border-gray-200 ${
+        isSidebarOpen ? "translate-x-0" : ""
       }`}
       aria-label="Sidebar"
     >
@@ -236,18 +281,17 @@ const Sidebar = () => {
           </li>
 
           {/* Settings Link */}
-        <ComponentGuard conditions={[employeeModeData ? false : true]}>
-        <li>
-            <Link
-              to="/settings"
-              className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
-            >
-              <IoSettings size={30} />
-              <span className="flex-1 ms-3 whitespace-nowrap">Settings</span>
-            </Link>
-          </li>
-        </ComponentGuard>
-          
+          <ComponentGuard conditions={[employeeModeData ? false : true]}>
+            <li>
+              <Link
+                to="/settings"
+                className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
+              >
+                <IoSettings size={30} />
+                <span className="flex-1 ms-3 whitespace-nowrap">Settings</span>
+              </Link>
+            </li>
+          </ComponentGuard>
 
           {/* Logout Button */}
           <li>

@@ -12,21 +12,25 @@ import { closeModal } from "../../features/slices/modalSlice";
 import { exportWebinarAttendeesExcel } from "../../features/actions/export-excel";
 import { ClipLoader } from "react-spinners";
 import { attendeeTableColumns } from "../../utils/columnData";
+import { resetExportSuccess } from "../../features/slices/export-excel";
 
 const ExportWebinarAttendeesModal = ({
   modalName,
   filters,
-  isAttended=true,
-  webinarId="",
+  isAttended,
+  webinarId,
+  validCall,
+  assignmentType,
+  sort,
 }) => {
   const dispatch = useDispatch();
+  console.log("ExportWebinarAttendeesModal -> Render");
+
 
   const { subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
 
   const { isLoading, isSuccess } = useSelector((state) => state.export);
-  const modalState = useSelector((state) => state.modals.modals);
-  const open = modalState[modalName] ? true : false;
 
   const [limit, setLimit] = useState("");
   const [selectedColumns, setSelectedColumns] = useState([]);
@@ -47,32 +51,42 @@ const ExportWebinarAttendeesModal = ({
     // dispatch(exportClientExcel({ limit: limitValue, columns, filters }));
     dispatch(
       exportWebinarAttendeesExcel({
-        limit: limitValue,
+        limit: Number(limitValue) || 0,
         columns: selectedColumns,
         filters,
         isAttended,
         webinarId,
+        validCall,
+        assignmentType,
+        sort,
       })
     );
+
     //
   };
+  console.log("isSuccess, assignSuccess, isSuccessReAssign", isSuccess);
 
   useEffect(() => {
     if (isSuccess) {
       handleClose();
+      dispatch(resetExportSuccess());
     }
   }, [isSuccess]);
 
   useEffect(() => {
+    console.log(tableConfig);
     const filteredColumns = attendeeTableColumns.filter(
       (col) => col.key in tableConfig && tableConfig[col.key].downloadable
     );
+    if(tableConfig['leadType']?.downloadable){
+      filteredColumns.push({ header: "LeadType", key: "leadType", width: 20 },)
+    }
     setColumns(filteredColumns);
     setSelectedColumns(filteredColumns.map((col) => col.key));
   }, [tableConfig]);
 
   return (
-    <Modal open={open} onClose={handleClose}>
+    <Modal open={true} onClose={handleClose} disablePortal>
       <Box className="p-6 bg-white rounded-lg shadow-lg max-w-xl mx-5 sm:mx-auto mt-20">
         <h2 className="text-xl font-semibold mb-4">Export Excel Options</h2>
         <div className="mb-4">
@@ -80,9 +94,19 @@ const ExportWebinarAttendeesModal = ({
             label="Limit"
             variant="outlined"
             type="number"
+            placeholder="All"
             fullWidth
             value={limit}
-            onChange={(e) => setLimit(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value === "") {
+                setLimit(e.target.value);
+                return;
+              }
+              const value = Number(e.target.value);
+              if (!isNaN(value) && value > 0 && value <= 10000) {
+                setLimit(value);
+              }
+            }}
             onKeyDown={(e) => {
               const allowedKeys = [
                 "Backspace",
@@ -99,6 +123,7 @@ const ExportWebinarAttendeesModal = ({
                 e.preventDefault();
               }
             }}
+            InputLabelProps={{ shrink: true }}
           />
         </div>
         <div className="mb-4">

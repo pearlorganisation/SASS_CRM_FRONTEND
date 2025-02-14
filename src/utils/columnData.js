@@ -35,14 +35,22 @@ export const clientTableColumns = [
 
 export const attendeeTableColumns = [
   { header: "Email", key: "email", width: 50, type: "" },
+  { header: "Phone", key: "phone", width: 20, type: "" },
+  { header: "Time in Session", key: "timeInSession", width: 20, type: "" },
   { header: "Assigned To", key: "isAssigned", width: 20, type: "" },
   { header: "First Name", key: "firstName", width: 20, type: "" },
   { header: "Last Name", key: "lastName", width: 20, type: "" },
   { header: "Status", key: "status", width: 20, type: "" },
-  { header: "Time in Session", key: "timeInSession", width: 20, type: "" },
   { header: "Gender", key: "gender", width: 20, type: "" },
   { header: "Location", key: "location", width: 20, type: "Location" },
-  { header: "Phone", key: "phone", width: 20, type: "" },
+  { header: "Source", key: "source", width: 20, type: "", default: "Import" },
+  { header: "Date", key: "createdAt", width: 20, type: "Date" },
+];
+
+export const groupedAttendeeTableColumns = [
+  { header: "Email", key: "_id", width: 50, type: "" },
+  { header: "Total Time in Session", key: "timeInSession", width: 20, type: "" },
+  { header: "Webinar Attended", key: "attendedWebinarCount", width: 20, type: "" },
 ];
 
 export const employeeTableColumns = [
@@ -69,15 +77,16 @@ export const employeeTableColumns = [
 export const locationTableColumns = [
   { header: "Name", key: "name", width: 50, type: "" },
   { header: "Previous Name", key: "previousName", width: 20, type: "" },
-  { header: "Is Verified", key: "isVerified", width: 10, type: "superAdminApproval" },
-  { header: "Admin", key: "admin", width: 20, type: "" },
+  { header: "Is Verified", key: "isVerified", width: 10, type: "superAdminApproval", title: "note" },
+  { header: "Admin", key: "adminEmail", width: 20, type: "" },
   {
     header: "Is Admin Verified",
     key: "isAdminVerified",
     width: 10,
     type: "adminApproval",
+    title: "adminNote"
   },
-  { header: "Employee", key: "employee", width: 20, type: "" },
+  { header: "Employee", key: "employeeEmail", width: 20, type: "" },
 ];
 
 export const webinarTableColumns = [
@@ -89,13 +98,14 @@ export const webinarTableColumns = [
     width: 10,
     type: "",
   },
-  { header: "Total Attendees", key: "totalAttendees", width: 20, type: "" },
   {
     header: "Total Participants",
     key: "totalParticipants",
     width: 15,
     type: "",
   },
+  { header: "Total Attendees", key: "totalAttendees", width: 20, type: "" },
+  { header: "Total Un Attended", key: "totalUnAttended", width: 20, type: "" },
 ];
 
 export const productTableColumns = [
@@ -104,6 +114,12 @@ export const productTableColumns = [
   {
     header: "Level",
     key: "level",
+    width: 10,
+    type: "",
+  },
+  {
+    header: "Tag",
+    key: "tag",
     width: 10,
     type: "",
   },
@@ -140,4 +156,17 @@ export const enrollmentsColumn = [
     type: "Product",
   },
   { header: "Date", key: "createdAt", width: 20, type: "Date" },
+];
+
+
+export const allAttendeesSortByOptions = [
+  { value: "_id", label: "Email" },
+  { value: "attendedWebinarCount", label: "Attended Webinar Count" },
+  { value: "timeInSession", label: "Time in Session" },
+];
+
+export const webinarAttendeesSortByOptions = [
+  { value: "email", label: "Email" },
+  { value: "createdAt", label: "Date" },
+  { value: "timeInSession", label: "Time in Session" }
 ];
