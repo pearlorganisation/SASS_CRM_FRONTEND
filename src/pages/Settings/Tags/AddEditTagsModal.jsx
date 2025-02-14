@@ -49,8 +49,21 @@ const AddEditTagsModal = ({ setModal, formState, fetchTags }) => {
             <label className="block text-sm font-medium mb-1">Tag Name</label>
             <input
               type="text"
-              {...register("name", { required: "Tag name is required" })}
+              {...register("name", { 
+                required: "Tag name is required",
+                pattern: {
+                  value: /^[a-z0-9_]+$/,
+                  message: "Only lowercase letters, numbers and underscores allowed"
+                }
+              })}
               aria-invalid={errors.name ? "true" : "false"}
+              placeholder="Enter tag name"
+              onChange={(e) => {
+                // Sanitize and lowercase input in real-time
+                let val = e.target.value.toLowerCase();
+                val = val.replace(/[^a-z0-9_]/g, '');
+                e.target.value = val;
+              }}
               className={`w-full px-3 py-2 border rounded-md focus:ring-2 ${
                 errors.name
                   ? "border-red-500 focus:ring-red-200"

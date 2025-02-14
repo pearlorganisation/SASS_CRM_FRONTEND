@@ -1,36 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import TextField from "@mui/material/TextField";
-import FormInput from "../../../components/FormInput";
-import { errorToast } from "../../../utils/extra";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  createAddon,
-  getAddons,
   getClientAddons,
 } from "../../../features/actions/pricePlan";
-import { resetAddonsData, resetPricePlanSuccess } from "../../../features/slices/pricePlan";
-import ComponentGuard from "../../../components/AccessControl/ComponentGuard";
+import { resetAddonsData } from "../../../features/slices/pricePlan";
 import useRoles from "../../../hooks/useRoles";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import AddonCard from "./AddonCard";
 
 const MyAddOns = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const roles = useRoles();
   const { id } = useParams();
 
-  const [isModalOpen, setModalOpen] = useState(false);
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm();
 
-  const { userData } = useSelector((state) => state.auth);
-  const { isLoading, isSuccess, addonsData } = useSelector(
+
+  const { addonsData } = useSelector(
     (state) => state.pricePlans
   );
 

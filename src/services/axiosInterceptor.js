@@ -1,15 +1,23 @@
 import axios from "axios";
-import {
-  delay,
-  getErrorMessage,
-  shouldRetryRequest,
-} from "../utils/interceptorUtils";
+
+
+// Returns an error message based on the status code or a default message
+ const getErrorMessage = (status, defaultMessage) => {
+  const errorMessages = {
+    400: "Bad Request",
+    401: "Unauthorized Access",
+    404: "Resource Not Found",
+    500: "Internal Server Error",
+  };
+  return (
+    defaultMessage || errorMessages[status] ||  "An unknown error occurred."
+  );
+};
 
 let store;
 export const injectStore = (_store) => {
   store = _store;
 };
-
 export const instance = axios.create({
   withCredentials: true,
   baseURL: `${
@@ -26,20 +34,17 @@ instance.interceptors.response.use(
     const originalRequest = error.config;
     const loggedInUserEmail = store.getState()?.auth?.userData?.email;
 
-    if (
-      (error?.response?.status === 401 || error?.response?.status === 403) &&
-      shouldRetryRequest(originalRequest, originalRequest.url)
-    ) {
+    if ((error?.response?.status === 401 || error?.response?.status === 403) && !originalRequest._retry) {
+      originalRequest._retry = true;
       try {
-        // console.log("Refreshing token...");
-        // await delay(1000 * retryTracker.get(originalRequest.url)); // Exponential backoff
-        // console.log('sf --- > ')
+       
         await instance.post("/auth/refresh", { email: loggedInUserEmail });
-        // console.log('< ---- sf --- > ')
 
         return instance(originalRequest);
       } catch (refreshError) {
+        console.log("refreshError", refreshError);
         console.error("Token refresh failed. Logging out user.");
+        store.dispatch({ type: "auth/logout" });
         return Promise.reject("Token refresh failed. Please log in again.");
       }
     }

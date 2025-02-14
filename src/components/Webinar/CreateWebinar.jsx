@@ -19,6 +19,7 @@ import { getAllEmployees } from "../../features/actions/employee";
 import useRoles from "../../hooks/useRoles";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { getAllProductsByAdminId } from "../../features/actions/product";
+import { DateFormat } from "../../utils/extra";
 
 const CreateWebinar = ({ modalName }) => {
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ const CreateWebinar = ({ modalName }) => {
 
   const { employeeData } = useSelector((state) => state.employee);
   const { userData } = useSelector((state) => state.auth);
+  const dateFormat = userData?.dateFormat || DateFormat.DD_MM_YYYY;
   const { productDropdownData } = useSelector((state) => state.product);
   console.log(productDropdownData, "productDropdownData");
   const {
@@ -165,14 +167,19 @@ const CreateWebinar = ({ modalName }) => {
               helperText={errors.webinarName?.message}
             />
 
+
             {/* Webinar Date */}
             <TextField
+            
               label="Webinar Date"
               type="date"
               fullWidth
               variant="outlined"
               InputLabelProps={{
                 shrink: true,
+              }}
+              inputProps={{
+                placeholder: dateFormat,  
               }}
               {...register("webinarDate", {
                 required: "Webinar Date is required",

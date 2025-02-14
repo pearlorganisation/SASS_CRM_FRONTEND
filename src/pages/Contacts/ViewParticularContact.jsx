@@ -41,6 +41,7 @@ import AddEnrollmentModal from "./Modal/AddEnrollmentModal";
 import { cancelAlarm, getAttendeeAlarm } from "../../features/actions/alarm";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import ProductLevelTable from "./ProductLevelTable";
+import { DateFormat, formatDateAsNumber } from "../../utils/extra";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -63,6 +64,7 @@ const ViewParticularContact = () => {
     (state) => state.webinarContact
   );
   const { userData } = useSelector((state) => state.auth);
+  const dateFormat = userData?.dateFormat || DateFormat.MM_DD_YYYY;
   const { selectedAttendee, attendeeLeadType, attendeeEnrollments } =
     useSelector((state) => state.attendee);
 
@@ -505,9 +507,7 @@ const ViewParticularContact = () => {
                                 <td className="px-3 py-4 whitespace-nowrap">
                                   {Array.isArray(item?.webinar) &&
                                   item.webinar.length > 0
-                                    ? new Date(
-                                        item?.webinar[0].webinarDate
-                                      ).toDateString()
+                                    ? formatDateAsNumber(item?.webinar[0].webinarDate)
                                     : "-"}
                                 </td>
                                 <ComponentGuard
@@ -637,6 +637,7 @@ const ViewParticularContact = () => {
         <ViewTimerModal
           setModal={setShowTimerModal}
           email={email}
+          dateFormat={dateFormat}
           attendeeId={attendeeId}
         />
       )}

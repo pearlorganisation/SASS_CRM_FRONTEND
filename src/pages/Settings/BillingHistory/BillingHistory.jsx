@@ -3,10 +3,11 @@ import { FiDownload } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { jsPDF } from "jspdf";
 import { getAdminBillingHistory } from "../../../features/actions/pricePlan";
-import { Pagination } from "@mui/material";
+import Pagination  from "@mui/material/Pagination";
 import PageLimitEditor from "../../../components/PageLimitEditor";
 import { getSuperAdmin } from "../../../features/actions/auth";
 import { toast } from "sonner";
+import { formatDateAsNumber } from "../../../utils/extra";
 
 const BillingHistory = () => {
   const dispatch = useDispatch();
@@ -239,7 +240,7 @@ const BillingHistory = () => {
               {billingHistory.map((bill) => (
                 <tr key={bill._id} className="text-center">
                   <td className="py-2 px-4 border-b">
-                    {new Date(bill?.date).toLocaleDateString()}
+                    {formatDateAsNumber(bill?.date)}
                   </td>
                   <td className="py-2 px-4 border-b">
                     {"\u20B9"}

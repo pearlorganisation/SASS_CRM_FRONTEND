@@ -5,6 +5,7 @@ import "./CalendarPage.css"; // Import your custom CSS file
 import { useDispatch, useSelector } from "react-redux";
 import { getUserAlarms } from "../../features/actions/alarm";
 import { useNavigate } from "react-router-dom";
+import { formatDateAsNumberWithTime } from "../../utils/extra";
 
 const CalendarPage = () => {
   const dispatch = useDispatch();
@@ -105,7 +106,7 @@ const CalendarPage = () => {
                 >
                   <p className="text-sm text-gray-500">
                     <strong>Date:</strong>{" "}
-                    {new Date(alarm.date).toLocaleString()}
+                    {formatDateAsNumberWithTime(alarm.date)}
                   </p>
                   <p className="text-sm text-gray-500">
                     <strong>Email:</strong> {alarm.email}

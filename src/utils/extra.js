@@ -1,33 +1,32 @@
 import { toast } from "sonner";
 
+
+
+export const DateFormat = {
+  DD_MM_YYYY: "dd-MM-yyyy",
+  MM_DD_YYYY: "MM-dd-yyyy",
+  YYYY_MM_DD: "yyyy-MM-dd",
+};
+
+let store;
+export const injectStoreInDateFormat = (_store) => {
+  store = _store;
+};
+
 /**
  * This function is used by multiple pages/components to format the date and time
  * in a readable format.
  */
+
 export const formatDate = (dateStr) => {
-  if (!dateStr) return "-";
-  const date = new Date(dateStr);
 
-  // Check if the date is valid
-  if (isNaN(date.getTime())) {
-    return "-";
-  }
-
-  return (
-    date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }) +
-    " " +
-    date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-  );
-};
+  return formatDateAsNumberWithTime(dateStr);
+}
 
 export const formatDateAsNumber = (dateStr) => {
+
+const dateFormat = store?.getState()?.auth?.userData?.dateFormat || DateFormat.MM_DD_YYYY;
+
   if (!dateStr) return "-";
   const date = new Date(dateStr);
 
@@ -40,10 +39,22 @@ export const formatDateAsNumber = (dateStr) => {
   const day = String(date.getDate()).padStart(2, "0");
   const year = date.getFullYear();
 
-  return `${day}/${month}/${year}`;
+  if (dateFormat === DateFormat.DD_MM_YYYY) {
+    return `${day}/${month}/${year}`;
+  } else if (dateFormat === DateFormat.MM_DD_YYYY) {
+    return `${month}/${day}/${year}`;
+  } else if (dateFormat === DateFormat.YYYY_MM_DD) {
+    return `${year}/${month}/${day}`;
+  }
 };
 
-export const formatDateAsNumberWithTime = (dateStr) => {
+export const formatDateAsNumberWithTime = (
+  dateStr
+) => {
+
+
+const dateFormat = store?.getState()?.auth?.userData?.dateFormat || DateFormat.MM_DD_YYYY;
+
   if (!dateStr) return "-";
   const date = new Date(dateStr);
 
@@ -56,7 +67,17 @@ export const formatDateAsNumberWithTime = (dateStr) => {
   const day = String(date.getDate()).padStart(2, "0");
   const year = date.getFullYear();
 
-  return `${day}/${month}/${year} ${date.toLocaleTimeString("en-US", {
+  let formattedDate = "";
+
+  if (dateFormat === DateFormat.DD_MM_YYYY) {
+    formattedDate = `${day}/${month}/${year}`;
+  } else if (dateFormat === DateFormat.MM_DD_YYYY) {
+    formattedDate = `${month}/${day}/${year}`;
+  } else if (dateFormat === DateFormat.YYYY_MM_DD) {
+    formattedDate = `${year}/${month}/${day}`;
+  }
+
+  return `${formattedDate} ${date.toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     second: "2-digit",
@@ -69,8 +90,7 @@ export const formatPhoneNumber = (phoneNumber) => {
     return Number(phoneNumber).toFixed(0);
   }
   const cleanedPhoneNumber = phoneNumber.toString().replace(/[^0-9]/g, "");
-  if (cleanedPhoneNumber.length === 12)
-    return cleanedPhoneNumber.slice(2);
+  if (cleanedPhoneNumber.length === 12) return cleanedPhoneNumber.slice(2);
   return cleanedPhoneNumber;
 };
 
@@ -164,12 +184,6 @@ export const NotifActionType = {
   WEBINAR_ASSIGNMENT: "webinar_assignment",
   ACCOUNT_DEACTIVATION: "account_deactivation",
   ATTENDEE_REGISTRATION: "attendee_registration",
-};
-
-export const DateFormat = {
-  DD_MM_YYYY: "dd-mm-yyyy",
-  MM_DD_YYYY: "mm-dd-yyyy",
-  YYYY_MM_DD: "yyyy-mm-dd",
 };
 
 export const Usecase = {

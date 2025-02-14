@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Card, Typography,Button, Grid, Box, Divider } from "@mui/material";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,6 +10,8 @@ const EmployeeDashboard = () => {
   const employeeId = useParams()?.id;
   const dispatch = useDispatch();
   const { dashBoardCardsData } = useSelector((state) => state.globalData);
+  const {userData} = useSelector((state) => state.auth);
+  const dateFormat = userData?.dateFormat || DateFormat.DD_MM_YYYY;
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -64,148 +65,96 @@ const EmployeeDashboard = () => {
 
   const fetchData = () => {
     if (startDate && endDate) {
-      dispatch(getDashboardData({ startDate: oneWeekAgo, endDate: today, employeeId }));
+      dispatch(getDashboardData({ startDate, endDate, employeeId }));
     }
   };
 
   return (
-    <Box className="md:px-10 py-10">
-      <Box className="flex justify-between">
+    <div className="md:px-10 px-4 py-14">
+      <div className="flex justify-between">
         {/* Date Filters */}
         <div className="flex flex-col md:flex-row items-center gap-4">
-          <Box display="flex" gap={2} alignItems="center">
-            <Typography>Start Date:</Typography>
+          <div className="flex gap-2 items-center">
+            <span className="text-gray-700">Start Date:</span>
             <DatePicker
               className="border p-2 rounded-lg w-28"
               selected={startDate}
               onChange={handleStartDateChange}
               placeholderText="Select start date"
-              dateFormat="dd-MM-yyyy"
+              dateFormat={dateFormat}
+              showYearDropdown
+              maxDate={new Date()}
+              showMonthDropdown
+              dropdownMode="select"
             />
-          </Box>
-          <Box display="flex" gap={2} alignItems="center">
-            <Typography>End Date:</Typography>
+          </div>
+          <div className="flex gap-2 items-center">
+            <span className="text-gray-700">End Date:</span>
             <DatePicker
               className="border p-2 rounded-lg w-28"
               selected={endDate}
               onChange={handleEndDateChange}
               placeholderText="Select end date"
-              dateFormat="dd-MM-yyyy"
+              dateFormat={dateFormat}
+              maxDate={new Date()}
+              showYearDropdown
+              showMonthDropdown
+              dropdownMode="select"
             />
-          </Box>
-          <Button
-            className="h-fit"
-            variant="outlined"
-            color="secondary"
+          </div>
+          <button
+            className="h-fit px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
             onClick={fetchData}
           >
             Find
-          </Button>
+          </button>
         </div>
-        {/* Filter Button */}
-        {/* <Button
-          className="h-fit"
-          variant="outlined"
-          color="secondary"
-          onClick={handleToggleModal}
-        >
-          Filter Cards
-        </Button> */}
-      </Box>
+      </div>
+
       {/* Metrics Cards */}
-      <Grid container spacing={4} className="pt-3">
-        <Grid item xs={12} md={12} lg={12}>
-          {/* Parent Card */}
-          <Card className="p-4 w-full">
-            <Typography variant="h6" gutterBottom>
-              Your activity on assignments
-            </Typography>
-            <Box className="mb-2 flex flex-wrap gap-2 justify-start">
+      <div className="grid grid-cols-12 gap-4 pt-3">
+        <div className="col-span-12">
+          <div className="p-4 w-full rounded-lg shadow-md bg-white">
+            <h2 className="text-xl font-semibold mb-4">Your activity on assignments</h2>
+            <div className="mb-2 flex flex-wrap gap-2 justify-start">
               {Array.isArray(webinarData) &&
                 webinarData?.length > 0 &&
                 webinarData.map((nested, nestedIndex) => (
-                  <Box
+                  <div
                     key={nestedIndex}
-                    className="p-1 my-1"
+                    className="p-1 my-1 border border-gray-300 rounded-lg"
                     style={{
-                      border: "1px solid #e0e0e0",
-                      borderRadius: "8px",
-                      backgroundColor:
-                        nested.color === "primary" ? "#f1f5fc" : "#fff",
+                      backgroundColor: nested.color === "primary" ? "#f1f5fc" : "#fff",
                     }}
                   >
-                    <Typography variant="body1">{nested._id}</Typography>
-                  </Box>
+                    <span className="text-gray-700">{nested._id}</span>
+                  </div>
                 ))}
-            </Box>
-            <Divider />
-            {/* Nested Cards */}
-            <Box className="flex gap-4 flex-wrap">
+            </div>
+            <hr className="my-4 border-gray-200" />
+            <div className="flex gap-4 flex-wrap">
               {Array.isArray(statusData) && statusData?.length > 0 ? (
                 statusData?.map((nested, nestedIndex) => (
-                  <Box
+                  <div
                     key={nestedIndex}
-                    className="p-2 my-2"
+                    className="p-2 my-2 border border-gray-300 rounded-lg"
                     style={{
-                      border: "1px solid #e0e0e0",
-                      borderRadius: "8px",
-                      backgroundColor:
-                        nested.color === "primary" ? "#f1f5fc" : "#fff",
+                      backgroundColor: nested.color === "primary" ? "#f1f5fc" : "#fff",
                     }}
                   >
-                    <Typography variant="body1">
+                    <span className="text-gray-700">
                       {nested._id}: <strong>{nested.count}</strong>
-                    </Typography>
-                  </Box>
+                    </span>
+                  </div>
                 ))
               ) : (
                 <div>No Data Found</div>
               )}
-            </Box>
-          </Card>
-        </Grid>
-      </Grid>
-
-      {/* Modal for Card Selection */}
-      {/* <Modal open={modalOpen} onClose={handleToggleModal}>
-        <Box className="bg-white rounded-lg shadow-lg p-6 w-[400px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <Typography variant="h6" gutterBottom>
-            Select Cards to Display
-          </Typography>
-          <Divider />
-          <div className="pt-3 grid grid-cols-2">
-            {cardData.map((item, index) => (
-              <FormControlLabel
-                key={index}
-                control={
-                  <Checkbox
-                    checked={visibleCards.includes(item.label)}
-                    onChange={() => handleCardSelection(item.label)}
-                  />
-                }
-                label={item.label}
-              />
-            ))}
+            </div>
           </div>
-          <Box className="flex justify-end gap-3 pt-4">
-            <Button
-              variant="outlined"
-              color="secondary"
-              onClick={handleToggleModal}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleToggleModal}
-            >
-              Apply
-            </Button>
-          </Box>
-        </Box>
-      </Modal> */}
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };
 

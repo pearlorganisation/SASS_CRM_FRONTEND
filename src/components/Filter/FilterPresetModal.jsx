@@ -4,16 +4,10 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
 import Divider from "@mui/material/Divider";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CheckIcon from "@mui/icons-material/Check";
-import { closeModal } from "../../features/slices/modalSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {
   creattFilterPreset,
@@ -21,7 +15,7 @@ import {
   getFilterPreset,
 } from "../../features/actions/filter-preset";
 import { clearPreset } from "../../features/slices/filter-preset";
-import { errorToast } from "../../utils/extra";
+import { errorToast, formatDateAsNumber } from "../../utils/extra";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
@@ -168,13 +162,10 @@ const FilterPresetModal = ({
                             if (value.$gte || value.$gte === 0) {
                               const gteValue = value.$gte;
                               if (isNaN(gteValue)) {
-                                const gteDate = new Date(gteValue);
-                                const gteDay = gteDate.getDate();
-                                const gteMonth = gteDate.getMonth() + 1;
-                                const gteYear = gteDate.getFullYear();
+                                const formattedGteDate = formatDateAsNumber(gteValue);
 
                                 parts.push(
-                                  `Min: ${gteDay}/${gteMonth}/${gteYear}`
+                                  `Min: ${formattedGteDate}`
                                 );
                               } else {
                                 parts.push(`Min: ${gteValue}`);
@@ -186,15 +177,8 @@ const FilterPresetModal = ({
                               const lteValue = value.$lte;
 
                               if (isNaN(lteValue)) {
-                                const lteDate = new Date(lteValue);
-                                const lteDay = lteDate.getDate();
-                                const lteMonth = lteDate.getMonth() + 1;
-
-                                const lteYear = lteDate.getFullYear();
-
-                                parts.push(
-                                  `Max: ${lteDay}/${lteMonth}/${lteYear}`
-                                );
+                                const formattedLteDate = formatDateAsNumber(lteValue);
+                                parts.push(`Max: ${formattedLteDate}`);
                               } else {
                                 parts.push(`Max: ${lteValue}`);
                               }

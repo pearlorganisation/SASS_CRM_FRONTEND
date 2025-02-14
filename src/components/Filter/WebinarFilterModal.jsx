@@ -9,7 +9,7 @@ import FormInput from "../FormInput";
 import { filterTruthyValues } from "../../utils/extra";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 
-const FilterModal = ({ modalName, setFilters, filters }) => {
+const FilterModal = ({ modalName, setFilters, filters, dateFormat }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
 
@@ -184,6 +184,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                       onChange={(date) => field.onChange(date)}
                       className="border p-4 w-full rounded flex-1"
                       placeholderText="Webinar Date (From)"
+                      dateFormat={dateFormat}
                     />
                   )}
                 />
@@ -198,6 +199,7 @@ const FilterModal = ({ modalName, setFilters, filters }) => {
                       onChange={(date) => field.onChange(date)}
                       className="border p-4 w-full rounded"
                       placeholderText="Webinar Date (To)"
+                      dateFormat={dateFormat}
                     />
                   )}
                 />
