@@ -27,10 +27,9 @@ const EditProductModal = ({
     handleSubmit,
     formState: { errors },
   } = useForm({
-
     defaultValues: {
       name: product?.name || "",
-      price: product?.price || "",
+      price: product?.price || 0,
       description: product?.description || "",
       level: productLevel ?? "",
       tag: product?.tag || "",
@@ -74,7 +73,11 @@ const EditProductModal = ({
             <label className="block text-sm font-medium">Price</label>
 
             <input
-              {...register("price", { required: "Price is required" })}
+              {...register("price", {
+                required: "Price is required",
+                min: 0,
+                valueAsNumber: true,
+              })}
               type="number"
               className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 focus:border-teal-500 focus:outline-none"
               placeholder="Price"
@@ -124,8 +127,8 @@ const EditProductModal = ({
             >
               <option value="">None</option>
               {tagData.map((item) => (
-                <option 
-                  key={item._id} 
+                <option
+                  key={item._id}
                   value={item.name}
                   selected={product?.tag === item.name}
                 >

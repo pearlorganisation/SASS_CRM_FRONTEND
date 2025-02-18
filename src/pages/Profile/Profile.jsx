@@ -41,7 +41,6 @@ const ProfilePage = () => {
 
   const [isDocumentOpen, setIsDocumentOpen] = useState(false);
   const [doc, setDoc] = useState(null);
-  console.log("doc", doc);
   const [deletemodal, setdeleteModal] = useState(false);
 
   const toggleEdit = () => {
@@ -62,7 +61,6 @@ const ProfilePage = () => {
   };
 
   const saveInfo = (data) => {
-    console.log("Info updated successfully", data);
     if (data.document) data.document = data.document[0];
     dispatch(updateUser(data));
     logUserActivity({

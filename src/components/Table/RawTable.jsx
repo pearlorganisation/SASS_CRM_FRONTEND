@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useRef } from "react";
 import {
+  formatDateAsNumber,
   formatDateAsNumberWithTime,
 } from "../../utils/extra";
 import { useSelector } from "react-redux";
@@ -129,7 +130,6 @@ const RawTable = ({
                   </div>
                 </td>
 
-
                 {isSelectVisible && (
                   <td className="px-4 py-2">
                     <input
@@ -173,6 +173,19 @@ const RawTable = ({
                       </span>
                     )}
 
+                    {column.type === "chip" && (
+                      <div className="flex flex-nowrap gap-2">
+                        {
+                          Array.isArray(row?.[column.key]) && row[column.key].map((tag, idx) => ( 
+                            <span key={idx} className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                              {tag}
+                            </span>
+                          ))
+                        }
+                      </div>
+                    )}
+                    
+
                     {column.type === "superAdminApproval" && (
                       <span
                         className={`px-2 py-1 rounded-full text-xs ${
@@ -205,7 +218,10 @@ const RawTable = ({
                       </span>
                     )}
                     {column.type === "Date" &&
-                      (formatDateAsNumberWithTime(row?.[column.key]) ?? "N/A")}
+                      (column.key === "webinarDate"
+                        ? formatDateAsNumber(row?.[column.key]) ?? "N/A"
+                        : formatDateAsNumberWithTime(row?.[column.key]) ??
+                          "N/A")}
                     {column.type === "Product" &&
                       (row?.[column.key][column?.subKey] ?? "N/A")}
                     {column.type === "Location" &&

@@ -45,6 +45,7 @@ export const attendeeTableColumns = [
   { header: "Location", key: "location", width: 20, type: "Location" },
   { header: "Source", key: "source", width: 20, type: "", default: "Import" },
   { header: "Date", key: "createdAt", width: 20, type: "Date" },
+  { header: "Tags", key: "tags", width: 20, type: "chip" },
 ];
 
 export const groupedAttendeeTableColumns = [
@@ -72,6 +73,7 @@ export const employeeTableColumns = [
     width: 20,
     type: "",
   },
+  { header: "Tags", key: "tags", width: 20, type: "chip" },
 ];
 
 export const locationTableColumns = [
