@@ -6,7 +6,7 @@ import AddNoteForm from "./AddNoteForm";
 import { FaRegEdit } from "react-icons/fa";
 import { getLeadType, getNotes } from "../../features/actions/assign";
 import EditModal from "./Modal/EditModal";
-import { addUserActivity } from "../../features/actions/userActivity";
+import { addUserActivity, getUserActivityByEmail } from "../../features/actions/userActivity";
 import NoteItem from "../../components/NoteItem";
 import {
   getAttendee,
@@ -27,7 +27,6 @@ import {
   DialogTitle,
   FormControl,
   IconButton,
-  InputLabel,
   ListItemIcon,
   ListItemText,
   MenuItem,
@@ -42,10 +41,16 @@ import { cancelAlarm, getAttendeeAlarm } from "../../features/actions/alarm";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import ProductLevelTable from "./ProductLevelTable";
 import { DateFormat, formatDateAsNumber } from "../../utils/extra";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
+import useRoles from "../../hooks/useRoles";
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const roles = useRoles();
+  
+  const logUserActivity = useAddUserActivity();
+
   const searchParams = new URLSearchParams(location.search);
   const email = searchParams.get("email");
   const attendeeId = searchParams.get("attendeeId");
@@ -60,9 +65,6 @@ const ViewParticularContact = () => {
   const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
   const [attendeeHistoryData, setAttendeeHistoryData] = useState([]);
 
-  const { attendeeContactDetails } = useSelector(
-    (state) => state.webinarContact
-  );
   const { userData } = useSelector((state) => state.auth);
   const dateFormat = userData?.dateFormat || DateFormat.MM_DD_YYYY;
   const { selectedAttendee, attendeeLeadType, attendeeEnrollments } =
@@ -171,6 +173,7 @@ const ViewParticularContact = () => {
     dispatch(getLeadType());
     dispatch(getAttendeeLeadTypeByEmail(email));
     dispatch(getAttendeeAlarm({ email }));
+    dispatch(getUserActivityByEmail({ email }));
   }, [email]);
 
   const handleTimerModal = () => {
@@ -212,7 +215,6 @@ const ViewParticularContact = () => {
       }))
     );
   }, [noteData, uniquePhones]);
-
 
   const cancelMyAlarm = (id) => {
     dispatch(cancelAlarm({ id }));
@@ -285,7 +287,11 @@ const ViewParticularContact = () => {
               <div className="flex gap-3 flex-wrap">
                 {uniquePhonesCount.map((item, index) => (
                   <Badge key={index} badgeContent={item.count} color="primary">
-                    <Chip label={item.label} color={item.isInvalid ? "error" : undefined} variant="outlined" />
+                    <Chip
+                      label={item.label}
+                      color={item.isInvalid ? "error" : undefined}
+                      variant="outlined"
+                    />
                   </Badge>
                 ))}
               </div>
@@ -402,7 +408,7 @@ const ViewParticularContact = () => {
                 employeeModeData={employeeModeData}
                 email={email}
                 attendeeId={attendeeId}
-                addUserActivityLog={addUserActivityLog}
+                addUserActivityLog={logUserActivity}
               />
               <div></div>
             </div>
@@ -451,6 +457,7 @@ const ViewParticularContact = () => {
                           <th className="py-3 px-1 min-w-[150px]">
                             Webinar Date
                           </th>
+                          <th className="py-3 px-1">Tags</th>
                           <th className="py-3 px-1 stickyFieldRight">Action</th>
                         </tr>
                       </thead>
@@ -507,8 +514,24 @@ const ViewParticularContact = () => {
                                 <td className="px-3 py-4 whitespace-nowrap">
                                   {Array.isArray(item?.webinar) &&
                                   item.webinar.length > 0
-                                    ? formatDateAsNumber(item?.webinar[0].webinarDate)
+                                    ? formatDateAsNumber(
+                                        item?.webinar[0].webinarDate
+                                      )
                                     : "-"}
+                                </td>
+                                <td className="px-3 py-4  whitespace-nowrap">
+                                  <div className="flex flex-nowrap gap-2">
+                                    {Array.isArray(item?.tags)
+                                      ? item?.tags.map((tag, idx) => (
+                                          <span
+                                            key={idx}
+                                            className="px-2 py-1 rounded-full text-xs bg-gray-300 text-gray-800"
+                                          >
+                                            {tag}
+                                          </span>
+                                        ))
+                                      : "-"}
+                                  </div>
                                 </td>
                                 <ComponentGuard
                                   conditions={[
@@ -541,7 +564,6 @@ const ViewParticularContact = () => {
               </div>
             ) : (
               <div className="p-6 bg-white rounded-lg shadow-md">
-
                 <div className=" mb-2 items-center px-3 text-neutral-800  flex justify-between">
                   <span className="font-semibold text-xl  ">
                     Enrollments History
@@ -562,64 +584,6 @@ const ViewParticularContact = () => {
                     </Add>
                   </ComponentGuard>
                 </div>
-                {/* <table className="w-full table-auto text-sm text-left ">
-                  <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
-                    <tr>
-                      <th className="py-3 px-1">S No.</th>
-                      <th className="py-3 px-1">Webinar</th>
-                      <th className="py-3 px-1">E-Mail</th>
-                      <th className="py-3 px-1">Product Name</th>
-                      <th className="py-3  text-center">Price</th>
-                      <th className="py-3 px-1">Level</th>
-                    </tr>
-                  </thead>
-
-                  <tbody className="text-gray-600 divide-y">
-                    {false ? (
-                      <tr>
-                        <td colSpan="8" className="text-center px-6 py-8">
-                          <Stack spacing={4}>
-                            <Skeleton variant="rounded" height={30} />
-                            <Skeleton variant="rounded" height={25} />
-                            <Skeleton variant="rounded" height={20} />
-                            <Skeleton variant="rounded" height={20} />
-                            <Skeleton variant="rounded" height={20} />
-                          </Stack>
-                        </td>
-                      </tr>
-                    ) : (
-                      attendeeEnrollments?.map((item, idx) => {
-                        return (
-                          <tr key={idx}>
-                            <td className={`px-3 py-4 whitespace-nowrap `}>
-                              {idx + 1}
-                            </td>
-
-                            <td className="px-2 py-4 whitespace-nowrap ">
-                              {item?.webinar ? item?.webinar.webinarName : "-"}
-                            </td>
-
-                            <td className="px-2 py-4 whitespace-nowrap ">
-                              {(item?.attendee && item?.attendee.email) || "-"}
-                            </td>
-
-                            <td className=" py-4 text-center whitespace-nowrap">
-                              {item?.product && item?.product?.name}
-                            </td>
-                            <td className="px-3 py-4 whitespace-nowrap">
-                              {item?.product && item?.product?.price}
-                            </td>
-
-                            <td className="px-3 py-4 whitespace-nowrap">
-                              {item?.product && item?.product?.level}
-                            </td>
-
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table> */}
 
                 <ProductLevelTable email={email} />
               </div>

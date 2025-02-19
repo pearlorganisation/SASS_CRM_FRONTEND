@@ -54,6 +54,7 @@ const useAddUserActivity = () => {
     navigateType,
     type = "",
     detailItem,
+    activityItem,
   }) => {
     let detailLog = "";
 
@@ -88,9 +89,12 @@ const useAddUserActivity = () => {
       case "filter":
         detailLog = `User applied filter ${type}: ${detailItem}`;
         break;
+      case "note":
+        detailLog = `User added a note to the ${type}: ${detailItem}`;
+        break;
     }
 
-    dispatch(addUserActivity({ action, details: detailLog }));
+    dispatch(addUserActivity({ action, details: detailLog, item: activityItem }));
     resetInactivityTimer();
   };
 
