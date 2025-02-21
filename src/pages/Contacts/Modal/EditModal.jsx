@@ -1,13 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { getLocations } from "../../../features/actions/location";
 import Select from "react-select";
+import FormControl from "@mui/material/FormControl";
+import MenuItem from "@mui/material/MenuItem";
+import { Select as MuiSelect } from "@mui/material";
+import tagsService from "../../../services/tagsService";
 
 const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
   const dispatch = useDispatch();
 
   const { locationsData } = useSelector((state) => state.location);
+  const [tagData, setTagData] = useState([]);
 
   useEffect(() => {
     dispatch(
@@ -17,6 +22,13 @@ const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
         filters: undefined,
       })
     );
+
+    tagsService.getTags().then((res) => {
+      console.log(res, "res");
+      if (res.success) {
+        setTagData(res.data);
+      }
+    });
   }, []);
 
   function removeBlankAttributes(obj) {
@@ -36,6 +48,7 @@ const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
       phone: initialData?.phone,
       location: initialData?.location,
       gender: initialData?.gender,
+      tags: initialData?.tags || [],
     },
   });
 
@@ -46,7 +59,7 @@ const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
   };
 
   return (
-    <div className="fixed top-0 left-0 z-[9999] flex h-screen w-screen items-center justify-center bg-slate-300/20 backdrop-blur-sm">
+    <div className="fixed top-0 left-0 z-50 flex h-screen w-screen items-center justify-center bg-slate-300/20 backdrop-blur-sm">
       <div className="flex flex-col gap-6 overflow-hidden rounded bg-white p-6 shadow-xl sm:w-[800px]">
         <h2 className="text-lg font-semibold text-center">
           Attendee Information
@@ -135,17 +148,50 @@ const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium">Gender</label>
-            <select
-              {...register("gender")}
-              className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 focus:border-teal-500 focus:outline-none"
-            >
-              <option value="">Select Gender</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="others">Others</option>
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium">Gender</label>
+              <select
+                {...register("gender")}
+                className="mt-1 block w-full h-10 rounded border border-gray-300 px-3 focus:border-teal-500 focus:outline-none"
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="others">Others</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm mb-1 font-medium">Tags</label>
+
+              <Controller
+                name="tags"
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <MuiSelect
+                      multiple
+                      {...field}
+                      className="h-10"
+                      label="Tags"
+                      value={field.value || []}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      renderValue={(selected) => selected.join(", ")}
+                    >
+                      {tagData.map((item) => {
+                        return (<MenuItem  key={item._id} value={item.name}>
+                          {item.name}
+                        </MenuItem>)
+                      })}
+                      
+                    </MuiSelect>
+                  </FormControl>
+                )}
+                rules={{
+                  required: "At least one tag is required",
+                }}
+              />
+            </div>
           </div>
 
           <button

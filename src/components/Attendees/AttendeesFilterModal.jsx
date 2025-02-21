@@ -20,6 +20,7 @@ import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { getCustomOptionsForFilters } from "../../features/actions/globalData";
 import { webinarAttendeesSortByOptions } from "../../utils/columnData";
 import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
+import tagsService from "../../services/tagsService";
 
 const FilterModal = ({ modalName, setPage, tabValue }) => {
   const dispatch = useDispatch();
@@ -38,7 +39,7 @@ const FilterModal = ({ modalName, setPage, tabValue }) => {
       sortOrder: "asc",
     }
   );
-
+  const [tagData, setTagData] = useState([]);
   const [selectedOption, setSelectedOption] = useState("");
   const [leadTypeOptions, setLeadTypeOptions] = useState([]);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
@@ -81,6 +82,11 @@ const FilterModal = ({ modalName, setPage, tabValue }) => {
   };
 
   useEffect(() => {
+    tagsService.getTags().then((res) => {
+      if (res.success) {
+        setTagData(res.data);
+      }
+    });
     dispatch(getCustomOptionsForFilters());
     if (webinarAttendeesFilters?.leadType)
       setSelectedOption(webinarAttendeesFilters?.leadType);
@@ -280,6 +286,30 @@ const FilterModal = ({ modalName, setPage, tabValue }) => {
                   </Select>
                 </FormControl>
               )}
+
+      <Controller
+                name="tags"
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel>Tags</InputLabel>
+                    <Select
+                      multiple
+                      {...field}
+                      label="Tags"
+                      value={field.value || []}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      renderValue={(selected) => selected.join(', ')}
+                    >
+                      {tagData.map((item) => (
+                        <MenuItem key={item._id} value={item.name}>
+                          {item.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+              />
             </div>
           </div>
 

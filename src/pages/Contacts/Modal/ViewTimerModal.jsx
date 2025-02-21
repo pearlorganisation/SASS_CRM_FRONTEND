@@ -5,7 +5,7 @@ import { getAttendeeAlarm, setAlarm } from "../../../features/actions/alarm";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const ViewTimerModal = ({ setModal, email, attendeeId, dateFormat }) => {
+const ViewTimerModal = ({ setModal, email, attendeeId, dateFormat, logUserActivity }) => {
   const {
     control,
     register,
@@ -21,8 +21,16 @@ const ViewTimerModal = ({ setModal, email, attendeeId, dateFormat }) => {
     data["email"] = email;
     data["attendeeId"] = attendeeId;
     data["date"] = date.toISOString();
-    dispatch(setAlarm(data)).then(() => {
-      dispatch(getAttendeeAlarm({ email }));
+    dispatch(setAlarm(data)).then((res) => {
+      if(res.meta.requestStatus === "fulfilled"){
+        logUserActivity({
+          action: "setAlarm",
+          type: "contact",
+          detailItem: email,
+          activityItem: email,
+        });
+        dispatch(getAttendeeAlarm({ email }));
+      }
     });
     setModal(false);
   };

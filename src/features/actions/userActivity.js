@@ -31,11 +31,11 @@ export const getUserActivity = createAsyncThunk(
 );
 
 export const getUserActivityByEmail = createAsyncThunk(
-  "userActivity/fetch",
-  async ({ email }, { rejectWithValue }) => {
+  "userActivityByEmail/fetch",
+  async (payload, { rejectWithValue }) => {
     try {
       const response = await instance.get(`/user-activities`, {
-        params: { email },
+        params: payload,
       });
       return response.data;
     } catch (e) {

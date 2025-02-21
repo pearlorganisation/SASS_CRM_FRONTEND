@@ -152,7 +152,7 @@ const RawTable = ({
                     //     ? row?.[column.key]
                     //     : "N/A"
                     // }
-                    className={`px-4 py-2 text-gray-600 max-w-72 truncate ${
+                    className={`px-4 py-2 text-gray-600 max-w-80 truncate ${
                       isRowClickable
                         ? "cursor-pointer"
                         : column.key === "firstName"
@@ -175,16 +175,62 @@ const RawTable = ({
 
                     {column.type === "chip" && (
                       <div className="flex flex-nowrap gap-2">
-                        {
-                          Array.isArray(row?.[column.key]) && row[column.key].map((tag, idx) => ( 
-                            <span key={idx} className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                        {Array.isArray(row?.[column.key]) &&
+                        row[column.key].length > 0 ? (
+                          row[column.key].map((tag, idx) => (
+                            <span
+                              key={idx}
+                              className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800"
+                            >
                               {tag}
                             </span>
                           ))
-                        }
+                        ) : (
+                          <span className="px-2 py-1 ">N/A</span>
+                        )}
                       </div>
                     )}
-                    
+
+                    {column.type === "product-chip" && (
+                      <div
+                        title={
+                          Array.isArray(row?.[column.key]) &&
+                          row[column.key]
+                            .map(
+                              (item) =>
+                                `${item?.productName} (${item?.count ?? 0})`
+                            )
+                            .join(", ")
+                        }
+                        className="flex flex-nowrap gap-2"
+                      >
+                        {Array.isArray(row?.[column.key]) ? (
+                          row[column.key].length === 0 ? (
+                            <span className="px-2 py-1 ">N/A</span>
+                          ) : (
+                            <>
+                              {row[column.key].slice(0, 2).map((item, idx) => (
+                                <span
+                                  key={idx}
+                                  className="px-2 py-1 rounded-full text-xs bg-gray-100 text-gray-800"
+                                >
+                                  {`${item?.productName ?? "N/A"} (${
+                                    item?.count ?? 0
+                                  })`}
+                                </span>
+                              ))}
+                              {row[column.key].length > 2 && (
+                                <span className="px-2  py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                                  +{row[column.key].length - 2} more
+                                </span>
+                              )}
+                            </>
+                          )
+                        ) : (
+                          "N/A"
+                        )}
+                      </div>
+                    )}
 
                     {column.type === "superAdminApproval" && (
                       <span

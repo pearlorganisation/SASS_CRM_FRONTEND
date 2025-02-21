@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from "react";
-import ViewFullDetailsModal from "./Modal/ViewFullDetailModal";
-import ViewTimerModal from "./Modal/ViewTimerModal";
+import React, { useEffect, useState, Suspense, lazy } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AddNoteForm from "./AddNoteForm";
 import { FaRegEdit } from "react-icons/fa";
 import { getLeadType, getNotes } from "../../features/actions/assign";
-import EditModal from "./Modal/EditModal";
 import { addUserActivity, getUserActivityByEmail } from "../../features/actions/userActivity";
 import NoteItem from "../../components/NoteItem";
 import {
@@ -36,13 +33,21 @@ import {
 import { Add, OpenInNew } from "@mui/icons-material";
 import { clearLeadType } from "../../features/slices/attendees";
 import { useNavigate } from "react-router-dom";
-import AddEnrollmentModal from "./Modal/AddEnrollmentModal";
 import { cancelAlarm, getAttendeeAlarm } from "../../features/actions/alarm";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import ProductLevelTable from "./ProductLevelTable";
 import { DateFormat, formatDateAsNumber } from "../../utils/extra";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import useRoles from "../../hooks/useRoles";
+import ModalFallback from "../../components/Fallback/ModalFallback";
+import LogsModal from "./Modal/LogsModal";
+import { createPortal } from "react-dom";
+
+// Lazy load modals
+const ViewFullDetailsModal = lazy(() => import("./Modal/ViewFullDetailModal"));
+const ViewTimerModal = lazy(() => import("./Modal/ViewTimerModal"));
+const EditModal = lazy(() => import("./Modal/EditModal"));
+const AddEnrollmentModal = lazy(() => import("./Modal/AddEnrollmentModal"));
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
@@ -77,6 +82,7 @@ const ViewParticularContact = () => {
   const { attendeeAlarm } = useSelector((state) => state.alarm);
 
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
+  const [showLogsModal, setShowLogsModal] = useState(false);
 
   const openCancelAlarmDialog = () => {
     setOpenCancelDialog(true);
@@ -159,7 +165,15 @@ const ViewParticularContact = () => {
     setSelectedOption(event.target.value);
     dispatch(
       updateAttendeeLeadType({ email: email, leadType: event.target.value })
-    );
+    ).then((res) => {
+      if(res.meta.requestStatus === "fulfilled"){
+        logUserActivity({
+          action: "update",
+          details: `User updated lead type of Attendee with Email: ${email}`,
+          activityItem: email,
+        });
+      }
+    });
   };
 
   useEffect(() => {
@@ -173,7 +187,6 @@ const ViewParticularContact = () => {
     dispatch(getLeadType());
     dispatch(getAttendeeLeadTypeByEmail(email));
     dispatch(getAttendeeAlarm({ email }));
-    dispatch(getUserActivityByEmail({ email }));
   }, [email]);
 
   const handleTimerModal = () => {
@@ -181,13 +194,16 @@ const ViewParticularContact = () => {
   };
 
   const onConfirmEdit = (data) => {
-    dispatch(updateAttendee(data)).then(() => {
-      setEditModalData(null);
-      addUserActivityLog({
-        action: "update",
-        details: `User updated information of Attendee with Email: ${email}`,
-      });
-      dispatch(getAttendee({ email }));
+    dispatch(updateAttendee(data)).then((res) => {
+      if(res.meta.requestStatus === "fulfilled"){
+        logUserActivity({
+          action: "update",
+          details: `User updated information of Attendee with Email: ${email}`,
+          activityItem: email,
+        });
+        setEditModalData(null);
+        dispatch(getAttendee({ email }));
+      }
     });
   };
 
@@ -327,13 +343,20 @@ const ViewParticularContact = () => {
               conditions={[employeeModeData ? false : true, userData?.isActive]}
             >
               <div className="flex  justify-between gap-10  items-center">
-                <div className="flex border items-center gap-3">
+                <div className="flex items-center gap-3">
                   <Button
                     variant="contained"
                     className="h-10"
                     onClick={handleTimerModal}
                   >
                     Set Alarm
+                  </Button>
+                  <Button
+                    variant="contained"
+                    className="h-10"
+                    onClick={() => setShowLogsModal(true)}
+                  >
+                    Logs
                   </Button>
                 </div>
                 <div className="flex items-center w-fit min-w-40 px-1 gap-3">
@@ -591,34 +614,42 @@ const ViewParticularContact = () => {
           </div>
         </div>
       </div>
-      {noteModalData && (
-        <ViewFullDetailsModal
-          modalData={noteModalData}
-          setModalData={setNoteModalData}
-        />
-      )}
-      {showTimerModal && (
-        <ViewTimerModal
-          setModal={setShowTimerModal}
-          email={email}
-          dateFormat={dateFormat}
-          attendeeId={attendeeId}
-        />
-      )}
-      {editModalData && (
-        <EditModal
-          setModal={setEditModalData}
-          initialData={editModalData}
-          onConfirmEdit={onConfirmEdit}
-        />
-      )}
-      {showEnrollmentModal && (
-        <AddEnrollmentModal
-          setModal={setShowEnrollmentModal}
-          attendeeEmail={selectedAttendee && selectedAttendee[0]?._id}
-          webinarData={attendeeHistoryData}
-        />
-      )}
+      <Suspense fallback={<ModalFallback />}>
+        {noteModalData && (
+          <ViewFullDetailsModal
+            modalData={noteModalData}
+            setModalData={setNoteModalData}
+          />
+        )}
+        {showTimerModal && (
+          <ViewTimerModal
+            setModal={setShowTimerModal}
+            email={email}
+            dateFormat={dateFormat}
+            attendeeId={attendeeId}
+            logUserActivity={logUserActivity}
+          />
+        )}
+        {editModalData && (
+          <EditModal
+            setModal={setEditModalData}
+            initialData={editModalData}
+            onConfirmEdit={onConfirmEdit}
+          />
+        )}
+        {showEnrollmentModal && (
+          <AddEnrollmentModal
+            setModal={setShowEnrollmentModal}
+            attendeeEmail={selectedAttendee && selectedAttendee[0]?._id}
+            webinarData={attendeeHistoryData}
+            logUserActivity={logUserActivity}
+          />
+        )}
+        {showLogsModal && createPortal(
+          <LogsModal setModal={setShowLogsModal} email={email} />,
+          document.body
+        )}
+      </Suspense>
       <Dialog
         open={openCancelDialog}
         onClose={closeCancelAlarmDialog}

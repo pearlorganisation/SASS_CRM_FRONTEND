@@ -46,12 +46,18 @@ export const attendeeTableColumns = [
   { header: "Source", key: "source", width: 20, type: "", default: "Import" },
   { header: "Date", key: "createdAt", width: 20, type: "Date" },
   { header: "Tags", key: "tags", width: 20, type: "chip" },
+  { header: "Enrollments", key: "enrollments", width: 20, type: "product-chip" },
+
 ];
 
 export const groupedAttendeeTableColumns = [
   { header: "Email", key: "_id", width: 50, type: "" },
   { header: "Total Time in Session", key: "timeInSession", width: 20, type: "" },
+  { header: "Last Assigned To", key: "lastAssignedTo", width: 20, type: "" },
+  { header: "Last Status", key: "lastStatus", width: 20, type: "" },
   { header: "Webinar Attended", key: "attendedWebinarCount", width: 20, type: "" },
+  { header: "Registered Webinar", key: "registeredWebinarCount", width: 20, type: "" },
+  { header: "Enrollments", key: "enrollments", width: 20, type: "product-chip" },
 ];
 
 export const employeeTableColumns = [

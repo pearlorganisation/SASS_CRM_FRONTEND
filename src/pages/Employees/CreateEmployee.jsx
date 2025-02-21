@@ -286,7 +286,7 @@ const CreateEmployee = () => {
                 name="tags"
                 control={control}
                 render={({ field }) => (
-                  <FormControl fullWidth error={!!errors.tags}>
+                  <FormControl fullWidth>
                     <InputLabel>Tags</InputLabel>
                     <Select
                       multiple
@@ -296,20 +296,14 @@ const CreateEmployee = () => {
                       onChange={(e) => field.onChange(e.target.value)}
                       renderValue={(selected) => selected.join(', ')}
                     >
-                      {tagData.filter((item) => item.usecase !== Usecase.PRODUCT_TAGGING).map((item) => (
+                      {tagData.map((item) => (
                         <MenuItem key={item._id} value={item.name}>
                           {item.name}
                         </MenuItem>
                       ))}
                     </Select>
-                    {errors.tags && (
-                      <FormHelperText>{errors.tags.message}</FormHelperText>
-                    )}
                   </FormControl>
                 )}
-                rules={{
-                  required: "At least one tag is required",
-                }}
               />
             </div>
 

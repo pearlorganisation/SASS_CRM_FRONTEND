@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllProducts } from "../../../features/actions/product";
+import { getAllProducts, getProductLevelCounts } from "../../../features/actions/product";
 import { addEnrollment, getEnrollments } from "../../../features/actions/attendees";
 
-const AddEnrollmentModal = ({ setModal, attendeeEmail, webinarData }) => {
+const AddEnrollmentModal = ({ setModal, attendeeEmail, webinarData, logUserActivity }) => {
   const { productData } = useSelector((state) => state.product);
   const dispatch = useDispatch();
 
@@ -30,6 +30,11 @@ const AddEnrollmentModal = ({ setModal, attendeeEmail, webinarData }) => {
       if(res.meta.requestStatus === "fulfilled"){
         dispatch(getProductLevelCounts(attendeeEmail));
         setModal(false)
+        logUserActivity({
+          action: "addEnrollment",
+          details: `User added an enrollment for the attendee with email: ${attendeeEmail}`,
+          activityItem: attendeeEmail,
+        });
       }
     })
   };

@@ -59,7 +59,7 @@ const useAddUserActivity = () => {
     let detailLog = "";
 
     if (action && details) {
-      dispatch(addUserActivity({ action, details }));
+      dispatch(addUserActivity({ action, details, item: activityItem }));
       resetInactivityTimer();
       return;
     }
@@ -91,6 +91,9 @@ const useAddUserActivity = () => {
         break;
       case "note":
         detailLog = `User added a note to the ${type}: ${detailItem}`;
+        break;
+      case "setAlarm":
+        detailLog = `User set an alarm for the ${type}: ${detailItem}`;
         break;
     }
 
