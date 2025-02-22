@@ -35,7 +35,10 @@ import FormInput from "../../../components/FormInput";
 import { filterTruthyValues } from "../../../utils/extra";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { getCustomOptions } from "../../../features/actions/globalData";
-import { attendeeTableColumns } from "../../../utils/columnData";
+import {
+  attendeeTableColumns,
+  groupedAttendeeTableColumns,
+} from "../../../utils/columnData";
 import { getAllClientsForDropdown } from "../../../features/actions/client";
 import { toast } from "sonner";
 import DiscountSection from "./DiscountSection";
@@ -60,7 +63,12 @@ function AttendeeTable({ control, setValue, watch }) {
             {[
               { header: "Lead Type", key: "leadType", width: 20, type: "" },
               ...attendeeTableColumns,
-              { header: "Webinar Attended", key: "attendedWebinarCount", width: 20, type: "" },
+              ...(groupedAttendeeTableColumns.filter(
+                (column) =>
+                  !attendeeTableColumns.some(
+                    (attendeeColumn) => attendeeColumn.key === column.key
+                  ) && column.header !== "Email"
+              )),
             ].map(({ key, header }) => (
               <TableRow key={key}>
                 <TableCell sx={tableCellStyles}>{header}</TableCell>
@@ -263,7 +271,7 @@ export default function AddPlan() {
       payload["_id"] = id;
     }
 
-    payload['planDurationConfig'] = planDurationConfig;
+    payload["planDurationConfig"] = planDurationConfig;
     console.log(payload);
     dispatch(isEditMode ? updatePricePlans(payload) : addPricePlans(payload));
   };

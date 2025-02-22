@@ -18,6 +18,7 @@ import { clearPreset } from "../../features/slices/filter-preset";
 import { errorToast, formatDateAsNumber } from "../../utils/extra";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { getAllProductsByAdminId } from "../../features/actions/product";
 
 const FilterPresetModal = ({
   setIsPresetModalOpen,
@@ -30,11 +31,13 @@ const FilterPresetModal = ({
 
   const { leadTypeData } = useSelector((state) => state.assign);
   const { plansForDropdown } = useSelector((state) => state.pricePlans);
+  const { productDropdownData } = useSelector((state) => state.product);
 
   const { filterPresets, isSuccess } = useSelector(
     (state) => state.filterPreset
   );
   const [newPresetName, setNewPresetName] = useState("");
+  const [activePresetId, setActivePresetId] = useState(null);
 
   const handleSavePreset = () => {
     if (
@@ -76,6 +79,10 @@ const FilterPresetModal = ({
   };
 
   useEffect(() => {
+    if (tableName === "webinarAttendeesTable") {
+      dispatch(getAllProductsByAdminId());
+    }
+
     dispatch(getFilterPreset(tableName));
   }, []);
 
@@ -141,79 +148,93 @@ const FilterPresetModal = ({
                     </button>
 
                     <div className="relative inline-block group">
-                      <button className="text-blue-600 p-2 hover:bg-blue-100 rounded-full">
+                      <button 
+                        className="text-blue-600 p-2 hover:bg-blue-100 rounded-full"
+                        onClick={() => setActivePresetId(preset._id === activePresetId ? null : preset._id)}
+                      >
                         <VisibilityIcon fontSize="small" />
                       </button>
-                      <div
-                        className="invisible opacity-0 group-hover:visible group-hover:opacity-100 
-                                  transition-all duration-200 absolute left-1/2 -translate-x-1/2 
-                                  top-full mt-2 z-50 bg-white p-4 rounded-lg shadow-xl border 
-                                  border-gray-200 min-w-[200px] overflow-y-auto max-h-[200px]"
-                      >
-                        {Object.entries(preset.filters).map(([key, value]) => {
-                          const formattedKey = key
-                            .replace(/([A-Z])/g, " $1")
-                            .replace(/^./, (str) => str.toUpperCase());
-                          let displayValue = value;
-                          console.log("value", value);
+                      {activePresetId === preset._id && (
+                        <div 
+                          className="absolute left-1/2 -translate-x-1/2 top-full mt-2 z-50 
+                                     bg-white p-4 rounded-lg shadow-xl border border-gray-200 
+                                     min-w-[200px] overflow-y-auto max-h-[200px]"
+                        >
+                          {Object.entries(preset.filters).map(([key, value]) => {
+                            const formattedKey = key
+                              .replace(/([A-Z])/g, " $1")
+                              .replace(/^./, (str) => str.toUpperCase());
+                            let displayValue = value;
 
-                          if (typeof value === "object" && value !== null) {
-                            const parts = [];
-                            if (value.$gte || value.$gte === 0) {
-                              const gteValue = value.$gte;
-                              if (isNaN(gteValue)) {
-                                const formattedGteDate = formatDateAsNumber(gteValue);
+                            if (
+                              typeof value === "object" &&
+                              !Array.isArray(value) &&
+                              value !== null
+                            ) {
+                              const parts = [];
+                              if (value.$gte || value.$gte === 0) {
+                                const gteValue = value.$gte;
+                                if (isNaN(gteValue)) {
+                                  const formattedGteDate =
+                                    formatDateAsNumber(gteValue);
 
-                                parts.push(
-                                  `Min: ${formattedGteDate}`
-                                );
-                              } else {
-                                parts.push(`Min: ${gteValue}`);
+                                  parts.push(`Min: ${formattedGteDate}`);
+                                } else {
+                                  parts.push(`Min: ${gteValue}`);
+                                }
                               }
+
+                              if (value.$lte || value.$lte === 0) {
+                                const lteValue = value.$lte;
+
+                                if (isNaN(lteValue)) {
+                                  const formattedLteDate =
+                                    formatDateAsNumber(lteValue);
+                                  parts.push(`Max: ${formattedLteDate}`);
+                                } else {
+                                  parts.push(`Max: ${lteValue}`);
+                                }
+                              }
+
+                              displayValue = parts.join(" - ");
                             }
 
-                            if (value.$lte || value.$lte === 0) {
-                              console.log("value.$lte", value.$lte);
-                              const lteValue = value.$lte;
-
-                              if (isNaN(lteValue)) {
-                                const formattedLteDate = formatDateAsNumber(lteValue);
-                                parts.push(`Max: ${formattedLteDate}`);
-                              } else {
-                                parts.push(`Max: ${lteValue}`);
-                              }
+                            if (key === "leadType") {
+                              displayValue =
+                                leadTypeData.find((lead) => lead._id === value)
+                                  ?.label || "N/A";
                             }
-                          console.log("plansForDropdown", parts);
+                            if (key === "planName") {
+                              displayValue =
+                                plansForDropdown.find(
+                                  (plan) => plan.value === value
+                                )?.label || "N/A";
+                            }
 
-                            displayValue = parts.join(" - ");
-                          }
-
-                          if (key === "leadType") {
-                           
-                            displayValue =
-                              leadTypeData.find((lead) => lead._id === value)
-                                ?.label || "N/A";
-                          }
-                          if (key === "planName") {
-                            displayValue =
-                              plansForDropdown.find(
-                                (plan) => plan.value === value
-                              )?.label || "N/A";
-                          }
-
-                          return (
-                            <div
-                              key={key}
-                              className="text-sm mb-2 last:mb-0 break-keep"
-                            >
-                              <p className="font-semibold text-gray-700">
-                                {formattedKey}
-                              </p>
-                              <p className="text-gray-600">{displayValue}</p>
-                            </div>
-                          );
-                        })}
-                      </div>
+                            return (
+                              <div
+                                key={key}
+                                className="text-sm mb-2 last:mb-0 break-keep"
+                              >
+                                <p className="font-semibold text-gray-700">
+                                  {formattedKey}
+                                </p>
+                                {console.log("value", value, displayValue)}
+                                <p className="text-gray-600">
+                                  {" "}
+                                  {Array.isArray(value)
+                                    ? key === "enrollments" 
+                                    ? productDropdownData
+                                    .filter((product) => value.includes(product._id))
+                                    .map((product) => `${product.name} | Level - ${product.level}`).join(", ")
+                                    :value.join(", ")
+                                    : displayValue}
+                                </p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
 
                     <button

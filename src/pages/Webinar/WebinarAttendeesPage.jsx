@@ -341,6 +341,17 @@ const WebinarAttendeesPage = (props) => {
         isLoading={isLoading}
         isLeadType={true}
         filters={webinarAttendeesFilters}
+        setFilters={(filters) => {
+          dispatch(
+            setWebinarAttendeesFilters({
+              filters: filters,
+              sortBy: {
+                sortBy: webinarAttendeesSortByOptions[0].value,
+                sortOrder: "asc",
+              },
+            })
+          );
+        }}
         locations={locationsData}
       />
 
