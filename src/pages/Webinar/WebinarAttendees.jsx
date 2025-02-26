@@ -48,7 +48,6 @@ const WebinarAttendees = () => {
 
   const [assignModal, setAssignModal] = useState(false);
   const [reAssignModal, setReAssignModal] = useState(false);
-  const webinarName = searchParams.get("webinarName");
   const [page, setPage] = useState(Number(searchParams.get("page")) || 1);
   const tabValueRef = useRef(searchParams.get("tabValue") || "preWebinar");
   const subTabValueRef = useRef(searchParams.get("subTabValue") || "attendees");
@@ -56,7 +55,6 @@ const WebinarAttendees = () => {
   useEffect(() => {
     setSearchParams({
       page: page,
-      webinarName: webinarName,
       tabValue: tabValueRef.current,
       subTabValue: subTabValueRef.current,
     });
@@ -66,7 +64,6 @@ const WebinarAttendees = () => {
     setSearchParams({
       tabValue: tabValueRef.current,
       page: 1,
-      webinarName: webinarName,
       subTabValue: subTabValueRef.current,
     });
     fetchCounts();
@@ -76,7 +73,6 @@ const WebinarAttendees = () => {
     setSearchParams({
       tabValue: tabValueRef.current,
       page: 1,
-      webinarName: webinarName,
       subTabValue: subTabValueRef.current,
     });
   }, [subTabValueRef.current]);

@@ -128,12 +128,20 @@ const ViewProducts = () => {
           allowedRoles={[roles.ADMIN]}
           conditions={[userData?.isActive, employeeModeData ? false : true]}
         >
+          <div className="flex gap-4 items-center">
+          <Button
+            onClick={() => navigate("/product-revenue")}
+            variant="contained"
+          >
+            Revenue
+          </Button>
           <Button
             onClick={() => navigate("/products/addProduct")}
             variant="contained"
           >
             Add Product
           </Button>
+          </div>
         </ComponentGuard>
       </div>
 

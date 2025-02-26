@@ -274,7 +274,7 @@ const RawTable = ({
                       (row?.[column.key] &&
                       locations &&
                       locations.findIndex(
-                        (item) => item.name === row?.[column.key]
+                        (item) => item?.name === row?.[column.key]
                       ) >= 0 ? (
                         row?.[column.key]
                       ) : (

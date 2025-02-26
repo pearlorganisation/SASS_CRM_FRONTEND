@@ -57,6 +57,8 @@ const Revenue = lazy(() => import("./Revenue/Revenue"));
 const ProductLevel = lazy(() => import("./Products/ProductLevel"));
 const ManageTags = lazy(() => import("./Settings/Tags/ManageTags"));
 const Locations = lazy(() => import("./Location/Location"));
+const ProductRevenue = lazy(() => import("./Revenue/ProductRevenue"));
+const ProductEnrollments = lazy(() => import("./Products/ProductEnrollments"));
 
 export {
   CalendarPage,
@@ -64,7 +66,6 @@ export {
   NoticeBoard,
   AddOnsPage,
   ViewEmployee,
-
   LeadTypes,
   EmployeeDashboard,
   AttendeeHistory,
@@ -104,4 +105,6 @@ export {
   ProductLevel,
   ManageTags,
   Locations,
+  ProductRevenue,
+  ProductEnrollments
 };

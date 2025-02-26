@@ -3,7 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import AddNoteForm from "./AddNoteForm";
 import { FaRegEdit } from "react-icons/fa";
 import { getLeadType, getNotes } from "../../features/actions/assign";
-import { addUserActivity, getUserActivityByEmail } from "../../features/actions/userActivity";
+import {
+  addUserActivity,
+  getUserActivityByEmail,
+} from "../../features/actions/userActivity";
 import NoteItem from "../../components/NoteItem";
 import {
   getAttendee,
@@ -53,7 +56,7 @@ const ViewParticularContact = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const roles = useRoles();
-  
+
   const logUserActivity = useAddUserActivity();
 
   const searchParams = new URLSearchParams(location.search);
@@ -166,7 +169,7 @@ const ViewParticularContact = () => {
     dispatch(
       updateAttendeeLeadType({ email: email, leadType: event.target.value })
     ).then((res) => {
-      if(res.meta.requestStatus === "fulfilled"){
+      if (res.meta.requestStatus === "fulfilled") {
         logUserActivity({
           action: "update",
           details: `User updated lead type of Attendee with Email: ${email}`,
@@ -195,7 +198,7 @@ const ViewParticularContact = () => {
 
   const onConfirmEdit = (data) => {
     dispatch(updateAttendee(data)).then((res) => {
-      if(res.meta.requestStatus === "fulfilled"){
+      if (res.meta.requestStatus === "fulfilled") {
         logUserActivity({
           action: "update",
           details: `User updated information of Attendee with Email: ${email}`,
@@ -235,6 +238,17 @@ const ViewParticularContact = () => {
   const cancelMyAlarm = (id) => {
     dispatch(cancelAlarm({ id }));
   };
+  console.log(attendeeId);
+  useEffect(() => {
+    if (!attendeeId && attendeeHistoryData?.length > 0) {
+      const firstAttendee = attendeeHistoryData[0];
+      if (firstAttendee?._id) {
+        navigate(`?email=${email}&attendeeId=${firstAttendee._id}`, {
+          replace: true,
+        });
+      }
+    }
+  }, [attendeeHistoryData, attendeeId, email, navigate]);
 
   return (
     <div className=" px-4 pt-14 space-y-6">
@@ -481,7 +495,17 @@ const ViewParticularContact = () => {
                             Webinar Date
                           </th>
                           <th className="py-3 px-1">Tags</th>
-                          <th className="py-3 px-1 stickyFieldRight">Action</th>
+                          <ComponentGuard
+                            conditions={[
+                              employeeModeData ? false : true,
+                              userData?.isActive,
+                            ]}
+                          >
+                            {" "}
+                            <th className="py-3 px-1 stickyFieldRight">
+                              Action
+                            </th>
+                          </ComponentGuard>
                         </tr>
                       </thead>
 
@@ -645,10 +669,11 @@ const ViewParticularContact = () => {
             logUserActivity={logUserActivity}
           />
         )}
-        {showLogsModal && createPortal(
-          <LogsModal setModal={setShowLogsModal} email={email} />,
-          document.body
-        )}
+        {showLogsModal &&
+          createPortal(
+            <LogsModal setModal={setShowLogsModal} email={email} />,
+            document.body
+          )}
       </Suspense>
       <Dialog
         open={openCancelDialog}

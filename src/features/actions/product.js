@@ -111,3 +111,21 @@ export const getEnrollmentsByProductLevel = createAsyncThunk(
     }
   }
 );
+
+
+export const getEnrollmentsByLevelOrId = createAsyncThunk(
+  "enrollments/product-level-or-id",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.get(
+        `/enrollments/level-or-product`,
+        {
+          params: payload,
+        }
+      );
+      return data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);

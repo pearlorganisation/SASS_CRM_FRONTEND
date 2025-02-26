@@ -13,7 +13,6 @@ import {
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import Delete from "../../components/ConfirmDeleteModal";
 import productLevelService from "../../services/productLevelService";
 import { successToast } from "../../utils/extra";

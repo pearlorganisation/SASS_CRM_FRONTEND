@@ -52,7 +52,9 @@ import {
   Revenue,
   ProductLevel,
   ManageTags,
-  Locations
+  Locations,
+  ProductRevenue,
+  ProductEnrollments
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 
@@ -260,6 +262,22 @@ const App = () => {
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN"]}>
               <Revenue />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/product-revenue",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <ProductRevenue />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/product-enrollments",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <ProductEnrollments />
             </RouteGuard>
           ),
         },
