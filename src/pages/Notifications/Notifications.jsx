@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { getUserNotifications } from "../../features/actions/notification";
 import PageLimitEditor from "../../components/PageLimitEditor";
 import { Pagination } from "@mui/material";
@@ -10,6 +10,8 @@ import ScrollControls from "../../components/ScrollControls";
 
 const Notifications = () => {
   const dispatch = useDispatch();
+
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const roles = useRoles();
   const navigate = useNavigate();
@@ -22,21 +24,25 @@ const Notifications = () => {
   );
 
   const { employeeModeData } = useSelector((state) => state.employee);
-  const { notifications, unseenCount, totalPages } = useSelector(
-    (state) => state.notification
-  );
+  const { notifications, totalPages, _notifications, _totalPages } =
+    useSelector((state) => state.notification);
+  const [imp, setImp] = useState(true);
 
   useEffect(() => {
-    if (userId) {
+    const important = searchParams.get("important");
+    setImp(important === "true");
+    console.log("useEffectin", searchParams, userId, important);
+    if (important && userId) {
       dispatch(
         getUserNotifications({
           id: employeeModeData ? employeeModeData?._id : userId,
+          important: important === "true",
           page: page,
           limit: LIMIT,
         })
       );
     }
-  }, [userId, page, LIMIT]);
+  }, [searchParams, userId, page, LIMIT]);
 
   function handleClick(notif) {
     console.log(notif);
@@ -76,9 +82,24 @@ const Notifications = () => {
       <div className="p-6 bg-gray-50  rounded-lg">
         <div className="flex gap-4 mb-8 justify-between items-center">
           <h2 className="text-2xl font-bold text-gray-700">Notifications</h2>
+          <div>
+            <button 
+              onClick={() => {
+                setPage(1)
+                setSearchParams({
+                  important: !imp 
+                })
+              }}
+              className={`px-4 py-2 rounded transition-colors bg-blue-500 text-white`}
+            >
+              {!imp 
+                ? 'Important' 
+                : 'Non Important'}
+            </button>
+          </div>
         </div>
         <div className="grid lg:grid-cols-2 grid-cols-1 gap-4">
-          {notifications.map((notif) => (
+          {(imp ? notifications : _notifications).map((notif) => (
             <div
               key={notif?._id}
               onClick={() => handleClick(notif)}
@@ -94,7 +115,9 @@ const Notifications = () => {
                     : "text-green-600"
                 }`}
               >
-                { notif?.actionType ? notif.actionType.split("_").join(" ") : "Unknown"}
+                {notif?.actionType
+                  ? notif.actionType.split("_").join(" ")
+                  : "Unknown"}
               </div>
 
               {/* Title */}
@@ -112,7 +135,7 @@ const Notifications = () => {
             </div>
           ))}
 
-          {notifications.length === 0 && (
+          {(imp ? notifications : _notifications).length === 0 && (
             <div className="flex justify-center items-center">
               <p className="text-lg font-bold text-gray-700">
                 No notifications found
@@ -120,7 +143,7 @@ const Notifications = () => {
             </div>
           )}
         </div>
-        {notifications.length !== 0 && (
+        {(imp ? notifications : _notifications).length !== 0 && (
           <div className="flex gap-4 md:flex-row flex-col flex-wrap items-center justify-between py-4">
             <Pagination
               onChange={(e, page) => {
@@ -130,7 +153,7 @@ const Notifications = () => {
                 //   details: `User changed page For ${tableHeader} to ${page} `,
                 // });
               }}
-              count={totalPages || 1}
+              count={(imp ? totalPages : _totalPages) || 1}
               page={Number(page) || 1}
               variant="outlined"
               shape="rounded"
@@ -138,10 +161,8 @@ const Notifications = () => {
             <PageLimitEditor setPage={setPage} pageId={"notificationsPage"} />
           </div>
         )}
-        <ScrollControls/>
-        </div>
-
-      
+        <ScrollControls />
+      </div>
     </div>
   );
 };
