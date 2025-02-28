@@ -12,12 +12,13 @@ import { closeModal } from "../../features/slices/modalSlice";
 import { ClipLoader } from "react-spinners";
 
 const ExportModal = ({ modalName, defaultColumns, handleExport }) => {
-
   const dispatch = useDispatch();
 
   const { isLoading, isSuccess } = useSelector((state) => state.export);
   const modalState = useSelector((state) => state.modals.modals);
   const open = modalState[modalName] ? true : false;
+  const { subscription } = useSelector((state) => state.auth);
+  const employeeInactivity = subscription?.plan?.employeeInactivity;
 
   const [limit, setLimit] = useState("");
   const [selectedColumns, setSelectedColumns] = useState(
@@ -36,7 +37,6 @@ const ExportModal = ({ modalName, defaultColumns, handleExport }) => {
 
   const handleSubmit = () => {
     handleExport({ limit: limit || undefined, columns: selectedColumns });
-
   };
 
   useEffect(() => {
@@ -78,18 +78,23 @@ const ExportModal = ({ modalName, defaultColumns, handleExport }) => {
         <div className="mb-4">
           <h3 className="text-lg font-semibold mb-2">Select Columns</h3>
           <div className="grid grid-cols-2 gap-2">
-            {defaultColumns.map((column) => (
-              <FormControlLabel
-                key={column.key}
-                control={
-                  <Checkbox
-                    checked={selectedColumns.includes(column.key)}
-                    onChange={() => handleCheckboxChange(column.key)}
+            {defaultColumns.map((column) => {
+              if (column.key === "inactivityTime" && !employeeInactivity) {
+                return null;
+              } else
+                return (
+                  <FormControlLabel
+                    key={column.key}
+                    control={
+                      <Checkbox
+                        checked={selectedColumns.includes(column.key)}
+                        onChange={() => handleCheckboxChange(column.key)}
+                      />
+                    }
+                    label={column.header}
                   />
-                }
-                label={column.header}
-              />
-            ))}
+                );
+            })}
           </div>
         </div>
         <div className="flex justify-end gap-2">
@@ -98,8 +103,15 @@ const ExportModal = ({ modalName, defaultColumns, handleExport }) => {
           </Button>
           <Button
             disabled={isLoading}
-            variant="contained" color="primary" onClick={handleSubmit}>
-            {isLoading ? <ClipLoader className="mx-8" color="#fff" size={20} /> : "Download"}
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+          >
+            {isLoading ? (
+              <ClipLoader className="mx-8" color="#fff" size={20} />
+            ) : (
+              "Download"
+            )}
           </Button>
         </div>
       </Box>

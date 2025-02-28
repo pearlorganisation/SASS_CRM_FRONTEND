@@ -92,6 +92,8 @@ const App = () => {
   const { userData, isUserLoggedIn, subscription } = useSelector(
     (state) => state.auth
   );
+  const calendarFeatures = subscription?.plan?.calendarFeatures;
+  const productRevenueMetrics = subscription?.plan?.productRevenueMetrics;
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
   const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed || false;
 
@@ -268,7 +270,9 @@ const App = () => {
         {
           path: "/product-revenue",
           element: (
-            <RouteGuard roleNames={["ADMIN"]}>
+            <RouteGuard
+            conditions={[productRevenueMetrics]}
+            roleNames={["ADMIN"]}>
               <ProductRevenue />
             </RouteGuard>
           ),
@@ -378,6 +382,7 @@ const App = () => {
           path: "/calendar",
           element: (
             <RouteGuard
+            conditions={[calendarFeatures]}
               roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER", "ADMIN"]}
             >
               <CalendarPage />

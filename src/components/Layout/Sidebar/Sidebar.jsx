@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useNavigate,
+  useSearchParams,
+  useLocation,
+} from "react-router-dom";
 import { TbLayoutDashboardFilled, TbReceiptRupee } from "react-icons/tb";
 import { IoLogOut, IoPeople, IoSettings } from "react-icons/io5";
 import { HiUserGroup } from "react-icons/hi2";
@@ -23,15 +28,22 @@ const Sidebar = () => {
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const location = useLocation();
 
   const { isUpdated } = useSelector((state) => state.noticeBoard);
   const { sidebarLinkData } = useSelector((state) => state.sidebarLink);
-  const { userData, isUserLoggedIn } = useSelector((state) => state.auth);
+  const { userData, isUserLoggedIn, subscription } = useSelector(
+    (state) => state.auth
+  );
+  const calendarFeatures = subscription?.plan?.calendarFeatures;
   const { isSidebarOpen } = useSelector((state) => state.globalData);
   const [showImportantLinks, setShowImportantLinks] = useState(false); // toggle state for sub-links
   const role = userData?.role || "";
   const { employeeModeData } = useSelector((state) => state.employee);
+
+  useEffect(() => {
+    console.log(location);
+  }, [location]);
 
   const navItems = [
     {
@@ -41,13 +53,13 @@ const Sidebar = () => {
           path: "/clients",
           label: "Clients",
           icon: <IoPeople size={30} />,
+          children: ["view-client", "add-client", "client/plan/"],
         },
         {
           path: "/revenue",
           label: "Revenue",
-          icon: <TbReceiptRupee  size={30} />,
+          icon: <TbReceiptRupee size={30} />,
         },
-
       ],
     },
     {
@@ -70,16 +82,19 @@ const Sidebar = () => {
               path: "/webinarDetails",
               label: "Webinars",
               icon: <SiGooglemeet size={30} />,
+              children: ["webinarDetails"],
             },
             {
               path: "/attendees",
               label: "Attendees",
               icon: <HiUserGroup size={30} />,
+              children: ["particularContact"],
             },
             {
               path: "/employees",
               label: "Employees",
               icon: <IoPeople size={30} />,
+              children: ["employees", "employee", "createEmployee"],
             },
           ],
     },
@@ -90,32 +105,39 @@ const Sidebar = () => {
           path: "/assignments",
           label: "Assignments",
           icon: <MdAssignment size={30} />,
+          children: ["assignments"],
         },
       ],
     },
     {
       roles: [roles.EMPLOYEE_SALES, roles.EMPLOYEE_REMINDER, roles.ADMIN],
       items: [
-        {
-          path: "/calendar",
-          label: "Calendar",
-          icon: <FaCalendarAlt size={30} />,
-        },
+        ...(calendarFeatures
+          ? [
+              {
+                path: "/calendar",
+                label: "Calendar",
+                icon: <FaCalendarAlt size={30} />,
+              },
+            ]
+          : []),
         {
           path: "/products",
           label: "Products",
           icon: <AiFillProduct size={30} />,
+          children: ["products"],
         },
+
         {
           path: "/notice-board",
           label: "Notice Board",
           icon: <FaClipboard size={25} />,
+          children: ["notice-board"],
         },
       ],
     },
   ];
 
-  
   // useEffect(() => {
   //   const handlePopState = (event) => {
   //     const currentPath = window.location.pathname;
@@ -137,7 +159,7 @@ const Sidebar = () => {
   //   };
 
   //   window.addEventListener('popstate', handlePopState);
-    
+
   //   return () => {
   //     window.removeEventListener('popstate', handlePopState);
   //   };
@@ -154,8 +176,8 @@ const Sidebar = () => {
   // const handleParamUpdate = (newParams) => {
   //   const searchParams = new URLSearchParams(newParams);
   //   window.history.replaceState(
-  //     { route: window.location.pathname }, 
-  //     '', 
+  //     { route: window.location.pathname },
+  //     '',
   //     `?${searchParams.toString()}`
   //   );
   //   setSearchParams(searchParams);
@@ -196,6 +218,19 @@ const Sidebar = () => {
     };
   }, [roles, role]);
 
+  const isActiveRoute = (item) => {
+    if (location.pathname === item.path) return true;
+
+    // Check if the current path starts with any children paths
+    if (Array.isArray(item.children)) {
+      return item.children.some((child) =>
+        location.pathname.startsWith(`/${child}`)
+      );
+    }
+
+    return false;
+  };
+
   return (
     <div
       id="logo-sidebar"
@@ -211,7 +246,9 @@ const Sidebar = () => {
             <li>
               <Link
                 to="/"
-                className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
+                className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group ${
+                  location.pathname === "/" ? "bg-gray-100" : ""
+                }`}
               >
                 <TbLayoutDashboardFilled size={30} />
                 <span className="ms-3">Dashboard</span>
@@ -228,7 +265,9 @@ const Sidebar = () => {
                   <Link
                     to={item.path}
                     onClick={() => handleNavigation(item.path)}
-                    className={`flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group`}
+                    className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group ${
+                      isActiveRoute(item) ? "bg-gray-100" : ""
+                    }`}
                   >
                     {item.icon}
                     <span className="flex-1 ms-3 whitespace-nowrap">
@@ -285,7 +324,25 @@ const Sidebar = () => {
             <li>
               <Link
                 to="/settings"
-                className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group"
+                className={`flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-100 group ${
+                  isActiveRoute({
+                    path: "settings",
+                    children: [
+                      "plans",
+                      "addons",
+                      "pabblyToken",
+                      "settings",
+                      "sidebarLinks",
+                      "update-landing-page",
+                      "product-level",
+                      "lead-type",
+                      "billing-history",
+                      "tags",
+                    ],
+                  })
+                    ? "bg-gray-100"
+                    : ""
+                }`}
               >
                 <IoSettings size={30} />
                 <span className="flex-1 ms-3 whitespace-nowrap">Settings</span>
@@ -297,7 +354,7 @@ const Sidebar = () => {
           <li>
             <button
               onClick={handleLogout}
-              className="flex items-center p-2 text-gray-900 rounded-lg hover:text-red-600  hover:bg-gray-100 group"
+              className="flex items-center p-2 text-gray-900 rounded-lg text-start hover:text-red-600 w-full  hover:bg-gray-100 group"
             >
               <IoLogOut size={30} />
               <span className="flex-1 ms-3 whitespace-nowrap">Sign Out</span>

@@ -18,11 +18,18 @@ const useAddUserActivity = () => {
   const dispatch = useDispatch();
 
   const userData = store.getState()?.auth?.userData;
+  const subscription = store.getState()?.auth?.subscription;
   const InactivityTimeInSeconds = userData?.inactivityTime || 10;
   const INACTIVITY_LIMIT = InactivityTimeInSeconds * 1000;
 
   const resetInactivityTimer = () => {
-    console.log("Resetting inactivity timer...");
+
+    const employeeInactivity = subscription?.plan?.employeeInactivity;
+
+    if(!employeeInactivity) {
+      console.log("employee inactivity is not allowed");
+      return;
+    }
 
     if (!roles.isEmployeeId("")) return;
 

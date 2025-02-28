@@ -73,7 +73,8 @@ const ViewParticularContact = () => {
   const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
   const [attendeeHistoryData, setAttendeeHistoryData] = useState([]);
 
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, subscription } = useSelector((state) => state.auth);
+  const setAlarm = subscription?.plan?.setAlarm;
   const dateFormat = userData?.dateFormat || DateFormat.MM_DD_YYYY;
   const { selectedAttendee, attendeeLeadType, attendeeEnrollments } =
     useSelector((state) => state.attendee);
@@ -358,13 +359,15 @@ const ViewParticularContact = () => {
             >
               <div className="flex  justify-between gap-10  items-center">
                 <div className="flex items-center gap-3">
-                  <Button
-                    variant="contained"
-                    className="h-10"
-                    onClick={handleTimerModal}
-                  >
-                    Set Alarm
-                  </Button>
+                  {setAlarm && (
+                    <Button
+                      variant="contained"
+                      className="h-10"
+                      onClick={handleTimerModal}
+                    >
+                      Set Alarm
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
                     className="h-10"
@@ -645,7 +648,7 @@ const ViewParticularContact = () => {
             setModalData={setNoteModalData}
           />
         )}
-        {showTimerModal && (
+        {showTimerModal && setAlarm && (
           <ViewTimerModal
             setModal={setShowTimerModal}
             email={email}
