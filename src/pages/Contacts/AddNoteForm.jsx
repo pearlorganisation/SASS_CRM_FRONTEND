@@ -96,13 +96,15 @@ const AddNoteForm = (props) => {
     // dispatch(addNote(payload));
     // }
 
-    dispatch(addNote(data));
-    // .then(() => {
-    //   addUserActivityLog({
-    //     action: "addNote",
-    //     details: `User added a note for Attendee with Email: ${email} - Note: ${note}`,
-    //   });
-    // });
+    dispatch(addNote(data))
+    .then(() => {
+      addUserActivityLog({
+        action: 'note',
+        type: "contact",
+        detailItem: data?.email,
+        activityItem: data?.email,
+      });
+    });
   };
 
   const handleFileChange = (e) => {

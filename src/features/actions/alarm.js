@@ -5,13 +5,14 @@ import { successToast } from "../../utils/extra";
 //set alarm
 export const setAlarm = createAsyncThunk(
   "alarm",
-  async ({ date, note, email, attendeeId }, { rejectWithValue }) => {
+  async ({ date, note, email, attendeeId, secondaryNumber }, { rejectWithValue }) => {
     try {
       const response = await instance.post(`/alarm`, {
         date,
         note,
         email,
         attendeeId,
+        secondaryNumber
       });
       successToast(response?.data);
       return response?.data;

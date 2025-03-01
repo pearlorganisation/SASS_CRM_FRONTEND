@@ -38,7 +38,6 @@ export const locationSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.locationsData = action.payload     
-        successToast('Locations fetched.')   
       })
       .addCase(getLocations.rejected, (state, action) => {
         state.isLoading = false;

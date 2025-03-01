@@ -31,8 +31,9 @@ const ViewProducts = () => {
   const navigate = useNavigate();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
+  const { userData, subscription } = useSelector((state) => state.auth);
+  const productRevenueMetrics = subscription?.plan?.productRevenueMetrics;
 
-  const { userData } = useSelector((state) => state.auth);
   const { isLoading, isSuccess, productData, totalPages } = useSelector(
     (state) => state.product
   );
@@ -128,12 +129,23 @@ const ViewProducts = () => {
           allowedRoles={[roles.ADMIN]}
           conditions={[userData?.isActive, employeeModeData ? false : true]}
         >
-          <Button
-            onClick={() => navigate("/products/addProduct")}
-            variant="contained"
-          >
-            Add Product
-          </Button>
+          <div className="flex gap-4 items-center">
+            {productRevenueMetrics && (
+              <Button
+                onClick={() => navigate("/product-revenue")}
+                variant="contained"
+              >
+                Revenue
+              </Button>
+            )}
+
+            <Button
+              onClick={() => navigate("/products/addProduct")}
+              variant="contained"
+            >
+              Add Product
+            </Button>
+          </div>
         </ComponentGuard>
       </div>
 
@@ -148,7 +160,6 @@ const ViewProducts = () => {
             ? productData.map((item) => ({
                 ...item,
                 level: productLevelObj[item.level] || `L${item.level}`,
-
               }))
             : [],
         }}

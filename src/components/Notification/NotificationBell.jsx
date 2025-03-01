@@ -1,29 +1,31 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import MessageIcon from "@mui/icons-material/Message";
 import {
   getUserNotifications,
   resetUnseenCount,
 } from "../../features/actions/notification";
 import { useNavigate } from "react-router-dom";
 import { NotifActionType } from "../../utils/extra";
+import LinearProgressWithLabel from "../Export/LinearProgressWithLabel";
 
-const NotificationBell = ({ userData, roles }) => {
+const NotificationBell = ({ userData, roles, important }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
   const bellRef = useRef(null);
   const dropdownRef = useRef(null);
+  const [progress, setProgress] = useState(0);
 
   const { employeeModeData } = useSelector((state) => state.employee);
-  const { notifications, unseenCount } = useSelector(
-    (state) => state.notification
-  );
+  const { notifications, unseenCount, _notifications, _unseenCount } =
+    useSelector((state) => state.notification);
 
   const handleBellClick = () => {
     setIsOpen((prev) => !prev);
-    if (unseenCount > 0 && !employeeModeData) {
-      dispatch(resetUnseenCount());
+    if ((important ? unseenCount : _unseenCount) > 0 && !employeeModeData) {
+      dispatch(resetUnseenCount(important));
     }
   };
 
@@ -51,10 +53,14 @@ const NotificationBell = ({ userData, roles }) => {
 
   useEffect(() => {
     if (userData?._id) {
-      dispatch(getUserNotifications({ id: employeeModeData ? employeeModeData?._id : userData?._id  }));
+      dispatch(
+        getUserNotifications({
+          id: employeeModeData ? employeeModeData?._id : userData?._id,
+          important,
+        })
+      );
     }
   }, [userData, employeeModeData]);
-
 
   function handleClick(notif) {
     // console.log(notif);
@@ -84,7 +90,7 @@ const NotificationBell = ({ userData, roles }) => {
 
     if (notif.actionType === NotifActionType.REASSIGNMENT) {
       if (!notif?.metadata?.webinarId) return;
-      const tabValue = notif?.metadata?.recordType || 'preWebinar';
+      const tabValue = notif?.metadata?.recordType || "preWebinar";
       navigate(
         `/webinarDetails/${notif.metadata.webinarId}?tabValue=${tabValue}&page=1&subTabValue=reassignrequested`
       );
@@ -93,17 +99,30 @@ const NotificationBell = ({ userData, roles }) => {
 
   return (
     <div className="sm:relative">
-      <button 
-        ref={bellRef} 
+      <button
+        ref={bellRef}
         onClick={handleBellClick}
         className="p-2 hover:bg-gray-100 rounded-full transition-colors"
       >
         <div className="relative">
-          <NotificationsIcon className="text-gray-600" />
-          {unseenCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
-              {unseenCount}
-            </span>
+          {important ? (
+            <>
+              <MessageIcon className="text-gray-600" />
+              {unseenCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                  {unseenCount}
+                </span>
+              )}
+            </>
+          ) : (
+            <>
+              <NotificationsIcon className="text-gray-600" />
+              {_unseenCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
+                  {_unseenCount}
+                </span>
+              )}
+            </>
           )}
         </div>
       </button>
@@ -118,7 +137,9 @@ const NotificationBell = ({ userData, roles }) => {
               <h3 className="text-lg font-bold">Notifications</h3>
               <button
                 onClick={() => {
-                  navigate(`/notifications/${userData?._id}`);
+                  navigate(
+                    `/notifications/${userData?._id}?important=${important}`
+                  );
                   setIsOpen(false);
                 }}
                 className="text-gray-500 hover:text-gray-900 hover:underline"
@@ -128,8 +149,8 @@ const NotificationBell = ({ userData, roles }) => {
             </div>
             <hr className="my-2 border-gray-200" />
             <div className="divide-y">
-              {notifications.map((notif) => (
-                <div 
+              {(important ? notifications : _notifications).map((notif) => (
+                <div
                   key={notif._id}
                   onClick={() => handleClick(notif)}
                   className="p-3 hover:bg-gray-50 cursor-pointer"
@@ -139,14 +160,14 @@ const NotificationBell = ({ userData, roles }) => {
                   <div className="text-xs text-gray-500 text-right mt-1">
                     {new Date(notif?.createdAt).toLocaleDateString()} •{" "}
                     {new Date(notif?.createdAt).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit'
+                      hour: "2-digit",
+                      minute: "2-digit",
                     })}
                   </div>
                 </div>
               ))}
 
-              {notifications.length === 0 && (
+              {(important ? notifications : _notifications).length === 0 && (
                 <div className="p-4 text-center text-gray-700">
                   No notifications found
                 </div>

@@ -20,6 +20,8 @@ import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { getCustomOptionsForFilters } from "../../features/actions/globalData";
 import { webinarAttendeesSortByOptions } from "../../utils/columnData";
 import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
+import tagsService from "../../services/tagsService";
+import { getAllProductsByAdminId } from "../../features/actions/product";
 
 const FilterModal = ({ modalName, setPage, tabValue }) => {
   const dispatch = useDispatch();
@@ -32,13 +34,14 @@ const FilterModal = ({ modalName, setPage, tabValue }) => {
   const { webinarAttendeesSortBy, webinarAttendeesFilters } = useSelector(
     (state) => state.filters
   );
+  const { productDropdownData } = useSelector((state) => state.product);
   const [sortBy, setSortBy] = useState(
     webinarAttendeesSortBy || {
       sortBy: webinarAttendeesSortByOptions[0].value,
       sortOrder: "asc",
     }
   );
-
+  const [tagData, setTagData] = useState([]);
   const [selectedOption, setSelectedOption] = useState("");
   const [leadTypeOptions, setLeadTypeOptions] = useState([]);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
@@ -81,12 +84,19 @@ const FilterModal = ({ modalName, setPage, tabValue }) => {
   };
 
   useEffect(() => {
+    tagsService.getTags().then((res) => {
+      if (res.success) {
+        setTagData(res.data);
+      }
+    });
     dispatch(getCustomOptionsForFilters());
     if (webinarAttendeesFilters?.leadType)
       setSelectedOption(webinarAttendeesFilters?.leadType);
     reset({
       ...webinarAttendeesFilters,
     });
+
+    dispatch(getAllProductsByAdminId());
   }, []);
 
   useEffect(() => {
@@ -280,6 +290,66 @@ const FilterModal = ({ modalName, setPage, tabValue }) => {
                   </Select>
                 </FormControl>
               )}
+              {tableConfig?.tags?.filterable && (
+                <Controller
+                  name="tags"
+                  control={control}
+                  render={({ field }) => (
+                    <FormControl fullWidth>
+                      <InputLabel>Tags</InputLabel>
+                      <Select
+                        multiple
+                        {...field}
+                        label="Tags"
+                        value={field.value || []}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        renderValue={(selected) => selected.join(", ")}
+                      >
+                        {tagData.map((item) => (
+                          <MenuItem key={item._id} value={item.name}>
+                            {item.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
+                />
+              )}
+              {tableConfig?.enrollments?.filterable && (
+                <Controller
+                  name="enrollments"
+                  control={control}
+                  render={({ field }) => (
+                    <FormControl fullWidth>
+                      <InputLabel>Enrollments</InputLabel>
+                      <Select
+                        multiple
+                        {...field}
+                        label="Enrollments"
+                        value={field.value || []}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        renderValue={(selected) =>
+                          productDropdownData
+                            .filter((product) => selected.includes(product._id))
+                            .map((product) => product.name)
+                            .join(", ")
+                        }
+                      >
+                        {(
+                          productDropdownData?.map((product) => ({
+                            value: product._id,
+                            label: `${product.name} | Level - ${product.level}`,
+                          })) || []
+                        ).map((item) => (
+                          <MenuItem key={item.value} value={item.value}>
+                            {item.label}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
+                />
+              )}
             </div>
           </div>
 
@@ -288,7 +358,6 @@ const FilterModal = ({ modalName, setPage, tabValue }) => {
             <p className="text-sm font-medium">Sort By</p>
             <div className="grid grid-cols-2 gap-2">
               <FormControl fullWidth>
-
                 <Select
                   labelId="sort-by-select-label"
                   value={sortBy.sortBy || ""}
@@ -342,8 +411,6 @@ const FilterModal = ({ modalName, setPage, tabValue }) => {
                       sortOrder: e.target.value,
                     }))
                   }
-
-
                   displayEmpty
                   renderValue={(selected) => {
                     if (!selected) {
@@ -365,7 +432,6 @@ const FilterModal = ({ modalName, setPage, tabValue }) => {
                       >
                         <span className="capitalize">{selectedOption}</span>
                       </div>
-
                     );
                   }}
                 >

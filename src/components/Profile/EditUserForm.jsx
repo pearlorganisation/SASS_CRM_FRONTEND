@@ -1,6 +1,10 @@
 import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { TextField, Button, IconButton } from "@mui/material";
+import { Controller, useForm } from "react-hook-form";
+import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import { DateFormat } from "../../utils/extra";
 import { useSelector } from "react-redux";
 import CloseIcon from "@mui/icons-material/Close";
 import { ClipLoader } from "react-spinners";
@@ -17,7 +21,12 @@ const EditUserForm = ({ onSubmit, onClose }) => {
     reset,
     control,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      dateFormat: DateFormat.DD_MM_YYYY
+    }
+  });
+  console.log(userData);
 
   useEffect(() => {
     if (userData) {
@@ -28,6 +37,7 @@ const EditUserForm = ({ onSubmit, onClose }) => {
         companyName: userData?.companyName || null,
         gst: userData?.gst || null, // No pre-population for GST Number
         document: null, // No pre-population for Document
+        dateFormat: userData?.dateFormat || DateFormat.DD_MM_YYYY,
       });
     }
   }, [userData]);
@@ -79,6 +89,27 @@ const EditUserForm = ({ onSubmit, onClose }) => {
           },
         }}
       />
+
+<Controller
+                name="dateFormat"
+                control={control}
+                rules={{ required: "Date Format is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    select
+                    label="Date Format"
+                    variant="outlined"
+                    error={!!errors.dateFormat}
+                    helperText={errors.dateFormat?.message}
+                  >
+                    <MenuItem value={DateFormat.MM_DD_YYYY}>MM-DD-YYYY</MenuItem>
+                    <MenuItem value={DateFormat.DD_MM_YYYY}>DD-MM-YYYY</MenuItem>
+                    <MenuItem value={DateFormat.YYYY_MM_DD}>YYYY-MM-DD</MenuItem>
+                  </TextField>
+                )}
+              />
 
       <ComponentGuard allowedRoles={[roles.ADMIN, roles.SUPER_ADMIN]}>
         <FormInput

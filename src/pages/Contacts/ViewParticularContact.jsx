@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import ViewFullDetailsModal from "./Modal/ViewFullDetailModal";
-import ViewTimerModal from "./Modal/ViewTimerModal";
+import React, { useEffect, useState, Suspense, lazy } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AddNoteForm from "./AddNoteForm";
 import { FaRegEdit } from "react-icons/fa";
 import { getLeadType, getNotes } from "../../features/actions/assign";
-import EditModal from "./Modal/EditModal";
-import { addUserActivity } from "../../features/actions/userActivity";
+import {
+  addUserActivity,
+  getUserActivityByEmail,
+} from "../../features/actions/userActivity";
 import NoteItem from "../../components/NoteItem";
 import {
   getAttendee,
@@ -27,7 +27,6 @@ import {
   DialogTitle,
   FormControl,
   IconButton,
-  InputLabel,
   ListItemIcon,
   ListItemText,
   MenuItem,
@@ -37,15 +36,29 @@ import {
 import { Add, OpenInNew } from "@mui/icons-material";
 import { clearLeadType } from "../../features/slices/attendees";
 import { useNavigate } from "react-router-dom";
-import AddEnrollmentModal from "./Modal/AddEnrollmentModal";
 import { cancelAlarm, getAttendeeAlarm } from "../../features/actions/alarm";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import ProductLevelTable from "./ProductLevelTable";
 import { DateFormat, formatDateAsNumber } from "../../utils/extra";
+import useAddUserActivity from "../../hooks/useAddUserActivity";
+import useRoles from "../../hooks/useRoles";
+import ModalFallback from "../../components/Fallback/ModalFallback";
+import LogsModal from "./Modal/LogsModal";
+import { createPortal } from "react-dom";
+
+// Lazy load modals
+const ViewFullDetailsModal = lazy(() => import("./Modal/ViewFullDetailModal"));
+const ViewTimerModal = lazy(() => import("./Modal/ViewTimerModal"));
+const EditModal = lazy(() => import("./Modal/EditModal"));
+const AddEnrollmentModal = lazy(() => import("./Modal/AddEnrollmentModal"));
 
 const ViewParticularContact = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const roles = useRoles();
+
+  const logUserActivity = useAddUserActivity();
+
   const searchParams = new URLSearchParams(location.search);
   const email = searchParams.get("email");
   const attendeeId = searchParams.get("attendeeId");
@@ -60,10 +73,8 @@ const ViewParticularContact = () => {
   const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
   const [attendeeHistoryData, setAttendeeHistoryData] = useState([]);
 
-  const { attendeeContactDetails } = useSelector(
-    (state) => state.webinarContact
-  );
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, subscription } = useSelector((state) => state.auth);
+  const setAlarm = subscription?.plan?.setAlarm;
   const dateFormat = userData?.dateFormat || DateFormat.MM_DD_YYYY;
   const { selectedAttendee, attendeeLeadType, attendeeEnrollments } =
     useSelector((state) => state.attendee);
@@ -75,6 +86,7 @@ const ViewParticularContact = () => {
   const { attendeeAlarm } = useSelector((state) => state.alarm);
 
   const [openCancelDialog, setOpenCancelDialog] = useState(false);
+  const [showLogsModal, setShowLogsModal] = useState(false);
 
   const openCancelAlarmDialog = () => {
     setOpenCancelDialog(true);
@@ -157,7 +169,15 @@ const ViewParticularContact = () => {
     setSelectedOption(event.target.value);
     dispatch(
       updateAttendeeLeadType({ email: email, leadType: event.target.value })
-    );
+    ).then((res) => {
+      if (res.meta.requestStatus === "fulfilled") {
+        logUserActivity({
+          action: "update",
+          details: `User updated lead type of Attendee with Email: ${email}`,
+          activityItem: email,
+        });
+      }
+    });
   };
 
   useEffect(() => {
@@ -178,13 +198,16 @@ const ViewParticularContact = () => {
   };
 
   const onConfirmEdit = (data) => {
-    dispatch(updateAttendee(data)).then(() => {
-      setEditModalData(null);
-      addUserActivityLog({
-        action: "update",
-        details: `User updated information of Attendee with Email: ${email}`,
-      });
-      dispatch(getAttendee({ email }));
+    dispatch(updateAttendee(data)).then((res) => {
+      if (res.meta.requestStatus === "fulfilled") {
+        logUserActivity({
+          action: "update",
+          details: `User updated information of Attendee with Email: ${email}`,
+          activityItem: email,
+        });
+        setEditModalData(null);
+        dispatch(getAttendee({ email }));
+      }
     });
   };
 
@@ -213,10 +236,20 @@ const ViewParticularContact = () => {
     );
   }, [noteData, uniquePhones]);
 
-
   const cancelMyAlarm = (id) => {
     dispatch(cancelAlarm({ id }));
   };
+  console.log(attendeeId);
+  useEffect(() => {
+    if (!attendeeId && attendeeHistoryData?.length > 0) {
+      const firstAttendee = attendeeHistoryData[0];
+      if (firstAttendee?._id) {
+        navigate(`?email=${email}&attendeeId=${firstAttendee._id}`, {
+          replace: true,
+        });
+      }
+    }
+  }, [attendeeHistoryData, attendeeId, email, navigate]);
 
   return (
     <div className=" px-4 pt-14 space-y-6">
@@ -285,7 +318,11 @@ const ViewParticularContact = () => {
               <div className="flex gap-3 flex-wrap">
                 {uniquePhonesCount.map((item, index) => (
                   <Badge key={index} badgeContent={item.count} color="primary">
-                    <Chip label={item.label} color={item.isInvalid ? "error" : undefined} variant="outlined" />
+                    <Chip
+                      label={item.label}
+                      color={item.isInvalid ? "error" : undefined}
+                      variant="outlined"
+                    />
                   </Badge>
                 ))}
               </div>
@@ -321,13 +358,22 @@ const ViewParticularContact = () => {
               conditions={[employeeModeData ? false : true, userData?.isActive]}
             >
               <div className="flex  justify-between gap-10  items-center">
-                <div className="flex border items-center gap-3">
+                <div className="flex items-center gap-3">
+                  {setAlarm && (
+                    <Button
+                      variant="contained"
+                      className="h-10"
+                      onClick={handleTimerModal}
+                    >
+                      Set Alarm
+                    </Button>
+                  )}
                   <Button
                     variant="contained"
                     className="h-10"
-                    onClick={handleTimerModal}
+                    onClick={() => setShowLogsModal(true)}
                   >
-                    Set Alarm
+                    Logs
                   </Button>
                 </div>
                 <div className="flex items-center w-fit min-w-40 px-1 gap-3">
@@ -402,7 +448,7 @@ const ViewParticularContact = () => {
                 employeeModeData={employeeModeData}
                 email={email}
                 attendeeId={attendeeId}
-                addUserActivityLog={addUserActivityLog}
+                addUserActivityLog={logUserActivity}
               />
               <div></div>
             </div>
@@ -451,7 +497,18 @@ const ViewParticularContact = () => {
                           <th className="py-3 px-1 min-w-[150px]">
                             Webinar Date
                           </th>
-                          <th className="py-3 px-1 stickyFieldRight">Action</th>
+                          <th className="py-3 px-1">Tags</th>
+                          <ComponentGuard
+                            conditions={[
+                              employeeModeData ? false : true,
+                              userData?.isActive,
+                            ]}
+                          >
+                            {" "}
+                            <th className="py-3 px-1 stickyFieldRight">
+                              Action
+                            </th>
+                          </ComponentGuard>
                         </tr>
                       </thead>
 
@@ -507,8 +564,24 @@ const ViewParticularContact = () => {
                                 <td className="px-3 py-4 whitespace-nowrap">
                                   {Array.isArray(item?.webinar) &&
                                   item.webinar.length > 0
-                                    ? formatDateAsNumber(item?.webinar[0].webinarDate)
+                                    ? formatDateAsNumber(
+                                        item?.webinar[0].webinarDate
+                                      )
                                     : "-"}
+                                </td>
+                                <td className="px-3 py-4  whitespace-nowrap">
+                                  <div className="flex flex-nowrap gap-2">
+                                    {Array.isArray(item?.tags)
+                                      ? item?.tags.map((tag, idx) => (
+                                          <span
+                                            key={idx}
+                                            className="px-2 py-1 rounded-full text-xs bg-gray-300 text-gray-800"
+                                          >
+                                            {tag}
+                                          </span>
+                                        ))
+                                      : "-"}
+                                  </div>
                                 </td>
                                 <ComponentGuard
                                   conditions={[
@@ -541,7 +614,6 @@ const ViewParticularContact = () => {
               </div>
             ) : (
               <div className="p-6 bg-white rounded-lg shadow-md">
-
                 <div className=" mb-2 items-center px-3 text-neutral-800  flex justify-between">
                   <span className="font-semibold text-xl  ">
                     Enrollments History
@@ -562,64 +634,6 @@ const ViewParticularContact = () => {
                     </Add>
                   </ComponentGuard>
                 </div>
-                {/* <table className="w-full table-auto text-sm text-left ">
-                  <thead className="bg-gray-50 text-gray-600 font-medium border-b justify-between">
-                    <tr>
-                      <th className="py-3 px-1">S No.</th>
-                      <th className="py-3 px-1">Webinar</th>
-                      <th className="py-3 px-1">E-Mail</th>
-                      <th className="py-3 px-1">Product Name</th>
-                      <th className="py-3  text-center">Price</th>
-                      <th className="py-3 px-1">Level</th>
-                    </tr>
-                  </thead>
-
-                  <tbody className="text-gray-600 divide-y">
-                    {false ? (
-                      <tr>
-                        <td colSpan="8" className="text-center px-6 py-8">
-                          <Stack spacing={4}>
-                            <Skeleton variant="rounded" height={30} />
-                            <Skeleton variant="rounded" height={25} />
-                            <Skeleton variant="rounded" height={20} />
-                            <Skeleton variant="rounded" height={20} />
-                            <Skeleton variant="rounded" height={20} />
-                          </Stack>
-                        </td>
-                      </tr>
-                    ) : (
-                      attendeeEnrollments?.map((item, idx) => {
-                        return (
-                          <tr key={idx}>
-                            <td className={`px-3 py-4 whitespace-nowrap `}>
-                              {idx + 1}
-                            </td>
-
-                            <td className="px-2 py-4 whitespace-nowrap ">
-                              {item?.webinar ? item?.webinar.webinarName : "-"}
-                            </td>
-
-                            <td className="px-2 py-4 whitespace-nowrap ">
-                              {(item?.attendee && item?.attendee.email) || "-"}
-                            </td>
-
-                            <td className=" py-4 text-center whitespace-nowrap">
-                              {item?.product && item?.product?.name}
-                            </td>
-                            <td className="px-3 py-4 whitespace-nowrap">
-                              {item?.product && item?.product?.price}
-                            </td>
-
-                            <td className="px-3 py-4 whitespace-nowrap">
-                              {item?.product && item?.product?.level}
-                            </td>
-
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table> */}
 
                 <ProductLevelTable email={email} />
               </div>
@@ -627,34 +641,43 @@ const ViewParticularContact = () => {
           </div>
         </div>
       </div>
-      {noteModalData && (
-        <ViewFullDetailsModal
-          modalData={noteModalData}
-          setModalData={setNoteModalData}
-        />
-      )}
-      {showTimerModal && (
-        <ViewTimerModal
-          setModal={setShowTimerModal}
-          email={email}
-          dateFormat={dateFormat}
-          attendeeId={attendeeId}
-        />
-      )}
-      {editModalData && (
-        <EditModal
-          setModal={setEditModalData}
-          initialData={editModalData}
-          onConfirmEdit={onConfirmEdit}
-        />
-      )}
-      {showEnrollmentModal && (
-        <AddEnrollmentModal
-          setModal={setShowEnrollmentModal}
-          attendeeEmail={selectedAttendee && selectedAttendee[0]?._id}
-          webinarData={attendeeHistoryData}
-        />
-      )}
+      <Suspense fallback={<ModalFallback />}>
+        {noteModalData && (
+          <ViewFullDetailsModal
+            modalData={noteModalData}
+            setModalData={setNoteModalData}
+          />
+        )}
+        {showTimerModal && setAlarm && (
+          <ViewTimerModal
+            setModal={setShowTimerModal}
+            email={email}
+            dateFormat={dateFormat}
+            attendeeId={attendeeId}
+            logUserActivity={logUserActivity}
+          />
+        )}
+        {editModalData && (
+          <EditModal
+            setModal={setEditModalData}
+            initialData={editModalData}
+            onConfirmEdit={onConfirmEdit}
+          />
+        )}
+        {showEnrollmentModal && (
+          <AddEnrollmentModal
+            setModal={setShowEnrollmentModal}
+            attendeeEmail={selectedAttendee && selectedAttendee[0]?._id}
+            webinarData={attendeeHistoryData}
+            logUserActivity={logUserActivity}
+          />
+        )}
+        {showLogsModal &&
+          createPortal(
+            <LogsModal setModal={setShowLogsModal} email={email} />,
+            document.body
+          )}
+      </Suspense>
       <Dialog
         open={openCancelDialog}
         onClose={closeCancelAlarmDialog}

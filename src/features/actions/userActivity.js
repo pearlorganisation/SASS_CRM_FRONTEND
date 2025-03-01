@@ -30,6 +30,20 @@ export const getUserActivity = createAsyncThunk(
   }
 );
 
+export const getUserActivityByEmail = createAsyncThunk(
+  "userActivityByEmail/fetch",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`/user-activities`, {
+        params: payload,
+      });
+      return response.data;
+    } catch (e) {
+      return rejectWithValue(e);
+    }
+  }
+);
+
 export const sendInactiveNotification = createAsyncThunk(
   "userActivity/fetch",
   async (payload, { rejectWithValue }) => {

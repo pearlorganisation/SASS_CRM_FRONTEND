@@ -52,7 +52,9 @@ import {
   Revenue,
   ProductLevel,
   ManageTags,
-  Locations
+  Locations,
+  ProductRevenue,
+  ProductEnrollments
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 
@@ -90,6 +92,8 @@ const App = () => {
   const { userData, isUserLoggedIn, subscription } = useSelector(
     (state) => state.auth
   );
+  const calendarFeatures = subscription?.plan?.calendarFeatures;
+  const productRevenueMetrics = subscription?.plan?.productRevenueMetrics;
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
   const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed || false;
 
@@ -263,6 +267,24 @@ const App = () => {
             </RouteGuard>
           ),
         },
+        {
+          path: "/product-revenue",
+          element: (
+            <RouteGuard
+            conditions={[productRevenueMetrics]}
+            roleNames={["ADMIN"]}>
+              <ProductRevenue />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/product-enrollments",
+          element: (
+            <RouteGuard roleNames={["ADMIN"]}>
+              <ProductEnrollments />
+            </RouteGuard>
+          ),
+        },
 
         {
           path: "/*",
@@ -360,6 +382,7 @@ const App = () => {
           path: "/calendar",
           element: (
             <RouteGuard
+            conditions={[calendarFeatures]}
               roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER", "ADMIN"]}
             >
               <CalendarPage />

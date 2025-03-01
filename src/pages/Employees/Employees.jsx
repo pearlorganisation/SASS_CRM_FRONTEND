@@ -51,7 +51,8 @@ const Employees = () => {
   const { employeeData, isLoading, isSuccess, totalPages } = useSelector(
     (state) => state.employee
   );
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, subscription } = useSelector((state) => state.auth);
+  const employeeInactivity = subscription?.plan?.employeeInactivity;
 
   useEffect(() => {
     dispatch(
@@ -165,7 +166,12 @@ const Employees = () => {
           filters={filters}
           setFilters={setFilters}
           tableData={{
-            columns: employeeTableColumns,
+            columns: employeeTableColumns.filter((column) => {
+              if(column.key === "inactivityTime"){
+                return employeeInactivity
+              }
+              return true;
+            }),
             rows: employeeData || [],
           }}
           actions={actionIcons}
