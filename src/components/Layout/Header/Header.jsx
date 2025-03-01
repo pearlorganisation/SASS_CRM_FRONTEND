@@ -8,6 +8,7 @@ import { setEmployeeModeId } from "../../../features/slices/employee";
 import ComponentGuard from "../../AccessControl/ComponentGuard";
 import useRoles from "../../../hooks/useRoles";
 import NotificationBell from "../../Notification/NotificationBell";
+import ImportExportNotifications from "../../Notification/ImportExportNotifications";
 const Header = () => {
   const [expiryDays, setExpiryDays] = useState();
   const dispatch = useDispatch();
@@ -117,6 +118,7 @@ const Header = () => {
           </ComponentGuard>
 
           <div className="flex items-center">
+            <ImportExportNotifications/>
             <NotificationBell
               important={true}
               userData={userData}

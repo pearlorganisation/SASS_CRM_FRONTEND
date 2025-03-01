@@ -31,6 +31,7 @@ const initialState = {
   attendeeLeadType: "",
   pagination: {},
   isSwapping: false,
+  isImporting: false
 };
 // ---------------------------------------------------------------------------------------
 
@@ -56,15 +57,19 @@ export const attendeeSlice = createSlice({
       .addCase(addAttendees.pending, (state) => {
         state.isLoading = true;
         state.isSuccess = false;
+        state.isImporting = true;
       })
       .addCase(addAttendees.fulfilled, (state) => {
         state.isLoading = false;
         state.isSuccess = true;
+        state.isImporting = false;
         successToast("attendees Added Successfully");
       })
       .addCase(addAttendees.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
+        state.isImporting = false;
+
       })
       .addCase(updateAttendee.pending, (state) => {
         state.isLoading = true;

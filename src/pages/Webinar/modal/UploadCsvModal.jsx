@@ -14,7 +14,7 @@ import { formatPhoneNumber } from "../../../utils/extra";
 const UploadCsvModal = ({ tabValue, setModal, update }) => {
   const logUserActivity = useAddUserActivity();
 
-  const { isLoading, isSuccess } = useSelector((state) => state.attendee);
+  const { isLoading, isImporting } = useSelector((state) => state.attendee);
   const { id } = useParams();
   const [mapUI, setMapUI] = useState(false);
   const [selectedValues, setSelectedValues] = useState({}); // State to store selected values
@@ -215,11 +215,11 @@ const UploadCsvModal = ({ tabValue, setModal, update }) => {
   }
 
   useEffect(() => {
-    console.log("isSucess ", isSuccess);
-    if (isSuccess) {
+    console.log("isSucess ", isImporting);
+    if (isImporting) {
       handleCloseModal();
     }
-  }, [isSuccess]);
+  }, [isImporting]);
 
   return (
     <div

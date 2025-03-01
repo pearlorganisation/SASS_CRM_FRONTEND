@@ -180,7 +180,7 @@ const CreateWebinar = ({ modalName }) => {
                   placeholderText="Select Webinar Date"
                   dateFormat={dateFormat}
                   showYearDropdown
-                  maxDate={new Date()}
+                  minDate={new Date()}
                   showMonthDropdown
                   dropdownMode="select"
                 />
