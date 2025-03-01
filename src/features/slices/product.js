@@ -12,6 +12,7 @@ import {
   getProductLevelCounts,
   getEnrollmentsByProductLevel,
   updateProduct,
+  getEnrollmentsByLevelOrId
 } from "../actions/product";
 import { errorToast, successToast } from "../../utils/extra";
 
@@ -24,6 +25,8 @@ const initialState = {
   errorMessage: "",
   productLevelCounts: [],
   enrollmentsByProductLevel: [],
+  enrollmentsData:[],
+  pagination: {}
 };
 
 // ---------------------------------------------------------------------------------------
@@ -139,6 +142,18 @@ export const productSlice = createSlice({
         state.enrollmentsByProductLevel = action.payload;
       })
       .addCase(getEnrollmentsByProductLevel.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(getEnrollmentsByLevelOrId.pending, (state, action) => {
+        state.isLoading = true;
+      })
+      .addCase(getEnrollmentsByLevelOrId.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.enrollmentsData = action.payload?.data || [];
+        state.pagination = action.payload?.pagination || {};
+      })
+      .addCase(getEnrollmentsByLevelOrId.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action?.payload);
       });

@@ -8,6 +8,7 @@ import { setEmployeeModeId } from "../../../features/slices/employee";
 import ComponentGuard from "../../AccessControl/ComponentGuard";
 import useRoles from "../../../hooks/useRoles";
 import NotificationBell from "../../Notification/NotificationBell";
+import ImportExportNotifications from "../../Notification/ImportExportNotifications";
 const Header = () => {
   const [expiryDays, setExpiryDays] = useState();
   const dispatch = useDispatch();
@@ -19,11 +20,10 @@ const Header = () => {
   useEffect(() => {
     if (subscription) {
       const expiryDate = new Date(subscription.expiryDate);
-      expiryDate.setHours(0,0,0,0);
+      expiryDate.setHours(0, 0, 0, 0);
 
       const currentDate = new Date();
-      currentDate.setHours(0,0,0,0);
-      
+      currentDate.setHours(0, 0, 0, 0);
 
       const diffTime = Math.abs(expiryDate - currentDate);
       const diffDays = diffTime / (1000 * 3600 * 24);
@@ -71,11 +71,6 @@ const Header = () => {
               </svg>
             </button>
             <Link href="/" className="flex ms-2 md:me-24">
-              <img
-                src="https://flowbite.com/docs/images/logo.svg"
-                className="h-8 me-3"
-                alt="SAAS App Logo"
-              />
               <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap">
                 SAAS APP
               </span>
@@ -123,7 +118,19 @@ const Header = () => {
           </ComponentGuard>
 
           <div className="flex items-center">
-            <NotificationBell userData={userData} roles={roles} />
+            <ImportExportNotifications/>
+            <NotificationBell
+              important={true}
+              userData={userData}
+              roles={roles}
+            />
+            {/* {!roles.isSuperAdmin() && ( */}
+              <NotificationBell
+                important={false}
+                userData={userData}
+                roles={roles}
+              />
+            {/* )} */}
 
             <div
               className="flex items-center ms-3 cursor-pointer"

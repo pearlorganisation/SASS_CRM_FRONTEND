@@ -83,7 +83,7 @@ const Webinar = () => {
       navigateType: "page",
       detailItem: `/webinarDetails/${webinarName}`,
     });
-    navigate(`/webinarDetails/${id}?webinarName=${webinarName}`);
+    navigate(`/webinarDetails/${id}`);
   };
 
   // ----------------------- Action Icons -----------------------

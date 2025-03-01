@@ -67,8 +67,8 @@ const ManageTags = () => {
                   <td className="px-4 py-3 text-sm text-gray-900 whitespace-nowrap">
                     {tag.name}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
-                    {tag.usecase}
+                  <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap capitalize">
+                    {tag.usecase ? tag.usecase.replace("_", " ") : "N/A"}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600 whitespace-nowrap">
                     {formatDateAsNumberWithTime(tag.createdAt)}

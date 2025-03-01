@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import {
   Dialog,
   DialogTitle,
@@ -20,6 +20,7 @@ import useRoles from "../../hooks/useRoles";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import { getAllProductsByAdminId } from "../../features/actions/product";
 import { DateFormat } from "../../utils/extra";
+import DatePicker from "react-datepicker";
 
 const CreateWebinar = ({ modalName }) => {
   const dispatch = useDispatch();
@@ -33,14 +34,17 @@ const CreateWebinar = ({ modalName }) => {
   const { userData } = useSelector((state) => state.auth);
   const dateFormat = userData?.dateFormat || DateFormat.DD_MM_YYYY;
   const { productDropdownData } = useSelector((state) => state.product);
-  console.log(productDropdownData, "productDropdownData");
   const {
     register,
     handleSubmit,
     reset,
     control,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      webinarDate: null,
+    },
+  });
 
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [options, setOptions] = useState([]);
@@ -92,16 +96,13 @@ const CreateWebinar = ({ modalName }) => {
             modalData?.assignedEmployees?.includes(option.value)
         ) || []
       );
-      const product = productDropdownData?.find(
-        (product) => product.name === modalData?.productName
-      );
       setSelectedProduct(
-        product
-          ? {
-              value: product?._id,
-              label: product?.name,
-            }
-          : null
+        productDropdownData
+          ?.filter((product) => modalData?.productIds?.includes(product._id))
+          .map((product) => ({
+            value: product._id,
+            label: product.name,
+          }))
       );
     } else {
       reset({
@@ -111,13 +112,13 @@ const CreateWebinar = ({ modalName }) => {
       setSelectedEmployees([]);
       setSelectedProduct(null);
     }
-  }, [modalData, open]);
+  }, [modalData, open, productDropdownData, options]);
 
   const submitForm = (data) => {
     const payload = {
       ...data,
       assignedEmployees: selectedEmployees.map((e) => e.value),
-      productId: selectedProduct?.value,
+      productIds: selectedProduct?.map((p) => p.value),
     };
 
     logUserActivity({
@@ -151,9 +152,9 @@ const CreateWebinar = ({ modalName }) => {
       disablePortal
     >
       <DialogTitle>{modalData ? "Edit Webinar" : "Create Webinar"}</DialogTitle>
-      <form onSubmit={handleSubmit(submitForm)}>
+      <form className="py-2" onSubmit={handleSubmit(submitForm)}>
         <DialogContent>
-          <div className="space-y-4">
+          <div className="space-y-4 grid ">
             {/* Webinar Name */}
             <TextField
               label="Webinar Name"
@@ -167,25 +168,23 @@ const CreateWebinar = ({ modalName }) => {
               helperText={errors.webinarName?.message}
             />
 
-
             {/* Webinar Date */}
-            <TextField
-            
-              label="Webinar Date"
-              type="date"
-              fullWidth
-              variant="outlined"
-              InputLabelProps={{
-                shrink: true,
-              }}
-              inputProps={{
-                placeholder: dateFormat,  
-              }}
-              {...register("webinarDate", {
-                required: "Webinar Date is required",
-              })}
-              error={!!errors.webinarDate}
-              helperText={errors.webinarDate?.message}
+            <Controller
+              control={control}
+              name="webinarDate"
+              render={({ field }) => (
+                <DatePicker
+                  className="border p-2 rounded-lg w-full"
+                  selected={field.value}
+                  onChange={(date) => field.onChange(date)}
+                  placeholderText="Select Webinar Date"
+                  dateFormat={dateFormat}
+                  showYearDropdown
+                  minDate={new Date()}
+                  showMonthDropdown
+                  dropdownMode="select"
+                />
+              )}
             />
 
             {/* Employee Selection */}
@@ -213,6 +212,7 @@ const CreateWebinar = ({ modalName }) => {
                 Assign Product
               </label>
               <Select
+                isMulti
                 options={
                   productDropdownData?.map((product) => ({
                     value: product._id,
@@ -234,23 +234,25 @@ const CreateWebinar = ({ modalName }) => {
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleClose} variant="outlined" color="secondary">
-            Cancel
-          </Button>
-          <Button
-            disabled={isLoading}
-            type="submit"
-            variant="contained"
-            color="primary"
-          >
-            {isLoading ? (
-              <ClipLoader color="#fff" className="mx-14 my-[2px]" size={20} />
-            ) : modalData ? (
-              "Update Webinar"
-            ) : (
-              "Create Webinar"
-            )}
-          </Button>
+          <div className="flex justify-end gap-4 mb-4">
+            <Button onClick={handleClose} variant="outlined" color="secondary">
+              Cancel
+            </Button>
+            <Button
+              disabled={isLoading}
+              type="submit"
+              variant="contained"
+              color="primary"
+            >
+              {isLoading ? (
+                <ClipLoader color="#fff" className="mx-14 my-[2px]" size={20} />
+              ) : modalData ? (
+                "Update Webinar"
+              ) : (
+                "Create Webinar"
+              )}
+            </Button>
+          </div>
         </DialogActions>
       </form>
     </Dialog>

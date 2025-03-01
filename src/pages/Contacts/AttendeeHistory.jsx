@@ -6,6 +6,7 @@ import useAddUserActivity from "../../hooks/useAddUserActivity";
 import EditModal from "./Modal/EditModal";
 import { getAttendee, updateAttendee } from "../../features/actions/attendees";
 import { useParams } from "react-router-dom";
+import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 
 const AttendeeHistory = () => {
   const addUserActivityLog = useAddUserActivity();
@@ -15,6 +16,8 @@ const AttendeeHistory = () => {
   const [isDataVisible, setIsDataVisible] = useState(false);
   const [editModalData, setEditModalData] = useState(null);
   const { selectedAttendee } = useSelector((state) => state.attendee);
+  const { userData } = useSelector((state) => state.auth);
+  const { employeeModeData } = useSelector((state) => state.employee);
 
   useEffect(() => {
     setIsDataVisible(false);
@@ -42,11 +45,11 @@ const AttendeeHistory = () => {
     });
   };
 
-    useEffect(() => {
-        console.log("email", email);
-        setIsDataVisible(false);
-      dispatch(getAttendee({ email }));
-    }, [email]);
+  useEffect(() => {
+    console.log("email", email);
+    setIsDataVisible(false);
+    dispatch(getAttendee({ email }));
+  }, [email]);
 
   return (
     <div className="px-6 md:px-10 pt-14 space-y-6">
@@ -71,7 +74,14 @@ const AttendeeHistory = () => {
                     <th className="py-3 px-2">Last Name</th>
                     <th className="py-3  text-center">Webinar Minutes</th>
                     <th className="py-3 px-2">Webinar Date</th>
-                    <th className="py-3 px-2">Action</th>
+                    <ComponentGuard
+                      conditions={[
+                        employeeModeData ? false : true,
+                        userData?.isActive,
+                      ]}
+                    >
+                      <th className="py-3 px-2">Action</th>
+                    </ComponentGuard>
                   </tr>
                 </thead>
 
@@ -123,13 +133,19 @@ const AttendeeHistory = () => {
                                 ).toDateString()
                               : "-"}
                           </td>
-
-                          <td className="px-3 py-4 h-full">
-                            <FaRegEdit
-                              onClick={() => setEditModalData(item)}
-                              className="text-xl cursor-pointer"
-                            />
-                          </td>
+                          <ComponentGuard
+                            conditions={[
+                              employeeModeData ? false : true,
+                              userData?.isActive,
+                            ]}
+                          >
+                            <td className="px-3 py-4 h-full">
+                              <FaRegEdit
+                                onClick={() => setEditModalData(item)}
+                                className="text-xl cursor-pointer"
+                              />
+                            </td>
+                          </ComponentGuard>
                         </tr>
                       );
                     })

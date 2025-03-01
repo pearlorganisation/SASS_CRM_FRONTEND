@@ -15,12 +15,15 @@ export const getPabblyToken = createAsyncThunk(
 
 export const getUserNotifications = createAsyncThunk(
   "userNotifications/fetchData",
-  async ({id, page=1, limit=6}, { rejectWithValue }) => {
+  async ({ id, page = 1, limit = 6, important }, { rejectWithValue }) => {
     try {
-      const { data } = await instance.get(`/notification/${id}`,{
-        params: { page, limit },
+      const { data } = await instance.get(`/notification/${id}`, {
+        params: { page, limit, important },
       });
-      return data;
+      return {
+        data,
+        important,
+      };
     } catch (e) {
       return rejectWithValue(e);
     }
@@ -29,10 +32,12 @@ export const getUserNotifications = createAsyncThunk(
 
 export const resetUnseenCount = createAsyncThunk(
   "userNotifications/Unseen",
-  async (_, { rejectWithValue }) => {
+  async (important, { rejectWithValue }) => {
     try {
-      const { data } = await instance.patch(`/notification/unseen`);
-      return data;
+      const { data } = await instance.patch(`/notification/unseen`, {
+        important,
+      });
+      return {data, important};
     } catch (e) {
       return rejectWithValue(e);
     }

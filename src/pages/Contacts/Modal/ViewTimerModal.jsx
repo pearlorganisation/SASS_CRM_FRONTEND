@@ -4,8 +4,9 @@ import { useDispatch } from "react-redux";
 import { getAttendeeAlarm, setAlarm } from "../../../features/actions/alarm";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { toast } from "sonner";
 
-const ViewTimerModal = ({ setModal, email, attendeeId, dateFormat }) => {
+const ViewTimerModal = ({ setModal, email, attendeeId, dateFormat, logUserActivity }) => {
   const {
     control,
     register,
@@ -21,8 +22,19 @@ const ViewTimerModal = ({ setModal, email, attendeeId, dateFormat }) => {
     data["email"] = email;
     data["attendeeId"] = attendeeId;
     data["date"] = date.toISOString();
-    dispatch(setAlarm(data)).then(() => {
-      dispatch(getAttendeeAlarm({ email }));
+    if(!data?.secondaryNumber){
+      data.secondaryNumber = undefined;
+    }
+    dispatch(setAlarm(data)).then((res) => {
+      if(res.meta.requestStatus === "fulfilled"){
+        logUserActivity({
+          action: "setAlarm",
+          type: "contact",
+          detailItem: email,
+          activityItem: email,
+        });
+        dispatch(getAttendeeAlarm({ email }));
+      }
     });
     setModal(false);
   };
@@ -37,7 +49,7 @@ const ViewTimerModal = ({ setModal, email, attendeeId, dateFormat }) => {
     >
       {/*    <!-- Modal --> */}
       <div
-        className="relative h-auto max-w-full  flex-col gap-6  rounded bg-white p-6 shadow-xl "
+        className="relative h-auto max-w-96 flex-col gap-6  rounded bg-white p-6 shadow-xl "
         id="modal"
         role="document"
       >
@@ -71,6 +83,9 @@ const ViewTimerModal = ({ setModal, email, attendeeId, dateFormat }) => {
                       className="border w-full p-2 rounded-lg"
                       selected={date}
                       onChange={(date) => setDate(date)}
+                      minDate={new Date()} 
+                      maxTime={new Date().setHours(23, 59, 59)}  
+                      filterTime={(time) => time >= minDate} 
                       placeholderText="Select start date"
                       dateFormat={`${dateFormat} hh:mm aa`}
                       showYearDropdown
@@ -85,16 +100,40 @@ const ViewTimerModal = ({ setModal, email, attendeeId, dateFormat }) => {
               <div className="pt-2 ">
                 <label className="font-medium text-sm">Note</label>
                 <textarea
-                  {...register("note", { required: true })}
+                  {...register("note", { 
+                    required: "Note is required",
+                    maxLength: {
+                      value: 600,
+                      message: "Note cannot exceed 600 characters"
+                    }
+                  })}
                   className="w-full bg-white mt-1  px-5 py-2 text-gray-500 text-sm border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
                   placeholder="Write a note (Max. 600 chars)"
-                  maxLength={600}
                 />
-                {/* {errors.duration && (
-                   <span className="text-red-500">
-                     Duration is required
-                   </span>
-                 )} */}
+                {errors.note && (
+                  <span className="text-red-500 text-sm">
+                    {errors.note.message}
+                  </span>
+                )}
+              </div>
+              <div className="pt-2">
+                <label className="font-medium text-sm">Secondary Number (Optional)</label>
+                <input
+                  {...register("secondaryNumber", {
+                    pattern: {
+                      value: /^\+91\d+$/,
+                      message: "Number must start with +91"
+                    }
+                  })}
+                  type="tel"
+                  placeholder="+91XXXXXXXXXX"
+                  className="w-full bg-white mt-1 px-5 py-2 text-gray-500 text-sm border-slate-300 bg-transparent outline-none border focus:border-teal-400 shadow-sm rounded-lg"
+                />
+                {errors.secondaryNumber && (
+                  <span  className="w-fit text-red-500 text-sm">
+                    {errors.secondaryNumber.message}
+                  </span>
+                )}
               </div>
               <button className="text-white bg-blue-600 hover:bg-blue-700  py-1 px-4 mt-2 rounded-md  border-md w-full">
                 Set Alarm

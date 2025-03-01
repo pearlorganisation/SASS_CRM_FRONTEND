@@ -18,11 +18,18 @@ const useAddUserActivity = () => {
   const dispatch = useDispatch();
 
   const userData = store.getState()?.auth?.userData;
+  const subscription = store.getState()?.auth?.subscription;
   const InactivityTimeInSeconds = userData?.inactivityTime || 10;
   const INACTIVITY_LIMIT = InactivityTimeInSeconds * 1000;
 
   const resetInactivityTimer = () => {
-    console.log("Resetting inactivity timer...");
+
+    const employeeInactivity = subscription?.plan?.employeeInactivity;
+
+    if(!employeeInactivity) {
+      console.log("employee inactivity is not allowed");
+      return;
+    }
 
     if (!roles.isEmployeeId("")) return;
 
@@ -54,11 +61,12 @@ const useAddUserActivity = () => {
     navigateType,
     type = "",
     detailItem,
+    activityItem,
   }) => {
     let detailLog = "";
 
     if (action && details) {
-      dispatch(addUserActivity({ action, details }));
+      dispatch(addUserActivity({ action, details, item: activityItem }));
       resetInactivityTimer();
       return;
     }
@@ -88,9 +96,15 @@ const useAddUserActivity = () => {
       case "filter":
         detailLog = `User applied filter ${type}: ${detailItem}`;
         break;
+      case "note":
+        detailLog = `User added a note to the ${type}: ${detailItem}`;
+        break;
+      case "setAlarm":
+        detailLog = `User set an alarm for the ${type}: ${detailItem}`;
+        break;
     }
 
-    dispatch(addUserActivity({ action, details: detailLog }));
+    dispatch(addUserActivity({ action, details: detailLog, item: activityItem }));
     resetInactivityTimer();
   };
 

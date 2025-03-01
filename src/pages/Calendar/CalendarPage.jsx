@@ -102,8 +102,22 @@ const CalendarPage = () => {
                 <div
                   key={alarm._id}
                   onClick={() => handleAlarmClick(alarm)}
-                  className="p-4 bg-white cursor-pointer shadow-md rounded-md border border-gray-200"
+                  className={`p-4 bg-white cursor-pointer shadow-md rounded-md border-l-4 ${
+                    alarm.isActive 
+                      ? 'border-green-500 hover:border-green-600' 
+                      : 'border-red-500 hover:border-red-600'
+                  } border border-gray-200`}
                 >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={`w-2 h-2 rounded-full ${
+                      alarm.isActive ? 'bg-green-500' : 'bg-red-500'
+                    }`} />
+                    <span className={`text-xs font-medium ${
+                      alarm.isActive ? 'text-green-700' : 'text-red-700'
+                    }`}>
+                      {alarm.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
                   <p className="text-sm text-gray-500">
                     <strong>Date:</strong>{" "}
                     {formatDateAsNumberWithTime(alarm.date)}

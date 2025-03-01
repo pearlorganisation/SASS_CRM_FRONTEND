@@ -50,7 +50,6 @@ const UpdateClientModal = ({ modalName }) => {
   });
 
   useEffect(() => {
-    console.log(defaultUserInfo);
     reset({
       userName: defaultUserInfo?.userName,
       email: defaultUserInfo?.email,

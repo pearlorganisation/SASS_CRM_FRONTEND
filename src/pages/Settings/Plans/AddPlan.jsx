@@ -8,11 +8,8 @@ import {
 } from "../../../features/actions/pricePlan";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  TextField,
   Button,
-  Grid,
   CircularProgress,
-  FormControlLabel,
   Checkbox,
   Typography,
   Box,
@@ -30,12 +27,16 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
+import InfoIcon from '@mui/icons-material/Info';
 
 import FormInput from "../../../components/FormInput";
 import { filterTruthyValues } from "../../../utils/extra";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
 import { getCustomOptions } from "../../../features/actions/globalData";
-import { attendeeTableColumns } from "../../../utils/columnData";
+import {
+  attendeeTableColumns,
+  groupedAttendeeTableColumns,
+} from "../../../utils/columnData";
 import { getAllClientsForDropdown } from "../../../features/actions/client";
 import { toast } from "sonner";
 import DiscountSection from "./DiscountSection";
@@ -60,7 +61,12 @@ function AttendeeTable({ control, setValue, watch }) {
             {[
               { header: "Lead Type", key: "leadType", width: 20, type: "" },
               ...attendeeTableColumns,
-              { header: "Webinar Attended", key: "attendedWebinarCount", width: 20, type: "" },
+              ...groupedAttendeeTableColumns.filter(
+                (column) =>
+                  !attendeeTableColumns.some(
+                    (attendeeColumn) => attendeeColumn.key === column.key
+                  ) && column.header !== "Email"
+              ),
             ].map(({ key, header }) => (
               <TableRow key={key}>
                 <TableCell sx={tableCellStyles}>{header}</TableCell>
@@ -187,10 +193,6 @@ function AttendeeTable({ control, setValue, watch }) {
                     />
                   )}
                 />
-                {console.log(
-                  !watch(`attendeeTableConfig.status.filterable`) &&
-                    !watch(`attendeeTableConfig.isCustomOptionsAllowed`)
-                )}
               </TableCell>
             </TableRow>
           </TableBody>
@@ -246,8 +248,16 @@ export default function AddPlan() {
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
-    console.log(data);
     const payload = filterTruthyValues(data);
+
+    payload["calendarFeatures"] = data["calendarFeatures"];
+    payload["employeeRealTimeStatusUpdate"] =
+      data["employeeRealTimeStatusUpdate"];
+    payload["employeeInactivity"] = data["employeeInactivity"];
+    payload["whatsappNotificationOnAlarms"] =
+      data["whatsappNotificationOnAlarms"];
+    payload["setAlarm"] = data["setAlarm"];
+    payload["productRevenueMetrics"] = data["productRevenueMetrics"];
 
     if (planType === "custom") {
       payload["planType"] = "custom";
@@ -263,8 +273,7 @@ export default function AddPlan() {
       payload["_id"] = id;
     }
 
-    payload['planDurationConfig'] = planDurationConfig;
-    console.log(payload);
+    payload["planDurationConfig"] = planDurationConfig;
     dispatch(isEditMode ? updatePricePlans(payload) : addPricePlans(payload));
   };
 
@@ -291,6 +300,14 @@ export default function AddPlan() {
         contactLimit: singlePlanData.contactLimit || 0,
         toggleLimit: singlePlanData.toggleLimit || 0,
         attendeeTableConfig: singlePlanData.attendeeTableConfig || {},
+        whatsappNotificationOnAlarms:
+          singlePlanData.whatsappNotificationOnAlarms || false,
+        employeeInactivity: singlePlanData.employeeInactivity || false,
+        employeeRealTimeStatusUpdate:
+          singlePlanData.employeeRealTimeStatusUpdate || false,
+        calendarFeatures: singlePlanData.calendarFeatures || false,
+        setAlarm: singlePlanData.setAlarm || false,
+        productRevenueMetrics: singlePlanData.productRevenueMetrics || false,
       });
 
       setPlanType(singlePlanData.planType || "normal");
@@ -404,43 +421,149 @@ export default function AddPlan() {
             </div>
           )}
 
-          <div className="flex mt-4 items-center">
-            <Typography className="font-semibold text-gray-800">
-              {"Custom Options (Create/Dropdown)"}
-            </Typography>
-            <Controller
-              name={`attendeeTableConfig.isCustomOptionsAllowed`}
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Checkbox
-                  onChange={(e) => {
-                    const isChecked = e.target.checked;
-                    // Update "Downloadable" checkbox
-                    onChange(isChecked);
-                    // Automatically check "Filterable" if "Downloadable" is checked
-                    if (!isChecked) {
-                      setValue(
-                        `attendeeTableConfig.customOptions.filterable`,
-                        false
-                      );
-                      // if (key === "status") {
-                      //   customOptions.forEach((option) =>
-                      //     setValue(
-                      //       `attendeeTableConfig.defaultOptions.${option?.label}`,
-                      //       false
-                      //     )
-                      //   );
-                      //   setValue(
-                      //     `attendeeTableConfig.customOptions.filterable`,
-                      //     false
-                      //   );
-                      // }
-                    }
-                  }}
-                  checked={value || false}
-                />
-              )}
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4">
+            <div className="flex justify-between mt-4 items-center">
+              <Typography 
+                title="Allow creation and use of custom status options for attendee filtering"
+                className="font-semibold text-gray-800">
+                <span className="flex items-center">
+                  Custom Options
+                  <InfoIcon className="ms-2 text-blue-600 text-sm" />
+                </span>
+              </Typography>
+              
+              <Controller
+                name={`attendeeTableConfig.isCustomOptionsAllowed`}
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      onChange(isChecked);
+                      if (!isChecked) {
+                        setValue(
+                          `attendeeTableConfig.customOptions.filterable`,
+                          false
+                        );
+                      }
+                    }}
+                    checked={value || false}
+                  />
+                )}
+              />
+            </div>
+
+            <div className="flex justify-between mt-4 items-center">
+              <Typography 
+                title="Enable employee inactivity monitoring with automatic reminder notifications"
+                className="font-semibold text-gray-800">
+                <span className="flex items-center">
+                  Employee Inactivity Tracking
+                  <InfoIcon className="ms-2 text-blue-600 text-sm" />
+                </span>
+              </Typography>
+              <Controller
+                name="employeeInactivity"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox
+                    onChange={(e) => onChange(e.target.checked)}
+                    checked={value || false}
+                  />
+                )}
+              />
+            </div>
+
+            <div className="flex justify-between mt-4 items-center">
+              <Typography 
+                title="Enable setting alarms for important events or deadlines"
+                className="font-semibold text-gray-800">
+                <span className="flex items-center">
+                  Set Alarm
+                  <InfoIcon className="ms-2 text-blue-600 text-sm" />
+                </span>
+              </Typography>
+              <Controller
+                name="setAlarm"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox
+                    onChange={(e) => {
+                      const isChecked = e.target.checked;
+                      onChange(isChecked);
+                      if (!isChecked) {
+                        setValue('whatsappNotificationOnAlarms', false);
+                      }
+                    }}
+                    checked={value || false}
+                  />
+                )}
+              />
+            </div>
+
+            <div className="flex justify-between mt-4 items-center">
+              <Typography 
+                title="Automatically send WhatsApp messages when alarms are triggered"
+                className="font-semibold text-gray-800">
+                <span className="flex items-center">
+                  WhatsApp Notifications
+                  <InfoIcon className="ms-2 text-blue-600 text-sm" />
+                </span>
+              </Typography>
+              <Controller
+                name="whatsappNotificationOnAlarms"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox
+                    onChange={(e) => onChange(e.target.checked)}
+                    checked={value || false}
+                    disabled={!watch('setAlarm')}
+                  />
+                )}
+              />
+            </div>
+
+            <div className="flex justify-between mt-4 items-center">
+              <Typography 
+                title="Provide access to calendar with alarm history and scheduled event management"
+                className="font-semibold text-gray-800">
+                <span className="flex items-center">
+                  Calendar Features
+                  <InfoIcon className="ms-2 text-blue-600 text-sm" />
+                </span>
+              </Typography>
+              <Controller
+                name="calendarFeatures"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox
+                    onChange={(e) => onChange(e.target.checked)}
+                    checked={value || false}
+                  />
+                )}
+              />
+            </div>
+
+            <div className="flex justify-between mt-4 items-center">
+              <Typography 
+                title="Enable tracking and analysis of product sales performance metrics"
+                className="font-semibold text-gray-800">
+                <span className="flex items-center">
+                  Product Revenue Metrics
+                  <InfoIcon className="ms-2 text-blue-600 text-sm" />
+                </span>
+              </Typography>
+              <Controller
+                name="productRevenueMetrics"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox
+                    onChange={(e) => onChange(e.target.checked)}
+                    checked={value || false}
+                  />
+                )}
+              />
+            </div>
           </div>
 
           <Box className="mt-6 shadow-md">
@@ -452,7 +575,7 @@ export default function AddPlan() {
               onClick={() => setIsTableOpen(!isTableOpen)}
             >
               <Typography variant="h6" className="mb-2 font-semibold">
-                Attendees
+                Attendee Filters and Exports
               </Typography>
               <IconButton>
                 {isTableOpen ? <ExpandLess /> : <ExpandMore />}

@@ -20,19 +20,18 @@ import {
 } from "@mui/material";
 import { ClipLoader } from "react-spinners";
 import { clearSuccess } from "../../features/slices/employee";
-import ComponentGuard from "../../components/AccessControl/ComponentGuard";
 import { getRoleNameByID } from "../../utils/roles";
-import useRoles from "../../hooks/useRoles";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import FormInput from "../../components/FormInput";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import tagsService from "../../services/tagsService";
 
 const CreateEmployee = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
-  const roles = useRoles();
   const logUserActivity = useAddUserActivity();
+  const [tagData, setTagData] = useState([]);
 
   const {
     register,
@@ -44,9 +43,11 @@ const CreateEmployee = () => {
   } = useForm({
     defaultValues: {
       role: "",
+      tags: [],
     },
   });
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, subscription } = useSelector((state) => state.auth);
+  const employeeInactivity = subscription?.plan?.employeeInactivity;
   const { isLoading, isSuccess, singleEmployeeData } = useSelector(
     (state) => state.employee
   );
@@ -55,6 +56,7 @@ const CreateEmployee = () => {
     password: false,
     confirmPassword: false,
   });
+
   const togglePasswordVisibility = (field) => {
     setShowPassword((prev) => ({
       ...prev,
@@ -86,8 +88,6 @@ const CreateEmployee = () => {
     });
   };
 
-  const [isPasswordHidden, setPasswordHidden] = useState(true);
-
   useEffect(() => {
     if (isSuccess) {
       navigate("/employees");
@@ -114,6 +114,7 @@ const CreateEmployee = () => {
         validCallTime: singleEmployeeData?.validCallTime,
         dailyContactLimit: singleEmployeeData?.dailyContactLimit,
         inactivityTime: singleEmployeeData?.inactivityTime || 10,
+        tags: singleEmployeeData?.tags || [],
       });
     }
   }, [singleEmployeeData]);
@@ -126,6 +127,14 @@ const CreateEmployee = () => {
       reset();
     };
   }, [id]);
+
+  useEffect(() => {
+    tagsService.getTags().then((res) => {
+      if (res.success) {
+        setTagData(res.data);
+      }
+    });
+  }, []);
 
   return (
     <div className="p-10">
@@ -220,11 +229,35 @@ const CreateEmployee = () => {
                   }}
                 />
               </div>
-
-              {id && (
+              <Controller
+                name="tags"
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel>Tags</InputLabel>
+                    <Select
+                      multiple
+                      {...field}
+                      label="Tags"
+                      value={field.value || []}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      renderValue={(selected) => selected.join(", ")}
+                    >
+                      {tagData.map((item) => (
+                        <MenuItem key={item._id} value={item.name}>
+                          {item.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+              />
+            </div>
+            <div className="sm:grid sm:grid-cols-2 sm:gap-6">
+              {employeeInactivity && (
                 <FormInput
                   name="inactivityTime"
-                  label="Inactivity Time (Minutes)"
+                  label="Inactivity Time (Seconds)"
                   control={control}
                   type="number"
                   validation={{
@@ -334,24 +367,6 @@ const CreateEmployee = () => {
                 />
               </div>
             </div>
-
-            {!id && (
-              <div className="sm:grid sm:grid-cols-2 sm:gap-6">
-                <FormInput
-                  name="inactivityTime"
-                  label="Inactivity Time (Seconds)"
-                  control={control}
-                  type="number"
-                  validation={{
-                    required: "Inactivity Time is required",
-                    min: {
-                      value: 1,
-                      message: "Value must be at least 1",
-                    },
-                  }}
-                />
-              </div>
-            )}
 
             <div className="mt-6">
               <Button

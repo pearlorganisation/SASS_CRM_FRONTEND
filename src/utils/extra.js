@@ -151,6 +151,13 @@ export function filterTruthyValues(obj) {
           filteredObj[key] = value;
         }
       } else if (typeof value === "object" && value !== null) {
+        if(Array.isArray(value)){
+          if(value.length > 0){
+            filteredObj[key] = value;
+          }
+          continue;
+        }
+
         const nestedFiltered = filterTruthyValues(value);
         if (Object.keys(nestedFiltered).length > 0 || Array.isArray(value)) {
           filteredObj[key] = nestedFiltered;
@@ -165,7 +172,6 @@ export function filterTruthyValues(obj) {
       }
     }
   }
-
   return filteredObj;
 }
 
