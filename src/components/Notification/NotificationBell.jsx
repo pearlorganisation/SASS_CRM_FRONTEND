@@ -8,6 +8,7 @@ import {
 } from "../../features/actions/notification";
 import { useNavigate } from "react-router-dom";
 import { NotifActionType } from "../../utils/extra";
+import LinearProgressWithLabel from "../Export/LinearProgressWithLabel";
 
 const NotificationBell = ({ userData, roles, important }) => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const NotificationBell = ({ userData, roles, important }) => {
   const [isOpen, setIsOpen] = useState(false);
   const bellRef = useRef(null);
   const dropdownRef = useRef(null);
+  const [progress, setProgress] = useState(0);
 
   const { employeeModeData } = useSelector((state) => state.employee);
   const { notifications, unseenCount, _notifications, _unseenCount } =
@@ -135,7 +137,9 @@ const NotificationBell = ({ userData, roles, important }) => {
               <h3 className="text-lg font-bold">Notifications</h3>
               <button
                 onClick={() => {
-                  navigate(`/notifications/${userData?._id}?important=${important}`);
+                  navigate(
+                    `/notifications/${userData?._id}?important=${important}`
+                  );
                   setIsOpen(false);
                 }}
                 className="text-gray-500 hover:text-gray-900 hover:underline"
