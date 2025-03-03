@@ -37,6 +37,7 @@ const EditUserForm = ({ onSubmit, onClose }) => {
         companyName: userData?.companyName || null,
         gst: userData?.gst || null, // No pre-population for GST Number
         document: null, // No pre-population for Document
+        address: userData?.address || null,
         dateFormat: userData?.dateFormat || DateFormat.DD_MM_YYYY,
       });
     }
@@ -125,6 +126,18 @@ const EditUserForm = ({ onSubmit, onClose }) => {
           }}
         />
       </ComponentGuard>
+      <ComponentGuard allowedRoles={[roles.ADMIN, roles.SUPER_ADMIN]}>
+      <FormInput
+          name="address"
+          label="Address"
+          control={control}
+          validation={{
+            required: "Address is required.",
+              
+          }}
+        />
+
+      </ComponentGuard>
 
       <ComponentGuard allowedRoles={[roles.ADMIN]}>
         {/* GST Number Field */}
@@ -135,8 +148,8 @@ const EditUserForm = ({ onSubmit, onClose }) => {
           validation={{
             required: "GST number is required.",
             pattern: {
-              value: /^[0-9]{15}$/,
-              message: "Please enter a valid 15-digit GST number.",
+              value: /^[A-Za-z0-9]{15}$/,
+              message: "Must be 15-character alphanumeric",
             },
           }}
         />
