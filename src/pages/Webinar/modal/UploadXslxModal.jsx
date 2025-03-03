@@ -137,10 +137,10 @@ const UploadXslxModal = ({ tabValue, setModal, update }) => {
 
       if (!update) {
         data.forEach((item) => {
-          const email = item[emailField];
+          const email = (item[emailField] || "").toLowerCase();
           if (!mergedData[email]) {
             mergedData[email] = {
-              email: item[emailField],
+              email: email,
               firstName: item[firstNameField],
               lastName: item[lastNameField],
               phone: formatPhoneNumber(item[phoneNumberField]),
@@ -157,10 +157,10 @@ const UploadXslxModal = ({ tabValue, setModal, update }) => {
         });
       } else {
         data.forEach((item) => {
-          const email = item[emailField];
+          const email = (item[emailField] || "").toLowerCase();
           if (!mergedData[email]) {
             mergedData[email] = {
-              email: item[emailField],
+              email: email,
               firstName: item[firstNameField],
               lastName: item[lastNameField],
               phone: formatPhoneNumber(item[phoneNumberField]),

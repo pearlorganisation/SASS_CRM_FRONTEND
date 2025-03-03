@@ -98,8 +98,6 @@ const App = () => {
   const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed || false;
 
   const [bannerOpen, setBannerOpen] = useState(false);
-  const [bannerTitle, setBannerTitle] = useState("");
-  const [bannerMsg, setBannerMsg] = useState("");
   const [bannerData, setBannerData] = useState(null);
 
   const closeBanner = () => {
@@ -115,6 +113,7 @@ const App = () => {
 
   useEffect(() => {
     function onConnect() {
+      console.log("connected");
       setIsConnected(true);
     }
 
@@ -127,8 +126,6 @@ const App = () => {
       audio.loop = true; // Enable looping
       audio.play().catch((err) => console.error("Audio play error:", err)); // Handle potential play errors
       setBannerOpen(true);
-      setBannerTitle(data.message);
-      setBannerMsg(data.deleteResult.note);
       setBannerData(data);
       dispatch(resetAlarmData());
     }
@@ -162,8 +159,9 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    console.log("isConnected", isConnected, userData);
     if (isConnected && userData) {
-      // console.log("join emitted");
+      console.log("join emitted");
       socket.emit("join", { user: userData._id });
     }
 

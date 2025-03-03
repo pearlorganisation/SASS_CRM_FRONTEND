@@ -47,6 +47,8 @@ const ImportExportNotifications = ({ userData, roles }) => {
     setProgress(0)
     if (isImporting) {
       setIsOpen(true);
+    }else{
+      setIsOpen(false);
     }
   }, [isImporting]);
 
