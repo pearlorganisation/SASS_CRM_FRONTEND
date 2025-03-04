@@ -170,6 +170,11 @@ const App = () => {
     }
   }, [userData, isConnected]);
 
+
+  useEffect(() => {
+    console.log("isConnected ----- >", isConnected);
+  },[isConnected])
+
   if (isUserLoggedIn && !userData?.role) {
     dispatch(logout());
   }

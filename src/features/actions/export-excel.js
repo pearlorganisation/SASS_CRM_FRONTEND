@@ -64,6 +64,11 @@ export const exportWebinarAttendeesExcel = createAsyncThunk(
       link.click();
       link.remove(); // Clean up after download
 
+      dispatch(getUserDocuments({
+        page: 1,
+        limit: 10,
+      }));
+
       dispatch(
         addUserActivity({
           action: "export",
@@ -156,6 +161,54 @@ export const exportEmployeesExcel = createAsyncThunk(
           details: `User Exported the Employees, limit: ${limit}`,
         })
       );
+
+      return true; // Optional: Return a success status
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+
+export const getUserDocuments = createAsyncThunk(
+  "userDocuments/getUserDocuments",
+  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`export-excel/user-documents`, {
+        params: { page, limit },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+export const  getUserDocument = createAsyncThunk(
+  "userDocuments/getUserDocument",
+  async (
+    { id, fileName },
+    { rejectWithValue, }
+  ) => {
+    try {
+      const response = await instance.get(
+        `export-excel/user-documents/${id}`,
+        {
+          responseType: "blob", // Ensure you get the file as a binary Blob
+        }
+      );
+
+      // Automatically trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Set file name for download
+      link.setAttribute("download", fileName);
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove(); // Clean up after download
 
       return true; // Optional: Return a success status
     } catch (error) {

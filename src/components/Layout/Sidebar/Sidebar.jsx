@@ -41,10 +41,6 @@ const Sidebar = () => {
   const role = userData?.role || "";
   const { employeeModeData } = useSelector((state) => state.employee);
 
-  useEffect(() => {
-    console.log(location);
-  }, [location]);
-
   const navItems = [
     {
       roles: [roles.SUPER_ADMIN],

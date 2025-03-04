@@ -5,12 +5,16 @@ import {
   exportEmployeesExcel,
   exportWebinarAttendeesExcel,
   exportWebinarExcel,
+  getUserDocuments,
 } from "../actions/export-excel";
 // -------------------------------------------------------------------------------------------
 
 const initialState = {
   isLoading: false,
   isSuccess: false,
+  isExportLoading: false,
+  userDocuments: [],
+  pagination: {}
 };
 
 // -------------------------------------- Slices------------------------------------------------
@@ -41,14 +45,17 @@ const exportSlice = createSlice({
       .addCase(exportWebinarAttendeesExcel.pending, (state, action) => {
         state.isLoading = true;
         state.isSuccess = false;
+        state.isExportLoading = true;
       })
       .addCase(exportWebinarAttendeesExcel.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.isExportLoading = false;
         state.isSuccess = true;
         successToast(`Data Exported Successfully`);
       })
       .addCase(exportWebinarAttendeesExcel.rejected, (state, action) => {
         state.isLoading = false;
+        state.isExportLoading = false;
         errorToast(action.payload);
       })
       .addCase(exportWebinarExcel.pending, (state, action) => {
@@ -74,6 +81,21 @@ const exportSlice = createSlice({
         successToast(`Data Exported Successfully`);
       })
       .addCase(exportEmployeesExcel.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action.payload);
+      })
+      .addCase(getUserDocuments.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(getUserDocuments.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        const { data, pagination } = action.payload || {};
+        state.userDocuments = data || [];
+        state.pagination = pagination || {};
+      })
+      .addCase(getUserDocuments.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action.payload);
       });
