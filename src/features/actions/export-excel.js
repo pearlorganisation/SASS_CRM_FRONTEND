@@ -35,7 +35,7 @@ export const exportClientExcel = createAsyncThunk(
 
       return true; // Optional: Return a success status
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error);
     }
   }
 );
@@ -64,10 +64,12 @@ export const exportWebinarAttendeesExcel = createAsyncThunk(
       link.click();
       link.remove(); // Clean up after download
 
-      dispatch(getUserDocuments({
-        page: 1,
-        limit: 10,
-      }));
+      dispatch(
+        getUserDocuments({
+          page: 1,
+          limit: 10,
+        })
+      );
 
       dispatch(
         addUserActivity({
@@ -80,7 +82,7 @@ export const exportWebinarAttendeesExcel = createAsyncThunk(
 
       return true; // Optional: Return a success status
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error);
     }
   }
 );
@@ -122,7 +124,7 @@ export const exportWebinarExcel = createAsyncThunk(
 
       return true; // Optional: Return a success status
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error);
     }
   }
 );
@@ -164,39 +166,32 @@ export const exportEmployeesExcel = createAsyncThunk(
 
       return true; // Optional: Return a success status
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error);
     }
   }
 );
-
 
 export const getUserDocuments = createAsyncThunk(
   "userDocuments/getUserDocuments",
-  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, bell }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(`export-excel/user-documents`, {
+      const { data } = await instance.get(`export-excel/user-documents`, {
         params: { page, limit },
       });
-      return response.data;
+      return { ...data, bell };
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error);
     }
   }
 );
 
-export const  getUserDocument = createAsyncThunk(
+export const getUserDocument = createAsyncThunk(
   "userDocuments/getUserDocument",
-  async (
-    { id, fileName },
-    { rejectWithValue, }
-  ) => {
+  async ({ id, fileName }, { rejectWithValue }) => {
     try {
-      const response = await instance.get(
-        `export-excel/user-documents/${id}`,
-        {
-          responseType: "blob", // Ensure you get the file as a binary Blob
-        }
-      );
+      const response = await instance.get(`export-excel/user-documents/${id}`, {
+        responseType: "blob", // Ensure you get the file as a binary Blob
+      });
 
       // Automatically trigger download
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -212,7 +207,20 @@ export const  getUserDocument = createAsyncThunk(
 
       return true; // Optional: Return a success status
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      console.log(error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const deleteUserDocument = createAsyncThunk(
+  "userDocuments/delete",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await instance.delete(`export-excel/user-documents/${id}`); // Optional: Return a success status
+      return {id};
+    } catch (error) {
+      return rejectWithValue(error);
     }
   }
 );

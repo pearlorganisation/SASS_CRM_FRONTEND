@@ -1,10 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { errorToast, successToast } from "../../utils/extra";
 import {
+  deleteUserDocument,
   exportClientExcel,
   exportEmployeesExcel,
   exportWebinarAttendeesExcel,
   exportWebinarExcel,
+  getUserDocument,
   getUserDocuments,
 } from "../actions/export-excel";
 // -------------------------------------------------------------------------------------------
@@ -14,7 +16,8 @@ const initialState = {
   isSuccess: false,
   isExportLoading: false,
   userDocuments: [],
-  pagination: {}
+  userDocumentsForPage: [],
+  pagination: {},
 };
 
 // -------------------------------------- Slices------------------------------------------------
@@ -24,6 +27,9 @@ const exportSlice = createSlice({
   reducers: {
     resetExportSuccess: (state) => {
       state.isSuccess = false;
+    },
+    setNewDownload: (state, action) => {
+      state.userDocuments = [action.payload, ...state.userDocuments];
     },
   },
   extraReducers: (builder) => {
@@ -86,22 +92,50 @@ const exportSlice = createSlice({
       })
       .addCase(getUserDocuments.pending, (state, action) => {
         state.isLoading = true;
-        state.isSuccess = false;
       })
       .addCase(getUserDocuments.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.isSuccess = true;
-        const { data, pagination } = action.payload || {};
-        state.userDocuments = data || [];
-        state.pagination = pagination || {};
+        const { data, pagination, bell } = action.payload || {};
+        if (bell) {
+          state.userDocuments = data || [];
+        } else {
+          state.userDocumentsForPage = data || [];
+          state.pagination = pagination || {};
+        }
       })
       .addCase(getUserDocuments.rejected, (state, action) => {
         state.isLoading = false;
         errorToast(action.payload);
-      });
+      })
+      .addCase(getUserDocument.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(getUserDocument.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+      })
+      .addCase(getUserDocument.rejected, (state, action) => {
+        console.log(action)
+        errorToast(action.payload);
+      })
+      .addCase(deleteUserDocument.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(deleteUserDocument.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        const {id} = action.payload;
+        state.userDocuments = state.userDocuments.filter((doc) => doc._id !== id)
+      })
+      .addCase(deleteUserDocument.rejected, (state, action) => {
+        state.isLoading = false;
+        errorToast(action.payload);
+      })
   },
 });
 
 // ===========================================Exports==================================================
 export default exportSlice.reducer;
-export const {resetExportSuccess} = exportSlice.actions;
+export const { resetExportSuccess, setNewDownload } = exportSlice.actions;

@@ -54,7 +54,8 @@ import {
   ManageTags,
   Locations,
   ProductRevenue,
-  ProductEnrollments
+  ProductEnrollments,
+  UserDownloads
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 
@@ -372,6 +373,14 @@ const App = () => {
         {
           path: "/notifications/:userId",
           element: <Notifications />,
+        },
+        {
+          path: "/user-downloads",
+          element: (
+            <RouteGuard roleNames={["ADMIN", "SUPER_ADMIN"]}>
+              <UserDownloads />
+            </RouteGuard>
+          )
         },
         {
           path: "/assignments",

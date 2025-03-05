@@ -16,7 +16,7 @@ const Layout = () => {
     }
   }, [isUserLoggedIn]);
   return (
-    <div className="">
+    <div className="w-full max-w-screen ">
       <Header />
       <Sidebar />
       <Suspense fallback={<FallbackPage />}>

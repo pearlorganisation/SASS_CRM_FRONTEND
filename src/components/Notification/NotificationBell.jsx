@@ -17,7 +17,7 @@ const NotificationBell = ({ userData, roles, important }) => {
   const dropdownRef = useRef(null);
 
   const { employeeModeData } = useSelector((state) => state.employee);
-  const { notifications, unseenCount, _notifications, _unseenCount } =
+  const { bellNotifications, unseenCount, _bellNotifications, _unseenCount } =
     useSelector((state) => state.notification);
 
   const handleBellClick = () => {
@@ -55,6 +55,7 @@ const NotificationBell = ({ userData, roles, important }) => {
         getUserNotifications({
           id: employeeModeData ? employeeModeData?._id : userData?._id,
           important,
+          bell: true
         })
       );
     }
@@ -145,7 +146,7 @@ const NotificationBell = ({ userData, roles, important }) => {
             </div>
             <hr className="my-2 border-gray-200" />
             <div className="divide-y">
-              {(important ? notifications : _notifications).map((notif) => (
+              {(important ? bellNotifications : _bellNotifications).map((notif) => (
                 <div
                   key={notif._id}
                   onClick={() => handleClick(notif)}
@@ -163,7 +164,7 @@ const NotificationBell = ({ userData, roles, important }) => {
                 </div>
               ))}
 
-              {(important ? notifications : _notifications).length === 0 && (
+              {(important ? bellNotifications : _bellNotifications).length === 0 && (
                 <div className="p-4 text-center text-gray-700">
                   No notifications found
                 </div>

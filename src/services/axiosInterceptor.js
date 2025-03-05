@@ -8,6 +8,7 @@ import axios from "axios";
     401: "Unauthorized Access",
     404: "Resource Not Found",
     500: "Internal Server Error",
+    429: "Too Many Requests",
   };
   return (
     defaultMessage || errorMessages[status] ||  "An unknown error occurred."

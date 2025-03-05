@@ -13,8 +13,10 @@ const initialState = {
   errorMessage: "",
   isSuccess: false,
   notifications: [],
+  bellNotifications: [],
   totalPages: 1,
   unseenCount: 0,
+  _bellNotifications: [],
   _notifications: [],
   _totalPages: 1,
   _unseenCount: 0,
@@ -33,10 +35,10 @@ export const notificationSlice = createSlice({
           NotifActionType.ASSIGNMENT,
         ].includes(action.payload?.actionType)
       ) {
-        state._notifications = [action.payload, ...state._notifications];
+        state._bellNotifications = [action.payload, ...state._bellNotifications];
         state._unseenCount = state._unseenCount + 1;
       } else {
-        state.notifications = [action.payload, ...state.notifications];
+        state.bellNotifications = [action.payload, ...state.bellNotifications];
         state.unseenCount = state.unseenCount + 1;
       }
     },
@@ -61,15 +63,25 @@ export const notificationSlice = createSlice({
       })
       .addCase(getUserNotifications.fulfilled, (state, action) => {
         state.isLoading = false;
-        const { data, important } = action.payload;
+        const { data, important, bell } = action.payload;
         if (important) {
-          state.notifications = data.notifications || [];
-          state.totalPages = data.totalPages || 1;
-          state.unseenCount = data.unseenCount || 0;
+          if(bell){
+            state.bellNotifications = data.notifications || [];
+          }
+          else{
+            state.notifications = data.notifications || [];
+            state.totalPages = data.totalPages || 1;
+            state.unseenCount = data.unseenCount || 0;
+          }
         } else {
-          state._notifications = data.notifications || [];
-          state._totalPages = data.totalPages || 1;
-          state._unseenCount = data.unseenCount || 0;
+          if(bell){
+            state._bellNotifications = data.notifications || [];
+          }
+          else{
+            state._notifications = data.notifications || [];
+            state._totalPages = data.totalPages || 1;
+            state._unseenCount = data.unseenCount || 0;
+          }
         }
       })
       .addCase(getUserNotifications.rejected, (state, action) => {
