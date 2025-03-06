@@ -85,6 +85,7 @@ import { newNotification } from "./features/slices/notification";
 import { NotifActionType } from "./utils/extra";
 import { logout } from "./features/slices/auth";
 import LayoutFallback from "./components/Fallback/LayoutFallback";
+import EmployeeAssignMetrics from "./pages/Assignments/EmployeeAssignMetrics";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -268,6 +269,14 @@ const App = () => {
           element: (
             <RouteGuard roleNames={["SUPER_ADMIN"]}>
               <Revenue />
+            </RouteGuard>
+          ),
+        },
+        {
+          path: "/employee-assign-metrics",
+          element: (
+            <RouteGuard roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER", "ADMIN"]}>
+              <EmployeeAssignMetrics />
             </RouteGuard>
           ),
         },
