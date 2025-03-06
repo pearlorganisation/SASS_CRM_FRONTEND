@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import LinearProgressWithLabel from "../Export/LinearProgressWithLabel";
 import { socket } from "../../socket";
 import { deleteUserDocument, getUserDocument, getUserDocuments } from "../../features/actions/export-excel";
-import { formatFileSize } from "../../utils/extra";
+import { formatDateAsNumber, formatDateAsNumberWithTime, formatFileSize } from "../../utils/extra";
 import { setNewDownload } from "../../features/slices/export-excel";
 
 const ImportExportNotifications = ({ userData, roles }) => {
@@ -52,6 +52,9 @@ const ImportExportNotifications = ({ userData, roles }) => {
     setProgress(0)
     if (isExportLoading || isImporting) {
       setIsOpen(true);
+    }
+    else{
+      setIsOpen(false);
     }
     
   }, [isExportLoading,isImporting]);
@@ -164,7 +167,7 @@ const ImportExportNotifications = ({ userData, roles }) => {
                         </span>
                         <span>•</span>
                         <span>
-                          {new Date(notif?.createdAt).toLocaleDateString()}
+                          {formatDateAsNumber(notif?.createdAt)}
                         </span>
                       </div>
                     </div>

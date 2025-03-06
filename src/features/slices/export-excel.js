@@ -117,6 +117,7 @@ const exportSlice = createSlice({
       })
       .addCase(getUserDocument.rejected, (state, action) => {
         console.log(action)
+        state.isLoading = false;
         errorToast(action.payload);
       })
       .addCase(deleteUserDocument.pending, (state, action) => {

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUserNotifications } from "../../features/actions/notification";
 import PageLimitEditor from "../../components/PageLimitEditor";
 import { Pagination } from "@mui/material";
-import { formatFileSize, NotifActionType } from "../../utils/extra";
+import { formatDateAsNumberWithTime, formatFileSize, NotifActionType } from "../../utils/extra";
 import useRoles from "../../hooks/useRoles";
 import ScrollControls from "../../components/ScrollControls";
 import {
@@ -86,7 +86,7 @@ const UserDownloads = () => {
                       </span>
                       <span>•</span>
                       <span>
-                        {new Date(notif?.createdAt).toLocaleDateString()}
+                        {formatDateAsNumberWithTime(notif?.createdAt)}
                       </span>
                     </div>
                   </div>

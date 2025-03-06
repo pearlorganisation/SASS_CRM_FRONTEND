@@ -16,7 +16,7 @@ const ViewTimerModal = ({ setModal, email, attendeeId, dateFormat, logUserActivi
   } = useForm();
 
   const dispatch = useDispatch();
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(() => new Date(Date.now() + 60000));
 
   const onSubmit = (data) => {
     data["email"] = email;
