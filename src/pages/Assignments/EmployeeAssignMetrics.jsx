@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
 import multiService from "../../services/multiService";
-import { formatDate, errorToast, formatDateAsNumber } from "../../utils/extra";
+import { errorToast, formatDateAsNumber } from "../../utils/extra";
 import useRoles from "../../hooks/useRoles";
 import { useSelector } from "react-redux";
+import Visibility from "@mui/icons-material/Visibility";
 
 const EmployeeAssignMetrics = () => {
   const roles = useRoles();
   const { userData } = useSelector((state) => state.auth);
   const role = userData?.role;
   const [startDate, setStartDate] = useState(
-    new Date().toISOString().split("T")[0]
+    new Date(new Date().setDate(new Date().getDate() - 7))
+      .toISOString()
+      .split("T")[0]
   );
   const [endDate, setEndDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -25,34 +28,30 @@ const EmployeeAssignMetrics = () => {
   const fetchMetrics = async () => {
     try {
       setLoading(true);
-       // Create adjusted end date
-       const adjustEndDate = (dateString) => {
+      // Create adjusted end date
+      const adjustEndDate = (dateString) => {
         const date = new Date(dateString);
         date.setDate(date.getDate() + 1);
         return date.toISOString().split("T")[0];
       };
 
       if (roles.isEmployeeId(role)) {
-       
-
-        const [countRes, dailyRes] = await Promise.all([
-          multiService.getAssignmentCountByDateRange({
-            start: startDate,
-            end: adjustEndDate(endDate), // Use adjusted end date
-          }),
-          multiService.getDailyAssignmentStats({
-            start: startDate,
-            end: adjustEndDate(endDate), // Use adjusted end date
-          }),
-        ]);
-        if (countRes.success) {
-          const [countData = {}] = countRes.data || [];
+        const dailyRes = await multiService.getDailyAssignmentStats({
+          start: startDate,
+          end: adjustEndDate(endDate),
+        });
+        if (dailyRes?.success) {
           const dailyData = dailyRes.data || [];
 
+          const statsData = { total: 0, completed: 0, active: 0 };
+          dailyData.forEach((item) => {
+            statsData.total += item.count;
+            statsData.completed += item.completed;
+            statsData.active += item.count - item.completed;
+          });
+
           setStats({
-            total: countData?.totalAssignments || 0,
-            completed: countData?.completed || 0,
-            active: countData?.active || 0,
+            ...statsData,
             daily: dailyData || [],
           });
         }
@@ -62,15 +61,15 @@ const EmployeeAssignMetrics = () => {
           end: adjustEndDate(endDate),
         });
 
-        if (allRes.success) {
+        if (allRes?.success) {
           const allData = allRes.data || [];
-          const result =  {total: 0 , completed: 0 , active: 0};
+          const result = { total: 0, completed: 0, active: 0 };
           const dataByDate = {};
-          allData.forEach(item => {
+          allData.forEach((item) => {
             result.total += item.count;
             result.completed += item.completed;
             result.active += item.count - item.completed;
-            if(!dataByDate[item.date]){
+            if (!dataByDate[item.date]) {
               dataByDate[item.date] = {
                 count: item.count,
                 completed: item.completed,
@@ -78,8 +77,7 @@ const EmployeeAssignMetrics = () => {
                 date: item.date,
                 data: [item],
               };
-            }
-            else{
+            } else {
               dataByDate[item.date].count += item.count;
               dataByDate[item.date].completed += item.completed;
               dataByDate[item.date].active += item.count - item.completed;
@@ -87,9 +85,9 @@ const EmployeeAssignMetrics = () => {
             }
           });
           const dailyData = Object.values(dataByDate);
-          console.log(dailyData,'skdjfljflskfj');
-          
-          setStats(prev => ({...prev, ...result, daily: dailyData}));
+          console.log(dailyData, "skdjfljflskfj");
+
+          setStats((prev) => ({ ...prev, ...result, daily: dailyData }));
         }
       }
     } catch (error) {
@@ -112,7 +110,7 @@ const EmployeeAssignMetrics = () => {
   }, []);
 
   // Calculate max value for scaling
-  const maxAssignments = Math.max(...stats.daily.map((d) => d.count), 1);
+  // const maxAssignments = Math.max(...stats.daily.map((d) => d.count), 1);
 
   return (
     <div className="p-8 max-w-7xl mt-10 mx-auto">
@@ -224,35 +222,45 @@ const EmployeeAssignMetrics = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="pr-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                       Date
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                       Total
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                       Completed
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                       Completion Rate
                     </th>
+                    {!roles.isEmployeeId(role) && <th className=" py-3  "></th>}
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {stats.daily.map((day) => (
                     <tr key={day.date}>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="pr-6 py-4 text-center whitespace-nowrap">
                         {day.date}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 text-center whitespace-nowrap">
                         {day.count}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-green-600">
+                      <td className="px-6 py-4 text-center whitespace-nowrap text-green-600">
                         {day.completed}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 text-center whitespace-nowrap">
                         {((day.completed / day.count) * 100 || 0).toFixed(1)}%
                       </td>
+                      {!roles.isEmployeeId(role) && (
+                        <td className=" px-4 whitespace-nowrap">
+                          <button 
+                          onClick={() => console.log(day)}
+                          className="hover:bg-neutral-200 px-2 py-2 rounded-full">
+                            <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

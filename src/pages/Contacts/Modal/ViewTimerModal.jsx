@@ -4,14 +4,11 @@ import { useDispatch } from "react-redux";
 import { getAttendeeAlarm, setAlarm } from "../../../features/actions/alarm";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { toast } from "sonner";
 
 const ViewTimerModal = ({ setModal, email, attendeeId, dateFormat, logUserActivity }) => {
   const {
-    control,
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
 

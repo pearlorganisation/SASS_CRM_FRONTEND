@@ -129,8 +129,15 @@ const Webinar = () => {
   ];
   return (
     <div className="px-6 md:px-10 pt-14 space-y-6">
-      <div className="flex gap-4 justify-end">
+      <div className="flex gap-4 justify-between">
         <ComponentGuard conditions={[userData?.isActive]}>
+        <Button
+            onClick={() => navigate(`/employee-assign-metrics`)}
+            className="h-10"
+            variant="contained"
+          >
+            Employee Assign Metrics
+          </Button>
           <Button
             onClick={() => dispatch(openModal(createWebinarModalName))}
             variant="contained"

@@ -249,7 +249,7 @@ const Assignments = () => {
             className="h-10"
             variant="contained"
           >
-            Employee Assign Metrics
+            Assign Metrics
           </Button>
 
           {selectedRows.length > 0 &&
