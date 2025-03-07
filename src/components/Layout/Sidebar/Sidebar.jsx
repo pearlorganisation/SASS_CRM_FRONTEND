@@ -78,7 +78,7 @@ const Sidebar = () => {
               path: "/webinarDetails",
               label: "Webinars",
               icon: <SiGooglemeet size={30} />,
-              children: ["webinarDetails"],
+              children: ["webinarDetails","assignment-metrics"],
             },
             {
               path: "/attendees",
@@ -101,7 +101,7 @@ const Sidebar = () => {
           path: "/assignments",
           label: "Assignments",
           icon: <MdAssignment size={30} />,
-          children: ["assignments"],
+          children: ["assignments","assignment-metrics"],
         },
       ],
     },

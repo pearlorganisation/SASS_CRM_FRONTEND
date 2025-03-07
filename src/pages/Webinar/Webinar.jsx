@@ -132,11 +132,11 @@ const Webinar = () => {
       <div className="flex gap-4 justify-between">
         <ComponentGuard conditions={[userData?.isActive]}>
         <Button
-            onClick={() => navigate(`/employee-assign-metrics`)}
+            onClick={() => navigate(`/assignment-metrics`)}
             className="h-10"
             variant="contained"
           >
-            Employee Assign Metrics
+            Assignment Metrics
           </Button>
           <Button
             onClick={() => dispatch(openModal(createWebinarModalName))}

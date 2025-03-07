@@ -2,16 +2,6 @@ import { instance } from "./axiosInterceptor";
 import { errorToast } from "../utils/extra";
 
 class MultiService {
-  async getAssignmentCountByDateRange(params = {}) {
-    try {
-      const { data } = await instance.get(`assignment/metrics/count`, { params });
-      return data;
-    } catch (error) {
-      console.error(error);
-      errorToast(error || "Error fetching assignment count by date range");
-      return { success: false };
-    }
-  }
 
   async getDailyAssignmentStats(params = {}) {
     try {

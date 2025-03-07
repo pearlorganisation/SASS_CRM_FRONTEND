@@ -241,12 +241,12 @@ const Assignments = () => {
       </Tabs>
 
       <div
-        className={`flex items-center gap-4 justify-between`}
+        className={`flex items-center gap-4 flex-wrap  justify-between`}
       >
         <div className="flex items-center gap-4">
           <Button
-            onClick={() => navigate(`/employee-assign-metrics`)}
-            className="h-10"
+            onClick={() => navigate(`/assignment-metrics`)}
+            className="h-10 whitespace-nowrap"
             variant="contained"
           >
             Assign Metrics

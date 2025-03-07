@@ -1,13 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import multiService from "../../services/multiService";
 import { errorToast, formatDateAsNumber } from "../../utils/extra";
 import useRoles from "../../hooks/useRoles";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Visibility from "@mui/icons-material/Visibility";
+import { useSearchParams } from "react-router-dom";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import {
+  getAllWebinars,
+  getEmployeeWebinars,
+} from "../../features/actions/webinarContact";
+import { socket } from "../../socket";
+import ModalFallback from "../../components/Fallback/ModalFallback";
+import EmpAssignModal from "./EmpAssignModal";
 
 const EmployeeAssignMetrics = () => {
+  const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const roles = useRoles();
   const { userData } = useSelector((state) => state.auth);
+  const { webinarData } = useSelector((state) => state.webinarContact);
+  const {employeeModeData} = useSelector((state) => state.employee);
+  const employeeId = employeeModeData ? employeeModeData?._id : userData?._id
+
+  console.log(employeeModeData)
   const role = userData?.role;
   const [startDate, setStartDate] = useState(
     new Date(new Date().setDate(new Date().getDate() - 7))
@@ -24,8 +41,14 @@ const EmployeeAssignMetrics = () => {
     active: 0,
     daily: [],
   });
+  const webinarInQuery = searchParams.get("webinarId");
+  const [currentWebinar, setCurrentWebinar] = useState(
+    webinarInQuery ? webinarInQuery : "all"
+  );
+  const [selectedData, setSelectedData] = useState(null);
 
-  const fetchMetrics = async () => {
+  const fetchMetrics = async (webinarId) => {
+
     try {
       setLoading(true);
       // Create adjusted end date
@@ -35,10 +58,18 @@ const EmployeeAssignMetrics = () => {
         return date.toISOString().split("T")[0];
       };
 
-      if (roles.isEmployeeId(role)) {
+      const adjustStartDate = (dateString) => {
+        const date = new Date(dateString);
+        date.setDate(date.getDate() - 1);
+        return date.toISOString().split("T")[0];
+      };
+
+      if (roles.isEmployeeId(role) || employeeModeData) {
         const dailyRes = await multiService.getDailyAssignmentStats({
-          start: startDate,
-          end: adjustEndDate(endDate),
+          start: adjustStartDate(startDate),
+          end: endDate,
+          webinarId,
+          employeeId
         });
         if (dailyRes?.success) {
           const dailyData = dailyRes.data || [];
@@ -57,8 +88,9 @@ const EmployeeAssignMetrics = () => {
         }
       } else {
         const allRes = await multiService.getAllAssignmentsByDateRange({
-          start: startDate,
-          end: adjustEndDate(endDate),
+          start: adjustStartDate(startDate),
+          end: endDate,
+          webinarId,
         });
 
         if (allRes?.success) {
@@ -85,7 +117,6 @@ const EmployeeAssignMetrics = () => {
             }
           });
           const dailyData = Object.values(dataByDate);
-          console.log(dailyData, "skdjfljflskfj");
 
           setStats((prev) => ({ ...prev, ...result, daily: dailyData }));
         }
@@ -106,8 +137,29 @@ const EmployeeAssignMetrics = () => {
   };
 
   useEffect(() => {
-    fetchMetrics();
+    const webinarId =
+      webinarInQuery && webinarInQuery !== "all" ? webinarInQuery : undefined;
+    fetchMetrics(webinarId);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!webinarData.length) {
+      if (roles.isEmployeeId(role) || employeeModeData) dispatch(getEmployeeWebinars({employeeId}));
+      else dispatch(getAllWebinars({}));
+    }
   }, []);
+
+  useEffect(() => {
+    function onNoteCreation() {
+      const webinarId =
+        webinarInQuery && webinarInQuery !== "all" ? webinarInQuery : undefined;
+      fetchMetrics(webinarId);
+    }
+    socket.on("note-creation", onNoteCreation);
+    return () => {
+      socket.off("note-creation", onNoteCreation);
+    };
+  }, [searchParams]);
 
   // Calculate max value for scaling
   // const maxAssignments = Math.max(...stats.daily.map((d) => d.count), 1);
@@ -115,8 +167,30 @@ const EmployeeAssignMetrics = () => {
   return (
     <div className="p-8 max-w-7xl mt-10 mx-auto">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Assignment Metrics</h1>
-
+        <div className="flex justify-between">
+          <h1 className="text-2xl font-bold text-gray-900">
+            Assignment Metrics
+          </h1>
+          <FormControl className="w-40">
+            <InputLabel id="webinar-label">Webinar</InputLabel>
+            <Select
+              labelId="webinar-label"
+              label="Webinar"
+              value={currentWebinar}
+              onChange={(e) => {
+                setCurrentWebinar(e.target.value);
+                setSearchParams({ webinarId: e.target.value });
+              }}
+            >
+              <MenuItem value="all">All Webinars</MenuItem>
+              {webinarData.map((webinar, index) => (
+                <MenuItem key={index} value={webinar._id}>
+                  {webinar.webinarName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </div>
         <div className="flex flex-col sm:flex-row gap-4 mt-4">
           <div className="flex items-center gap-2">
             <label className="text-sm text-gray-600">From:</label>
@@ -254,9 +328,10 @@ const EmployeeAssignMetrics = () => {
                       </td>
                       {!roles.isEmployeeId(role) && (
                         <td className=" px-4 whitespace-nowrap">
-                          <button 
-                          onClick={() => console.log(day)}
-                          className="hover:bg-neutral-200 px-2 py-2 rounded-full">
+                          <button
+                            onClick={() => setSelectedData(day)}
+                            className="hover:bg-neutral-200 px-2 py-2 rounded-full"
+                          >
                             <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
                           </button>
                         </td>
@@ -269,6 +344,14 @@ const EmployeeAssignMetrics = () => {
           </>
         )}
       </div>
+      <Suspense fallback={<ModalFallback />}>
+        {selectedData && (
+          <EmpAssignModal
+            selectedData={selectedData}
+            setSelectedData={setSelectedData}
+          />
+        )}
+      </Suspense>
     </div>
   );
 };

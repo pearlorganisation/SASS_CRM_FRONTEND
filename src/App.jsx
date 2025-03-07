@@ -55,7 +55,8 @@ import {
   Locations,
   ProductRevenue,
   ProductEnrollments,
-  UserDownloads
+  UserDownloads,
+  EmployeeAssignMetrics
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 
@@ -85,7 +86,6 @@ import { newNotification } from "./features/slices/notification";
 import { NotifActionType } from "./utils/extra";
 import { logout } from "./features/slices/auth";
 import LayoutFallback from "./components/Fallback/LayoutFallback";
-import EmployeeAssignMetrics from "./pages/Assignments/EmployeeAssignMetrics";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -115,7 +115,6 @@ const App = () => {
 
   useEffect(() => {
     function onConnect() {
-      console.log("connected");
       setIsConnected(true);
     }
 
@@ -133,7 +132,6 @@ const App = () => {
     }
 
     function onNotification(data) {
-      // console.log(data);
       dispatch(newNotification(data));
       toast.info(data.title || "New Notification");
       if (data.actionType === NotifActionType.ACCOUNT_DEACTIVATION) {
@@ -142,7 +140,6 @@ const App = () => {
     }
 
     function onReminderPlay(data) {
-      // console.log(data);
     }
 
     socket.on("connect", onConnect);
@@ -161,9 +158,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    console.log("isConnected", isConnected, userData);
     if (isConnected && userData) {
-      console.log("join emitted");
       socket.emit("join", { user: userData._id });
     }
 
@@ -173,9 +168,6 @@ const App = () => {
   }, [userData, isConnected]);
 
 
-  useEffect(() => {
-    console.log("isConnected ----- >", isConnected);
-  },[isConnected])
 
   if (isUserLoggedIn && !userData?.role) {
     dispatch(logout());
@@ -185,7 +177,6 @@ const App = () => {
     dispatch(setEmployeeModeId());
 
     if (isUserLoggedIn) {
-      // console.log("connecting socket");
       socket.connect();
     }
 
@@ -273,7 +264,7 @@ const App = () => {
           ),
         },
         {
-          path: "/employee-assign-metrics",
+          path: "/assignment-metrics",
           element: (
             <RouteGuard roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER", "ADMIN"]}>
               <EmployeeAssignMetrics />

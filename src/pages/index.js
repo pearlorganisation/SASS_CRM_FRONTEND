@@ -60,6 +60,7 @@ const Locations = lazy(() => import("./Location/Location"));
 const ProductRevenue = lazy(() => import("./Revenue/ProductRevenue"));
 const ProductEnrollments = lazy(() => import("./Products/ProductEnrollments"));
 const UserDownloads = lazy(() => import("./Notifications/UserDownloads"));
+const EmployeeAssignMetrics = lazy(() => import("./Assignments/EmployeeAssignMetrics"));
 
 export {
   CalendarPage,
@@ -108,5 +109,6 @@ export {
   Locations,
   ProductRevenue,
   ProductEnrollments,
-  UserDownloads
+  UserDownloads,
+  EmployeeAssignMetrics
 };

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import LinearProgressWithLabel from "../Export/LinearProgressWithLabel";
 import { socket } from "../../socket";
 import { deleteUserDocument, getUserDocument, getUserDocuments } from "../../features/actions/export-excel";
-import { formatDateAsNumber, formatDateAsNumberWithTime, formatFileSize } from "../../utils/extra";
+import { formatDateAsNumber, formatFileSize } from "../../utils/extra";
 import { setNewDownload } from "../../features/slices/export-excel";
 
 const ImportExportNotifications = ({ userData, roles }) => {
