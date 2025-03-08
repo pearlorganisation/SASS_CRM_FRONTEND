@@ -87,6 +87,53 @@ export const exportWebinarAttendeesExcel = createAsyncThunk(
   }
 );
 
+export const exportGroupedAttendeesExcel = createAsyncThunk(
+  "groupedAttendees/exportExcel",
+  async (payload = {}, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await instance.post(
+        `export-excel/attendees`,
+        { fieldName: "attendeeTableConfig", ...payload },
+        {
+          responseType: "blob", // Ensure you get the file as a binary Blob
+        }
+      );
+
+      // Automatically trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Set file name for download
+      link.setAttribute("download", "Attendees.xlsx");
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove(); // Clean up after download
+
+      dispatch(
+        getUserDocuments({
+          page: 1,
+          limit: 10,
+        })
+      );
+
+      dispatch(
+        addUserActivity({
+          action: "export",
+          details: `User Exported the Attendees, limit: ${
+            !payload.limit ? "All" : payload.limit
+          }`,
+        })
+      );
+
+      return true; // Optional: Return a success status
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
 export const exportWebinarExcel = createAsyncThunk(
   "webinar/exportExcel",
   async (
@@ -152,7 +199,7 @@ export const exportEmployeesExcel = createAsyncThunk(
       link.href = url;
 
       // Set file name for download
-      link.setAttribute("download", "clients.xlsx");
+      link.setAttribute("download", "Employees.xlsx");
 
       document.body.appendChild(link);
       link.click();

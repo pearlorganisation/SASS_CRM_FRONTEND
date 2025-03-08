@@ -10,16 +10,17 @@ import GroupedAttendeeFilterModal from "./Modal/GroupedAttendeeFilterModal";
 import { createPortal } from "react-dom";
 import { clearAttendeeData } from "../../features/slices/attendees";
 import FullScreen from "../../components/FullScreen";
+import ExportModal from "../../components/Export/ExportModal";
+import { exportGroupedAttendeesExcel } from "../../features/actions/export-excel";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
   const AttendeesFilterModalName = "ViewAttendeesFilterModal";
   const tableHeader = "All Attendees Table";
-  const exportExcelModalName = "ExportViewAttendeesExcel";
+  const exportModalName = "ExportViewAttendeesExcel";
   // ----------------------- etcetra -----------------------
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
 
   const { leadTypeData } = useSelector((state) => state.assign);
   const { attendeeData, isLoading, pagination } = useSelector(
@@ -32,7 +33,7 @@ const WebinarAttendees = () => {
   );
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const modalState = useSelector((state) => state.modals.modals);
-  const exportModalOpen = modalState[exportExcelModalName] ? true : false;
+  const exportModalOpen = modalState[exportModalName] ? true : false;
   const AttendeesFilterModalOpen = modalState[AttendeesFilterModalName]
     ? true
     : false;
@@ -56,7 +57,6 @@ const WebinarAttendees = () => {
   }, [page, LIMIT, allAttendeesSortBy, allAttendeesFilters]);
 
   useEffect(() => {
-   
     dispatch(getLeadType());
 
     return () => {
@@ -103,7 +103,7 @@ const WebinarAttendees = () => {
           setPage={setPage}
           limit={LIMIT}
           filterModalName={AttendeesFilterModalName}
-          exportModalName={exportExcelModalName}
+          exportModalName={exportModalName}
           isLoading={isLoading}
           isLeadType={true}
         />
@@ -116,6 +116,24 @@ const WebinarAttendees = () => {
             document.body
           )}
       </FullScreen>
+      {exportModalOpen &&
+        createPortal(
+          <ExportModal
+            modalName={exportModalName}
+            defaultColumns={[{ header: "Email", key: "email", width: 20, type: "" },...(groupedAttendeeTableColumns.filter((column) => column.header !== "Email")),   { header: "Phone", key: "phone", width: 20, type: "" }]}
+            handleExport={({ limit, columns }) => {
+              dispatch(
+                exportGroupedAttendeesExcel({
+                  limit,
+                  columns,
+                  filters: allAttendeesFilters,
+                  sort: allAttendeesSortBy,
+                })
+              );
+            }}
+          />,
+          document.body
+        )}
     </div>
   );
 };

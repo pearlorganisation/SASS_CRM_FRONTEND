@@ -55,6 +55,8 @@ const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
   const onSubmit = (data) => {
     data["id"] = initialData?._id;
     let finalData = removeBlankAttributes(data);
+
+    finalData["tags"] = data?.tags;
     onConfirmEdit(finalData);
   };
 
@@ -187,9 +189,6 @@ const EditModal = ({ setModal, initialData, onConfirmEdit }) => {
                     </MuiSelect>
                   </FormControl>
                 )}
-                rules={{
-                  required: "At least one tag is required",
-                }}
               />
             </div>
           </div>

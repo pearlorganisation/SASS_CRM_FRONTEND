@@ -5,6 +5,7 @@ import {
   exportClientExcel,
   exportEmployeesExcel,
   exportWebinarAttendeesExcel,
+  exportGroupedAttendeesExcel,
   exportWebinarExcel,
   getUserDocument,
   getUserDocuments,
@@ -38,14 +39,17 @@ const exportSlice = createSlice({
       .addCase(exportClientExcel.pending, (state, action) => {
         state.isLoading = true;
         state.isSuccess = false;
+        state.isExportLoading = true;
       })
       .addCase(exportClientExcel.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        state.isExportLoading = false;
         successToast(`Data Exported Successfully`);
       })
       .addCase(exportClientExcel.rejected, (state, action) => {
         state.isLoading = false;
+        state.isExportLoading = false;
         errorToast(action.payload);
       })
       .addCase(exportWebinarAttendeesExcel.pending, (state, action) => {
@@ -60,6 +64,22 @@ const exportSlice = createSlice({
         successToast(`Data Exported Successfully`);
       })
       .addCase(exportWebinarAttendeesExcel.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isExportLoading = false;
+        errorToast(action.payload);
+      })
+      .addCase(exportGroupedAttendeesExcel.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isExportLoading = true;
+      })
+      .addCase(exportGroupedAttendeesExcel.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isExportLoading = false;
+        state.isSuccess = true;
+        successToast(`Data Exported Successfully`);
+      })
+      .addCase(exportGroupedAttendeesExcel.rejected, (state, action) => {
         state.isLoading = false;
         state.isExportLoading = false;
         errorToast(action.payload);
@@ -83,14 +103,17 @@ const exportSlice = createSlice({
       .addCase(exportEmployeesExcel.pending, (state, action) => {
         state.isLoading = true;
         state.isSuccess = false;
+        state.isExportLoading = true;
       })
       .addCase(exportEmployeesExcel.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        state.isExportLoading = false;
         successToast(`Data Exported Successfully`);
       })
       .addCase(exportEmployeesExcel.rejected, (state, action) => {
         state.isLoading = false;
+        state.isExportLoading = false;
         errorToast(action.payload);
       })
       .addCase(getUserDocuments.pending, (state, action) => {
