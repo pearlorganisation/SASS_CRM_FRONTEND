@@ -94,6 +94,7 @@ export const exportWebinarExcel = createAsyncThunk(
     { rejectWithValue, dispatch }
   ) => {
     try {
+      console.log("exportWebinarExcel -> filters", filters);
       const response = await instance.post(
         `export-excel/webinars`,
         { filters, columns },

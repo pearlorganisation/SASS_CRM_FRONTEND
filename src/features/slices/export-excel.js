@@ -67,14 +67,17 @@ const exportSlice = createSlice({
       .addCase(exportWebinarExcel.pending, (state, action) => {
         state.isLoading = true;
         state.isSuccess = false;
+        state.isExportLoading = true;
       })
       .addCase(exportWebinarExcel.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
+        state.isExportLoading = false;
         successToast(`Data Exported Successfully`);
       })
       .addCase(exportWebinarExcel.rejected, (state, action) => {
         state.isLoading = false;
+        state.isExportLoading = false;
         errorToast(action.payload);
       })
       .addCase(exportEmployeesExcel.pending, (state, action) => {
