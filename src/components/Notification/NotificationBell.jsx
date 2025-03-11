@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import MessageIcon from "@mui/icons-material/Message";
+import NotificationsIcon from "./bell.svg";
+import MessageIcon from "./message.svg";
 import {
   getUserNotifications,
   resetUnseenCount,
@@ -106,7 +106,7 @@ const NotificationBell = ({ userData, roles, important }) => {
         <div className="relative">
           {important ? (
             <>
-              <MessageIcon className="text-gray-600" />
+              <img src={MessageIcon} width={25} height={25} alt="Notifications" />
               {unseenCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
                   {unseenCount}
@@ -115,7 +115,7 @@ const NotificationBell = ({ userData, roles, important }) => {
             </>
           ) : (
             <>
-              <NotificationsIcon className="text-gray-600" />
+              <img src={NotificationsIcon} width={25} height={25} alt="Notifications" />
               {_unseenCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
                   {_unseenCount}

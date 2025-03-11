@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { getRoleNameByID } from "../../../utils/roles";
 import { toggleSidebar } from "../../../features/slices/globalData";
-import { FaUserCircle } from "react-icons/fa"; // Importing profile icon
+import Profile from './profile.svg'
 import { setEmployeeModeId } from "../../../features/slices/employee";
 import ComponentGuard from "../../AccessControl/ComponentGuard";
 import useRoles from "../../../hooks/useRoles";
@@ -148,8 +148,13 @@ const Header = () => {
                   </p>
                 </div>
                 <div className="text-gray-500">
-                  {/* Profile Icon */}
-                  <FaUserCircle size={34} />
+                  {/* Use img tag for SVG */}
+                  <img 
+                    src={Profile} 
+                    alt="Profile" 
+                    className="w-10 h-10" 
+                    style={{ fill: '#525252' }}
+                  />
                 </div>
               </div>
             </div>

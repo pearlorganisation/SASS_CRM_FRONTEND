@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
+import CloudDownloadIcon from "./download.svg";
 import { useNavigate } from "react-router-dom";
-import LinearProgressWithLabel from "../Export/LinearProgressWithLabel";
+const LinearProgressWithLabel = lazy(() => import("../Export/LinearProgressWithLabel"));
 import { socket } from "../../socket";
 import { deleteUserDocument, getUserDocument, getUserDocuments } from "../../features/actions/export-excel";
 import { formatDateAsNumber, formatFileSize } from "../../utils/extra";
@@ -89,7 +89,7 @@ const ImportExportNotifications = ({ userData, roles }) => {
         className="p-2 hover:bg-gray-100 rounded-full transition-colors"
       >
         <div className="relative">
-          <CloudDownloadIcon className="text-gray-600" />
+          <img src={CloudDownloadIcon} width={30} height={30} alt="Download" />
           {false && (
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
               2
@@ -124,7 +124,9 @@ const ImportExportNotifications = ({ userData, roles }) => {
                     some text describing what's happening on the backend
                   </p>
                   <div className="text-xs text-gray-500 text-right mt-1">
-                    <LinearProgressWithLabel value={progress} />
+                    <Suspense fallback={<></>}>
+                      <LinearProgressWithLabel value={progress} />
+                    </Suspense>
                   </div>
                 </div>
               )}

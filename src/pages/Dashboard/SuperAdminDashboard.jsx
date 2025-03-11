@@ -167,7 +167,7 @@ const SuperAdminDashboard = () => {
   };
 
   return (
-    <Box className="md:px-10 py-10">
+    <Box className="md:px-10 py-14">
       <Box className="flex justify-between">
         {/* Date Filters */}
         <div className="flex flex-col md:flex-row items-center gap-4">
