@@ -120,7 +120,6 @@ const Webinar = () => {
               <Delete className="text-red-500 group-hover:text-red-600" />
             ),
             tooltip: "Delete Attendee",
-            hideCondition: (item) => item?.totalParticipants <= 0 && item?.totalRegistrations <= 0,
             onClick: (item) => {
               handleDeleteModal(item?._id, item?.webinarName);
             },
@@ -130,8 +129,15 @@ const Webinar = () => {
   ];
   return (
     <div className="px-6 md:px-10 pt-14 space-y-6">
-      <div className="flex gap-4 justify-end">
+      <div className="flex gap-4 justify-between">
         <ComponentGuard conditions={[userData?.isActive]}>
+        <Button
+            onClick={() => navigate(`/assignment-metrics`)}
+            className="h-10"
+            variant="contained"
+          >
+            Assignment Metrics
+          </Button>
           <Button
             onClick={() => dispatch(openModal(createWebinarModalName))}
             variant="contained"

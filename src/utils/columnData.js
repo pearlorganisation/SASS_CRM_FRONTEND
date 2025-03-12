@@ -98,6 +98,12 @@ export const employeeTableColumns = [
     type: "",
   },
   {
+    header: "Daily Contact Count",
+    key: "dailyContactCount",
+    width: 20,
+    type: "",
+  },
+  {
     header: "Inactivity Time(Sec)",
     key: "inactivityTime",
     width: 20,

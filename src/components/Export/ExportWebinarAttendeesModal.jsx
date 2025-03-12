@@ -30,7 +30,7 @@ const ExportWebinarAttendeesModal = ({
   const { subscription } = useSelector((state) => state.auth);
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
 
-  const { isLoading, isSuccess } = useSelector((state) => state.export);
+  const { isExportLoading } = useSelector((state) => state.export);
 
   const [limit, setLimit] = useState("");
   const [selectedColumns, setSelectedColumns] = useState([]);
@@ -64,14 +64,12 @@ const ExportWebinarAttendeesModal = ({
 
     //
   };
-  console.log("isSuccess, assignSuccess, isSuccessReAssign", isSuccess);
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isExportLoading) {
       handleClose();
-      dispatch(resetExportSuccess());
     }
-  }, [isSuccess]);
+  }, [isExportLoading]);
 
   useEffect(() => {
     console.log(tableConfig);
@@ -148,16 +146,12 @@ const ExportWebinarAttendeesModal = ({
             Cancel
           </Button>
           <Button
-            disabled={isLoading}
             variant="contained"
             color="primary"
             onClick={handleSubmit}
           >
-            {isLoading ? (
-              <ClipLoader className="mx-8" color="#fff" size={20} />
-            ) : (
-              "Download"
-            )}
+            
+              Download
           </Button>
         </div>
       </Box>

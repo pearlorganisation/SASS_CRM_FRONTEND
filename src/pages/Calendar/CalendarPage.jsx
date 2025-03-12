@@ -17,6 +17,7 @@ const CalendarPage = () => {
   const { userData } = useSelector((state) => state.auth);
   const [dateMapping, setDateMapping] = useState(new Map());
   const [selectedDateAlarms, setSelectedDateAlarms] = useState([]);
+  const [selectedTab, setSelectedTab] = useState('active');
 
   useEffect(() => {
     if (Array.isArray(userAlarms)) {
@@ -70,6 +71,10 @@ const CalendarPage = () => {
         `/particularContact?email=${alarm.email}&attendeeId=${alarm.attendeeId}`
       );
   };
+
+  const activeAlarms = userAlarms?.filter(alarm => alarm.isActive) || [];
+  const inactiveAlarms = userAlarms?.filter(alarm => !alarm.isActive) || [];
+  const visibleAlarms = selectedTab === 'active' ? activeAlarms : inactiveAlarms;
 
   return (
     <div className="py-14 px-6 flex flex-col items-center">
@@ -130,6 +135,73 @@ const CalendarPage = () => {
                   </p>
                 </div>
               ))
+            )}
+          </div>
+        </div>
+
+        {/* Add new section for all alarms table */}
+        <div className="mt-8 w-full">
+          <div className="flex gap-4 mb-4 border-b border-gray-200">
+            <button
+              onClick={() => setSelectedTab('active')}
+              className={`pb-2 px-1 ${
+                selectedTab === 'active'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Active Alarms
+            </button>
+            <button
+              onClick={() => setSelectedTab('inactive')}
+              className={`pb-2 px-1 ${
+                selectedTab === 'inactive'
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Inactive Alarms
+            </button>
+          </div>
+          
+          <h3 className="text-xl font-semibold text-gray-700 mb-4">All Alarms</h3>
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            {visibleAlarms?.length > 0 ? (
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Note</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {visibleAlarms.map(alarm => (
+                    <tr 
+                      key={alarm._id} 
+                      onClick={() => handleAlarmClick(alarm)}
+                      className="hover:bg-gray-50 cursor-pointer"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <div className={`w-2 h-2 rounded-full ${alarm.isActive ? 'bg-green-500' : 'bg-red-500'}`} />
+                          <span className="text-sm">{alarm.isActive ? 'Active' : 'Inactive'}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {formatDateAsNumberWithTime(alarm.date)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{alarm.email}</td>
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                        {alarm.note || "No note provided"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="p-6 text-gray-600">No {selectedTab} alarms found</p>
             )}
           </div>
         </div>

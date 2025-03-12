@@ -8,9 +8,11 @@ import PageLimitEditor from "../../../components/PageLimitEditor";
 import { getSuperAdmin } from "../../../features/actions/auth";
 import { toast } from "sonner";
 import { formatDateAsNumber } from "../../../utils/extra";
+import { useNavigate } from "react-router-dom";
 
 const BillingHistory = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { billingHistory, totalPages } = useSelector(
     (state) => state.pricePlans
   );
@@ -33,6 +35,17 @@ const BillingHistory = () => {
   const downloadPDF = (bill) => {
     if (!superAdminData || !userData) {
       toast.error("Super Admin and Admin Data is required to download the PDF");
+      return;
+    }
+
+    if(!superAdminData?.address){
+      toast.error("Super Admin's Address is required to download the PDF");
+      return;
+    }
+
+    if(!userData?.address){
+      toast.error("Address is required to download the PDF");
+      navigate("/profile");
       return;
     }
 
@@ -68,7 +81,7 @@ const BillingHistory = () => {
     YAxis = YAxis + 5;
 
     doc.text("Address : ", 13, YAxis);
-    doc.text("South Canmore, Spring Creek Mountain Village", 30, YAxis);
+    doc.text(superAdminData.address, 30, YAxis);
 
     YAxis += 10;
     doc
@@ -96,7 +109,7 @@ const BillingHistory = () => {
 
     doc
       .text("Address : ", 13, YAxis)
-      .text("South Canmore, Spring Creek Mountain Village", 40, YAxis);
+      .text(userData.address, 40, YAxis);
 
     if (userData?.gst) {
       YAxis += 5;

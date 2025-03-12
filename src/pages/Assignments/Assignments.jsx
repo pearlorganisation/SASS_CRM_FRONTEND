@@ -241,15 +241,20 @@ const Assignments = () => {
       </Tabs>
 
       <div
-        className={`flex items-center gap-4 ${
-          selectedRows.length > 0 && userData?.isActive
-            ? "justify-between"
-            : "justify-end"
-        } `}
+        className={`flex items-center gap-4 flex-wrap  justify-between`}
       >
-        {selectedRows.length > 0 &&
-          userData?.isActive &&
-          tabValue === AssignmentStatus.ACTIVE && (
+        <div className="flex items-center gap-4">
+          <Button
+            onClick={() => navigate(`/assignment-metrics`)}
+            className="h-10 whitespace-nowrap"
+            variant="contained"
+          >
+            Assign Metrics
+          </Button>
+
+          {selectedRows.length > 0 &&
+            userData?.isActive &&
+            tabValue === AssignmentStatus.ACTIVE && (
             <Button
               onClick={() => setOpenReassignModal(true)}
               className="h-10"
@@ -258,7 +263,7 @@ const Assignments = () => {
               Request ReAssignment
             </Button>
           )}
-
+        </div>
         <FormControl className="w-60">
           <InputLabel id="webinar-label">Webinar</InputLabel>
           <Select

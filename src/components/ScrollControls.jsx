@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { DownIcon, UpIcon } from "./SVGs";
+
 
 export default function ScrollControls() {
   const [showButtons, setShowButtons] = useState(false);
@@ -32,15 +33,15 @@ export default function ScrollControls() {
     >
       <button
         onClick={() => scrollTo("top")}
-        className="bg-gray-800 text-white p-2 rounded-full shadow-lg hover:bg-gray-700 transition"
+        className=" text-white rounded-full shadow-lg hover:bg-gray-200 transition"
       >
-        <FaArrowUp size={24} />
+        <img src={UpIcon} alt="Tags" width={50} height={50} />
       </button>
       <button
         onClick={() => scrollTo("bottom")}
-        className="bg-gray-800 text-white p-2 rounded-full shadow-lg hover:bg-gray-700 transition"
+        className=" text-white rounded-full shadow-lg hover:bg-gray-200 transition"
       >
-        <FaArrowDown size={24} />
+        <img src={DownIcon} alt="Tags" width={50} height={50} />
       </button>
     </div>
   );

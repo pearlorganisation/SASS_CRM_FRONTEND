@@ -14,7 +14,7 @@ import { formatPhoneNumber } from "../../../utils/extra";
 const UploadXslxModal = ({ tabValue, setModal, update }) => {
   const logUserActivity = useAddUserActivity();
 
-  const { isLoading, isSuccess } = useSelector((state) => state.attendee);
+  const { isLoading, isImporting } = useSelector((state) => state.attendee);
   const { id } = useParams();
 
   const [filterRow, setFilterRow] = useState("");
@@ -78,7 +78,6 @@ const UploadXslxModal = ({ tabValue, setModal, update }) => {
           });
 
           setMeetingData(formattedData);
-          console.log("uploaded");
         } else {
           console.error("Not enough rows in the file to process.");
           toast.error(
@@ -114,7 +113,6 @@ const UploadXslxModal = ({ tabValue, setModal, update }) => {
     }
   };
   const onSubmit = (data2) => {
-    console.log(data2);
     const {
       email,
       firstName,
@@ -139,10 +137,10 @@ const UploadXslxModal = ({ tabValue, setModal, update }) => {
 
       if (!update) {
         data.forEach((item) => {
-          const email = item[emailField];
+          const email = (item[emailField] || "").toLowerCase();
           if (!mergedData[email]) {
             mergedData[email] = {
-              email: item[emailField],
+              email: email,
               firstName: item[firstNameField],
               lastName: item[lastNameField],
               phone: formatPhoneNumber(item[phoneNumberField]),
@@ -159,10 +157,10 @@ const UploadXslxModal = ({ tabValue, setModal, update }) => {
         });
       } else {
         data.forEach((item) => {
-          const email = item[emailField];
+          const email = (item[emailField] || "").toLowerCase();
           if (!mergedData[email]) {
             mergedData[email] = {
-              email: item[emailField],
+              email: email,
               firstName: item[firstNameField],
               lastName: item[lastNameField],
               phone: formatPhoneNumber(item[phoneNumberField]),
@@ -177,7 +175,6 @@ const UploadXslxModal = ({ tabValue, setModal, update }) => {
           }
         });
       }
-      console.log(mergedData);
 
       if (!update) {
         return Object.values(mergedData).map((item) => ({
@@ -210,7 +207,6 @@ const UploadXslxModal = ({ tabValue, setModal, update }) => {
       isAttended: tabValue === "postWebinar" ? true : false,
       data: mergedResult,
     };
-    console.log(mergedResult, "mergedResult");
 
     dispatch(addAttendees(payloadData));
     logUserActivity({
@@ -226,11 +222,10 @@ const UploadXslxModal = ({ tabValue, setModal, update }) => {
   }
 
   useEffect(() => {
-    console.log("isSucess ", isSuccess);
-    if (isSuccess) {
+    if (isImporting) {
       handleCloseModal();
     }
-  }, [isSuccess]);
+  }, [isImporting]);
 
   return (
     <div

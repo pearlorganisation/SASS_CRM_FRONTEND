@@ -1,33 +1,33 @@
 import React, { useEffect, useState } from "react";
 import {
   Link,
-  useNavigate,
-  useSearchParams,
   useLocation,
 } from "react-router-dom";
-import { TbLayoutDashboardFilled, TbReceiptRupee } from "react-icons/tb";
-import { IoLogOut, IoPeople, IoSettings } from "react-icons/io5";
-import { HiUserGroup } from "react-icons/hi2";
-import { SiGooglemeet } from "react-icons/si";
-import { AiFillProduct } from "react-icons/ai";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi"; // for dropdown icon
+import {
+  DashboardIcon,
+  WebinarIcon,
+  AttendeesIcon,
+  EmployeeIcon,
+  CalendarIcon,
+  ProductsIcon,
+  NoticeBoardIcon,
+  LinksIcon,
+  SettingsIcon,
+  LogoutIcon,
+  RupeeIcon,
+  AssignmentIcon,
+} from "./SVGs";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../features/slices/auth";
 import { getAllSidebarLinks } from "../../../features/actions/sidebarLink";
-import { FaClipboard } from "react-icons/fa";
-import { Badge, Chip } from "@mui/material";
 import { getNoticeBoard } from "../../../features/actions/noticeBoard";
 import useRoles from "../../../hooks/useRoles";
-import { MdAssignment } from "react-icons/md";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
-import { FaCalendarAlt } from "react-icons/fa";
 import ComponentGuard from "../../AccessControl/ComponentGuard";
 const Sidebar = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const roles = useRoles();
   const logUserActivity = useAddUserActivity();
-  const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
 
   const { isUpdated } = useSelector((state) => state.noticeBoard);
@@ -41,10 +41,6 @@ const Sidebar = () => {
   const role = userData?.role || "";
   const { employeeModeData } = useSelector((state) => state.employee);
 
-  useEffect(() => {
-    console.log(location);
-  }, [location]);
-
   const navItems = [
     {
       roles: [roles.SUPER_ADMIN],
@@ -52,13 +48,13 @@ const Sidebar = () => {
         {
           path: "/clients",
           label: "Clients",
-          icon: <IoPeople size={30} />,
+          icon: <img src={EmployeeIcon} width={30} height={30} alt="Clients" />,
           children: ["view-client", "add-client", "client/plan/"],
         },
         {
           path: "/revenue",
           label: "Revenue",
-          icon: <TbReceiptRupee size={30} />,
+          icon: <img src={RupeeIcon} width={30} height={30} alt="Revenue" />,
         },
       ],
     },
@@ -69,31 +65,42 @@ const Sidebar = () => {
             {
               path: `/employee/dashboard/${employeeModeData?._id}`,
               label: "Dashboard",
-              icon: <TbLayoutDashboardFilled size={30} />,
+              icon: <img src={DashboardIcon} width={30} height={30} alt="Dashboard" />,
             },
             {
               path: `/employee/assignments/${employeeModeData?._id}`,
               label: "Assignments",
-              icon: <MdAssignment size={30} />,
+              icon: <img src={AssignmentIcon} width={30} height={30} alt="Assignment" />,
             },
           ]
         : [
             {
-              path: "/webinarDetails",
+              path: "/webinarDetails?page=1",
               label: "Webinars",
-              icon: <SiGooglemeet size={30} />,
-              children: ["webinarDetails"],
+              icon: (
+                <img src={WebinarIcon} width={30} height={30} alt="Webinar" />
+              ),
+              children: ["webinarDetails", "assignment-metrics"],
             },
             {
-              path: "/attendees",
+              path: "/attendees?page=1",
               label: "Attendees",
-              icon: <HiUserGroup size={30} />,
+              icon: (
+                <img
+                  src={AttendeesIcon}
+                  width={30}
+                  height={30}
+                  alt="Attendees"
+                />
+              ),
               children: ["particularContact"],
             },
             {
-              path: "/employees",
+              path: "/employees?page=1",
               label: "Employees",
-              icon: <IoPeople size={30} />,
+              icon: (
+                <img src={EmployeeIcon} width={30} height={30} alt="Employee" />
+              ),
               children: ["employees", "employee", "createEmployee"],
             },
           ],
@@ -104,8 +111,8 @@ const Sidebar = () => {
         {
           path: "/assignments",
           label: "Assignments",
-          icon: <MdAssignment size={30} />,
-          children: ["assignments"],
+          icon: <img src={AssignmentIcon} width={30} height={30} alt="Assignment" />,
+          children: ["assignments", "assignment-metrics"],
         },
       ],
     },
@@ -117,53 +124,43 @@ const Sidebar = () => {
               {
                 path: "/calendar",
                 label: "Calendar",
-                icon: <FaCalendarAlt size={30} />,
+                icon: (
+                  <img
+                    src={CalendarIcon}
+                    width={30}
+                    height={30}
+                    alt="Calendar"
+                  />
+                ),
               },
             ]
           : []),
         {
           path: "/products",
           label: "Products",
-          icon: <AiFillProduct size={30} />,
+          icon: (
+            <img src={ProductsIcon} width={30} height={30} alt="Products" />
+          ),
           children: ["products"],
         },
 
         {
           path: "/notice-board",
           label: "Notice Board",
-          icon: <FaClipboard size={25} />,
+          icon: (
+            <img
+              src={NoticeBoardIcon}
+              width={30}
+              height={30}
+              alt="Notice Board"
+            />
+          ),
           children: ["notice-board"],
         },
       ],
     },
   ];
 
-  // useEffect(() => {
-  //   const handlePopState = (event) => {
-  //     const currentPath = window.location.pathname;
-  //     const referrer = document.referrer;
-  //     console.log(referrer);
-
-  //     console.log(referrer.includes(window.location.host));
-  //     // Check if coming from external page
-  //     if (referrer.includes(window.location.host)) {
-  //     navigate(-1);
-  //       return;
-  //     }
-
-  //     // Check if previous state was same route
-  //     if (event.state?.route === currentPath) {
-  //       // Go back further in history
-  //       window.history.go(-2);
-  //     }
-  //   };
-
-  //   window.addEventListener('popstate', handlePopState);
-
-  //   return () => {
-  //     window.removeEventListener('popstate', handlePopState);
-  //   };
-  // }, [navigate]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -173,15 +170,6 @@ const Sidebar = () => {
     });
   };
 
-  // const handleParamUpdate = (newParams) => {
-  //   const searchParams = new URLSearchParams(newParams);
-  //   window.history.replaceState(
-  //     { route: window.location.pathname },
-  //     '',
-  //     `?${searchParams.toString()}`
-  //   );
-  //   setSearchParams(searchParams);
-  // };
 
   const toggleImportantLinks = () => {
     setShowImportantLinks((prev) => !prev);
@@ -219,7 +207,7 @@ const Sidebar = () => {
   }, [roles, role]);
 
   const isActiveRoute = (item) => {
-    if (location.pathname === item.path) return true;
+    if (location.pathname === item.path.split('?')[0]) return true;
 
     // Check if the current path starts with any children paths
     if (Array.isArray(item.children)) {
@@ -250,7 +238,12 @@ const Sidebar = () => {
                   location.pathname === "/" ? "bg-gray-100" : ""
                 }`}
               >
-                <TbLayoutDashboardFilled size={30} />
+                <img
+                  src={DashboardIcon}
+                  width={30}
+                  height={30}
+                  alt="Dashboard"
+                />
                 <span className="ms-3">Dashboard</span>
               </Link>
             </li>
@@ -273,7 +266,9 @@ const Sidebar = () => {
                     <span className="flex-1 ms-3 whitespace-nowrap">
                       {item.label}{" "}
                       {item.label === "Notice Board" && isUpdated && (
-                        <Chip color="secondary" label="New" />
+                        <div className="inline-flex items-center rounded-full bg-rose-100 px-2.5 py-0.5 text-xs font-medium text-rose-800">
+                          New
+                        </div>
                       )}
                     </span>
                   </Link>
@@ -287,14 +282,18 @@ const Sidebar = () => {
               onClick={toggleImportantLinks}
               className="flex items-center p-2 text-gray-900 rounded-lg  hover:bg-gray-100 group cursor-pointer"
             >
-              <AiFillProduct size={30} />
+              <img src={LinksIcon} width={25} height={25} alt="Links" />
               <span className="flex-1 ms-3 whitespace-nowrap">
                 Important Links
               </span>
               {showImportantLinks ? (
-                <FiChevronUp size={20} />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 15l-6-6-6 6"/>
+                </svg>
               ) : (
-                <FiChevronDown size={20} />
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
               )}
             </div>
 
@@ -344,7 +343,7 @@ const Sidebar = () => {
                     : ""
                 }`}
               >
-                <IoSettings size={30} />
+                <img src={SettingsIcon} width={30} height={30} alt="Settings" />
                 <span className="flex-1 ms-3 whitespace-nowrap">Settings</span>
               </Link>
             </li>
@@ -356,7 +355,7 @@ const Sidebar = () => {
               onClick={handleLogout}
               className="flex items-center p-2 text-gray-900 rounded-lg text-start hover:text-red-600 w-full  hover:bg-gray-100 group"
             >
-              <IoLogOut size={30} />
+              <img src={LogoutIcon} width={30} height={30} alt="Logout" />
               <span className="flex-1 ms-3 whitespace-nowrap">Sign Out</span>
             </button>
           </li>

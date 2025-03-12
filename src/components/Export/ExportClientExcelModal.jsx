@@ -14,28 +14,26 @@ import { ClipLoader } from "react-spinners";
 
 const ExportClientExcelModal = ({ modalName, filters }) => {
   const defaultColumns = [
-    { header: "Email", key: "email", },
-    { header: "Company Name", key: "companyName", },
-    { header: "User Name", key: "userName", },
-    { header: "Phone", key: "phone", },
-    { header: "Is Active", key: "isActive", },
-    { header: "Plan Name", key: "planName", },
-    { header: "Plan Start Date", key: "planStartDate", },
-    { header: "Plan Expiry", key: "planExpiry", },
-    { header: "Contacts Limit", key: "contactsLimit", },
-    { header: "Total Employees", key: "totalEmployees", },
-    { header: "Employee Sales Count", key: "employeeSalesCount", },
+    { header: "Email", key: "email" },
+    { header: "Company Name", key: "companyName" },
+    { header: "User Name", key: "userName" },
+    { header: "Phone", key: "phone" },
+    { header: "Is Active", key: "isActive" },
+    { header: "Plan Name", key: "planName" },
+    { header: "Plan Start Date", key: "planStartDate" },
+    { header: "Plan Expiry", key: "planExpiry" },
+    { header: "Contacts Limit", key: "contactsLimit" },
+    { header: "Total Employees", key: "totalEmployees" },
+    { header: "Employee Sales Count", key: "employeeSalesCount" },
     {
       header: "Employee Reminder Count",
       key: "employeeReminderCount",
-
     },
-    { header: "Toggle Limit", key: "toggleLimit", },
+    { header: "Toggle Limit", key: "toggleLimit" },
   ];
   const dispatch = useDispatch();
 
-  const { isLoading, isSuccess } = useSelector((state) => state.export);
-  
+  const { isExportLoading } = useSelector((state) => state.export);
 
   const [limit, setLimit] = useState("");
   const [selectedColumns, setSelectedColumns] = useState(
@@ -60,10 +58,10 @@ const ExportClientExcelModal = ({ modalName, filters }) => {
   };
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isExportLoading) {
       handleClose();
     }
-  }, [isSuccess]);
+  }, [isExportLoading]);
 
   return (
     <Modal open={true} onClose={handleClose} disablePortal>
@@ -117,9 +115,12 @@ const ExportClientExcelModal = ({ modalName, filters }) => {
             Cancel
           </Button>
           <Button
-            disabled={isLoading}
-            variant="contained" color="primary" onClick={handleSubmit}>
-            {isLoading ? <ClipLoader className="mx-8" color="#fff" size={20} /> : "Download"}
+            disabled={isExportLoading}
+            variant="contained"
+            color="primary"
+            onClick={handleSubmit}
+          >
+            Download
           </Button>
         </div>
       </Box>

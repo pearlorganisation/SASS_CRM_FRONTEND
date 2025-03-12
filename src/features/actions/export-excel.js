@@ -35,7 +35,7 @@ export const exportClientExcel = createAsyncThunk(
 
       return true; // Optional: Return a success status
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error);
     }
   }
 );
@@ -65,6 +65,13 @@ export const exportWebinarAttendeesExcel = createAsyncThunk(
       link.remove(); // Clean up after download
 
       dispatch(
+        getUserDocuments({
+          page: 1,
+          limit: 10,
+        })
+      );
+
+      dispatch(
         addUserActivity({
           action: "export",
           details: `User Exported the Attendees, limit: ${
@@ -75,7 +82,54 @@ export const exportWebinarAttendeesExcel = createAsyncThunk(
 
       return true; // Optional: Return a success status
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const exportGroupedAttendeesExcel = createAsyncThunk(
+  "groupedAttendees/exportExcel",
+  async (payload = {}, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await instance.post(
+        `export-excel/attendees`,
+        { fieldName: "attendeeTableConfig", ...payload },
+        {
+          responseType: "blob", // Ensure you get the file as a binary Blob
+        }
+      );
+
+      // Automatically trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Set file name for download
+      link.setAttribute("download", "Attendees.xlsx");
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove(); // Clean up after download
+
+      dispatch(
+        getUserDocuments({
+          page: 1,
+          limit: 10,
+        })
+      );
+
+      dispatch(
+        addUserActivity({
+          action: "export",
+          details: `User Exported the Attendees, limit: ${
+            !payload.limit ? "All" : payload.limit
+          }`,
+        })
+      );
+
+      return true; // Optional: Return a success status
+    } catch (error) {
+      return rejectWithValue(error);
     }
   }
 );
@@ -87,6 +141,7 @@ export const exportWebinarExcel = createAsyncThunk(
     { rejectWithValue, dispatch }
   ) => {
     try {
+      console.log("exportWebinarExcel -> filters", filters);
       const response = await instance.post(
         `export-excel/webinars`,
         { filters, columns },
@@ -117,7 +172,7 @@ export const exportWebinarExcel = createAsyncThunk(
 
       return true; // Optional: Return a success status
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error);
     }
   }
 );
@@ -144,7 +199,7 @@ export const exportEmployeesExcel = createAsyncThunk(
       link.href = url;
 
       // Set file name for download
-      link.setAttribute("download", "clients.xlsx");
+      link.setAttribute("download", "Employees.xlsx");
 
       document.body.appendChild(link);
       link.click();
@@ -159,7 +214,61 @@ export const exportEmployeesExcel = createAsyncThunk(
 
       return true; // Optional: Return a success status
     } catch (error) {
-      return rejectWithValue(error.response?.data || error.message);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const getUserDocuments = createAsyncThunk(
+  "userDocuments/getUserDocuments",
+  async ({ page = 1, limit = 10, bell }, { rejectWithValue }) => {
+    try {
+      const { data } = await instance.get(`export-excel/user-documents`, {
+        params: { page, limit },
+      });
+      return { ...data, bell };
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const getUserDocument = createAsyncThunk(
+  "userDocuments/getUserDocument",
+  async ({ id, fileName }, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`export-excel/user-documents/${id}`, {
+        responseType: "blob", // Ensure you get the file as a binary Blob
+      });
+
+      // Automatically trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Set file name for download
+      link.setAttribute("download", fileName);
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove(); // Clean up after download
+
+      return true; // Optional: Return a success status
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error);
+    }
+  }
+);
+
+export const deleteUserDocument = createAsyncThunk(
+  "userDocuments/delete",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await instance.delete(`export-excel/user-documents/${id}`); // Optional: Return a success status
+      return {id};
+    } catch (error) {
+      return rejectWithValue(error);
     }
   }
 );

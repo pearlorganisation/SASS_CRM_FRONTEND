@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { getRoleNameByID } from "../../../utils/roles";
 import { toggleSidebar } from "../../../features/slices/globalData";
-import { FaUserCircle } from "react-icons/fa"; // Importing profile icon
+import Profile from './profile.svg'
 import { setEmployeeModeId } from "../../../features/slices/employee";
 import ComponentGuard from "../../AccessControl/ComponentGuard";
 import useRoles from "../../../hooks/useRoles";
 import NotificationBell from "../../Notification/NotificationBell";
+import ImportExportNotifications from "../../Notification/ImportExportNotifications";
 const Header = () => {
   const [expiryDays, setExpiryDays] = useState();
   const dispatch = useDispatch();
@@ -43,7 +44,7 @@ const Header = () => {
   };
 
   return (
-    <nav className="fixed top-0 z-50 w-full bg-white border-b border-gray-200">
+    <nav className="fixed top-0 z-50 w-full max-w-screen  bg-white border-b border-gray-200">
       <div className="px-3 py-3 lg:px-5 lg:pl-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center justify-start rtl:justify-end">
@@ -117,6 +118,11 @@ const Header = () => {
           </ComponentGuard>
 
           <div className="flex items-center">
+          <ComponentGuard
+            allowedRoles={[roles.ADMIN, roles.SUPER_ADMIN]}
+          >
+            <ImportExportNotifications/>
+            </ComponentGuard>
             <NotificationBell
               important={true}
               userData={userData}
@@ -142,8 +148,13 @@ const Header = () => {
                   </p>
                 </div>
                 <div className="text-gray-500">
-                  {/* Profile Icon */}
-                  <FaUserCircle size={34} />
+                  {/* Use img tag for SVG */}
+                  <img 
+                    src={Profile} 
+                    alt="Profile" 
+                    className="w-10 h-10" 
+                    style={{ fill: '#525252' }}
+                  />
                 </div>
               </div>
             </div>

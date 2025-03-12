@@ -14,7 +14,7 @@ import { ClipLoader } from "react-spinners";
 const ExportModal = ({ modalName, defaultColumns, handleExport }) => {
   const dispatch = useDispatch();
 
-  const { isLoading, isSuccess } = useSelector((state) => state.export);
+  const { isExportLoading } = useSelector((state) => state.export);
   const modalState = useSelector((state) => state.modals.modals);
   const open = modalState[modalName] ? true : false;
   const { subscription } = useSelector((state) => state.auth);
@@ -36,14 +36,14 @@ const ExportModal = ({ modalName, defaultColumns, handleExport }) => {
   };
 
   const handleSubmit = () => {
-    handleExport({ limit: limit || undefined, columns: selectedColumns });
+    handleExport({ limit: limit || 0, columns: selectedColumns });
   };
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isExportLoading) {
       handleClose();
     }
-  }, [isSuccess]);
+  }, [isExportLoading]);
 
   return (
     <Modal open={open} onClose={handleClose} disablePortal>
@@ -54,9 +54,19 @@ const ExportModal = ({ modalName, defaultColumns, handleExport }) => {
             label="Limit"
             variant="outlined"
             type="number"
+            placeholder="All"
             fullWidth
             value={limit}
-            onChange={(e) => setLimit(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value === "") {
+                setLimit(e.target.value);
+                return;
+              }
+              const value = Number(e.target.value);
+              if (!isNaN(value) && value > 0 && value <= 10000) {
+                setLimit(value);
+              }
+            }}
             onKeyDown={(e) => {
               const allowedKeys = [
                 "Backspace",
@@ -73,6 +83,7 @@ const ExportModal = ({ modalName, defaultColumns, handleExport }) => {
                 e.preventDefault();
               }
             }}
+            InputLabelProps={{ shrink: true }}
           />
         </div>
         <div className="mb-4">
@@ -102,16 +113,12 @@ const ExportModal = ({ modalName, defaultColumns, handleExport }) => {
             Cancel
           </Button>
           <Button
-            disabled={isLoading}
+            disabled={isExportLoading}
             variant="contained"
             color="primary"
             onClick={handleSubmit}
           >
-            {isLoading ? (
-              <ClipLoader className="mx-8" color="#fff" size={20} />
-            ) : (
-              "Download"
-            )}
+              Download
           </Button>
         </div>
       </Box>

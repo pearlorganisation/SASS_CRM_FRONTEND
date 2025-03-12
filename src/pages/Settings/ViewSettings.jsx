@@ -2,20 +2,24 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ComponentGuard from "../../components/AccessControl/ComponentGuard";
-import { RiMoneyRupeeCircleLine } from "react-icons/ri";
-import { PiLetterCirclePBold } from "react-icons/pi";
-import { MdArrowDropDownCircle, MdLeaderboard } from "react-icons/md";
-import { PiLinkSimpleBold } from "react-icons/pi";
-import { GiPerspectiveDiceSixFacesRandom } from "react-icons/gi";
 import { Box, Typography, Checkbox, FormControlLabel } from "@mui/material";
 import { setTableMasked } from "../../features/slices/tableSlice";
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import useRoles from "../../hooks/useRoles";
-import { MdDelete } from "react-icons/md";
 import { deleteAllData } from "../../features/actions/globalData";
-import { TbRecharging } from "react-icons/tb";
-import { FaRegMoneyBillAlt, FaTags  } from "react-icons/fa";
-import { AiOutlineProduct } from "react-icons/ai";
+import {
+  Addon,
+  API,
+  Billing,
+  DeleteIcon,
+  Dropdown,
+  LandingPageIcon,
+  LeadTypeIcon,
+  Plan,
+  ProductLevelIcon,
+  SidebarLinksIcon,
+  Tags,
+} from "./SVGs";
 // Configuration for the links
 
 const ViewSettings = () => {
@@ -36,62 +40,62 @@ const ViewSettings = () => {
     {
       to: "/plans",
       name: "Plans",
-      icon: <RiMoneyRupeeCircleLine size={40} />,
+      icon: <img src={Plan} alt="Plan" className="w-10 h-10" />,
       allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
     },
     {
       to: "/addons",
       name: "Addons",
-      icon: <TbRecharging size={40} />,
+      icon: <img src={Addon} alt="Addon" className="w-10 h-10" />,
       allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
     },
     {
       to: "/tags",
       name: "Tags",
-      icon: <FaTags size={35} />,
+      icon: <img src={Tags} alt="Tags" className="w-10 h-10" />,
       allowedRoles: [roles.ADMIN],
     },
     {
       to: "/billing-history",
       name: "Billing History",
-      icon: <FaRegMoneyBillAlt size={40} />,
+      icon: <img src={Billing} alt="Tags" className="w-10 h-10" />,
       allowedRoles: [roles.ADMIN],
     },
     {
       to: "/pabblyToken",
       name: "External API Token",
-      icon: <PiLetterCirclePBold size={40} />,
+      icon: <img src={API} alt="Tags" className="w-10 h-10" />,
       allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
     },
     {
       to: "/settings/custom-status",
       name: `${roles.isSuperAdmin() ? "Default" : "Custom"} Options`,
-      icon: <MdArrowDropDownCircle size={40} />,
+      icon: <img src={Dropdown} alt="Tags" className="w-10 h-10" />,
       conditions: [isCustomStatusEnabled || roles.isSuperAdmin()],
       allowedRoles: [roles.SUPER_ADMIN, roles.ADMIN],
     },
     {
       to: "/lead-type",
       name: "Lead Types",
-      icon: <MdLeaderboard size={40} />,
+      icon: <img src={LeadTypeIcon} alt="Tags" className="w-10 h-10" />,
       allowedRoles: [roles.ADMIN],
     },
     {
       to: "/product-level",
       name: "Product Level",
-      icon: <AiOutlineProduct size={40} />,
+      icon: <img src={ProductLevelIcon} alt="Tags" className="w-10 h-10" />,
       allowedRoles: [roles.ADMIN],
     },
     {
       to: "/sidebarLinks",
       name: "Sidebar Links",
-      icon: <PiLinkSimpleBold size={40} />,
+      icon: <img src={SidebarLinksIcon} alt="Tags" className="w-10 h-10" />,
       allowedRoles: [roles.SUPER_ADMIN],
     },
     {
       to: "/update-landing-page",
       name: "Landing Page",
-      icon: <GiPerspectiveDiceSixFacesRandom size={40} />,
+      icon: <img src={LandingPageIcon} alt="Tags" className="w-10 h-10" />,
       allowedRoles: [roles.SUPER_ADMIN],
     },
   ];
@@ -112,7 +116,6 @@ const ViewSettings = () => {
     <Box className="mt-10 text-center">
       <Typography variant="h4" className="font-bold">
         SETTINGS
-        
       </Typography>
       {/* Tailwind Grid Layout */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 my-10 md:mx-10">
@@ -127,7 +130,7 @@ const ViewSettings = () => {
               <Link
                 to={to}
                 onClick={() => addUserActivityLog(to, "page")}
-                className={`flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-green-600 hover:text-white text-green-600 shadow-lg`}
+                className={`flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-neutral-200 text-green-600 shadow-lg`}
               >
                 {icon}
                 <Typography>{name}</Typography>
@@ -153,9 +156,9 @@ const ViewSettings = () => {
         <ComponentGuard allowedRoles={[roles.SUPER_ADMIN]}>
           <button
             onClick={() => setIsDeleteOpen(true)}
-            className={`flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-red-600 hover:text-white text-red-600 shadow-lg`}
+            className={`flex items-center justify-center gap-3 font-bold text-xl rounded-lg bg-white h-20 w-full cursor-pointer hover:bg-red-100  text-red-600 shadow-lg`}
           >
-            <MdDelete size={30} />
+            <img src={DeleteIcon} alt="Delete" className="w-10 h-10" />
             <Typography>Delete All</Typography>
           </button>
         </ComponentGuard>

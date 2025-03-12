@@ -3,23 +3,24 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchGroupedAttendees } from "../../features/actions/attendees";
 import { groupedAttendeeTableColumns } from "../../utils/columnData";
-import { MdVisibility } from "react-icons/md";
 import DataTable from "../../components/Table/DataTable";
 import { getLeadType } from "../../features/actions/assign";
 import GroupedAttendeeFilterModal from "./Modal/GroupedAttendeeFilterModal";
 import { createPortal } from "react-dom";
 import { clearAttendeeData } from "../../features/slices/attendees";
 import FullScreen from "../../components/FullScreen";
+import ExportModal from "../../components/Export/ExportModal";
+import { exportGroupedAttendeesExcel } from "../../features/actions/export-excel";
+import { VisibilityIcon } from "../../components/SVGs";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
   const AttendeesFilterModalName = "ViewAttendeesFilterModal";
   const tableHeader = "All Attendees Table";
-  const exportExcelModalName = "ExportViewAttendeesExcel";
+  const exportModalName = "ExportViewAttendeesExcel";
   // ----------------------- etcetra -----------------------
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
 
   const { leadTypeData } = useSelector((state) => state.assign);
   const { attendeeData, isLoading, pagination } = useSelector(
@@ -32,7 +33,7 @@ const WebinarAttendees = () => {
   );
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
   const modalState = useSelector((state) => state.modals.modals);
-  const exportModalOpen = modalState[exportExcelModalName] ? true : false;
+  const exportModalOpen = modalState[exportModalName] ? true : false;
   const AttendeesFilterModalOpen = modalState[AttendeesFilterModalName]
     ? true
     : false;
@@ -56,7 +57,6 @@ const WebinarAttendees = () => {
   }, [page, LIMIT, allAttendeesSortBy, allAttendeesFilters]);
 
   useEffect(() => {
-   
     dispatch(getLeadType());
 
     return () => {
@@ -69,10 +69,7 @@ const WebinarAttendees = () => {
   const actionIcons = [
     {
       icon: () => (
-        <MdVisibility
-          size={24}
-          className="text-indigo-500 group-hover:text-indigo-600"
-        />
+        <img src={VisibilityIcon} alt="Bookmark" width={24} height={24} />
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
@@ -103,7 +100,7 @@ const WebinarAttendees = () => {
           setPage={setPage}
           limit={LIMIT}
           filterModalName={AttendeesFilterModalName}
-          exportModalName={exportExcelModalName}
+          exportModalName={exportModalName}
           isLoading={isLoading}
           isLeadType={true}
         />
@@ -116,6 +113,30 @@ const WebinarAttendees = () => {
             document.body
           )}
       </FullScreen>
+      {exportModalOpen &&
+        createPortal(
+          <ExportModal
+            modalName={exportModalName}
+            defaultColumns={[
+              { header: "Email", key: "email", width: 20, type: "" },
+              ...groupedAttendeeTableColumns.filter(
+                (column) => column.header !== "Email"
+              ),
+              { header: "Phone", key: "phone", width: 20, type: "" },
+            ]}
+            handleExport={({ limit, columns }) => {
+              dispatch(
+                exportGroupedAttendeesExcel({
+                  limit,
+                  columns,
+                  filters: allAttendeesFilters,
+                  sort: allAttendeesSortBy,
+                })
+              );
+            }}
+          />,
+          document.body
+        )}
     </div>
   );
 };

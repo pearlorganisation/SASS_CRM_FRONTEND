@@ -20,7 +20,7 @@ import RawTable from "./RawTable";
 const FilterPresetModal = lazy(() => import("../Filter/FilterPresetModal"));
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import ModalFallback from "../Fallback/ModalFallback";
-import { MdBookmark, MdFilterAlt, MdSort } from "react-icons/md";
+import { BookmarkIcon, FilterIcon } from "../SVGs";
 // import SortModal from "../SortModal";
 
 const DataTable = ({
@@ -107,7 +107,7 @@ const DataTable = ({
               }}
               className="border-purple-500 h-10 border text-md text-purple-500 px-4 rounded-md flex items-center gap-2 "
             >
-              <MdBookmark size={22} />
+              <img src={BookmarkIcon} alt="Bookmark" width={20} height={20} />
               Presets
             </button>
             <button
@@ -116,7 +116,7 @@ const DataTable = ({
               }}
               className="border-blue-500 h-10 border text-md text-blue-500 px-4 rounded-md flex items-center gap-2 "
             >
-              <MdFilterAlt size={22} />
+              <img src={FilterIcon} alt="Bookmark" width={22} height={22} />
               Filters
               {filters && Object.keys(filters)?.length > 0 && (
                 <span className=" px-2 text-xs font-medium bg-indigo-100 text-indigo-800 rounded-full">

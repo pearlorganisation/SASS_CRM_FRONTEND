@@ -110,6 +110,12 @@ const ProfilePage = () => {
                 <p className="mb-2">
                   <strong>Date Format:</strong> {dateFormat?.toUpperCase().replaceAll("-", "/")}
                 </p>
+                <ComponentGuard allowedRoles={[roles.ADMIN, roles.SUPER_ADMIN]}>
+                  
+                <p className="mb-2">
+                    <strong>Address:</strong> {userData?.address || "N/A"}
+                  </p>
+                </ComponentGuard>
                 <ComponentGuard allowedRoles={[roles.ADMIN]}>
                   <p className="mb-2">
                     <strong>GST Number:</strong> {userData?.gst || "N/A"}

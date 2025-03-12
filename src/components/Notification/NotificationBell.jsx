@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import MessageIcon from "@mui/icons-material/Message";
+import NotificationsIcon from "./bell.svg";
+import MessageIcon from "./message.svg";
 import {
   getUserNotifications,
   resetUnseenCount,
 } from "../../features/actions/notification";
 import { useNavigate } from "react-router-dom";
 import { NotifActionType } from "../../utils/extra";
-import LinearProgressWithLabel from "../Export/LinearProgressWithLabel";
 
 const NotificationBell = ({ userData, roles, important }) => {
   const navigate = useNavigate();
@@ -16,10 +15,9 @@ const NotificationBell = ({ userData, roles, important }) => {
   const [isOpen, setIsOpen] = useState(false);
   const bellRef = useRef(null);
   const dropdownRef = useRef(null);
-  const [progress, setProgress] = useState(0);
 
   const { employeeModeData } = useSelector((state) => state.employee);
-  const { notifications, unseenCount, _notifications, _unseenCount } =
+  const { bellNotifications, unseenCount, _bellNotifications, _unseenCount } =
     useSelector((state) => state.notification);
 
   const handleBellClick = () => {
@@ -57,6 +55,7 @@ const NotificationBell = ({ userData, roles, important }) => {
         getUserNotifications({
           id: employeeModeData ? employeeModeData?._id : userData?._id,
           important,
+          bell: true
         })
       );
     }
@@ -107,7 +106,7 @@ const NotificationBell = ({ userData, roles, important }) => {
         <div className="relative">
           {important ? (
             <>
-              <MessageIcon className="text-gray-600" />
+              <img src={MessageIcon} width={25} height={25} alt="Notifications" />
               {unseenCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
                   {unseenCount}
@@ -116,7 +115,7 @@ const NotificationBell = ({ userData, roles, important }) => {
             </>
           ) : (
             <>
-              <NotificationsIcon className="text-gray-600" />
+              <img src={NotificationsIcon} width={25} height={25} alt="Notifications" />
               {_unseenCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
                   {_unseenCount}
@@ -137,9 +136,7 @@ const NotificationBell = ({ userData, roles, important }) => {
               <h3 className="text-lg font-bold">Notifications</h3>
               <button
                 onClick={() => {
-                  navigate(
-                    `/notifications/${userData?._id}?important=${important}`
-                  );
+                  navigate(`/notifications/${userData?._id}?important=${important}`);
                   setIsOpen(false);
                 }}
                 className="text-gray-500 hover:text-gray-900 hover:underline"
@@ -149,7 +146,7 @@ const NotificationBell = ({ userData, roles, important }) => {
             </div>
             <hr className="my-2 border-gray-200" />
             <div className="divide-y">
-              {(important ? notifications : _notifications).map((notif) => (
+              {(important ? bellNotifications : _bellNotifications).map((notif) => (
                 <div
                   key={notif._id}
                   onClick={() => handleClick(notif)}
@@ -167,7 +164,7 @@ const NotificationBell = ({ userData, roles, important }) => {
                 </div>
               ))}
 
-              {(important ? notifications : _notifications).length === 0 && (
+              {(important ? bellNotifications : _bellNotifications).length === 0 && (
                 <div className="p-4 text-center text-gray-700">
                   No notifications found
                 </div>

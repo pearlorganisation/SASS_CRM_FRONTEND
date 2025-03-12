@@ -54,7 +54,9 @@ import {
   ManageTags,
   Locations,
   ProductRevenue,
-  ProductEnrollments
+  ProductEnrollments,
+  UserDownloads,
+  EmployeeAssignMetrics,
 } from "./pages";
 import RouteGuard from "./components/AccessControl/RouteGuard";
 
@@ -68,13 +70,7 @@ import useRoles from "./hooks/useRoles";
 import useAddUserActivity from "./hooks/useAddUserActivity";
 
 import { socket } from "./socket";
-import TrapFocus from "@mui/material/Unstable_TrapFocus";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Fade from "@mui/material/Fade";
-import Paper from "@mui/material/Paper";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
+const AlarmBanner = lazy(() => import("./components/AlarmBanner"));
 
 import alarm from "/alarm.wav";
 import { setEmployeeModeId } from "./features/slices/employee";
@@ -98,8 +94,6 @@ const App = () => {
   const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed || false;
 
   const [bannerOpen, setBannerOpen] = useState(false);
-  const [bannerTitle, setBannerTitle] = useState("");
-  const [bannerMsg, setBannerMsg] = useState("");
   const [bannerData, setBannerData] = useState(null);
 
   const closeBanner = () => {
@@ -127,14 +121,11 @@ const App = () => {
       audio.loop = true; // Enable looping
       audio.play().catch((err) => console.error("Audio play error:", err)); // Handle potential play errors
       setBannerOpen(true);
-      setBannerTitle(data.message);
-      setBannerMsg(data.deleteResult.note);
       setBannerData(data);
       dispatch(resetAlarmData());
     }
 
     function onNotification(data) {
-      // console.log(data);
       dispatch(newNotification(data));
       toast.info(data.title || "New Notification");
       if (data.actionType === NotifActionType.ACCOUNT_DEACTIVATION) {
@@ -142,9 +133,7 @@ const App = () => {
       }
     }
 
-    function onReminderPlay(data) {
-      // console.log(data);
-    }
+    function onReminderPlay(data) {}
 
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
@@ -163,7 +152,6 @@ const App = () => {
 
   useEffect(() => {
     if (isConnected && userData) {
-      // console.log("join emitted");
       socket.emit("join", { user: userData._id });
     }
 
@@ -180,7 +168,6 @@ const App = () => {
     dispatch(setEmployeeModeId());
 
     if (isUserLoggedIn) {
-      // console.log("connecting socket");
       socket.connect();
     }
 
@@ -268,11 +255,22 @@ const App = () => {
           ),
         },
         {
+          path: "/assignment-metrics",
+          element: (
+            <RouteGuard
+              roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER", "ADMIN"]}
+            >
+              <EmployeeAssignMetrics />
+            </RouteGuard>
+          ),
+        },
+        {
           path: "/product-revenue",
           element: (
             <RouteGuard
-            conditions={[productRevenueMetrics]}
-            roleNames={["ADMIN"]}>
+              conditions={[productRevenueMetrics]}
+              roleNames={["ADMIN"]}
+            >
               <ProductRevenue />
             </RouteGuard>
           ),
@@ -371,6 +369,14 @@ const App = () => {
           element: <Notifications />,
         },
         {
+          path: "/user-downloads",
+          element: (
+            <RouteGuard roleNames={["ADMIN", "SUPER_ADMIN"]}>
+              <UserDownloads />
+            </RouteGuard>
+          ),
+        },
+        {
           path: "/assignments",
           element: (
             <RouteGuard roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER"]}>
@@ -382,7 +388,7 @@ const App = () => {
           path: "/calendar",
           element: (
             <RouteGuard
-            conditions={[calendarFeatures]}
+              conditions={[calendarFeatures]}
               roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER", "ADMIN"]}
             >
               <CalendarPage />
@@ -570,7 +576,14 @@ const App = () => {
     },
     {
       path: "/login",
-      element: !isUserLoggedIn ?<Suspense fallback={<></>}> <Login /></Suspense> : <Navigate to="/" replace />,
+      element: !isUserLoggedIn ? (
+        <Suspense fallback={<></>}>
+          {" "}
+          <Login />
+        </Suspense>
+      ) : (
+        <Navigate to="/" replace />
+      ),
     },
     {
       path: "*",
@@ -582,92 +595,11 @@ const App = () => {
     <div className="">
       <Toaster position="top-center" richColors />
       <RouterProvider router={router} />
-      <TrapFocus open disableAutoFocus disableEnforceFocus>
-        <Fade appear={false} in={bannerOpen}>
-          <Paper
-            role="dialog"
-            aria-modal="false"
-            aria-label="Alarm banner"
-            square
-            variant="outlined"
-            tabIndex={-1}
-            sx={{
-              position: "fixed",
-              bottom: 15,
-              // left: 0,
-              right: 5,
-              m: 0,
-              p: 2,
-              color: "#ffffff",
-              borderWidth: 0,
-              border: 1,
-              borderColor: "#117195f0",
-              borderRadius: "10px",
-              width: 400,
-              minHeight: 150,
-              maxWidth: "100%",
-              background: "#23a7daee",
-            }}
-          >
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              sx={{
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: 2,
-              }}
-            >
-              <Box
-                sx={{
-                  flexShrink: 1,
-                  alignSelf: { xs: "flex-start", sm: "center" },
-                }}
-              >
-                {bannerData && (
-                  <>
-                    <Typography sx={{ fontWeight: "bold" }}>
-                      {bannerData.message}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>E-Mail:</strong> {bannerData.deleteResult.email}
-                    </Typography>
-                    <Typography variant="body2">
-                      <strong>Note:</strong> {bannerData.deleteResult.note}
-                    </Typography>
-                  </>
-                )}
-              </Box>
-              <Stack
-                direction={{
-                  xs: "row-reverse",
-                  sm: "column",
-                }}
-                sx={{
-                  gap: 2,
-                  flexShrink: 0,
-                  alignSelf: { xs: "flex-end", sm: "center" },
-                }}
-              >
-                {bannerData && (
-                  <a
-                    href={`/particularContact?email=${bannerData?.deleteResult?.email}&attendeeId=${bannerData?.deleteResult?.attendeeId}`}
-                  >
-                    <Button size="small" variant="contained">
-                      View Attendee
-                    </Button>
-                  </a>
-                )}
-                <Button size="small" onClick={closeBanner} variant="contained">
-                  Stop Alarm
-                </Button>
-                {/* <Button size="small" onClick={closeBanner}>
-                  Reject all
-                </Button> */}
-              </Stack>
-            </Stack>
-          </Paper>
-        </Fade>
-      </TrapFocus>
+      {bannerOpen && (
+        <Suspense fallback={<></>}>
+          <AlarmBanner bannerData={bannerData} closeBanner={closeBanner} />
+        </Suspense>
+      )}
     </div>
   );
 };

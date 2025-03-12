@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { FaRegEdit, FaCheckSquare } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { setPageLimit } from "../features/slices/pageLimits";
 import useAddUserActivity from "../hooks/useAddUserActivity";
+import { EditIcon, CheckSquare } from "./SVGs";
 
 const PageLimitEditor = ({ pageId = "defaultPage", setPage = () => {} }) => {
   const logUserActivity = useAddUserActivity();
@@ -71,10 +71,10 @@ const PageLimitEditor = ({ pageId = "defaultPage", setPage = () => {} }) => {
       {isEditing ? (
         <button
           onClick={handleSaveClick}
-          className="text-green-500 hover:text-green-700"
+          className="text-green-500 "
           title="Save"
         >
-          <FaCheckSquare size={20} />
+          <img src={CheckSquare} alt="check" className="w-6 h-6" />
         </button>
       ) : (
         <button
@@ -82,7 +82,7 @@ const PageLimitEditor = ({ pageId = "defaultPage", setPage = () => {} }) => {
           className="text-gray-500 hover:text-gray-700"
           title="Edit"
         >
-          <FaRegEdit size={20} />
+          <img src={EditIcon} alt="edit" className="w-6 h-6" />
         </button>
       )}
     </div>

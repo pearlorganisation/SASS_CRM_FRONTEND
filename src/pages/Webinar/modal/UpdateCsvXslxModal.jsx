@@ -12,13 +12,13 @@ const UpdateCsvXslxModal = ({ setModal, csvId, tabValue }) => {
   const handleModal = () => setShowModal(true);
   const handleXslxModal = () => setShowXslxModal(true);
 
-  const { isSuccess } = useSelector((state) => state.attendee);
+  const { isImporting } = useSelector((state) => state.attendee);
 
   useEffect(() => {
-    if (isSuccess) {
+    if (isImporting) {
       setModal(false);
     }
-  }, [isSuccess]);
+  }, [isImporting]);
 
   return (
     <div

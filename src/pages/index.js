@@ -59,6 +59,8 @@ const ManageTags = lazy(() => import("./Settings/Tags/ManageTags"));
 const Locations = lazy(() => import("./Location/Location"));
 const ProductRevenue = lazy(() => import("./Revenue/ProductRevenue"));
 const ProductEnrollments = lazy(() => import("./Products/ProductEnrollments"));
+const UserDownloads = lazy(() => import("./Notifications/UserDownloads"));
+const EmployeeAssignMetrics = lazy(() => import("./Assignments/EmployeeAssignMetrics"));
 
 export {
   CalendarPage,
@@ -106,5 +108,7 @@ export {
   ManageTags,
   Locations,
   ProductRevenue,
-  ProductEnrollments
+  ProductEnrollments,
+  UserDownloads,
+  EmployeeAssignMetrics
 };
