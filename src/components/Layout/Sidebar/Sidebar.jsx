@@ -75,7 +75,7 @@ const Sidebar = () => {
           ]
         : [
             {
-              path: "/webinarDetails",
+              path: "/webinarDetails?page=1",
               label: "Webinars",
               icon: (
                 <img src={WebinarIcon} width={30} height={30} alt="Webinar" />
@@ -83,7 +83,7 @@ const Sidebar = () => {
               children: ["webinarDetails", "assignment-metrics"],
             },
             {
-              path: "/attendees",
+              path: "/attendees?page=1",
               label: "Attendees",
               icon: (
                 <img
@@ -96,7 +96,7 @@ const Sidebar = () => {
               children: ["particularContact"],
             },
             {
-              path: "/employees",
+              path: "/employees?page=1",
               label: "Employees",
               icon: (
                 <img src={EmployeeIcon} width={30} height={30} alt="Employee" />
@@ -207,7 +207,7 @@ const Sidebar = () => {
   }, [roles, role]);
 
   const isActiveRoute = (item) => {
-    if (location.pathname === item.path) return true;
+    if (location.pathname === item.path.split('?')[0]) return true;
 
     // Check if the current path starts with any children paths
     if (Array.isArray(item.children)) {
