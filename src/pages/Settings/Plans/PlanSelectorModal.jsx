@@ -4,8 +4,8 @@ import { resetPricePlanSuccess } from "../../../features/slices/pricePlan";
 
 const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
   const dispatch = useDispatch();
-  const [selectedPlan, setSelectedPlan] = useState("monthly");
-  const {isLoading , isSuccess} = useSelector((state) => state.pricePlans);
+  const [selectedPlan, setSelectedPlan] = useState("");
+  const { isLoading, isSuccess } = useSelector((state) => state.pricePlans);
   const [error, setError] = useState(null);
 
   // Default month multipliers for plans
@@ -16,46 +16,71 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
     yearly: 12,
   };
 
-  // Destructuring planData
-  const { planDurationConfig = {}, name = "Plan Name", amount = 0 } = planData;
-
-  // Ensure planDurationConfig and name exist
-  if (!planDurationConfig || Object.keys(planDurationConfig).length === 0) {
-    throw new Error("Invalid plan configuration");
+  // Validate incoming props
+  if (!planData || typeof planData !== 'object') {
+    console.error("Invalid planData prop");
+    return null;
   }
 
+  // Safe destructuring with defaults
+  const { 
+    planDurationConfig = {}, 
+    name = "Plan Name", 
+    amount = 0 
+  } = planData;
+
+  useEffect(() => {
+    // Initialize selected plan when component mounts
+    const planKeys = Object.keys(planDurationConfig);
+    if (planKeys.length > 0 && !selectedPlan) {
+      setSelectedPlan(planKeys[0]);
+    }
+  }, [planDurationConfig]);
+
   const calculatePlanPrice = (planKey) => {
-    const durationConfig = planDurationConfig[planKey];
-    if (!durationConfig) {
-      setError("Selected plan configuration is missing.");
-      return 0;
-    }
-
-    const basePrice = amount * monthMultiplier[planKey];
-
+     
+    const durationConfig = planDurationConfig[planKey] || {};
+    let basePrice = 0;
+    if(planKey === "custom")
+      basePrice = Number(amount) ;
+      else
+    basePrice = Number(amount) * (Number(monthMultiplier[planKey]) || 0);
+    
     if (durationConfig.discountType === "flat") {
-      return Math.max(basePrice - durationConfig.discountValue, 0);
-    } else if (durationConfig.discountType === "percent") {
-      return Math.max(
-        basePrice * ((100 - durationConfig.discountValue) / 100),
-        0
-      );
+      return Math.max(basePrice - (Number(durationConfig.discountValue) || 0), 0);
     }
-
+    if (durationConfig.discountType === "percent") {
+      const discountValue = Number(durationConfig.discountValue) || 0;
+      return Math.max(basePrice * ((100 - discountValue) / 100), 0);
+    }
     return basePrice;
   };
 
   const totalAmount = calculatePlanPrice(selectedPlan);
-  const durationConfig = planDurationConfig[selectedPlan];
 
-  const discountAmount =
+  let discountAmount = 0;
+  const durationConfig = planDurationConfig[selectedPlan] || {};
+  if (selectedPlan && selectedPlan !== 'custom') {
+
+    discountAmount =
+      durationConfig.discountType === "flat"
+        ? durationConfig.discountValue
+        : (amount *
+            monthMultiplier[selectedPlan] *
+            durationConfig.discountValue) /
+          100;
+  }
+  else if(selectedPlan && selectedPlan === 'custom'){
+
+    discountAmount =
     durationConfig.discountType === "flat"
       ? durationConfig.discountValue
       : (amount *
-          monthMultiplier[selectedPlan] *
           durationConfig.discountValue) /
         100;
+  }
 
+  
   const subtotal = totalAmount;
   const gst = subtotal * 0.18; // 18% GST
   const totalWithGST = subtotal + gst;
@@ -76,7 +101,10 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
   }, [isSuccess]);
 
   const handleConfirmPlan = () => {
-    const billingData = { durationType: selectedPlan, totalAmount: totalWithGST };
+    const billingData = {
+      durationType: selectedPlan,
+      totalAmount: totalWithGST,
+    };
     onSuccess(billingData);
   };
 
@@ -130,7 +158,7 @@ const PlanSelectorModal = ({ onClose, onSuccess, planData, setModal }) => {
           <div className="flex justify-between items-center">
             <p className="text-lg font-bold">Base Price:</p>
             <p className="text-lg font-semibold text-gray-800">
-              ₹{(amount * monthMultiplier[selectedPlan]).toFixed(2)}
+              ₹{(selectedPlan === "custom" ? amount : amount * monthMultiplier[selectedPlan]).toFixed(2)}
             </p>
           </div>
           <div className="flex justify-between items-center mt-2">

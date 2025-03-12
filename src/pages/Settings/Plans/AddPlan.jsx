@@ -26,6 +26,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  TextField,
 } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
 
@@ -40,6 +41,7 @@ import {
 import { getAllClientsForDropdown } from "../../../features/actions/client";
 import { toast } from "sonner";
 import DiscountSection from "./DiscountSection";
+import { clearSinglePlanData } from "../../../features/slices/pricePlan";
 const tableCellStyles = {
   paddingTop: "6px",
   paddingBottom: "6px",
@@ -202,47 +204,47 @@ function AttendeeTable({ control, setValue, watch }) {
   );
 }
 
+const regularDurations = {
+  monthly: {
+    duration: 30,
+    discountType: "percent",
+    discountValue: 0,
+  },
+  quarterly: {
+    duration: 90,
+    discountType: "percent",
+    discountValue: 0,
+  },
+  halfyearly: {
+    duration: 180,
+    discountType: "percent",
+    discountValue: 0,
+  },
+  yearly: {
+    duration: 365,
+    discountType: "percent",
+    discountValue: 0,
+  },
+};
+
 export default function AddPlan() {
   const { id } = useParams();
   const [isEditMode, setIsEditMode] = useState(id ? true : false);
   const {
-    register,
     handleSubmit,
     control,
     watch,
     reset,
     setValue,
-    formState: { errors },
   } = useForm();
-  const { isLoading, planData, isSuccess, singlePlanData } = useSelector(
+  const { isLoading, isSuccess, singlePlanData } = useSelector(
     (state) => state.pricePlans
   );
   const { clientsDropdownData } = useSelector((state) => state.client);
   const [isTableOpen, setIsTableOpen] = useState(false);
   const [planType, setPlanType] = useState("");
   const [assignedUsers, setAssignedUsers] = useState([]);
-  const [planDurationConfig, setPlanDurationConfig] = useState({
-    monthly: {
-      duration: 30,
-      discountType: "percent",
-      discountValue: 0,
-    },
-    quarterly: {
-      duration: 90,
-      discountType: "percent",
-      discountValue: 0,
-    },
-    halfyearly: {
-      duration: 180,
-      discountType: "percent",
-      discountValue: 0,
-    },
-    yearly: {
-      duration: 365,
-      discountType: "percent",
-      discountValue: 0,
-    },
-  });
+  const [planDurationConfig, setPlanDurationConfig] = useState(regularDurations);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -326,6 +328,10 @@ export default function AddPlan() {
 
     dispatch(getAllClientsForDropdown());
     dispatch(getCustomOptions());
+
+    return () => {
+      dispatch(clearSinglePlanData());
+    }
   }, []);
 
   return (
@@ -410,6 +416,16 @@ export default function AddPlan() {
                   value={assignedUsers}
                   onChange={(e) => setAssignedUsers(e.target.value)}
                   label="Select Users"
+                  MenuProps={{
+                    PaperProps: {
+                      style: {
+                        maxHeight: 350,
+                      },
+                    },
+                  }}
+                  inputProps={{
+                    'aria-label': 'Search users',
+                  }}
                 >
                   {clientsDropdownData.map((client, index) => (
                     <MenuItem key={index} value={client.value}>
@@ -598,6 +614,7 @@ export default function AddPlan() {
             <DiscountSection
               planDurationConfig={planDurationConfig}
               setPlanDurationConfig={setPlanDurationConfig}
+              regularDurations={regularDurations}
               watch={watch}
             />
           </Box>

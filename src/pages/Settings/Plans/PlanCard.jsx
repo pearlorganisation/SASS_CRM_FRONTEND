@@ -72,16 +72,19 @@ const PlanCard = (props) => {
     internalName,
     amount,
     isActive,
-    planDuration,
     employeeCount,
     contactLimit,
     toggleLimit,
-    employeeReminder,
-    purchaseHistory,
-    employeeStatus,
-    employeeActivity,
     subscriptionCount,
+    attendeeTableConfig,
+    employeeInactivity,
+    setAlarm,
+    whatsappNotificationOnAlarms,
+    calendarFeatures,
+    productRevenueMetrics
   } = plan;
+
+  const { isCustomOptionsAllowed = false} = attendeeTableConfig || {};
 
   return (
     <div className="relative mx-auto border border-gray-200 p-6 overflow-hidden rounded-xl shadow-lg max-w-sm bg-white m-4 transition-all duration-300 hover:shadow-xl">
@@ -138,6 +141,15 @@ const PlanCard = (props) => {
         </div>
       )}
 
+      {plan.planType === "custom" && (
+        <div
+          title="Current Plan"
+          className="absolute top-10 right-0 bg-indigo-500 text-white text-xs px-3 py-1 rounded-l-md  items-center"
+        >
+          Custom Plan
+        </div>
+      )}
+
       {/* Card Content */}
       <div className="text-center mt-2 mb-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-2">{name}</h2>
@@ -173,10 +185,12 @@ const PlanCard = (props) => {
       </div>
 
       <div className="border-t border-gray-200 pt-4 space-y-2">
-        <Feature label="Employee Reminder" enabled={employeeReminder} />
-        <Feature label="Purchase History" enabled={purchaseHistory} />
-        <Feature label="Employee Status" enabled={employeeStatus} />
-        <Feature label="Employee Activity" enabled={employeeActivity} />
+        <Feature label="Custom Options" enabled={isCustomOptionsAllowed} />
+        <Feature label="Employee Inactivity Tracking" enabled={employeeInactivity} />
+        <Feature label="Set Alarm" enabled={setAlarm} />
+        <Feature label="Whatsapp Notifications" enabled={whatsappNotificationOnAlarms} />
+        <Feature label="Calendar & Alarm History" enabled={calendarFeatures} />
+        <Feature label="Product Revenue Metrics" enabled={productRevenueMetrics} />
       </div>
 
       {/* Copy Plan ID Button */}

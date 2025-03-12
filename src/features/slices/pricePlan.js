@@ -30,11 +30,13 @@ const initialState = {
   plansForDropdown: [],
 };
 
-
 const pricePlans = createSlice({
   name: "PricePlans",
   initialState,
   reducers: {
+    clearSinglePlanData: (state) => {
+      state.singlePlanData = null;
+    },
     resetPricePlanSuccess: (state) => {
       state.isSuccess = false;
     },
@@ -215,5 +217,5 @@ const pricePlans = createSlice({
       });
   },
 });
-export const { resetPricePlanSuccess, resetAddonsData } = pricePlans.actions;
+export const { resetPricePlanSuccess, resetAddonsData, clearSinglePlanData } = pricePlans.actions;
 export default pricePlans.reducer;
