@@ -23,6 +23,7 @@ import ClientCard from "../../components/Client/ClientCard";
 import { MdVisibility, MdEdit, MdLogout } from "react-icons/md";
 import ModalFallback from "../../components/Fallback/ModalFallback";
 import { getPlansForDropdown } from "../../features/actions/pricePlan";
+import { VisibilityIcon } from "../../components/SVGs";
 
 const Clients = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -44,9 +45,10 @@ const Clients = () => {
   const actionIcons = [
     {
       icon: () => (
-        <MdVisibility
-          size={24}
-          className="text-indigo-500 group-hover:text-indigo-600"
+        <img 
+          src={VisibilityIcon} 
+          alt="Visibility"
+          className="min-h-7 min-w-7"
         />
       ),
       tooltip: "View Client Info",
@@ -130,7 +132,6 @@ const Clients = () => {
 
   return (
     <div className="w-full pt-14 sm:px-5">
-
       <div className="flex justify-end mb-5">
         <button
           className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 transition"
@@ -190,7 +191,6 @@ const Clients = () => {
             filters={filters}
             modalName={clientFilterModalName}
           />
-
         </Suspense>
       )}
     </div>

@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchGroupedAttendees } from "../../features/actions/attendees";
 import { groupedAttendeeTableColumns } from "../../utils/columnData";
-import { MdVisibility } from "react-icons/md";
 import DataTable from "../../components/Table/DataTable";
 import { getLeadType } from "../../features/actions/assign";
 import GroupedAttendeeFilterModal from "./Modal/GroupedAttendeeFilterModal";
@@ -12,6 +11,7 @@ import { clearAttendeeData } from "../../features/slices/attendees";
 import FullScreen from "../../components/FullScreen";
 import ExportModal from "../../components/Export/ExportModal";
 import { exportGroupedAttendeesExcel } from "../../features/actions/export-excel";
+import { VisibilityIcon } from "../../components/SVGs";
 
 const WebinarAttendees = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -69,10 +69,7 @@ const WebinarAttendees = () => {
   const actionIcons = [
     {
       icon: () => (
-        <MdVisibility
-          size={24}
-          className="text-indigo-500 group-hover:text-indigo-600"
-        />
+        <img src={VisibilityIcon} alt="Bookmark" width={24} height={24} />
       ),
       tooltip: "View Attendee Info",
       onClick: (item) => {
@@ -120,7 +117,13 @@ const WebinarAttendees = () => {
         createPortal(
           <ExportModal
             modalName={exportModalName}
-            defaultColumns={[{ header: "Email", key: "email", width: 20, type: "" },...(groupedAttendeeTableColumns.filter((column) => column.header !== "Email")),   { header: "Phone", key: "phone", width: 20, type: "" }]}
+            defaultColumns={[
+              { header: "Email", key: "email", width: 20, type: "" },
+              ...groupedAttendeeTableColumns.filter(
+                (column) => column.header !== "Email"
+              ),
+              { header: "Phone", key: "phone", width: 20, type: "" },
+            ]}
             handleExport={({ limit, columns }) => {
               dispatch(
                 exportGroupedAttendeesExcel({
