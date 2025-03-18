@@ -168,7 +168,8 @@ const WebinarAttendees = () => {
           </Button>
 
           {subTabValueRef.current === "attendees" &&
-            tabValueRef.current !== "enrollments" && (
+            tabValueRef.current !== "enrollments" &&
+            userData?.isActive && (
               <Button onClick={() => setSwapOpen(true)} variant="contained">
                 Swap Columns
               </Button>
@@ -276,6 +277,7 @@ const WebinarAttendees = () => {
               tabValue={tabValueRef.current}
               selectedRows={selectedRows}
               setSelectedRows={setSelectedRows}
+              userData={userData}
             />
           )}
         {tabValueRef.current === "enrollments" && (

@@ -81,8 +81,8 @@ const Notifications = () => {
     <div className=" w-full pt-14 p-6">
       <div className="p-6 bg-gray-50  rounded-lg">
         <div className="flex gap-4 mb-8 justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-700">Notifications</h2>
-          <div>
+          <h2 className="text-2xl font-bold text-gray-700">{imp && "Important"} Notifications</h2>
+          {/* <div>
             <button 
               onClick={() => {
                 setPage(1)
@@ -96,7 +96,7 @@ const Notifications = () => {
                 ? 'Important' 
                 : 'Non Important'}
             </button>
-          </div>
+          </div> */}
         </div>
         <div className="grid lg:grid-cols-2 grid-cols-1 gap-4">
           {(imp ? notifications : _notifications).map((notif) => (

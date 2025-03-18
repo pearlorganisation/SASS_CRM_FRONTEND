@@ -106,7 +106,7 @@ const NotificationBell = ({ userData, roles, important }) => {
         <div className="relative">
           {important ? (
             <>
-              <img src={MessageIcon} width={25} height={25} alt="Notifications" />
+              <img src={MessageIcon} className="w-5 h-5 min-w-5 min-h-5 sm:w-6 sm:h-6 sm:min-w-6 sm:min-h-6" alt="Notifications" />
               {unseenCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
                   {unseenCount}
@@ -115,7 +115,7 @@ const NotificationBell = ({ userData, roles, important }) => {
             </>
           ) : (
             <>
-              <img src={NotificationsIcon} width={25} height={25} alt="Notifications" />
+              <img src={NotificationsIcon} className="w-5 h-5 min-w-5 min-h-5 sm:w-6 sm:h-6 sm:min-w-6 sm:min-h-6" alt="Notifications" />
               {_unseenCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
                   {_unseenCount}
@@ -133,7 +133,7 @@ const NotificationBell = ({ userData, roles, important }) => {
         >
           <div className="p-4">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-lg font-bold">Notifications</h3>
+              <h3 className="text-lg font-bold">{ important && "Important"} Notifications</h3>
               <button
                 onClick={() => {
                   navigate(`/notifications/${userData?._id}?important=${important}`);

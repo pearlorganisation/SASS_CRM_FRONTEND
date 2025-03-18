@@ -6,7 +6,7 @@ import { AssignmentStatus } from "../../utils/extra";
 export const addAssign = createAsyncThunk(
   "attendee/assign",
   async (
-    { webinar = "", user = "", attendees = [], recordType = "" },
+    { webinar = "", user = "", attendees = [], recordType = "", forceAssign = false },
     { rejectWithValue, dispatch }
   ) => {
     try {
@@ -14,7 +14,8 @@ export const addAssign = createAsyncThunk(
         webinar,
         user,
         attendees,
-        recordType
+        recordType,
+        forceAssign
       });
       return response;
     } catch (e) {

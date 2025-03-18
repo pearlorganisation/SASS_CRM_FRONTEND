@@ -89,7 +89,7 @@ const ImportExportNotifications = ({ userData, roles }) => {
         className="p-2 hover:bg-gray-100 rounded-full transition-colors"
       >
         <div className="relative">
-          <img src={CloudDownloadIcon} width={30} height={30} alt="Download" />
+          <img src={CloudDownloadIcon} className="w-5 h-5 min-w-5 min-h-5 sm:w-6 sm:h-6 sm:min-w-6 sm:min-h-6" alt="Download" />
           {false && (
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-1">
               2
@@ -121,7 +121,7 @@ const ImportExportNotifications = ({ userData, roles }) => {
                 <div className="p-3 hover:bg-gray-50 cursor-pointer">
                   <div className="font-medium">Data Import Progress</div>
                   <p className="text-gray-600 text-sm">
-                    some text describing what's happening on the backend
+                    {isImporting ? "Importing data from the backend" : "Exporting data to the backend"}
                   </p>
                   <div className="text-xs text-gray-500 text-right mt-1">
                     <Suspense fallback={<></>}>
@@ -176,6 +176,7 @@ const ImportExportNotifications = ({ userData, roles }) => {
                   </div>
   
                   {/* Action Buttons */}
+                  {userData?.isActive && (
                   <div className="flex flex-col gap-2">
                     <button
                     disabled={isLoading}
@@ -233,6 +234,7 @@ const ImportExportNotifications = ({ userData, roles }) => {
                       </svg>
                     </button>
                   </div>
+                  )}
                 </div>
   
                 {/* Status Indicator */}
@@ -258,7 +260,7 @@ const ImportExportNotifications = ({ userData, roles }) => {
               </div>
               ))}
 
-              {false && (
+              {userDocuments.length === 0 && (
                 <div className="p-4 text-center text-gray-700">
                   No Downloads found
                 </div>

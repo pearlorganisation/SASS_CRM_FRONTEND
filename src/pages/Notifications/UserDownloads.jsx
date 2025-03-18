@@ -93,7 +93,9 @@ const UserDownloads = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col flex-shrink-0 gap-2">
+                {
+                  userData?.isActive && (
+                    <div className="flex flex-col flex-shrink-0 gap-2">
                   <button
                   disabled={isLoading}
                     onClick={(e) => {
@@ -151,6 +153,8 @@ const UserDownloads = () => {
                     </svg>
                   </button>
                 </div>
+                  )
+                }
               </div>
 
               {/* Status Indicator */}

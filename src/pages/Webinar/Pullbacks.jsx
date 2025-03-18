@@ -24,13 +24,13 @@ const Pullbacks = (props) => {
     setPage,
     selectedRows,
     setSelectedRows,
+    userData,
   } = props;
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { reAssignData, totalPages, isLoading, isSuccess, requestLoading } = useSelector(
-    (state) => state.reAssign
-  );
+  const { reAssignData, totalPages, isLoading, isSuccess, requestLoading } =
+    useSelector((state) => state.reAssign);
   const LIMIT = useSelector((state) => state.pageLimits[tableHeader] || 10);
 
   useEffect(() => {
@@ -47,7 +47,11 @@ const Pullbacks = (props) => {
     }
 
     function onNotification(data) {
-      console.log(data.actionType, subTabValue, AssignmentStatus.REASSIGN_REQUESTED);
+      console.log(
+        data.actionType,
+        subTabValue,
+        AssignmentStatus.REASSIGN_REQUESTED
+      );
       if (
         data.actionType === NotifActionType.REASSIGNMENT &&
         subTabValue === AssignmentStatus.REASSIGN_REQUESTED
@@ -81,42 +85,48 @@ const Pullbacks = (props) => {
   }, [isSuccess]);
 
   const actionIcons = [
-    {
-      icon: () => (
-        <CheckCircle className="text-green-500 group-hover:text-green-600" />
-      ),
-      tooltip: "Accept Re-Assignment Request",
-      disabled: requestLoading,
-      hideCondition: (row) =>
-        row?.status !== AssignmentStatus.REASSIGN_APPROVED,
-      onClick: (item) => {
-        dispatch(
-          handleReAssigmentRequest({
-            status: "approved",
-            assignments: [item?._id],
-            userId: item?.user,
-            webinarId: item?.webinar,
-          })
-        );
-      },
-    },
-    {
-      icon: () => <Cancel className="text-red-500 group-hover:text-red-600" />,
-      tooltip: "Reject Re-Assignment Request",
-      disabled: requestLoading,
-      hideCondition: (row) =>
-        row?.status !== AssignmentStatus.REASSIGN_APPROVED,
-      onClick: (item) => {
-        dispatch(
-          handleReAssigmentRequest({
-            status: "rejected",
-            assignments: [item?._id],
-            userId: item?.user,
-            webinarId: item?.webinar,
-          })
-        );
-      },
-    },
+    ...(userData?.isActive
+      ? [
+          {
+            icon: () => (
+              <CheckCircle className="text-green-500 group-hover:text-green-600" />
+            ),
+            tooltip: "Accept Re-Assignment Request",
+            disabled: requestLoading,
+            hideCondition: (row) =>
+              row?.status !== AssignmentStatus.REASSIGN_APPROVED,
+            onClick: (item) => {
+              dispatch(
+                handleReAssigmentRequest({
+                  status: "approved",
+                  assignments: [item?._id],
+                  userId: item?.user,
+                  webinarId: item?.webinar,
+                })
+              );
+            },
+          },
+          {
+            icon: () => (
+              <Cancel className="text-red-500 group-hover:text-red-600" />
+            ),
+            tooltip: "Reject Re-Assignment Request",
+            disabled: requestLoading,
+            hideCondition: (row) =>
+              row?.status !== AssignmentStatus.REASSIGN_APPROVED,
+            onClick: (item) => {
+              dispatch(
+                handleReAssigmentRequest({
+                  status: "rejected",
+                  assignments: [item?._id],
+                  userId: item?.user,
+                  webinarId: item?.webinar,
+                })
+              );
+            },
+          },
+        ]
+      : []),
     {
       icon: () => (
         <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
@@ -135,9 +145,9 @@ const Pullbacks = (props) => {
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="webinarReAssignmentsAttendeesTable"
-        isSelectVisible={true}
         setSelectedRows={setSelectedRows}
         selectedRows={selectedRows}
+        isSelectVisible={userData?.isActive}
         tableData={{
           columns: pullbacksTableColumns.map((column) => {
             if (

@@ -81,10 +81,11 @@ const PlanCard = (props) => {
     setAlarm,
     whatsappNotificationOnAlarms,
     calendarFeatures,
-    productRevenueMetrics
+    productRevenueMetrics,
+    renewalNotAllowed,
   } = plan;
 
-  const { isCustomOptionsAllowed = false} = attendeeTableConfig || {};
+  const { isCustomOptionsAllowed = false } = attendeeTableConfig || {};
 
   return (
     <div className="relative mx-auto border border-gray-200 p-6 overflow-hidden rounded-xl shadow-lg max-w-sm bg-white m-4 transition-all duration-300 hover:shadow-xl">
@@ -186,41 +187,56 @@ const PlanCard = (props) => {
 
       <div className="border-t border-gray-200 pt-4 space-y-2">
         <Feature label="Custom Options" enabled={isCustomOptionsAllowed} />
-        <Feature label="Employee Inactivity Tracking" enabled={employeeInactivity} />
+        <Feature
+          label="Employee Inactivity Tracking"
+          enabled={employeeInactivity}
+        />
         <Feature label="Set Alarm" enabled={setAlarm} />
-        <Feature label="Whatsapp Notifications" enabled={whatsappNotificationOnAlarms} />
+        <Feature
+          label="Whatsapp Notifications"
+          enabled={whatsappNotificationOnAlarms}
+        />
         <Feature label="Calendar & Alarm History" enabled={calendarFeatures} />
-        <Feature label="Product Revenue Metrics" enabled={productRevenueMetrics} />
+        <Feature
+          label="Product Revenue Metrics"
+          enabled={productRevenueMetrics}
+        />
       </div>
 
-      {/* Copy Plan ID Button */}
-      <div className="flex justify-center items-center mt-4">
-        <Button
-          onClick={() => copyToClipboard(plan?._id, "Plan")}
-          variant="outlined"
-          endIcon={<ContentCopy />}
-          style={{ textTransform: "none" }}
-        >
-          {plan?._id}
-        </Button>
-      </div>
+      {(roles.isSuperAdmin(userData?.role) || !renewalNotAllowed) && (
+        <>
+          {/* Copy Plan ID Button */}
+          {isActive && (
+            <div className="flex justify-center items-center mt-4">
+              <Button
+                onClick={() => copyToClipboard(plan?._id, "Plan")}
+                variant="outlined"
+                endIcon={<ContentCopy />}
+                style={{ textTransform: "none" }}
+              >
+                {plan?._id}
+              </Button>
+            </div>
+          )}
 
-      <ComponentGuard allowedRoles={isSelectVisible ? [] : [roles.ADMIN]}>
-        {isActive && (
-          <button
-            onClick={() => setDurationModalOpen(true)}
-            className={`${
-              selectedPlan === plan?._id ? "bg-green-600" : "bg-blue-500"
-            } w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
-          >
-            {selectedPlan === null
-              ? "Choose Plan"
-              : selectedPlan === plan?._id
-              ? "Selected"
-              : "Choose Plan"}
-          </button>
-        )}
-      </ComponentGuard>
+          <ComponentGuard allowedRoles={isSelectVisible ? [] : [roles.ADMIN]}>
+            {isActive && (
+              <button
+                onClick={() => setDurationModalOpen(true)}
+                className={`${
+                  selectedPlan === plan?._id ? "bg-green-600" : "bg-blue-500"
+                } w-full mt-6 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors duration-300`}
+              >
+                {selectedPlan === null
+                  ? "Choose Plan"
+                  : selectedPlan === plan?._id
+                  ? "Selected"
+                  : "Choose Plan"}
+              </button>
+            )}
+          </ComponentGuard>
+        </>
+      )}
 
       {durationModalOpen &&
         selectedPlan !== plan?._id &&

@@ -22,9 +22,8 @@ const EmployeeAssignMetrics = () => {
   const { userData } = useSelector((state) => state.auth);
   const { webinarData } = useSelector((state) => state.webinarContact);
   const {employeeModeData} = useSelector((state) => state.employee);
-  const employeeId = employeeModeData ? employeeModeData?._id : userData?._id
+  const employeeId = employeeModeData?._id;
 
-  console.log(employeeModeData)
   const role = userData?.role;
   const [startDate, setStartDate] = useState(
     new Date(new Date().setDate(new Date().getDate() - 7))
@@ -69,7 +68,7 @@ const EmployeeAssignMetrics = () => {
           start: adjustStartDate(startDate),
           end: endDate,
           webinarId,
-          employeeId
+          employeeId: employeeId || userData?._id
         });
         if (dailyRes?.success) {
           const dailyData = dailyRes.data || [];
@@ -144,7 +143,11 @@ const EmployeeAssignMetrics = () => {
 
   useEffect(() => {
     if (!webinarData.length) {
-      if (roles.isEmployeeId(role) || employeeModeData) dispatch(getEmployeeWebinars({employeeId}));
+      console.log('employeeId', employeeId, role, roles.isEmployeeId(role))
+
+      if (roles.isEmployeeId(role) || employeeModeData) {
+        dispatch(getEmployeeWebinars({employeeId}));
+      }
       else dispatch(getAllWebinars({}));
     }
   }, []);
@@ -251,7 +254,7 @@ const EmployeeAssignMetrics = () => {
                 </p>
               </div>
               <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-700">Active</h3>
+                <h3 className="text-lg font-semibold text-gray-700">Pending</h3>
                 <p className="text-3xl font-bold text-amber-600 mt-2">
                   {stats.active}
                 </p>
@@ -306,6 +309,9 @@ const EmployeeAssignMetrics = () => {
                       Completed
                     </th>
                     <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                      Pending
+                    </th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                       Completion Rate
                     </th>
                     {!roles.isEmployeeId(role) && <th className=" py-3  "></th>}
@@ -322,6 +328,9 @@ const EmployeeAssignMetrics = () => {
                       </td>
                       <td className="px-6 py-4 text-center whitespace-nowrap text-green-600">
                         {day.completed}
+                      </td>
+                      <td className="px-6 py-4 text-center whitespace-nowrap text-amber-600">
+                        {day.count - day.completed}
                       </td>
                       <td className="px-6 py-4 text-center whitespace-nowrap">
                         {((day.completed / day.count) * 100 || 0).toFixed(1)}%

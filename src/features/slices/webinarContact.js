@@ -29,6 +29,10 @@ export const webinarContactSlice = createSlice({
     resetWebinarSuccess: (state) => {
       state.isSuccess = false;
     },
+
+    clearAssignedEmployees: (state) => {
+      state.assignedEmployees = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -118,7 +122,7 @@ export const webinarContactSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { resetAttendeeContactDetails, resetWebinarSuccess } = webinarContactSlice.actions;
+export const { resetAttendeeContactDetails, resetWebinarSuccess, clearAssignedEmployees } = webinarContactSlice.actions;
 export default webinarContactSlice.reducer;
 
 // ================================================== THE END ==================================================

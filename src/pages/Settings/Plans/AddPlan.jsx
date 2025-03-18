@@ -275,6 +275,10 @@ export default function AddPlan() {
       payload["_id"] = id;
     }
 
+    if(planType === "normal" && payload["renewalNotAllowed"]) {
+      payload["renewalNotAllowed"] = false;
+    }
+
     payload["planDurationConfig"] = planDurationConfig;
     dispatch(isEditMode ? updatePricePlans(payload) : addPricePlans(payload));
   };
@@ -310,6 +314,7 @@ export default function AddPlan() {
         calendarFeatures: singlePlanData.calendarFeatures || false,
         setAlarm: singlePlanData.setAlarm || false,
         productRevenueMetrics: singlePlanData.productRevenueMetrics || false,
+        renewalNotAllowed: singlePlanData.renewalNotAllowed || false,
       });
 
       setPlanType(singlePlanData.planType || "normal");
@@ -580,6 +585,32 @@ export default function AddPlan() {
                 )}
               />
             </div>
+            {
+              planType === "custom" && (
+                <div className="flex justify-between mt-4 items-center">
+                  <Typography 
+                    title="Disable renewal of this plan"
+                    className="font-semibold text-gray-800">
+                    <span className="flex items-center">
+                      Renewal Not Allowed
+                      <InfoIcon className="ms-2 text-blue-600 text-sm" />
+                    </span>
+                  </Typography>
+                  <Controller
+                    name="renewalNotAllowed"
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <Checkbox
+                        onChange={(e) => {
+                          const isChecked = e.target.checked;
+                          onChange(isChecked);
+                        }}
+                        checked={value || false}
+                      />
+                    )}
+                  />
+                </div>)
+            }
           </div>
 
           <Box className="mt-6 shadow-md">

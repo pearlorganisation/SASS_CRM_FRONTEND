@@ -244,6 +244,7 @@ const Assignments = () => {
         className={`flex items-center gap-4 flex-wrap  justify-between`}
       >
         <div className="flex items-center gap-4">
+          {userData?.isActive && (
           <Button
             onClick={() => navigate(`/assignment-metrics`)}
             className="h-10 whitespace-nowrap"
@@ -251,6 +252,7 @@ const Assignments = () => {
           >
             Assign Metrics
           </Button>
+          )}
 
           {selectedRows.length > 0 &&
             userData?.isActive &&

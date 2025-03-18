@@ -33,6 +33,9 @@ const EmpAssignModal = ({ selectedData, setSelectedData }) => {
                     Completed
                   </th>
                   <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                    Pending
+                  </th>
+                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
                     Completion Rate
                   </th>
                 </tr>
@@ -49,8 +52,11 @@ const EmpAssignModal = ({ selectedData, setSelectedData }) => {
                     <td className="px-4 py-3 text-center text-sm text-gray-600 whitespace-nowrap">
                       {entry.count}
                     </td>
-                    <td className="px-4 py-3 text-center text-sm text-gray-600 whitespace-nowrap text-green-600">
+                    <td className="px-4 py-3 text-center text-sm whitespace-nowrap text-green-600">
                       {entry.completed}
+                    </td>
+                    <td className="px-4 py-3 text-center text-sm whitespace-nowrap text-amber-600">
+                      {entry.count - entry.completed}
                     </td>
                     <td className="px-6 py-4 text-center whitespace-nowrap">
                         {((entry.completed / entry.count) * 100 || 0).toFixed(1)}%
