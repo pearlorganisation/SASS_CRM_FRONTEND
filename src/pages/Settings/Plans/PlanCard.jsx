@@ -83,7 +83,11 @@ const PlanCard = (props) => {
     calendarFeatures,
     productRevenueMetrics,
     renewalNotAllowed,
+    customRibbon,
+    customRibbonColor,
   } = plan;
+
+  console.log("customRibbonColor", customRibbonColor, customRibbon);
 
   const { isCustomOptionsAllowed = false } = attendeeTableConfig || {};
 
@@ -124,21 +128,33 @@ const PlanCard = (props) => {
         </div>
       </ComponentGuard>
 
-      {!isActive && (
-        <div
-          title="Inactive Plan, Please contact Administrator."
-          className="absolute top-2 left-0 flex gap-2 bg-red-500 text-white text-xs px-3 py-1 rounded-r-md  items-center"
-        >
-          Inactive Plan <MdInfo />
-        </div>
-      )}
+      <div className="absolute top-2 left-0 flex flex-col gap-2">
+        {customRibbon && (
+          <div
+            className={` flex gap-2 ${
+              customRibbonColor ? `bg-[${customRibbonColor.trim()}]` : "bg-indigo-500"
+            }  text-white text-xs px-3 py-1 rounded-r-md  items-center`}
+          >
+            {customRibbon}
+          </div>
+        )}
+
+        {!isActive && (
+          <div
+            title="Inactive Plan, renewal not allowed. Please contact Administrator."
+            className=" flex gap-2 bg-red-500 text-white text-xs px-3 py-1 rounded-r-md  items-center"
+          >
+            Inactive Plan <MdInfo />
+          </div>
+        )}
+      </div>
 
       {currentPlan === plan?._id && (
         <div
           title="Current Plan"
           className="absolute top-2 right-0 flex gap-2 bg-green-500 text-white text-xs px-3 py-1 rounded-l-md  items-center"
         >
-          Current Plan <MdInfo />
+          Current Plan
         </div>
       )}
 

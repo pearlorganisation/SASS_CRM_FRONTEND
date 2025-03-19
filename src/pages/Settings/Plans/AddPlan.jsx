@@ -315,6 +315,8 @@ export default function AddPlan() {
         setAlarm: singlePlanData.setAlarm || false,
         productRevenueMetrics: singlePlanData.productRevenueMetrics || false,
         renewalNotAllowed: singlePlanData.renewalNotAllowed || false,
+        customRibbon: singlePlanData.customRibbon || "",
+        customRibbonColor: singlePlanData.customRibbonColor || "",
       });
 
       setPlanType(singlePlanData.planType || "normal");
@@ -441,6 +443,37 @@ export default function AddPlan() {
               </FormControl>
             </div>
           )}
+
+          <div className="grid grid-cols-1 mt-5 lg:grid-cols-2 gap-5">
+          <FormInput
+              name="customRibbon"
+              label="Custom Ribbon"
+              control={control}
+              placeholder="Enter Custom Ribbon Label"
+            />
+
+              {/* Color Picker */}
+              <Controller
+                name="customRibbonColor"
+                control={control}
+                render={({ field }) => (
+                  <div className="flex border px-4 py-[10px] rounded border-neutral-400 gap-5 items-center">
+                    <label
+                      htmlFor="color-picker"
+                      className="block text-gray-600"
+                    >
+                        Custom Ribbon Color
+                    </label>
+                    <input
+                      type="color"
+                      id="color-picker"
+                      {...field}
+                      className="w-20 h-8 cursor-pointer border rounded-full"
+                    />
+                  </div>
+                )}
+              />
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4">
             <div className="flex justify-between mt-4 items-center">
