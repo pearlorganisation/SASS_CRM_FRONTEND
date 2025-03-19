@@ -19,7 +19,14 @@ const EmployeeAssignMetrics = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const roles = useRoles();
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, subscription } = useSelector(
+    (state) => state.auth
+  );
+  const assignmentMetrics = subscription?.plan?.assignmentMetrics || false;
+  if(!assignmentMetrics){
+    return null;
+  }
+
   const { webinarData } = useSelector((state) => state.webinarContact);
   const {employeeModeData} = useSelector((state) => state.employee);
   const employeeId = employeeModeData?._id;

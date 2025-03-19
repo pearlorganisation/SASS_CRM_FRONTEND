@@ -24,6 +24,7 @@ import { getNoticeBoard } from "../../../features/actions/noticeBoard";
 import useRoles from "../../../hooks/useRoles";
 import useAddUserActivity from "../../../hooks/useAddUserActivity";
 import ComponentGuard from "../../AccessControl/ComponentGuard";
+import { clearNotifications } from "../../../features/slices/notification";
 const Sidebar = () => {
   const dispatch = useDispatch();
   const roles = useRoles();
@@ -163,6 +164,7 @@ const Sidebar = () => {
 
 
   const handleLogout = () => {
+    dispatch(clearNotifications());
     dispatch(logout());
     logUserActivity({
       action: "logout",

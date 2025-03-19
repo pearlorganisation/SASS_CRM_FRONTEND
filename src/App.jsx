@@ -92,9 +92,13 @@ const App = () => {
   const productRevenueMetrics = subscription?.plan?.productRevenueMetrics;
   const tableConfig = subscription?.plan?.attendeeTableConfig || {};
   const isCustomStatusEnabled = tableConfig?.isCustomOptionsAllowed || false;
+  const assignmentMetrics = subscription?.plan?.assignmentMetrics || false;
 
+  const [isConnected, setIsConnected] = useState(socket.connected);
   const [bannerOpen, setBannerOpen] = useState(false);
   const [bannerData, setBannerData] = useState(null);
+  const audioRef = useRef(new Audio(alarm));
+
 
   const closeBanner = () => {
     audioRef.current.pause();
@@ -102,10 +106,6 @@ const App = () => {
     audioRef.current.currentTime = 0;
     setBannerOpen(false);
   };
-
-  const [isConnected, setIsConnected] = useState(socket.connected);
-
-  const audioRef = useRef(new Audio(alarm));
 
   useEffect(() => {
     function onConnect() {
@@ -173,6 +173,7 @@ const App = () => {
 
     function initFunctions() {
       if (isUserLoggedIn && userData?.role) {
+        console.log("fetching subscription")
         // && !roles.isEmployeeId(role) removed this from the condition
         dispatch(getUserSubscription());
         dispatch(getAllRoles());
@@ -180,13 +181,19 @@ const App = () => {
     }
     initFunctions();
 
-    if (isUserLoggedIn && userData?.role) {
+
+  }, [userData, isUserLoggedIn]);
+
+
+  useEffect(() => {
+    if (isUserLoggedIn && userData?.role && subscription?.plan) {
       logUserActivity({
         action: "login/refresh",
         details: "User logged in or refreshed successfully",
       });
     }
-  }, [userData, isUserLoggedIn]);
+  }, [userData, isUserLoggedIn, subscription]);
+
 
   useEffect(() => {
     dispatch(getCurrentUser());
@@ -258,6 +265,7 @@ const App = () => {
           path: "/assignment-metrics",
           element: (
             <RouteGuard
+              conditions={[assignmentMetrics]}
               roleNames={["EMPLOYEE_SALES", "EMPLOYEE_REMINDER", "ADMIN"]}
             >
               <EmployeeAssignMetrics />

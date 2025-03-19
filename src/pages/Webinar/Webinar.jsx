@@ -38,7 +38,8 @@ const Webinar = () => {
   const { isLoading, isSuccess, webinarData, totalPages } = useSelector(
     (state) => state.webinarContact
   );
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, subscription } = useSelector((state) => state.auth);
+  const assignmentMetrics = subscription?.plan?.assignmentMetrics || false;
   const dateFormat = userData?.dateFormat || DateFormat.DD_MM_YYYY;
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -55,7 +56,6 @@ const Webinar = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
-
 
   useEffect(() => {
     setSearchParams({ page: page });
@@ -103,7 +103,7 @@ const Webinar = () => {
       ? [
           {
             icon: () => (
-              <Edit className="text-blue-500 group-hover:text-blue-600"  />
+              <Edit className="text-blue-500 group-hover:text-blue-600" />
             ),
             tooltip: "Edit Attendee",
             onClick: (item) => {
@@ -131,14 +131,16 @@ const Webinar = () => {
     <div className="px-6 md:px-10 pt-14 space-y-6">
       <div className="flex flex-wrap gap-4 justify-between">
         <ComponentGuard conditions={[userData?.isActive]}>
-        <Button
-            onClick={() => navigate(`/assignment-metrics`)}
-            className="h-10 whitespace-nowrap"
-            variant="contained"
-            color="secondary"
-          >
-            Assignment Metrics
-          </Button>
+          {assignmentMetrics && (
+            <Button
+              onClick={() => navigate(`/assignment-metrics`)}
+              className="h-10 whitespace-nowrap"
+              variant="contained"
+              color="secondary"
+            >
+              Assignment Metrics
+            </Button>
+          )}
           <Button
             onClick={() => dispatch(openModal(createWebinarModalName))}
             variant="contained"

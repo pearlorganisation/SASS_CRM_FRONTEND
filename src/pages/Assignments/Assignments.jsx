@@ -44,7 +44,10 @@ const Assignments = () => {
 
   const [selectedRows, setSelectedRows] = useState([]);
 
-  const { userData } = useSelector((state) => state.auth);
+  const { userData, subscription } = useSelector(
+    (state) => state.auth
+  );
+  const assignmentMetrics = subscription?.plan?.assignmentMetrics || false;
   const { assignData, isLoading, isSuccess, totalPages, assignLoading } =
     useSelector((state) => state.assign);
 
@@ -244,7 +247,7 @@ const Assignments = () => {
         className={`flex items-center gap-4 flex-wrap  justify-between`}
       >
         <div className="flex items-center gap-4">
-          {userData?.isActive && (
+          {userData?.isActive && assignmentMetrics && (
           <Button
             onClick={() => navigate(`/assignment-metrics`)}
             className="h-10 whitespace-nowrap"

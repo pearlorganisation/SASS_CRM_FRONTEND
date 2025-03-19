@@ -85,9 +85,9 @@ const PlanCard = (props) => {
     renewalNotAllowed,
     customRibbon,
     customRibbonColor,
+    assignmentMetrics,
   } = plan;
 
-  console.log("customRibbonColor", customRibbonColor, customRibbon);
 
   const { isCustomOptionsAllowed = false } = attendeeTableConfig || {};
 
@@ -216,6 +216,10 @@ const PlanCard = (props) => {
         <Feature
           label="Product Revenue Metrics"
           enabled={productRevenueMetrics}
+        />
+        <Feature
+          label="Employee Assignment Metrics"
+          enabled={assignmentMetrics}
         />
       </div>
 

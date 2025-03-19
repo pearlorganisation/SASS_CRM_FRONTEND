@@ -194,13 +194,13 @@ const RawTable = ({
                     {column.type === "product-chip" && (
                       <div
                         title={
-                          Array.isArray(row?.[column.key]) &&
+                          Array.isArray(row?.[column.key]) ?
                           row[column.key]
                             .map(
                               (item) =>
                                 `${item?.productName} (${item?.count ?? 0})`
                             )
-                            .join(", ")
+                            .join(", ") : undefined
                         }
                         className="flex flex-nowrap gap-2"
                       >

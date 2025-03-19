@@ -1,5 +1,17 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { deleteUserDocumet, generateOTP, getAllRoles, getCurrentUser, getSuperAdmin, getUserSubscription, logIn, signUp, updatePassword, updateUser, validateOTP } from "../actions/auth";
+import {
+  deleteUserDocumet,
+  generateOTP,
+  getAllRoles,
+  getCurrentUser,
+  getSuperAdmin,
+  getUserSubscription,
+  logIn,
+  signUp,
+  updatePassword,
+  updateUser,
+  validateOTP,
+} from "../actions/auth";
 import { toast } from "sonner";
 import { errorToast, successToast } from "../../utils/extra";
 import { socket } from "../../socket";
@@ -16,8 +28,8 @@ const initialState = {
   isRolesLoading: false,
   roles: [],
   subscription: null,
-  superAdminData:null,
-  isSomethingStillLoading:false
+  superAdminData: null,
+  isSomethingStillLoading: false,
 };
 
 // -------------------------------------- Slices------------------------------------------------
@@ -132,10 +144,10 @@ const authSlice = createSlice({
         state.subscription = action.payload;
       })
       .addCase(getUserSubscription.rejected, (state, action) => {
-        errorToast(action?.payload || 'Error getting user subscription');
+        errorToast(action?.payload || "Error getting user subscription");
       })
       .addCase(getCurrentUser.fulfilled, (state, action) => {
-        state.userData = action.payload?.data;
+        if (!state.userData) state.userData = action.payload?.data;
       })
       .addCase(deleteUserDocumet.pending, (state, action) => {
         state.isLoading = true;
@@ -171,20 +183,22 @@ const authSlice = createSlice({
         state.isSomethingStillLoading = true;
         state.isSuccess = false;
       })
-      
+
       .addCase(validateOTP.fulfilled, (state, action) => {
         state.isSomethingStillLoading = false;
         state.isSuccess = true;
-        successToast("OTP Validated Successfully! A new password has been sent to your email. Please check your mail and reset your password.");
+        successToast(
+          "OTP Validated Successfully! A new password has been sent to your email. Please check your mail and reset your password."
+        );
       })
       .addCase(validateOTP.rejected, (state, action) => {
         state.isSomethingStillLoading = false;
         errorToast(action?.payload);
-      })
+      });
   },
 });
 
-
 // ===========================================Exports==================================================
 export default authSlice.reducer;
-export const { logout, clearLoadingAndData, clearOTPGenerated } = authSlice.actions;
+export const { logout, clearLoadingAndData, clearOTPGenerated } =
+  authSlice.actions;

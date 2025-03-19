@@ -42,6 +42,19 @@ export const notificationSlice = createSlice({
         state.unseenCount = state.unseenCount + 1;
       }
     },
+
+    clearNotifications(state) {
+      state.bellNotifications = [];
+      state.notifications = [];
+      state.totalPages = 1;
+      state.unseenCount = 0;
+
+      state._bellNotifications = [];
+      state._notifications = [];
+      state._totalPages = 1;
+      state._unseenCount = 0;
+      
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -100,7 +113,7 @@ export const notificationSlice = createSlice({
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { newNotification } = notificationSlice.actions;
+export const { newNotification, clearNotifications } = notificationSlice.actions;
 export default notificationSlice.reducer;
 
 // ================================================== THE END ==================================================

@@ -23,6 +23,7 @@ export default function RouteGuard({ children, roleNames = [], conditions = [] }
       });
       if (!isAllowed) {
         navigate("/");
+        return ;
       }
     }
 
@@ -39,6 +40,7 @@ export default function RouteGuard({ children, roleNames = [], conditions = [] }
       // console.log("isAllowed", isAllowed);
       if (!isAllowed) {
         navigate("/");
+        return;
       }
     }
 

@@ -260,6 +260,7 @@ export default function AddPlan() {
       data["whatsappNotificationOnAlarms"];
     payload["setAlarm"] = data["setAlarm"];
     payload["productRevenueMetrics"] = data["productRevenueMetrics"];
+    payload["assignmentMetrics"] = data["assignmentMetrics"];
 
     if (planType === "custom") {
       payload["planType"] = "custom";
@@ -317,6 +318,7 @@ export default function AddPlan() {
         renewalNotAllowed: singlePlanData.renewalNotAllowed || false,
         customRibbon: singlePlanData.customRibbon || "",
         customRibbonColor: singlePlanData.customRibbonColor || "",
+        assignmentMetrics: singlePlanData.assignmentMetrics || false,
       });
 
       setPlanType(singlePlanData.planType || "normal");
@@ -600,7 +602,7 @@ export default function AddPlan() {
 
             <div className="flex justify-between mt-4 items-center">
               <Typography 
-                title="Enable tracking and analysis of product sales performance metrics"
+                title="Enable user to View Product Revenue Metrics"
                 className="font-semibold text-gray-800">
                 <span className="flex items-center">
                   Product Revenue Metrics
@@ -609,6 +611,27 @@ export default function AddPlan() {
               </Typography>
               <Controller
                 name="productRevenueMetrics"
+                control={control}
+                render={({ field: { onChange, value } }) => (
+                  <Checkbox
+                    onChange={(e) => onChange(e.target.checked)}
+                    checked={value || false}
+                  />
+                )}
+              />
+            </div>
+
+            <div className="flex justify-between mt-4 items-center">
+              <Typography 
+                title="Enable user to View Assignment Metrics"
+                className="font-semibold text-gray-800">
+                <span className="flex items-center">
+                  Assignment Metrics
+                  <InfoIcon className="ms-2 text-blue-600 text-sm" />
+                </span>
+              </Typography>
+              <Controller
+                name="assignmentMetrics"
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <Checkbox
