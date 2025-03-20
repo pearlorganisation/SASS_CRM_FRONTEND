@@ -146,7 +146,7 @@ const Header = () => {
 
             <div className="flex items-center">
               <ComponentGuard allowedRoles={[roles.ADMIN, roles.SUPER_ADMIN]}>
-                <ImportExportNotifications />
+                <ImportExportNotifications userData={userData} roles={roles} />
               </ComponentGuard>
               <NotificationBell
                 important={true}

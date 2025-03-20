@@ -1,27 +1,18 @@
 import React, { memo, Suspense, useState, lazy, useEffect } from "react";
 import {
-  Button,
-  IconButton,
   Pagination,
   Menu,
   MenuItem,
   ListItemIcon,
-  Typography,
-  Chip,
 } from "@mui/material";
 import PageLimitEditor from "../PageLimitEditor";
-// import BookmarkOutlinedIcon from "@mui/icons-material/BookmarkOutlined";
-import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
-// import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import DownloadOutlinedIcon from "@mui/icons-material/DownloadOutlined";
 import { useDispatch, useSelector } from "react-redux";
 import { openModal } from "../../features/slices/modalSlice";
 import RawTable from "./RawTable";
 const FilterPresetModal = lazy(() => import("../Filter/FilterPresetModal"));
 import useAddUserActivity from "../../hooks/useAddUserActivity";
 import ModalFallback from "../Fallback/ModalFallback";
-import { BookmarkIcon, FilterIcon } from "../SVGs";
-// import SortModal from "../SortModal";
+import { BookmarkIcon, FilterIcon, GreenDownloadIcon, ThreeDotsIcon } from "../SVGs";
 
 const DataTable = ({
   tableHeader = "Table",
@@ -58,6 +49,7 @@ const DataTable = ({
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
+    console.log("handleClick", event.currentTarget);
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
@@ -84,12 +76,11 @@ const DataTable = ({
               dispatch(openModal({ modalName: exportModalName }));
               handleClose();
             }}
-            
           >
             <ListItemIcon>
-              <DownloadOutlinedIcon color="success" fontSize="small" />
+            <img src={GreenDownloadIcon} alt="Download" className="h-4 w-4" />
             </ListItemIcon>
-            <Typography variant="inherit"> Export</Typography>
+            <span className="text-sm font-medium"> Export</span>
           </MenuItem>
         </Menu>
       </div>
@@ -127,7 +118,7 @@ const DataTable = ({
             {userData?.isActive &&
               tableUniqueKey !== "viewAssignmentsTable" &&
               exportModalName !== "" && (
-                <div className="flex justify-center items-center gap-4">
+                <div className="flex justify-center overflow-visible relative items-center gap-4">
                   {tableData.totalRecords ? (
                     <span className="font-semibold text-neutral-800">
                       Total Records:{" "}
@@ -137,15 +128,20 @@ const DataTable = ({
                     </span>
                   ) : null}
 
-                  <IconButton
-                    id="demo-positioned-button"
-                    aria-controls={open ? "demo-positioned-menu" : undefined}
-                    aria-haspopup="true"
-                    aria-expanded={open ? "true" : undefined}
+                  <button
+                    className="p-2 hover:bg-gray-200 rounded-full group"
                     onClick={handleClick}
                   >
-                    <MoreVertOutlinedIcon />
-                  </IconButton>
+                    <img src={ThreeDotsIcon} alt="Edit" className="h-6 w-6" />
+                  </button>
+
+                  {/* {
+                    true && (
+                      <div className="absolute right-0 bottom-0 bg-white shadow-md rounded-md p-2">
+                        <span>Export</span>
+                      </div>
+                    )
+                  } */}
                 </div>
               )}
           </div>

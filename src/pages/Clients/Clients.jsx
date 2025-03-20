@@ -18,12 +18,15 @@ const ClientFilterModal = lazy(() =>
 );
 import { openModal } from "../../features/slices/modalSlice";
 import { getAllClients } from "../../features/actions/client";
-import { Button } from "@mui/material";
 import ClientCard from "../../components/Client/ClientCard";
-import { MdVisibility, MdEdit, MdLogout } from "react-icons/md";
 import ModalFallback from "../../components/Fallback/ModalFallback";
 import { getPlansForDropdown } from "../../features/actions/pricePlan";
-import { VisibilityIcon } from "../../components/SVGs";
+import {
+  VisibilityIcon,
+  PencilEditIcon,
+  GreenLogoutIcon,
+  RedLogoutIcon,
+} from "../../components/SVGs";
 
 const Clients = () => {
   // ----------------------- ModalNames for Redux -----------------------
@@ -45,10 +48,10 @@ const Clients = () => {
   const actionIcons = [
     {
       icon: () => (
-        <img 
-          src={VisibilityIcon} 
+        <img
+          src={VisibilityIcon}
           alt="Visibility"
-          className="min-h-7 min-w-7"
+          className="min-h-6 min-w-6"
         />
       ),
       tooltip: "View Client Info",
@@ -58,7 +61,7 @@ const Clients = () => {
     },
     {
       icon: () => (
-        <MdEdit size={24} className="text-blue-500 group-hover:text-blue-600" />
+        <img src={PencilEditIcon} alt="Edit" className="min-h-6 min-w-6" />
       ),
       tooltip: "Edit Client",
       onClick: (item) => {
@@ -67,12 +70,11 @@ const Clients = () => {
     },
     {
       icon: (item) => (
-        <div className={`${item?.isActive ? "" : "rotate-180"}`}>
-          <MdLogout
-            size={24}
-            className={`${!item?.isActive ? "text-green-700" : "text-red-500"}`}
-          />
-        </div>
+        <img
+          src={item?.isActive ? GreenLogoutIcon : RedLogoutIcon}
+          alt="Toggle Status"
+          className="min-h-6 min-w-6"
+        />
       ),
       tooltip: "Toggle Status",
       onClick: (item) => {

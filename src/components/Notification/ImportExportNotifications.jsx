@@ -16,6 +16,7 @@ const ImportExportNotifications = ({ userData, roles }) => {
   const dropdownRef = useRef(null);
   const [progress, setProgress] = useState(0);
   const { userDocuments, isLoading, isExportLoading} = useSelector((state) => state.export);
+  const { isImporting } = useSelector((state) => state.attendee);
 
   const handleBellClick = () => {
     setIsOpen((prev) => !prev);
@@ -47,7 +48,6 @@ const ImportExportNotifications = ({ userData, roles }) => {
     dispatch(getUserDocuments({bell: true}));
   }, []);
 
-  const { isImporting } = useSelector((state) => state.attendee);
   useEffect(() => {
     setProgress(0)
     if (isExportLoading || isImporting) {
