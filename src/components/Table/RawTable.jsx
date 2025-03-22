@@ -25,7 +25,7 @@ const RawTable = ({
   const { isTablesMasked } = useSelector((state) => state.table);
   const tableRef = useRef();
 
-  // console.log("RawTable -> Rendered");
+  console.log("RawTable -> Rendered");
   const handleCheckboxChange = (id) => {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]
@@ -194,13 +194,14 @@ const RawTable = ({
                     {column.type === "product-chip" && (
                       <div
                         title={
-                          Array.isArray(row?.[column.key]) ?
-                          row[column.key]
-                            .map(
-                              (item) =>
-                                `${item?.productName} (${item?.count ?? 0})`
-                            )
-                            .join(", ") : undefined
+                          Array.isArray(row?.[column.key])
+                            ? row[column.key]
+                                .map(
+                                  (item) =>
+                                    `${item?.productName} (${item?.count ?? 0})`
+                                )
+                                .join(", ")
+                            : undefined
                         }
                         className="flex flex-nowrap gap-2"
                       >
@@ -339,4 +340,29 @@ const RawTable = ({
   );
 };
 
-export default memo(RawTable);
+export default memo(RawTable,areEqual);
+
+function areEqual(prevProps, nextProps) {
+  // Compare each prop to determine if the component should re-render
+  // console.log("tableData", prevProps.tableData === nextProps.tableData);
+  // console.log("actions", prevProps.actions === nextProps.actions);
+  // console.log(
+  //   "isSelectVisible",
+  //   prevProps.isSelectVisible === nextProps.isSelectVisible
+  // );
+  // console.log("isLoading", prevProps.isLoading === nextProps.isLoading);
+  // console.log(
+  //   "selectedRows",
+  //   prevProps.selectedRows === nextProps.selectedRows
+  // );
+  // console.log("locations", prevProps.locations === nextProps.locations);
+
+  return (
+    prevProps.tableData === nextProps.tableData &&
+    prevProps.actions === nextProps.actions &&
+    prevProps.isSelectVisible === nextProps.isSelectVisible &&
+    prevProps.isLoading === nextProps.isLoading &&
+    prevProps.selectedRows === nextProps.selectedRows &&
+    prevProps.locations === nextProps.locations
+  );
+}

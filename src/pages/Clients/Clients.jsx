@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import DataTable from "../../components/Table/DataTable";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -45,48 +45,51 @@ const Clients = () => {
   const openUpdateClientModal = modals[updateClientModalname] ? true : false;
 
   // ----------------------- Constants -----------------------
-  const actionIcons = [
-    {
-      icon: () => (
-        <img
-          src={VisibilityIcon}
-          alt="Visibility"
-          className="min-h-6 min-w-6"
-        />
-      ),
-      tooltip: "View Client Info",
-      onClick: (item) => {
-        navigate(`/view-client/${item?._id}`);
+  const actionIcons = useMemo(
+    () => [
+      {
+        icon: () => (
+          <img
+            src={VisibilityIcon}
+            alt="Visibility"
+            className="min-h-6 min-w-6"
+          />
+        ),
+        tooltip: "View Client Info",
+        onClick: (item) => {
+          navigate(`/view-client/${item?._id}`);
+        },
       },
-    },
-    {
-      icon: () => (
-        <img src={PencilEditIcon} alt="Edit" className="min-h-6 min-w-6" />
-      ),
-      tooltip: "Edit Client",
-      onClick: (item) => {
-        dispatch(openModal({ modalName: updateClientModalname, data: item }));
+      {
+        icon: () => (
+          <img src={PencilEditIcon} alt="Edit" className="min-h-6 min-w-6" />
+        ),
+        tooltip: "Edit Client",
+        onClick: (item) => {
+          dispatch(openModal({ modalName: updateClientModalname, data: item }));
+        },
       },
-    },
-    {
-      icon: (item) => (
-        <img
-          src={item?.isActive ? GreenLogoutIcon : RedLogoutIcon}
-          alt="Toggle Status"
-          className="min-h-6 min-w-6"
-        />
-      ),
-      tooltip: "Toggle Status",
-      onClick: (item) => {
-        dispatch(
-          openModal({
-            modalName: updateClientStatusModalName,
-            data: item,
-          })
-        );
+      {
+        icon: (item) => (
+          <img
+            src={item?.isActive ? GreenLogoutIcon : RedLogoutIcon}
+            alt="Toggle Status"
+            className="min-h-6 min-w-6"
+          />
+        ),
+        tooltip: "Toggle Status",
+        onClick: (item) => {
+          dispatch(
+            openModal({
+              modalName: updateClientStatusModalName,
+              data: item,
+            })
+          );
+        },
       },
-    },
-  ];
+    ],
+    []
+  );
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -102,6 +105,16 @@ const Clients = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState({});
   const [page, setPage] = useState(searchParams.get("page") || 1);
+
+  const tableData = useMemo(
+    () => {
+      return {
+        columns: clientTableColumns,
+        rows: clientsData,
+      };
+    },
+    [clientsData]
+  );
 
   // ----------------------- Functions -----------------------
   const ClientCards = (
@@ -149,10 +162,7 @@ const Clients = () => {
         filters={filters}
         setFilters={setFilters}
         ClientCards={ClientCards}
-        tableData={{
-          columns: clientTableColumns,
-          rows: clientsData,
-        }}
+        tableData={tableData}
         actions={actionIcons}
         totalPages={totalPages}
         page={page}

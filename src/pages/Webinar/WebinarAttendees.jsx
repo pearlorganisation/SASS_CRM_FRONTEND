@@ -7,7 +7,10 @@ const WebinarAttendeesPage = lazy(() => import("./WebinarAttendeesPage"));
 
 import { useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button, Tabs, Tab } from "@mui/material";
+import Button from "@mui/material/Button";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+
 import { createPortal } from "react-dom";
 import { AttachFile, ContentCopy } from "@mui/icons-material";
 import { getLeadType } from "../../features/actions/assign";
@@ -157,7 +160,7 @@ const WebinarAttendees = () => {
       </Tabs>
 
       <div className="flex gap-4 justify-between flex-wrap items-center">
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <Button
             onClick={() => copyToClipboard(id, "Webinar")}
             variant="outlined"
@@ -170,7 +173,7 @@ const WebinarAttendees = () => {
           {subTabValueRef.current === "attendees" &&
             tabValueRef.current !== "enrollments" &&
             userData?.isActive && (
-              <Button onClick={() => setSwapOpen(true)} variant="contained">
+              <Button className=" whitespace-nowrap" onClick={() => setSwapOpen(true)} variant="contained">
                 Swap Columns
               </Button>
             )}

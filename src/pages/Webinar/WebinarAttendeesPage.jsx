@@ -3,6 +3,7 @@ import React, {
   Suspense,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useState,
 } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -37,7 +38,6 @@ const SwapAttendeeFieldsModal = lazy(() =>
 import { createPortal } from "react-dom";
 import ModalFallback from "../../components/Fallback/ModalFallback";
 import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
-import FullScreen from "../../components/FullScreen";
 import { getLocations } from "../../features/actions/location";
 import { NotifActionType } from "../../utils/extra";
 import { socket } from "../../socket";
@@ -216,7 +216,7 @@ const WebinarAttendeesPage = (props) => {
     webinarAttendeesSortBy,
   ]);
 
-  const actionIcons = [
+  const actionIcons = useMemo(() => [
     {
       icon: () => (
         <Visibility className="text-indigo-500 group-hover:text-indigo-600" />
@@ -229,7 +229,25 @@ const WebinarAttendeesPage = (props) => {
       },
       readOnly: true,
     },
-  ];
+  ], [navigate]);
+
+
+  const tableData = useMemo(() => {
+    return {
+      columns:
+        tabValue === "postWebinar"
+
+          ? attendeeTableColumns
+          : attendeeTableColumns.filter(
+              (item) => item.key !== "timeInSession"
+            ),
+      totalRecords: total,
+      rows: attendeeData.map((row) => ({
+        ...row,
+        leadType: leadTypeData.find((lead) => lead._id === row?.leadType),
+      })),
+    };
+  }, [attendeeData, leadTypeData, tabValue, total ]);
 
   const handleColumnSwap = (field1, field2) => {
     dispatch(
@@ -308,27 +326,14 @@ const WebinarAttendeesPage = (props) => {
     );
   }, []);
   return (
-    <FullScreen>
+    <>
       <DataTable
         tableHeader={tableHeader}
         tableUniqueKey="webinarAttendeesTable"
         ButtonGroup={React.memo(AttendeeDropdown)}
         isSelectVisible={userData?.isActive}
         sortByOrder={webinarAttendeesSortBy?.sortOrder}
-        tableData={{
-          columns:
-            tabValue === "postWebinar"
-
-              ? attendeeTableColumns
-              : attendeeTableColumns.filter(
-                  (item) => item.key !== "timeInSession"
-                ),
-          totalRecords: total,
-          rows: attendeeData.map((row) => ({
-            ...row,
-            leadType: leadTypeData.find((lead) => lead._id === row?.leadType),
-          })),
-        }}
+        tableData={tableData}
         actions={actionIcons}
         totalPages={totalPages}
         page={page}
@@ -360,7 +365,6 @@ const WebinarAttendeesPage = (props) => {
           <AttendeesFilterModal
             modalName={AttendeesFilterModalName}
             setPage={setPage}
-            tabValue={tabValue}
           />
         </Suspense>
       )}
@@ -393,7 +397,7 @@ const WebinarAttendeesPage = (props) => {
           </Suspense>,
           document.body
         )}
-    </FullScreen>
+    </>
   );
 };
 

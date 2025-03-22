@@ -9,6 +9,7 @@ import LeadTypeIcon from './lead-type.svg'
 import ProductLevelIcon from './product-level.svg'
 import SidebarLinksIcon from './sidebar-links.svg'
 import DeleteIcon from './delete.svg'
+import WhatsappIcon from './whatsapp.svg'
 
 export {
     Plan,
@@ -21,6 +22,6 @@ export {
     LeadTypeIcon,
     ProductLevelIcon,
     SidebarLinksIcon,
-    DeleteIcon
-    
+    DeleteIcon,
+    WhatsappIcon
 }

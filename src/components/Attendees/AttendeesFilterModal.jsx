@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Modal,
-  Typography,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-} from "@mui/material";
+import React, { memo, useEffect, useState } from "react";
+import Box from "@mui/material/Box";
+import Modal from "@mui/material/Modal";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+
+
+
 import { useForm, Controller } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../features/slices/modalSlice";
@@ -23,7 +24,7 @@ import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice"
 import tagsService from "../../services/tagsService";
 import { getAllProductsByAdminId } from "../../features/actions/product";
 
-const FilterModal = ({ modalName, setPage, tabValue }) => {
+const FilterModal = ({ modalName, setPage }) => {
   const dispatch = useDispatch();
   const logUserActivity = useAddUserActivity();
 
@@ -463,4 +464,4 @@ const FilterModal = ({ modalName, setPage, tabValue }) => {
   );
 };
 
-export default FilterModal;
+export default memo(FilterModal);

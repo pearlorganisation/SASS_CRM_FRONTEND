@@ -53,6 +53,7 @@ export const cancelAlarm = createAsyncThunk(
 export const getUserAlarms = createAsyncThunk(
   "alarm/user/fetchData",
   async ({ id, year, month }, { rejectWithValue }) => {
+    if (!id) return;
     try {
       const response = await instance.get(`/alarm/user/${id}`, {
         params: { year, month },

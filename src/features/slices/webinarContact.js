@@ -8,7 +8,7 @@ import {
   deleteWebinar,
   getEmployeeWebinars,
   getAssignedEmployees,
-  } from "../actions/webinarContact";
+} from "../actions/webinarContact";
 import { errorToast, successToast } from "../../utils/extra";
 
 const initialState = {
@@ -18,6 +18,12 @@ const initialState = {
   isSuccess: false,
   errorMessage: "",
   assignedEmployees: [],
+  pagination: {
+    totalPages: 1,
+    page: 1,
+    total: 0,
+    limit: 10,
+  },
 };
 
 // ---------------------------------------------------------------------------------------
@@ -41,8 +47,9 @@ export const webinarContactSlice = createSlice({
       })
       .addCase(getAllWebinars.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.webinarData = action.payload.result || [];
-        state.totalPages = action.payload.totalPages;
+        const { result = [], pagination = {} } = action.payload;
+        state.webinarData = result;
+        state.pagination = pagination;
       })
       .addCase(getAllWebinars.rejected, (state, action) => {
         state.isLoading = false;
@@ -103,7 +110,7 @@ export const webinarContactSlice = createSlice({
         state.isLoading = false;
         errorToast(action?.payload);
       })
-      
+
       .addCase(getAssignedEmployees.pending, (state, action) => {
         state.isLoading = true;
       })
@@ -115,14 +122,17 @@ export const webinarContactSlice = createSlice({
         state.isLoading = false;
         errorToast(action?.payload);
       });
-
   },
 });
 
 // -------------------------------------------------------------------------
 
 // Action creators are generated for each case reducer function
-export const { resetAttendeeContactDetails, resetWebinarSuccess, clearAssignedEmployees } = webinarContactSlice.actions;
+export const {
+  resetAttendeeContactDetails,
+  resetWebinarSuccess,
+  clearAssignedEmployees,
+} = webinarContactSlice.actions;
 export default webinarContactSlice.reducer;
 
 // ================================================== THE END ==================================================

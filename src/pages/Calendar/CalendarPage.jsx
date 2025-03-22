@@ -38,6 +38,7 @@ const CalendarPage = () => {
 
   useEffect(() => {
     const date = new Date();
+    if(userData?._id)
     dispatch(
       getUserAlarms({
         id: employeeModeData ? employeeModeData?._id : userData?._id,

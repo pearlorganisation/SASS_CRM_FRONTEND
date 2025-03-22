@@ -57,7 +57,7 @@ export const noticeBoardSlice = createSlice({
       })
       .addCase(getNoticeBoard.rejected, (state, action) => {
         state.isLoading = false;
-        errorToast(action?.payload);
+        // errorToast(action?.payload);
       });
   },
 });

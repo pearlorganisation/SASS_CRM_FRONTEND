@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
+import React, { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@mui/material";
@@ -20,7 +20,6 @@ import { exportWebinarExcel } from "../../features/actions/export-excel";
 import { toast } from "sonner";
 import { setWebinarAttendeesFilters } from "../../features/slices/filters.slice";
 import ModalFallback from "../../components/Fallback/ModalFallback";
-import FullScreen from "../../components/FullScreen";
 import { DateFormat } from "../../utils/extra";
 
 const Webinar = () => {
@@ -35,9 +34,12 @@ const Webinar = () => {
   const navigate = useNavigate();
   const logUserActivity = useAddUserActivity();
 
-  const { isLoading, isSuccess, webinarData, totalPages } = useSelector(
+  const { isLoading, isSuccess, webinarData, pagination } = useSelector(
     (state) => state.webinarContact
   );
+
+  const { totalPages = 1, total = 0 } = pagination;
+
   const { userData, subscription } = useSelector((state) => state.auth);
   const assignmentMetrics = subscription?.plan?.assignmentMetrics || false;
   const dateFormat = userData?.dateFormat || DateFormat.DD_MM_YYYY;
@@ -57,13 +59,26 @@ const Webinar = () => {
   const [page, setPage] = useState(searchParams.get("page") || 1);
   const [filters, setFilters] = useState({});
 
+  const initialMount = useRef(true);
+
+  const fetchWebinars = useCallback(() => {
+    dispatch(getAllWebinars({ page, limit: LIMIT, filters }));
+  }, [page, LIMIT, filters]);
+
+  useEffect(() => {
+    if (initialMount.current) {
+      initialMount.current = false;
+      if (total === 0) {
+        fetchWebinars();
+      }
+    } else {
+      fetchWebinars();
+    }
+  }, [fetchWebinars]);
+
   useEffect(() => {
     setSearchParams({ page: page });
   }, [page]);
-
-  useEffect(() => {
-    dispatch(getAllWebinars({ page, limit: LIMIT, filters }));
-  }, [page, LIMIT, filters]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -150,7 +165,6 @@ const Webinar = () => {
           </Button>
         </ComponentGuard>
       </div>
-      <FullScreen>
         <DataTable
           tableHeader={tableHeader}
           tableUniqueKey="webinarTable"
@@ -159,6 +173,7 @@ const Webinar = () => {
           tableData={{
             columns: webinarTableColumns,
             rows: webinarData,
+            totalRecords: total,
           }}
           actions={actionIcons}
           totalPages={totalPages}
@@ -199,7 +214,6 @@ const Webinar = () => {
             dispatch(exportWebinarExcel({ limit, columns, filters }));
           }}
         />
-      </FullScreen>
     </div>
   );
 };

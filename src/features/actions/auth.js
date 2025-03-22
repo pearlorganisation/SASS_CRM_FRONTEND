@@ -182,4 +182,17 @@ export const validateOTP = createAsyncThunk(
   }
 );
 
-
+export const updateWhatsappToken = createAsyncThunk(
+  "user/updateWhatsappToken",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await instance.patch(
+        `users/super-admin/whatsapp-token`,
+        payload
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);

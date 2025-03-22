@@ -81,7 +81,6 @@ const WebinarAttendees = () => {
   ];
   return (
     <div className="px-6 md:px-10 pt-14 space-y-6">
-      <FullScreen>
         <DataTable
           tableHeader={tableHeader}
           tableUniqueKey="ViewAttendeesTable"
@@ -112,7 +111,6 @@ const WebinarAttendees = () => {
             />,
             document.body
           )}
-      </FullScreen>
       {exportModalOpen &&
         createPortal(
           <ExportModal

@@ -1,12 +1,7 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
-import { TextField, Button } from "@mui/material";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
 import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
 import { closeModal } from "../../features/slices/modalSlice";
@@ -143,18 +138,19 @@ const CreateWebinar = ({ modalName }) => {
     setSelectedEmployees([]);
   };
 
+  if (!open) return null;
+
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      fullWidth
-      maxWidth="sm"
-      disablePortal
-    >
-      <DialogTitle>{modalData ? "Edit Webinar" : "Create Webinar"}</DialogTitle>
-      <form className="py-2" onSubmit={handleSubmit(submitForm)}>
-        <DialogContent>
-          <div className="space-y-4 grid ">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-xl">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-semibold text-gray-800">
+            {modalData ? "Edit Webinar" : "Create Webinar"}
+          </h2>
+        </div>
+
+        <form onSubmit={handleSubmit(submitForm)}>
+          <div className="p-6 space-y-4">
             {/* Webinar Name */}
             <TextField
               label="Webinar Name"
@@ -169,23 +165,25 @@ const CreateWebinar = ({ modalName }) => {
             />
 
             {/* Webinar Date */}
-            <Controller
-              control={control}
-              name="webinarDate"
-              render={({ field }) => (
-                <DatePicker
-                  className="border p-2 rounded-lg w-full"
-                  selected={field.value}
-                  onChange={(date) => field.onChange(date)}
-                  placeholderText="Select Webinar Date"
-                  dateFormat={dateFormat}
-                  showYearDropdown
-                  minDate={new Date()}
-                  showMonthDropdown
-                  dropdownMode="select"
-                />
-              )}
-            />
+            <div className="border rounded-lg grid grid-cols-1 overflow-hidden">
+              <Controller
+                control={control}
+                name="webinarDate"
+                render={({ field }) => (
+                  <DatePicker
+                    className="w-full p-3 outline-none"
+                    selected={field.value}
+                    onChange={(date) => field.onChange(date)}
+                    placeholderText="Select Webinar Date"
+                    dateFormat={dateFormat}
+                    showYearDropdown
+                    minDate={new Date()}
+                    showMonthDropdown
+                    dropdownMode="select"
+                  />
+                )}
+              />
+            </div>
 
             {/* Employee Selection */}
             <div>
@@ -199,9 +197,7 @@ const CreateWebinar = ({ modalName }) => {
                 onChange={setSelectedEmployees}
                 placeholder="Select employees"
                 menuPortalTarget={document.body}
-                styles={{
-                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                }}
+                styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                 aria-label="Assign Employees"
               />
             </div>
@@ -224,38 +220,42 @@ const CreateWebinar = ({ modalName }) => {
                 isClearable={true}
                 placeholder="Select product"
                 menuPortalTarget={document.body}
-                styles={{
-                  menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                }}
+                styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
                 aria-label="Assign Product"
               />
             </div>
           </div>
-        </DialogContent>
 
-        <DialogActions>
-          <div className="flex justify-end gap-4 mb-4">
-            <Button onClick={handleClose} variant="outlined" color="secondary">
-              Cancel
-            </Button>
-            <Button
-              disabled={isLoading}
-              type="submit"
-              variant="contained"
-              color="primary"
-            >
-              {isLoading ? (
-                <ClipLoader color="#fff" className="mx-14 my-[2px]" size={20} />
-              ) : modalData ? (
-                "Update Webinar"
-              ) : (
-                "Create Webinar"
-              )}
-            </Button>
+          <div className="p-4 border-t border-gray-200">
+            <div className="flex justify-end gap-3">
+              <Button
+                onClick={handleClose}
+                variant="outlined"
+                color="secondary"
+                className="px-4 py-2"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={isLoading}
+                className="px-4 py-2"
+              >
+                {isLoading ? (
+                  <ClipLoader color="#fff" size={20} />
+                ) : modalData ? (
+                  "Update Webinar"
+                ) : (
+                  "Create Webinar"
+                )}
+              </Button>
+            </div>
           </div>
-        </DialogActions>
-      </form>
-    </Dialog>
+        </form>
+      </div>
+    </div>
   );
 };
 

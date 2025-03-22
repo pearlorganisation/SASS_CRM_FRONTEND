@@ -10,6 +10,7 @@ import {
   signUp,
   updatePassword,
   updateUser,
+  updateWhatsappToken,
   validateOTP,
 } from "../actions/auth";
 import { toast } from "sonner";
@@ -193,6 +194,19 @@ const authSlice = createSlice({
       })
       .addCase(validateOTP.rejected, (state, action) => {
         state.isSomethingStillLoading = false;
+        errorToast(action?.payload);
+      })
+      .addCase(updateWhatsappToken.pending, (state, action) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+      })
+      .addCase(updateWhatsappToken.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        successToast("Whatsapp Token Updated Successfully");
+      })
+      .addCase(updateWhatsappToken.rejected, (state, action) => {
+        state.isLoading = false;
         errorToast(action?.payload);
       });
   },
